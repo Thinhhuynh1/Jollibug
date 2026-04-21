@@ -237,7 +237,7 @@
             <a href="/cart">Cart &amp; Checkout</a>
             <a href="/forgot-password">Reset Password</a>
             <a href="/register">Create Account</a>
-            <a href="manager-dashboard.html">Admin Center</a>
+            <a href="/admin">Admin Center</a>
           </div>
         </div>
         <div>
