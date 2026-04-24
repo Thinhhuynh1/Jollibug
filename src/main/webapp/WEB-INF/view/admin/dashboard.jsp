@@ -27,59 +27,21 @@
 
   <div class="admin-shell admin-body" data-super-dashboard-root>
 
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-      <div class="admin-sidebar__inner">
-        <div class="admin-brand">
-          <div class="brand">
-            <span class="brand__mark">JB</span>
-            <span class="brand__copy">
-              <span class="brand__title">Jollibug Admin</span>
-              <span class="brand__tag">Control Center</span>
-            </span>
-          </div>
-          <span class="admin-role">Super Admin</span>
-          <p>System governance and role control</p>
-        </div>
-
-        <nav class="admin-nav">
-          <span class="admin-nav__section">Workspace</span>
-          <a class="is-active" href="/admin">Dashboard</a>
-          <a href="/admin/users">Manage Users</a>
-          <span class="admin-nav__section">Quick links</span>
-          <a href="client-home.html">Back to site</a>
-        </nav>
-      </div>
-    </aside>
+    <jsp:include page="layout/sidebar.jsp" />
 
     <!-- MAIN CONTENT -->
     <main class="admin-main">
 
-      <!-- Topbar - JS fills #topbar-user-* at runtime -->
-      <div class="admin-topbar">
-        <div class="admin-topbar__copy">
-          <strong>Jollibug Control Center</strong>
-          <span class="muted">Live admin-ready UI with modal CRUD and role-based navigation.</span>
-        </div>
-        <div class="admin-topbar__user">
-          <span class="admin-role">Super Admin</span>
-          <div class="admin-avatar" id="topbar-user-initials">--</div>
-          <div class="stack" style="gap:0.15rem;">
-            <strong id="topbar-user-name">Loading...</strong>
-            <span class="muted" id="topbar-user-role">Super Admin</span>
-          </div>
-          <button class="btn btn-outline" type="button" data-admin-logout id="btn-logout">Logout</button>
-        </div>
-      </div>
+      
+      <jsp:include page="layout/header.jsp" />
 
       <!-- DASHBOARD SECTION -->
       <section class="admin-dashboard">
 
         <!-- Static copy - no JS injection needed -->
         <div class="page-intro">
-          <span class="eyebrow">Super Admin View</span>
-          <h1 class="section-title">Govern role access and branch leadership.</h1>
-          <p class="lead">Separate manager oversight from staff operations while keeping onboarding and system health visible.</p>
+          <h1 class="section-title">Dashboard</h1>
+          <p class="lead">Phân tách giám sát của quản lý từ các hoạt động của nhân viên trong khi vẫn giữ việc đào tạo và sức khỏe hệ thống rõ ràng.</p>
         </div>
 
            <!-- METRIC CARDS
