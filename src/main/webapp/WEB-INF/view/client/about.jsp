@@ -73,30 +73,9 @@
   </main>
 
   <!-- SHARED FOOTER -->
-  <footer class="site-footer" id="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="stack"><div class="brand"><span class="brand__mark">JB</span><span class="brand__copy"><span class="brand__title">Jollibug</span><span class="brand__tag">Crave-worthy comfort, delivered fast</span></span></div><p>Ready for Spring MVC storefront.</p></div>
-        <div><h3>Explore</h3><div class="footer-links"><a href="/menu">Menu</a><a href="/about">About</a><a href="/contact">Contact</a></div></div>
-        <div><h3>Support</h3><div class="footer-links"><a href="/cart">Cart</a><a href="/login">Sign In</a></div></div>
-        <div><h3>Contact</h3><div class="footer-links"><span>hello@Jollibug.vn</span><span>+84 28 5555 8899</span></div></div>
-      </div>
-      <div class="footer-note"><span>&copy; <span data-current-year id="footer-year"></span> Jollibug.</span></div>
-    </div>
-  </footer>
+  <jsp:include page="layout/footer.jsp" />
 
-  <div class="drawer-backdrop" data-drawer-backdrop id="drawer-backdrop"></div>
-  <aside class="cart-drawer" data-cart-drawer id="cart-drawer" aria-label="Shopping cart drawer">
-    <div class="cart-drawer__header"><div class="card-actions"><div class="stack"><strong>Your order</strong><span class="muted">Fresh picks, saved instantly.</span></div><button class="btn btn-outline" type="button" data-action="close-cart">Close</button></div></div>
-    <div class="cart-drawer__body" data-drawer-items id="drawer-items"></div>
-    <div class="cart-drawer__footer stack"><div class="summary-line"><span>Total</span><strong data-drawer-total id="drawer-total">$0.00</strong></div><div class="cluster"><a class="btn btn-outline" href="/cart">Full Cart</a><button class="btn btn-primary" type="button" data-action="checkout-demo">Checkout Demo</button></div></div>
-  </aside>
-  <div class="toast-stack" data-toast-stack id="toast-stack"></div>
-  <template id="mini-cart-item-template"><article class="mini-cart-item"><div class="mini-cart-item__media" style="background:rgba(255,248,238,0.92);"><img data-item-image alt="" /></div><div class="stack" style="gap:0.2rem;"><strong data-item-name></strong><span class="muted" data-item-price-qty></span></div><button class="btn btn-outline" type="button" data-action="remove-cart-item" data-cart-id="">Remove</button></article></template>
-  <template id="cart-drawer-empty-template"><div class="empty-state"><h3>Your cart is still warming up.</h3><p class="muted">Add a burger, combo, or drink.</p><a class="btn btn-secondary" href="/menu">Browse menu</a></div></template>
-<script src="js/client/nav.js" defer></script>
-  <script src="js/client/store.js"></script>
-<script src="js/client/main.js" defer></script>
+
   </body>
 </html>
 

@@ -19,25 +19,11 @@
       </nav>
 
       <div class="header-actions">
-        
-        <button class="btn btn-primary" type="button" data-action="open-cart" id="btn-open-cart">
+        <a class="btn btn-primary" href="/cart"  >
           Giỏ hàng: <span data-cart-count id="header-cart-count">0</span>
-        </button>
+        </a>
         <a class="btn btn-outline" href="/login">Đăng nhập</a>
         <a class="btn btn-ghost" href="/profile">Tài khoản</a>
-      </div>
-    </div>
-
-    <!-- Mobile navigation panel -->
-    <div class="container mobile-nav" data-mobile-nav id="mobile-nav">
-      <div class="mobile-nav__panel">
-        <a class="is-active" href="/">Trang chủ</a>
-        <a href="/menu">Thực đơn</a>
-        <a href="/about">Giới thiệu</a>
-        <a href="/contact">Liên hệ</a>
-        <a href="/profile">Tài khoản</a>
-        <a href="/login">Đăng nhập</a>
-        <a href="/cart">Giỏ hàng</a>
       </div>
     </div>
   </header>

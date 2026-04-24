@@ -23,77 +23,86 @@
   <main class="page-shell checkout-main">
     <div class="container">
       <div class="page-intro">
-        <span class="eyebrow">Checkout</span>
-        <h1 class="section-title">Confirm Your Order</h1>
-        <p class="lead">Review your selected items, update delivery details, and complete your order.</p>
+        <h1 class="section-title">Thông tin đặt hàng</h1>
       </div>
 
       <div class="checkout-layout">
-        <section class="checkout-card">
-          <h2 class="checkout-card__title">Order Details</h2>
-
-          <div class="order-list" id="order-list" aria-live="polite"></div>
-
-          <div class="voucher-box">
-            <p class="section-subtitle">Voucher</p>
-            <div class="voucher-box__row">
-              <input type="text" id="voucher-input" placeholder="Enter voucher code (e.g. GIAM20)" />
-              <button class="btn btn-outline" type="button" id="btn-apply-voucher">Apply</button>
-            </div>
-            <p class="voucher-message" id="voucher-message"></p>
-          </div>
-
-          <section class="invoice-box" aria-label="Invoice summary">
-            <p class="section-subtitle">Payment Summary</p>
-            <div class="invoice-line"><span>Subtotal</span><strong id="invoice-subtotal">0 VND</strong></div>
-            <div class="invoice-line"><span>Delivery Fee</span><strong id="invoice-delivery-fee">0 VND</strong></div>
-            <div class="invoice-line"><span>Discount / Voucher</span><strong id="invoice-discount">0 VND</strong></div>
-            <div class="invoice-line invoice-line--total"><span>Total</span><strong id="invoice-total">0 VND</strong></div>
-          </section>
-        </section>
 
         <section class="checkout-card checkout-sticky">
-          <h2 class="checkout-card__title">Delivery Information</h2>
           <form class="delivery-form" id="delivery-form">
             <label class="field-label">
-              <span>Full Name</span>
+              <span>Họ tên</span>
               <input type="text" id="delivery-name" required />
             </label>
 
             <label class="field-label">
-              <span>Phone Number</span>
+              <span>Số điện thoại</span>
               <input type="tel" id="delivery-phone" required />
             </label>
 
             <label class="field-label">
-              <span>Delivery Address</span>
+              <span>Địa chỉ email</span>
+              <input type="tel" id="delivery-phone" required />
+            </label>
+
+            <label class="field-label">
+              <span>Địa chỉ đặt hàng</span>
               <textarea id="delivery-address" required></textarea>
             </label>
           </form>
 
-          <button class="btn btn-outline" type="button" id="btn-open-address-modal">Choose another address</button>
+          <button class="btn btn-outline" type="button" id="btn-open-address-modal">Đổi địa chỉ</button>
 
           <section>
-            <h3 class="section-subtitle">Payment Method</h3>
+            <h3 class="section-subtitle">Phương thức thanh toán</h3>
             <div class="payment-options" role="radiogroup" aria-label="Payment method">
               <label class="payment-option">
                 <input type="radio" name="payment-method" value="cod" checked />
                 <div>
-                  <strong>Cash on Delivery (COD)</strong>
+                  <strong>Thanh toán khi nhận háng (COD)</strong>
                 </div>
               </label>
 
               <label class="payment-option">
                 <input type="radio" name="payment-method" value="online" />
                 <div>
-                  <strong>Card / E-wallet</strong>
+                  <strong>Thanh toán bằng ATM/ Ví điện tử</strong>
                 </div>
               </label>
             </div>
           </section>
 
-          <button class="btn btn-primary btn-block" type="button" id="btn-place-order">Place Order</button>
+          <button class="btn btn-primary btn-block" type="button" id="btn-place-order">Đặt hàng</button>
         </section>
+        <section class="checkout-card">
+          <h2 class="checkout-card__title">Tóm tắt đơn hàng</h2>
+          <div>
+            <div class="invoice-line ">
+              <strong>1xGa</strong>
+              <strong>0 VND</strong>
+            </div>
+            <div class="invoice-line ">
+              <strong>2xHamburger</strong>
+              <strong>0 VND</strong>
+            </div>
+            <div class="invoice-line ">
+              <strong>10xPizza</strong>
+              <strong>0 VND</strong>
+            </div>
+          </div>
+
+          <hr class="checkout-divider" />
+
+          <div>
+            <div class="invoice-line "><span>Subtotal</span><strong id="invoice-subtotal">0 VND</strong></div>
+            <div class="invoice-line"><span>Delivery Fee</span><strong id="invoice-delivery-fee">0 VND</strong></div>
+            <div class="invoice-line"><span>Discount / Voucher</span><strong id="invoice-discount">0 VND</strong></div>
+            <div class="invoice-line "><span>Total</span><strong id="invoice-total">0 VND</strong></div>
+          </div>
+        
+        </section>
+
+        
       </div>
     </div>
   </main>

@@ -13,11 +13,12 @@
 }
 
 .checkout-card {
-  border-radius: 24px;
+  --checkout-card-pad: clamp(1rem, 2.5vw, 1.45rem);
+  border-radius: 10px;
   background: #ffffff;
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-md);
-  padding: clamp(1rem, 2.5vw, 1.45rem);
+  padding: var(--checkout-card-pad);
   display: grid;
   gap: 1rem;
 }
@@ -256,3 +257,14 @@
     top: 6.4rem;
   }
 }
+
+.checkout-divider {
+  display: block;
+  justify-self: stretch;
+  width: 100%;
+  margin: 0;
+  margin-inline: 0;
+  border: 0;
+  border-top: 1px dashed #222;
+}
+

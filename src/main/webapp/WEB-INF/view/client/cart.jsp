@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -22,52 +22,93 @@
   <main class="page-shell section-tight">
     <div class="container">
       <div class="page-intro">
-        <span class="eyebrow">Cart</span>
-        <h1 class="page-title">My Cart</h1>
-        <p class="lead">Review your selected meals before placing the order.</p>
+        <h1 class="page-title">Giỏ hàng của tôi</h1>
       </div>
 
       <div class="cart-shell">
         <section class="cart-column">
           <article class="cart-panel">
-            <h2 class="cart-panel__title">My Cart</h2>
-            <div class="cart-item-list" id="cart-item-list" aria-live="polite"></div>
-            <div class="empty-state hidden" id="cart-empty-state">
-              <h3>Your cart is empty</h3>
-              <p class="muted">Add delicious items from the menu to continue.</p>
-              <a class="btn btn-primary" href="/menu">Browse Menu</a>
+            <div class="cart-item-list">
+              <article class="cart-line">
+                <div class="cart-line__thumb">
+                  <img src="https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg"
+                       alt="Combo Cung Vui"
+                       style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+                </div>
+                <div class="cart-line__meta">
+                  <h3 class="cart-line__name">Combo Cung Vui</h3>
+                  <p class="cart-line__unit">6 x Ga Gion Cay | Tang 3 lon Pepsi</p>
+                  <div class="cart-line__controls">
+                    <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
+                    <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
+                      <div class="qty-stepper" aria-label="Chinh so luong">
+                        <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
+                        <span class="qty-stepper__value">1</span>
+                        <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
+                      </div>
+                      <strong class="cart-line__sum">199.000 VND</strong>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="cart-line">
+                <div class="cart-line__thumb">
+                  <img src="https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg"
+                       alt="Combo Cung Vui"
+                       style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+                </div>
+                <div class="cart-line__meta">
+                  <h3 class="cart-line__name">Combo Cung Vui</h3>
+                  <p class="cart-line__unit">6 x Ga Gion Cay | Tang 3 lon Pepsi</p>
+                  <div class="cart-line__controls">
+                    <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
+                    <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
+                      <div class="qty-stepper" aria-label="Chinh so luong">
+                        <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
+                        <span class="qty-stepper__value">1</span>
+                        <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
+                      </div>
+                      <strong class="cart-line__sum">199.000 VND</strong>
+                    </div>
+                  </div>
+                </div>
+              </article>
             </div>
           </article>
         </section>
 
         <aside class="summary-column">
           <article class="summary-panel">
-            <h2 class="summary-panel__title">Order Summary</h2>
-            <p class="summary-count" id="summary-item-count">0 ITEMS</p>
+            <div style="display:flex; align-items:center; width:100%;">
+              <h2 class="summary-panel__title">Tổng sản phẩm </h2>
+              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">0 ITEMS</h2>
+            </div>
 
             <div class="voucher-inline">
-              <p class="section-subtitle">Have a promo code?</p>
+              <p class="section-subtitle">Bạn có Mã giảm giá?</p>
               <div class="voucher-inline__row">
                 <input id="voucher-code" type="text" placeholder="Enter promo code" />
-                <button class="btn btn-outline voucher-inline__apply" id="voucher-apply" type="button">Apply</button>
+                <button class="btn btn-outline voucher-inline__apply" id="voucher-apply" type="button">Áp dụng</button>
               </div>
               <p class="summary-note" id="voucher-note"></p>
             </div>
 
             <div class="summary-lines">
-              <div class="summary-line"><span>Subtotal</span><strong id="summary-subtotal">0 VND</strong></div>
-              <div class="summary-line summary-line--strong"><span>Total</span><strong id="summary-total">0 VND</strong></div>
+              <div class="summary-line"><span>Tạm tính</span><strong id="summary-subtotal">0 VND</strong></div>
+              <div class="summary-line"><span>Giảm giá</span><strong id="summary-subtotal">0 VND</strong></div>
+              <div class="summary-line summary-line--strong"><span>Tổng tiền</span><strong id="summary-total">0 VND</strong></div>
             </div>
 
-            <button class="btn btn-primary btn-block" type="button" id="checkout-button">Checkout</button>
+            <a class="btn btn-primary btn-block" type="button" id="checkout-button" href="/checkout">Thanh toán</a>
           </article>
         </aside>
       </div>
     </div>
   </main>
 
-  <script src="js/client/nav.js" defer></script>
-  <script src="js/client/cart.js" defer></script>
+  <!-- SHARED FOOTER -->
+  <jsp:include page="layout/footer.jsp" />
+
 </body>
 </html>
-
