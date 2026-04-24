@@ -78,10 +78,6 @@
           </div>
         </section>
 
-        <div class="menu-results reveal-up">
-
-          <strong data-menu-count id="menu-count">3 items ready</strong>
-        </div>
         <section class="card-grid" data-menu-grid id="menu-grid" aria-label="Menu items">
           <article class="card product-card reveal-up">
             <div class="product-card__media" style="background:rgba(255,248,238,0.92);">

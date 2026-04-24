@@ -195,7 +195,6 @@
 .btn-primary {
   background: var(--color-red-500);
   color: #ffffff;
-  box-shadow: 0 10px 20px rgba(230, 0, 0, 0.22);
 }
 
 .btn-primary:hover {
@@ -1280,9 +1279,8 @@
 }
 
 .client-tab.is-active {
-  background: var(--color-surface-strong);
-  color: #ffffff;
-  box-shadow: 0 10px 20px rgba(230, 0, 0, 0.2);
+  background: var(--color-red-500);
+  color: black;
 }
 
 .orders-list {

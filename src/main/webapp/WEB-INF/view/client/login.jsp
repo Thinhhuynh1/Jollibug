@@ -24,44 +24,25 @@
 
   <main class="page-shell">
     <section class="section">
-      <div class="container">
-        
-
-          <!-- SECTION -->
-
-
-          <!-- Form panel -->
+      <div class="container" style="width: min(700px, calc(100% - 1.5rem * 2));">
           <article class="auth-panel reveal-up">
             <div class="auth-panel__content">
               <div class="page-intro" style="margin-bottom:0;">
-                <span class="eyebrow">Sign In</span>
-                <h2 class="section-title">Access your Jollibug account</h2>
+                <h2 class="section-title">Đăng nhập vào Jollibug</h2>
               </div>
-              <div class="social-grid">
-                <button class="btn btn-outline social-btn" type="button">Continue with Google</button>
-                <button class="btn btn-outline social-btn" type="button">Continue with Facebook</button>
-              </div>
-              <div class="divider">or continue with email</div>
-              <!--
-                [data-demo-form] -> main.js bindDemoForms() attaches a submit listener.
-                data-success-message -> toast message on success.
-                Future Spring MVC: action="/login" method="post" + remove data-demo-form.
-              -->
-              <form class="floating-grid" data-demo-form
-                    data-success-message="Signed in demo successfully."
-                    id="login-form" novalidate>
+              <form class="floating-grid" >
                 <div class="floating-field">
                   <input id="login-email" name="email" type="email" placeholder=" " required />
-                  <label for="login-email">Email address</label>
+                  <label for="login-email">Email</label>
                 </div>
                 <div class="floating-field">
                   <input id="login-password" name="password" type="password" placeholder=" " required minlength="6" />
-                  <label for="login-password">Password</label>
+                  <label for="login-password">Mật khẩu</label>
                 </div>
-                <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+                <button class="btn btn-primary btn-block" type="submit">Đăng nhập</button>
               </form>
               <div class="card-actions">
-                <a href="/register">Create new account</a>
+                <a href="/register">Bạn chưa có tài khoản? Đăng ký</a>
               </div>
             </div>
           </article>
@@ -74,9 +55,6 @@
   <!-- SHARED FOOTER -->
   <jsp:include page="layout/footer.jsp" />
 
-<script src="js/client/nav.js" defer></script>
-  <script src="js/client/store.js"></script>
-<script src="js/client/main.js" defer></script>
   </body>
 </html>
 
