@@ -41,7 +41,7 @@
   --radius-md: 8px;
   --radius-lg: 8px;
   --radius-xl: 8px;
-  --radius-round: 999px;
+  --radius-round: 20px;
 
   --shadow-sm: 0 10px 20px rgba(26, 26, 26, 0.09);
   --shadow-md: 0 16px 30px rgba(26, 26, 26, 0.12);
@@ -275,6 +275,6 @@ table {
 
 @media (min-width: 768px) {
   .container {
-    width: min(var(--max-width), calc(100% - 2rem * 2));
+    width: min(1400px, calc(100% - 2rem * 2));
   }
 }

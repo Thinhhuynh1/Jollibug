@@ -1,3 +1,4 @@
+//cuộn danh sách trái phải
 (function () {
   var strip = document.querySelector("[data-menu-cats]");
   if (!strip) return;

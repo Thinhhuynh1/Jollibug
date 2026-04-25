@@ -91,11 +91,7 @@
           <h2 class="section-title">Guest favorites designed to convert fast.</h2>
           <p class="lead">A premium storefront needs a menu grid that feels energetic but intentional. These cards are driven from a shared catalog and can later be populated from your backend.</p>
         </div>
-        <!--
-          JS (main.js -> renderHomeFeatured):
-          Clones #product-card-template for each featured product
-          and appends clones into this container.
-        -->
+
         <div class="card-grid" data-home-featured id="home-featured-grid">
           <article class="card product-card reveal-up">
             <div class="product-card__media" style="background:rgba(255,248,238,0.92);">
@@ -152,9 +148,7 @@
               <h3 class="section-title">Jollibug signature moodboard</h3>
             </div>
             <!--
-              JS (main.js -> renderHomeCravings):
-              Clones #promo-tile-template for each burger/combo
-              and appends into this grid.
+
             -->
             <div class="grid" data-home-cravings id="home-cravings-grid">
               <article class="promo-tile reveal-up">

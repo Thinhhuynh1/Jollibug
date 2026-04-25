@@ -38,16 +38,18 @@
             <div class="profile-grid">
               <label class="profile-field">
                 <span>Tên người nhận</span>
-                <input type="text" placeholder="Ví dụ: Nguyễn Văn A" />
+                <input type="text" id="delivery-name" placeholder="Ví dụ: Nguyễn Văn A" />
               </label>
               <label class="profile-field">
                 <span>Số điện thoại</span>
-                <input type="text" placeholder="Ví dụ: 0903 123 456" />
+                <input type="text" id="delivery-phone" placeholder="Ví dụ: 0903 123 456" />
               </label>
             </div>
-            <label class="profile-field">
+            <label class="profile-field" style="position: relative;">
               <span>Địa chỉ</span>
-              <input type="text" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" />
+              <input type="text" id="delivery-address" autocomplete="off" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" />
+              <!-- Dropdown gợi ý địa chỉ -->
+              <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
             </label>
             <div class="modal__actions">
               <a href="/address" class="btn btn-ghost">Hủy</a>
@@ -61,5 +63,7 @@
   </main>
       <!-- SHARED FOOTER -->
   <jsp:include page="../layout/footer.jsp" />
+  
+  <script src="/js/client/main.js"></script>
 </body>
 </html>

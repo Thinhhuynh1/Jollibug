@@ -85,22 +85,13 @@
               <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">0 MÓN</h2>
             </div>
 
-            <div class="voucher-inline">
-              <p class="section-subtitle">Bạn có Mã giảm giá?</p>
-              <div class="voucher-inline__row">
-                <input id="voucher-code" type="text" placeholder="Enter promo code" />
-                <button class="btn btn-outline voucher-inline__apply" id="voucher-apply" type="button">Áp dụng</button>
-              </div>
-              <p class="summary-note" id="voucher-note"></p>
-            </div>
+
 
             <div class="summary-lines">
-              <div class="summary-line"><span>Tạm tính</span><strong id="summary-subtotal">0 VND</strong></div>
-              <div class="summary-line"><span>Giảm giá</span><strong id="summary-subtotal">0 VND</strong></div>
               <div class="summary-line summary-line--strong"><span>Tổng tiền</span><strong id="summary-total">0 VND</strong></div>
             </div>
 
-            <a class="btn btn-primary btn-block" type="button" id="checkout-button" href="/checkout">Thanh toán</a>
+            <a class="btn btn-primary btn-block" type="button" id="checkout-button" href="/checkout">Đặt hàng</a>
           </article>
         </aside>
       </div>

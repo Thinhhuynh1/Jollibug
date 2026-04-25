@@ -36,16 +36,18 @@
             <div class="profile-grid">
               <label class="profile-field">
                 <span>Tên người nhận</span>
-                <input type="text" value="Nguyễn Minh Khôi" />
+                <input type="text" id="delivery-name" value="Nguyễn Minh Khôi" />
               </label>
               <label class="profile-field">
                 <span>Số điện thoại</span>
-                <input type="text" value="0903 456 789" />
+                <input type="text" id="delivery-phone" value="0903 456 789" />
               </label>
             </div>
-            <label class="profile-field">
+            <label class="profile-field" style="position: relative;">
               <span>Địa chỉ</span>
-              <input type="text" value="128 Nguyễn Trãi, Phường 3, Quận 5, TP. Hồ Chí Minh" />
+              <input type="text" id="delivery-address" autocomplete="off" value="128 Nguyễn Trãi, Phường 3, Quận 5, TP. Hồ Chí Minh" />
+              <!-- Dropdown gợi ý địa chỉ -->
+              <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
             </label>
             <div class="modal__actions">
               <button type="button" class="btn btn-primary">Cập nhật</button>
@@ -58,5 +60,7 @@
   </main>
       <!-- SHARED FOOTER -->
   <jsp:include page="../layout/footer.jsp" />
+  
+  <script src="/js/client/main.js"></script>
 </body>
 </html>
