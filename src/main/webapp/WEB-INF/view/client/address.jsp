@@ -23,7 +23,7 @@
   <jsp:include page="layout/header.jsp" />
 
   <main class="profile-page">
-    <div class="container">
+    <div class="container container--account-wide">
       <div class="profile-layout">
         <aside class="profile-sidebar">
           <div class="profile-sidebar__avatar">U</div>
@@ -55,6 +55,7 @@
       </div>
     </div>
   </main>
-
-</body>
+      <!-- SHARED FOOTER -->
+  <jsp:include page="layout/footer.jsp" />
+</body> 
 </html>

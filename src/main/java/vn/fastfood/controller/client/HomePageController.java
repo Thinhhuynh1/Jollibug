@@ -17,9 +17,9 @@ public class HomePageController {
         return "client/about";
     }
 
-    @GetMapping("/contact")
+    @GetMapping("/chat")
     public String getContactPage() {
-        return "client/contact";
+        return "client/chat";
     }
 
     @GetMapping("/menu")

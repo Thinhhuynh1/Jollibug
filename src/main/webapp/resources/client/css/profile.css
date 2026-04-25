@@ -6,10 +6,14 @@ body[data-page="profile"] {
     padding: 2rem 0 4rem;
 }
 
+.container--account-wide {
+    width: min(1400px, calc(100% - 1.5rem * 2));
+}
+
 .profile-layout {
     display: grid;
-    grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: minmax(280px, 320px) minmax(0, 1.35fr);
+    gap: 2rem;
     align-items: start;
 }
 
@@ -213,6 +217,10 @@ body[data-page="profile"] {
     grid-template-columns: 1fr;
     }
 
+    .container--account-wide {
+    width: min(var(--max-width), calc(100% - 1.5rem * 2));
+    }
+
     .profile-sidebar {
     position: static;
     }
@@ -289,4 +297,115 @@ body[data-page="orders"] .orders-product__thumb {
     border-radius: 12px;
     object-fit: cover;
     flex-shrink: 0;
+}
+
+body[data-page="orders"] .order-detail {
+    display: grid;
+    gap: 1.5rem;
+}
+
+body[data-page="orders"] .order-detail__summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+body[data-page="orders"] .order-detail__info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+body[data-page="orders"] .order-detail__summary-card,
+body[data-page="orders"] .order-detail__info-card,
+body[data-page="orders"] .order-detail__total {
+    border: 1px solid rgba(26, 26, 26, 0.08);
+    border-radius: 16px;
+    background: #faf7f5;
+    padding: 1rem 1.1rem;
+}
+
+body[data-page="orders"] .order-detail__section {
+    display: grid;
+    gap: 1rem;
+}
+
+body[data-page="orders"] .order-detail__title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #1a1a1a;
+}
+
+body[data-page="orders"] .order-detail__label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+body[data-page="orders"] .order-detail__summary-card strong,
+body[data-page="orders"] .order-detail__info-card strong,
+body[data-page="orders"] .order-detail__total strong {
+    color: #111827;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+body[data-page="orders"] .order-detail__info-card--full {
+    grid-column: 1 / -1;
+}
+
+body[data-page="orders"] .orders-table--detail th:last-child,
+body[data-page="orders"] .orders-table--detail td:last-child,
+body[data-page="orders"] .orders-table--detail th:nth-child(3),
+body[data-page="orders"] .orders-table--detail td:nth-child(3) {
+    text-align: right;
+}
+
+body[data-page="orders"] .orders-product--detail {
+    min-width: 320px;
+    white-space: normal;
+}
+
+body[data-page="orders"] .orders-product__copy strong {
+    display: block;
+    color: #111827;
+    font-size: 1rem;
+}
+
+body[data-page="orders"] .order-detail__total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #fff1f2;
+}
+
+body[data-page="orders"] .order-detail__total span {
+    color: #374151;
+    font-weight: 700;
+}
+
+body[data-page="orders"] .order-detail__total strong {
+    color: #e11b22;
+    font-size: 1.35rem;
+    font-weight: 900;
+}
+
+@media (max-width: 768px) {
+    body[data-page="orders"] .order-detail__summary,
+    body[data-page="orders"] .order-detail__info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body[data-page="orders"] .orders-product--detail {
+        min-width: 240px;
+    }
+
+    body[data-page="orders"] .order-detail__total {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

@@ -82,7 +82,7 @@
           <article class="summary-panel">
             <div style="display:flex; align-items:center; width:100%;">
               <h2 class="summary-panel__title">Tổng sản phẩm </h2>
-              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">0 ITEMS</h2>
+              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">0 MÓN</h2>
             </div>
 
             <div class="voucher-inline">

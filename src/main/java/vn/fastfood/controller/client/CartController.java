@@ -17,9 +17,4 @@ public class CartController {
         return "client/checkout";
     }
 
-    @GetMapping("/orders")
-    public String getOrderPage() {
-        return "client/orders";
-    }
-
 }

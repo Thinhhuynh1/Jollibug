@@ -14,8 +14,7 @@
       <nav class="main-nav" aria-label="Primary">
         <a class="is-active" href="/">Trang chủ</a>
         <a href="/menu">Thực đơn</a>
-        <a href="/about">Giới thiệu</a>
-        <a href="/contact">Liên hệ</a>
+        <a href="/chat">Nhắn tin</a>
       </nav>
 
       <div class="header-actions">

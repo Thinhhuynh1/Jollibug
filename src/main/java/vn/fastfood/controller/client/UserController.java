@@ -21,34 +21,4 @@ public class UserController {
         return "client/forgot-password";
     }
 
-    @GetMapping("/reset-password")
-    public String getResetPasswordPage() {
-        return "client/reset-password";
-    }
-
-    @GetMapping("/profile")
-    public String getProfilePage() {
-        return "client/profile";
-    }
-
-    @GetMapping("/address")
-    public String getAddressPage() {
-        return "client/address/show";
-    }
-
-    @GetMapping("/address/create")
-    public String getAddressCreate() {
-        return "client/address/create";
-    }
-
-    @GetMapping("/address/update")
-    public String getAddressUpdate() {
-        return "client/address/update";
-    }
-
-    @GetMapping("/address/delete")
-    public String getAddressDelete() {
-        return "client/address/delete";
-    }
-
 }

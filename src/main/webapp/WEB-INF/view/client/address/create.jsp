@@ -50,8 +50,8 @@
               <input type="text" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" />
             </label>
             <div class="modal__actions">
+              <a href="/address" class="btn btn-ghost">Hủy</a>
               <button type="button" class="btn btn-primary">Lưu địa chỉ</button>
-              <button type="button" class="btn btn-ghost">Hủy</button>
             </div>
           </article>
 
@@ -59,6 +59,7 @@
       </div>
     </div>
   </main>
-
+      <!-- SHARED FOOTER -->
+  <jsp:include page="../layout/footer.jsp" />
 </body>
 </html>

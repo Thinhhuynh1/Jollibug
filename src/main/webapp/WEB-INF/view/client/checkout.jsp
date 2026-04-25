@@ -128,8 +128,9 @@
     </div>
   </div>
 
-  <script src="js/client/nav.js" defer></script>
-  <script src="js/client/checkout.js" defer></script>
+    <!-- SHARED FOOTER -->
+  <jsp:include page="layout/footer.jsp" />
+
 </body>
 </html>
 

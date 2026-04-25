@@ -18,22 +18,23 @@
 </head>
 <body data-page="orders">
 
-  <jsp:include page="layout/header.jsp" />
+  <jsp:include page="../layout/header.jsp" />
 
   <main class="profile-page">
-    <div class="container">
-      <div class="profile-layout">
-        <jsp:include page="layout/sidebar-profile.jsp" />
+    <div class="container container--account-wide">
+      <div class="profile-layout ">
+        <jsp:include page="../layout/sidebar-profile.jsp" />
 
         <section class="profile-content">
-          <div class="page-intro">
-            <h1 class="section-title">Đơn hàng của tôi</h1>
-          </div>
+          <h1 class="section-title">Đơn hàng của tôi</h1>
 
           <div class="client-tabs" role="tablist" aria-label="Order views">
-            <button class="client-tab is-active" type="button" role="tab">Tất cả</button>
-            <button class="client-tab" type="button" role="tab">Đang xử lý</button>
-            <button class="client-tab" type="button" role="tab">Lịch sử</button>
+            <a class="client-tab is-active" type="button" role="tab" href="/orders">Tất cả</a>
+            <a class="client-tab" type="button" role="tab" href="/orders/pending">Đang xử lý</a>
+            <a class="client-tab" type="button" role="tab" href="/orders/cofirmed">Đã xác nhận</a>
+            <a class="client-tab" type="button" role="tab" href="/orders/shipping">Đang giao hàng</a>
+            <a class="client-tab" type="button" role="tab" href="/orders/delivered">Đã giao</a>
+            <a class="client-tab" type="button" role="tab" href="/orders/reviews">Đánh giá</a>
           </div>
 
           <section class="orders-list">
@@ -42,56 +43,51 @@
                 <table class="orders-table">
                   <thead>
                     <tr>
-                      <th>Tên đơn hàng</th>
+                      <th>Mã đơn hàng</th>
                       <th>Số lượng</th>
-                      <th>Giá sản phẩm</th>
                       <th>Tổng tiền</th>
                       <th>Trạng thái</th>
+                      <th>Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td>
-                        <div class="orders-product">
-                          <img class="orders-product__thumb" src="https://placehold.co/64x64?text=Burger" alt="Burger combo" />
-                          <span>Combo Gà Rán 2 Miếng</span>
-                        </div>
+                        <strong>#DH002</strong>
                       </td>
                       <td>2</td>
-                      <td>89.000đ</td>
+                      
                       <td>178.000đ</td>
                       <td>
                         <span class="order-card__status" data-status="preparing">Đang chuẩn bị</span>
                       </td>
+                      <td><a class="btn btn-ghost" type="button" href="/orders/detail">Chi tiết đơn hàng</a></td>
                     </tr>
                     <tr>
                       <td>
-                        <div class="orders-product">
-                          <img class="orders-product__thumb" src="https://placehold.co/64x64?text=Pizza" alt="Pizza hải sản" />
-                          <span>Pizza Hải Sản Cỡ Vừa</span>
-                        </div>
+                        <strong>#DH001</strong>
                       </td>
                       <td>2</td>
-                      <td>129.000đ</td>
+                      
                       <td>258.000đ</td>
                       <td>
                         <span class="order-card__status" data-status="on_the_way">Đang giao</span>
                       </td>
+                      <td><a class="btn btn-ghost" type="button" href="/orders/detail">Chi tiết đơn hàng</a></td>
                     </tr>
                     <tr>
                       <td>
-                        <div class="orders-product">
-                          <img class="orders-product__thumb" src="https://placehold.co/64x64?text=Tea" alt="Trà sữa trân châu" />
-                          <span>Trà Sữa Trân Châu Đường Đen</span>
-                        </div>
+                        <strong>#DH003</strong>
                       </td>
                       <td>2</td>
-                      <td>45.000đ</td>
+                      
                       <td>90.000đ</td>
                       <td>
                         <span class="order-card__status" data-status="delivered">Đã giao</span>
                       </td>
+                      <td><a class="btn btn-ghost" type="button" href="/orders/detail">Chi tiết đơn hàng</a></td>                  
                     </tr>
+                  
                   </tbody>
                 </table>
               </div>
@@ -101,6 +97,7 @@
       </div>
     </div>
   </main>
-
+      <!-- SHARED FOOTER -->
+  <jsp:include page="../layout/footer.jsp" />
 </body>
 </html>

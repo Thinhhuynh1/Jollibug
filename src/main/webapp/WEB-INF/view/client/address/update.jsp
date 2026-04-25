@@ -49,13 +49,14 @@
             </label>
             <div class="modal__actions">
               <button type="button" class="btn btn-primary">Cập nhật</button>
-              <button type="button" class="btn btn-ghost">Hủy</button>
+              <a href="/address" class="btn btn-ghost">Hủy</a>
             </div>
           </article>
         </section>
       </div>
     </div>
   </main>
-
+      <!-- SHARED FOOTER -->
+  <jsp:include page="../layout/footer.jsp" />
 </body>
 </html>

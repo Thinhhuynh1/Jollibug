@@ -22,7 +22,7 @@
   <jsp:include page="layout/header.jsp" />
 
   <main class="profile-page">
-    <div class="container">
+    <div class="container container--account-wide">
       <div class="profile-layout">
         <jsp:include page="layout/sidebar-profile.jsp" />
 
@@ -54,6 +54,7 @@
       </div>
     </div>
   </main>
-
+      <!-- SHARED FOOTER -->
+  <jsp:include page="layout/footer.jsp" />
 </body>
 </html>
