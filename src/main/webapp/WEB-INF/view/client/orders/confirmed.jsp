@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/global.css" />
   <link rel="stylesheet" href="/css/components.css" />
-  <link rel="stylesheet" href="/client/css/profile.css">
+  <link rel="stylesheet" href="/css/client/profile.css">
 </head>
 <body data-page="orders">
 
@@ -35,6 +35,7 @@
             <a class="client-tab" type="button" role="tab" href="/orders/shipping">Đang giao hàng</a>
             <a class="client-tab" type="button" role="tab" href="/orders/delivered">Đã giao</a>
             <a class="client-tab" type="button" role="tab" href="/orders/reviews">Đánh giá</a>
+            <a class="client-tab" type="button" role="tab" href="/orders/cancelled">Đã hủy</a>
           </div>
 
           <section class="orders-list">
@@ -62,7 +63,10 @@
                       <td>
                         <span class="order-card__status" data-status="on_the_way">Đã xác nhận</span>
                       </td>
-                      <td><a class="btn btn-ghost" type="button" href="/orders/detail">Chi tiết đơn hàng</a></td>
+                                            <td>
+                        <a class="btn btn-ghost" type="button" href="/orders/detail">Chi tiết đơn hàng</a>
+                        <a class="btn btn-ghost" type="button" href="/orders/cancel">Hủy đơn hàng</a>
+                    </td>
                     </tr>
 
                   </tbody>

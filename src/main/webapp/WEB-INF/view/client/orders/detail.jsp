@@ -1,4 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -12,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/global.css" />
   <link rel="stylesheet" href="/css/components.css" />
-  <link rel="stylesheet" href="/client/css/profile.css">
+  <link rel="stylesheet" href="/css/client/profile.css">
 </head>
 <body data-page="orders">
 

@@ -8,7 +8,7 @@
     <div class="admin-topbar__user">
         <div class="admin-avatar" id="topbar-user-initials">JB</div>
         <div class="stack" style="gap:0.15rem;">
-        <span class="muted" id="topbar-user-role">Admin</span>
+        <span class="muted" id="topbar-user-role">Quản trị viên</span>
         </div>
         <button class="btn btn-outline" type="button" data-admin-logout id="btn-logout">Đăng xuất</button>
     </div>

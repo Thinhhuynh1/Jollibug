@@ -25,10 +25,13 @@
   <main class="page-shell">
     <section class="section">
       <div class="container">
-
+        <div class="page-intro">
+          <h1 class="section-title">Thực đơn Jollibug</h1>
+        </div>
 
         <!-- SECTION -->
         <section class="menu-toolbar reveal-up" aria-label="Menu filters">
+          
           <div class="toolbar-row">
             <div class="searchbar">
               <!--
@@ -134,7 +137,7 @@
   
 
   </body>
-  <script src="client/store.js"></script>  <!-- mui ten qua lai danh muc-->
+  <script src="js/client/main.js"></script>  <!-- mui ten qua lai danh muc-->
 </html>
 
 

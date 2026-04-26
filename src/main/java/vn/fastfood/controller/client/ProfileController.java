@@ -61,6 +61,16 @@ public class ProfileController {
         return "client/orders/delivered";
     }
 
+    @GetMapping("/orders/cancelled")
+    public String getOrderCancelled() {
+        return "client/orders/cancelled";
+    }
+
+    @GetMapping("/orders/cancel")
+    public String getOrderCancel() {
+        return "client/orders/cancel";
+    }
+
     @GetMapping("/orders/detail")
     public String getOrderDetail() {
         return "client/orders/detail";

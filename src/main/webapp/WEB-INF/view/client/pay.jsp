@@ -15,7 +15,7 @@
 
   <link rel="stylesheet" href="/css/global.css" />
   <link rel="stylesheet" href="/css/components.css" />
-  <link rel="stylesheet" href="/css/client-checkout.css" />
+  <link rel="stylesheet" href="/css/client/client-checkout.css" />
 </head>
 <body class="checkout-page" data-page="checkout">
   <jsp:include page="layout/header.jsp"/>

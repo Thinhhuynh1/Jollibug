@@ -33,16 +33,10 @@
     <main class="admin-main">
 
       
-      <jsp:include page="layout/header.jsp" />
+      <jsp:include page="layout/topbar.jsp" />
 
       <!-- DASHBOARD SECTION -->
       <section class="admin-dashboard">
-
-        <!-- Static copy - no JS injection needed -->
-        <div class="page-intro">
-          <h1 class="section-title">Dashboard</h1>
-          <p class="lead">Phân tách giám sát của quản lý từ các hoạt động của nhân viên trong khi vẫn giữ việc đào tạo và sức khỏe hệ thống rõ ràng.</p>
-        </div>
 
            <!-- METRIC CARDS
              Each <strong id="..."> is an injection target.

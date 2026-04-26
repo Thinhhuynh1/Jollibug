@@ -29,13 +29,14 @@
           <h1 class="section-title">Đơn hàng của tôi</h1>
 
           <div class="client-tabs" role="tablist" aria-label="Order views">
-            <a class="client-tab " type="button" role="tab" href="/orders">Tất cả</a>
+            <a class="client-tab" type="button" role="tab" href="/orders">Tất cả</a>
             <a class="client-tab" type="button" role="tab" href="/orders/pending">Đang xử lý</a>
             <a class="client-tab" type="button" role="tab" href="/orders/confirmed">Đã xác nhận</a>
             <a class="client-tab" type="button" role="tab" href="/orders/shipping">Đang giao hàng</a>
-            <a class="client-tab is-active" type="button" role="tab" href="/orders/delivered">Đã giao</a>
+            <a class="client-tab" type="button" role="tab" href="/orders/delivered">Đã giao</a>
             <a class="client-tab" type="button" role="tab" href="/orders/reviews">Đánh giá</a>
-            <a class="client-tab" type="button" role="tab" href="/orders/cancelled">Đã hủy</a>
+            <a class="client-tab is-active" type="button" role="tab" href="/orders/cancelled">Đã hủy</a>
+            
           </div>
 
           <section class="orders-list">
@@ -54,19 +55,19 @@
                   <tbody>
                     <tr>
                       <td>
-                        <strong>#DH003</strong>
+                        <strong>#DH002</strong>
                       </td>
                       <td>2</td>
                       
-                      <td>90.000đ</td>
+                      <td>178.000đ</td>
                       <td>
-                        <span class="order-card__status" data-status="delivered">Đã giao</span>
+                        <span class="order-card__status" data-status="preparing">Đã hủy</span>
                       </td>
                       <td>
                         <a class="btn btn-ghost" type="button" href="/orders/detail">Chi tiết đơn hàng</a>
-                        <a class="btn btn-ghost" type="button" href="/orders/reviews/create">Thêm đánh giá</a>
-                      </td>                  
+                    </td>
                     </tr>
+
                   
                   </tbody>
                 </table>

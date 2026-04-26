@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
 </head>
 
 <!--
@@ -26,58 +26,18 @@
 
   <div class="admin-shell admin-body" data-admin-table-root>
 
-    <!-- SECTION -->
-    <aside class="admin-sidebar">
-      <div class="admin-sidebar__inner">
-        <div class="admin-brand">
-          <div class="brand">
-            <span class="brand__mark">JB</span>
-            <span class="brand__copy">
-              <span class="brand__title">Jollibug Admin</span>
-              <span class="brand__tag">Control Center</span>
-            </span>
-          </div>
-          <span class="admin-role">Manager</span>
-          <p>Menu, catalog, and order operations</p>
-        </div>
-
-        <nav class="admin-nav">
-          <span class="admin-nav__section">Workspace</span>
-          <a href="/admin">Dashboard</a>
-          <a href="/categories">Manage Categories</a>
-          <a class="is-active" href="/products">Manage Products</a>
-          <a href="manager-orders.html">Manage Orders</a>
-          <span class="admin-nav__section">Quick links</span>
-          <a href="index.html">Back to site</a>
-        </nav>
-      </div>
-    </aside>
+    <jsp:include page="layout/sidebar.jsp" />
 
     <!-- SECTION -->
     <main class="admin-main">
 
-      <!-- SECTION -->
-      <div class="admin-topbar">
-        <div class="admin-topbar__copy">
-          <strong>Jollibug Control Center</strong>
-          <span class="muted">Product catalog management - visuals, pricing, and stock.</span>
-        </div>
-        <div class="admin-topbar__user">
-          <span class="admin-role">Manager</span>
-          <div class="admin-avatar" id="topbar-user-initials">--</div>
-          <div class="stack" style="gap:0.15rem;">
-            <strong id="topbar-user-name">Loading...</strong>
-            <span class="muted" id="topbar-user-role">Manager</span>
-          </div>
-          <button class="btn btn-outline" type="button" data-admin-logout id="btn-logout">Logout</button>
-        </div>
-      </div>
+      <!-- Top bar -->
+      <jsp:include page="layout/topbar.jsp" />
 
       <!-- SECTION -->
       <section class="admin-panel">
         <div class="panel-header">
           <div class="stack" style="gap:0.3rem;">
-            <span class="eyebrow" id="admin-table-eyebrow">Manager</span>
             <h1 class="section-title" id="admin-table-title">Manage Products</h1>
             <p class="muted" id="admin-table-subtitle"></p>
           </div>
@@ -176,34 +136,6 @@
   </div>
 
 
-  <!-- SECTION
-       PRODUCT DETAIL SLIDE-OVER PANEL
-       Triggered by: [data-admin-view] on each product row.
-       JS (showDetail / closeDetail in product.js):
-         * removes .sdp--hidden to open, adds it back to close
-         * fills [id="sdp-*"] slots via textContent / src / dataset only
-         * NEVER uses innerHTML for structural markup
-
-       SOC contract:
-         -œ…  All structure is here - JS injects data values only.
-         -œ…  Animation is pure CSS (transform + opacity transitions).
-         -œ…  Backdrop [data-sdp-close] closes on click.
-         -Œ  JS does NOT build or return HTML strings.
-
-       Product-specific slots:
-         sdp-product       -> overlay <aside>
-         sdp-product-image -> <img> - src + alt set by JS
-         sdp-product-name  -> product name heading
-         sdp-product-price -> formatted price
-         sdp-product-cat   -> category pill
-         sdp-product-badge -> featured / stock badge
-         sdp-product-id    -> ID field
-         sdp-product-status -> status badge
-         sdp-edit-btn      -> "Edit product" shortcut
-
-       Future Spring MVC:
-         <%@ include file="/WEB-INF/view/shared/product-detail-panel.jsp" %>
-  -->
   <aside class="sdp sdp--hidden"
          id="sdp-product"
          role="dialog"

@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -19,62 +22,13 @@
 
   <div class="admin-shell admin-body" data-staff-orders-root>
 
-    <!-- SECTION -->
-    <aside class="admin-sidebar">
-      <div class="admin-sidebar__inner">
-        <div class="admin-brand">
-          <div class="brand">
-            <span class="brand__mark">JB</span>
-            <span class="brand__copy">
-              <span class="brand__title">Jollibug Staff</span>
-              <span class="brand__tag">Operations Portal</span>
-            </span>
-          </div>
-          <span class="admin-role">Staff</span>
-          <p>Order fulfilment and customer support</p>
-        </div>
-        <nav class="admin-nav">
-          <span class="admin-nav__section">Workspace</span>
-          <a class="is-active" href="/orders">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-              <rect x="9" y="3" width="6" height="4" rx="1"/>
-              <path d="M9 12h6M9 16h4"/>
-            </svg>
-            Order Management
-          </a>
-          <a href="/support">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            Customer Support
-          </a>
-          <span class="admin-nav__section">Quick links</span>
-          <a href="client-home.html">Back to site</a>
-          <a href="index.html">Dev Portal</a>
-        </nav>
-      </div>
-    </aside>
+    <jsp:include page="layout/sidebar.jsp" />
 
     <!-- SECTION -->
     <main class="admin-main">
 
       <!-- Topbar -->
-      <div class="admin-topbar">
-        <div class="admin-topbar__copy">
-          <strong>Jollibug Operations Center</strong>
-          <span class="muted">Live order queue - view details, update status, or remove orders.</span>
-        </div>
-        <div class="admin-topbar__user">
-          <span class="admin-role">Staff</span>
-          <div class="admin-avatar" id="topbar-user-initials" aria-hidden="true">ST</div>
-          <div class="stack" style="gap:0.15rem;">
-            <strong id="topbar-user-name">Staff Member</strong>
-            <span class="muted" id="topbar-user-role">Staff · Orders</span>
-          </div>
-          <button class="btn btn-outline" type="button" id="btn-logout">Logout</button>
-        </div>
-      </div>
+      <jsp:include page="layout/topbar.jsp" />
 
       <!-- SECTION -->
       <div class="metric-grid" style="margin-bottom:var(--space-6);">
@@ -128,16 +82,6 @@
 
       <!-- SECTION -->
       <section class="admin-panel">
-        <div class="panel-header">
-          <div class="stack" style="gap:0.3rem;">
-            <span class="eyebrow">Staff View</span>
-            <h1 class="section-title">Order Management</h1>
-            <p class="muted">Showing active and historical orders.</p>
-          </div>
-          <div class="panel-controls">
-            <span class="muted" id="orders-result-count" style="align-self:center;font-size:0.88rem;">0 orders</span>
-          </div>
-        </div>
 
         <div class="table-wrap admin-table-wrap">
           <table class="admin-table" id="orders-table">

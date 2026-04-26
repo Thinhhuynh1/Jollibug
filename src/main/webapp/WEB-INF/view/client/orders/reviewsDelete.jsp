@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/global.css" />
   <link rel="stylesheet" href="/css/components.css" />
-  <link rel="stylesheet" href="/client/css/profile.css">
+  <link rel="stylesheet" href="/css/client/profile.css">
 </head>
 <body data-page="orders">
 
@@ -35,15 +35,13 @@
               <p style="color: #e52b34; font-size: 0.95rem; margin-top: 4px;">* Lưu ý: Hành động này không thể hoàn tác.</p>
             </div>
 
-            <form action="/client/orders/reviews/delete" method="post" class="review-form">
               <input type="hidden" name="orderId" value="DH001" />
               <input type="hidden" name="reviewId" value="REV001" />
 
               <div class="form-actions">
                 <a href="/orders/delivered" class="btn btn-secondary">Hủy bỏ</a>
-                <button type="submit" class="btn btn-primary">Xác Nhận Xóa</button>
+                <button type="submit" class="btn btn-primary">Xác Nhận</button>
               </div>
-            </form>
           </div>
           
         </section>

@@ -30,7 +30,7 @@
 
     <main class="admin-main">
 
-      <jsp:include page="layout/header.jsp" />
+      <jsp:include page="layout/topbar.jsp" />
 
       <div class="metric-grid" style="margin-bottom:var(--space-6);">
         <article class="metric-card">

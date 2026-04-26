@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-// Cuộn danh sách Voucher trái phải (Kế thừa từ store.js)
+// Cuộn danh sách trai phai
 (function () {
     var strip = document.querySelector("[data-voucher-list]");
     if (!strip) return;
@@ -119,6 +119,41 @@ document.addEventListener("DOMContentLoaded", function() {
     window.addEventListener("resize", updateArrows);
     
     // Cập nhật mũi tên sau khi DOM render xong
+    setTimeout(updateArrows, 100);
+})();
+
+// Cuộn danh mục món ăn trái/phải ở trang menu
+(function () {
+    var strip = document.querySelector("[data-menu-cats]");
+    if (!strip) return;
+
+    var prevBtn = document.querySelector("[data-cat-arrow='prev']");
+    var nextBtn = document.querySelector("[data-cat-arrow='next']");
+    if (!prevBtn || !nextBtn) return;
+
+    function scrollStep() {
+        return Math.max(140, Math.floor(strip.clientWidth * 0.6));
+    }
+
+    function updateArrows() {
+        var maxScroll = strip.scrollWidth - strip.clientWidth;
+        var hasOverflow = maxScroll > 1;
+
+        prevBtn.style.display = (!hasOverflow || strip.scrollLeft <= 1) ? "none" : "flex";
+        nextBtn.style.display = (!hasOverflow || strip.scrollLeft >= maxScroll - 1) ? "none" : "flex";
+    }
+
+    prevBtn.addEventListener("click", function () {
+        strip.scrollBy({ left: -scrollStep(), behavior: "smooth" });
+    });
+
+    nextBtn.addEventListener("click", function () {
+        strip.scrollBy({ left: scrollStep(), behavior: "smooth" });
+    });
+
+    strip.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+
     setTimeout(updateArrows, 100);
 })();
 
@@ -185,6 +220,44 @@ document.addEventListener("DOMContentLoaded", function() {
             if (position !== length) {
                 target.setSelectionRange(position, position);
             }
+        });
+    }
+
+    // Xử lý Hủy đơn hàng (Trang Cancel)
+    const cancelForm = document.getElementById('cancelOrderForm');
+    if (cancelForm) {
+        const otherReasonRadio = document.getElementById('otherReasonRadio');
+        const otherReasonContainer = document.getElementById('otherReasonContainer');
+        const reasonRadios = document.querySelectorAll('input[name="reason"]');
+        const otherTextarea = otherReasonContainer.querySelector('textarea');
+
+        function toggleOtherReason() {
+            if (otherReasonRadio.checked) {
+                otherReasonContainer.style.display = 'block';
+                // Focus vào textarea khi hiện
+                if (otherTextarea) otherTextarea.focus();
+            } else {
+                otherReasonContainer.style.display = 'none';
+            }
+        }
+
+        reasonRadios.forEach(radio => {
+            radio.addEventListener('change', toggleOtherReason);
+        });
+
+        // Chạy lần đầu để kiểm tra trạng thái mặc định
+        toggleOtherReason();
+
+        // Auto-expand textarea
+        if (otherTextarea) {
+            otherTextarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+
+        cancelForm.addEventListener('submit', function(e) {
+            console.log('Đang kiểm tra trạng thái đơn hàng và gửi yêu cầu hủy...');
         });
     }
 });

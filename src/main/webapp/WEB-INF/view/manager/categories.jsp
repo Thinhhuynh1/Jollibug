@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
 </head>
 
 <!--
@@ -26,67 +26,17 @@
 
   <div class="admin-shell admin-body" data-admin-table-root>
 
-    <!-- SECTION -->
-    <aside class="admin-sidebar">
-      <div class="admin-sidebar__inner">
-        <div class="admin-brand">
-          <div class="brand">
-            <span class="brand__mark">JB</span>
-            <span class="brand__copy">
-              <span class="brand__title">Jollibug Admin</span>
-              <span class="brand__tag">Control Center</span>
-            </span>
-          </div>
-          <span class="admin-role">Manager</span>
-          <p>Menu, catalog, and order operations</p>
-        </div>
-
-        <nav class="admin-nav">
-          <span class="admin-nav__section">Workspace</span>
-          <a href="/admin">Dashboard</a>
-          <a class="is-active" href="/categories">Manage Categories</a>
-          <a href="/products">Manage Products</a>
-          <a href="manager-orders.html">Manage Orders</a>
-          <span class="admin-nav__section">Quick links</span>
-          <a href="index.html">Back to site</a>
-        </nav>
-      </div>
-    </aside>
+    <jsp:include page="layout/sidebar.jsp" />
 
     <!-- SECTION -->
     <main class="admin-main">
 
-      <!-- SECTION -->
-      <div class="admin-topbar">
-        <div class="admin-topbar__copy">
-          <strong>Jollibug Control Center</strong>
-          <span class="muted">Category taxonomy management with live CRUD.</span>
-        </div>
-        <div class="admin-topbar__user">
-          <span class="admin-role">Manager</span>
-          <div class="admin-avatar" id="topbar-user-initials">--</div>
-          <div class="stack" style="gap:0.15rem;">
-            <strong id="topbar-user-name">Loading...</strong>
-            <span class="muted" id="topbar-user-role">Manager</span>
-          </div>
-          <button class="btn btn-outline" type="button" data-admin-logout id="btn-logout">Logout</button>
-        </div>
-      </div>
+      <!-- Top bar -->
+      <jsp:include page="layout/topbar.jsp" />
 
-      <!-- SECTION
-           JS slots:
-             #admin-table-eyebrow   -> role label
-             #admin-table-title     -> page title
-             #admin-table-subtitle  -> subtitle
-             #admin-table-search    -> placeholder + oninput
-             #admin-table-add-button -> button label
-             #admin-table-head-row  -> <th> nodes
-             #admin-table-body      -> <tr> clones
-      -->
       <section class="admin-panel">
         <div class="panel-header">
           <div class="stack" style="gap:0.3rem;">
-            <span class="eyebrow" id="admin-table-eyebrow">Manager</span>
             <h1 class="section-title" id="admin-table-title">Manage Categories</h1>
             <p class="muted" id="admin-table-subtitle"></p>
           </div>
@@ -136,12 +86,6 @@
     </main>
   </div><!-- /data-admin-table-root -->
 
-
-  <!-- SECTION
-       TEMPLATES
-       Row template: cells 0-4 -> [Category, Slug, Items, Status, Actions(View+Edit+Delete)].
-       JS category.js populates [data-cell="n"] via config.columns[n].render().
-  -->
   <template id="admin-table-row-template">
     <tr>
       <td data-cell="0"></td>
@@ -185,32 +129,7 @@
   </div>
 
 
-  <!-- SECTION
-       CATEGORY DETAIL SLIDE-OVER PANEL
-       Triggered by: [data-admin-view] on each table row.
-       JS (showDetail / closeDetail in category.js):
-         * removes .sdp--hidden to open, adds it back to close
-         * fills [id="sdp-*"] slots via textContent / dataset only
-         * NEVER uses innerHTML to inject structural markup
 
-       SOC contract:
-         -œ…  All structure is here - JS only injects data values.
-         -œ…  Animation is pure CSS (transform + opacity transitions).
-         -œ…  Backdrop [data-sdp-close] closes the panel on click.
-         -Œ  JS does NOT build or return HTML strings.
-
-       Element IDs:
-         sdp-category -> overlay <aside>
-         sdp-icon     -> category initial circle
-         sdp-name     -> category name heading
-         sdp-id       -> identity section - ID
-         sdp-slug     -> identity section - URL slug
-         sdp-status   -> status badge
-         sdp-items    -> metric - total products
-         sdp-edit-btn -> "Edit this category" shortcut
-
-       Future Spring MVC:
-         <%@ include file="/WEB-INF/view/shared/category-detail-panel.jsp" %>
   -->
   <aside class="sdp sdp--hidden"
          id="sdp-category"

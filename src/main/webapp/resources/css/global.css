@@ -184,7 +184,7 @@ table {
 }
 
 .section {
-  padding-block: clamp(3.5rem, 7vw, 6rem);
+  padding-block: clamp(3.5rem, 7vw, 3rem);
 }
 
 .section-tight {
