@@ -86,6 +86,11 @@ public class ProfileController {
         return "client/orders/reviewsCreate";
     }
 
+    @GetMapping("/orders/reviews/view")
+    public String getReviewsView() {
+        return "client/orders/reviewsView";
+    }
+
     @GetMapping("/orders/reviews/update")
     public String getReviewsUpdate() {
         return "client/orders/reviewsUpdate";

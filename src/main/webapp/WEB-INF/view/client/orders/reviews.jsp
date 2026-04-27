@@ -63,6 +63,7 @@
                         <span class="order-card__status" data-status="delivered">Đã đánh giá</span>
                       </td>
                       <td>
+                        <a class="btn btn-ghost" type="button" href="/orders/reviews/view">Xem đánh giá</a>
                         <a class="btn btn-ghost" type="button" href="/orders/reviews/update">Sửa đánh giá</a>
                         <a class="btn btn-ghost" type="button" href="/orders/reviews/delete">Xóa đánh giá</a>
                     </td>                  
