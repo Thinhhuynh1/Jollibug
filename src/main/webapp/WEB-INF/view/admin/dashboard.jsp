@@ -6,179 +6,117 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Super Admin Dashboard</title>
-  <meta name="description" content="Jollibug Super Admin - govern role access, branch leadership, and system health." />
+  <title>Jollibug | Admin Dashboard</title>
+  <meta name="description" content="Jollibug Super Admin dashboard for managing users, roles, and account status." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/admin.css" />
-
+  <link rel="stylesheet" href="<c:url value='/css/global.css'/>" />
+  <link rel="stylesheet" href="<c:url value='/css/components.css'/>" />
+  <link rel="stylesheet" href="<c:url value='/css/admin.css'/>" />
 </head>
 
-<!--
-  data-admin-role="admin" -> Spring Security enforces ROLE_SUPER_ADMIN
-  data-admin-page="dashboard"   -> dashboard.js picks the correct render branch
--->
-<body data-admin-role="admin" data-admin-page="dashboard">
+  <body data-admin-role="admin" data-admin-page="manage-users">
 
-  <div class="admin-shell admin-body" data-super-dashboard-root>
-
+  <div class="admin-shell admin-body" data-admin-table-root>
     <jsp:include page="layout/sidebar.jsp" />
 
-    <!-- MAIN CONTENT -->
     <main class="admin-main">
 
-      
       <jsp:include page="layout/topbar.jsp" />
 
-      <!-- DASHBOARD SECTION -->
       <section class="admin-dashboard">
+        <section class="admin-panel" style="margin-bottom:var(--space-6); position:relative; overflow:hidden;">
+          <div style="position:absolute; inset:auto -6rem -5rem auto; width:16rem; height:16rem; border-radius:50%; background:radial-gradient(circle, rgba(255,209,120,0.32), rgba(255,209,120,0)); pointer-events:none;"></div>
+          <div class="panel-header" style="margin-bottom:0; align-items:flex-start;">
+            <div class="stack" style="gap:0.45rem; max-width:42rem;">              <h1 class="section-title" style="margin:0;">Dashboard quản trị người dùng</h1>
+              <p class="muted" style="margin:0; line-height:1.65;">Theo dõi tổng quan tài khoản, trạng thái hoạt động và thao tác nhanh với người dùng. Phần doanh thu món ăn sẽ tách ra ở dashboard riêng sau.</p>
+            </div>
+            <div class="panel-controls">
+              <a href="/admin/users/create" class="btn btn-primary">Thêm người dùng</a>
+              <a href="/admin/users" class="btn btn-ghost">Xem danh sách</a>
+            </div>
+          </div>
+        </section>
 
-           <!-- METRIC CARDS
-             Each <strong id="..."> is an injection target.
-             JS: document.getElementById('active-staffs-count').textContent = n;
-           -->
-        <div class="metric-grid">
-
+        <div class="metric-grid" style="margin-bottom:var(--space-6);">
           <article class="metric-card">
-            <span class="muted">Active Staffs</span>
-            <strong id="active-staffs-count">0</strong>
-            <span class="metric-delta" data-tone="up">
-              <span id="total-staffs-count">0</span> total members
-            </span>
+            <span class="muted">Tổng người dùng</span>
+            <strong id="metric-total-users">128</strong>
+            <span class="metric-delta" data-tone="info">Tất cả vai trò</span>
           </article>
-
           <article class="metric-card">
-            <span class="muted">Managers</span>
-            <strong id="managers-count">0</strong>
-            <span class="metric-delta" data-tone="info">
-              <span id="active-managers-count">0</span> active
-            </span>
+            <span class="muted">Đang hoạt động</span>
+            <strong id="metric-active-users">112</strong>
+            <span class="metric-delta" data-tone="up">Tài khoản live</span>
           </article>
-
           <article class="metric-card">
-            <span class="muted">Managed Hubs</span>
-            <strong id="managed-hubs-count">0</strong>
-            <span class="metric-delta" data-tone="warm">3 live regions</span>
+            <span class="muted">Quản lý & Staff</span>
+            <strong id="metric-ops-users">34</strong>
+            <span class="metric-delta" data-tone="info">Khối vận hành</span>
           </article>
-
           <article class="metric-card">
-            <span class="muted">Policy Flags</span>
-            <!-- Static value - not derived from data; JS leaves this untouched -->
-            <strong id="policy-flags-count">02</strong>
-            <span class="metric-delta" data-tone="warm">Review this week</span>
+            <span class="muted">Tài khoản bị hạn chế</span>
+            <strong id="metric-blocked">16</strong>
+            <span class="metric-delta" data-tone="warm">Cần xử lý</span>
           </article>
+        </div>
 
-        </div><!-- /metric-grid -->
-
-        <!-- BOTTOM PANELS -->
-        <div class="admin-dashboard__bottom">
-
-          <!-- Leadership pulse panel -->
+        <div class="admin-dashboard__bottom" style="margin-bottom:var(--space-6);">
           <section class="admin-panel">
             <div class="panel-header">
               <div class="stack" style="gap:0.2rem;">
-                <strong>Leadership pulse</strong>
-                <span class="muted">Quick scan of manager readiness and staffing.</span>
+                <strong>Trạng thái người dùng</strong>
+                <span class="muted">Bức tranh nhanh về các nhóm tài khoản trong hệ thống.</span>
               </div>
             </div>
             <div class="mini-stat-grid">
               <article class="mini-stat">
-                <span class="muted">Active Managers</span>
-                <strong id="leadership-active-managers">0</strong>
+                <span class="muted">Khách hàng</span>
+                <strong>94</strong>
               </article>
               <article class="mini-stat">
-                <span class="muted">Inactive Staffs</span>
-                <strong id="leadership-inactive-staffs">0</strong>
+                <span class="muted">Nhân viên</span>
+                <strong>22</strong>
               </article>
               <article class="mini-stat">
-                <span class="muted">Coverage Areas</span>
-                <strong id="leadership-coverage-areas">0</strong>
+                <span class="muted">Quản lý</span>
+                <strong>12</strong>
               </article>
             </div>
           </section>
 
-          <!-- Governance activity panel -->
           <section class="admin-activity">
             <div class="panel-header">
               <div class="stack" style="gap:0.2rem;">
-                <strong>Recent governance actions</strong>
-                <span class="muted">A narrative block for future audit events.</span>
+                <strong>Thao tác nhanh</strong>
+                <span class="muted">Các lối tắt phục vụ quản trị user thường xuyên.</span>
               </div>
             </div>
-            <!--
-              Empty container - JS clones #admin-activity-item-template
-              for each event and appends clones here.
-            -->
-            <div class="activity-list" id="admin-activity-list">
+            <div class="activity-list">
               <article class="activity-item">
-                <strong>Manager role review initialized</strong>
-                <span class="muted">Fallback view: assign or revoke manager roles from Manage Managers.</span>
+                <strong>Tạo người dùng mới</strong>
+                <span class="muted">Thêm tài khoản khách hàng, staff hoặc manager.</span>
               </article>
               <article class="activity-item">
-                <strong>Staff onboarding policy synced</strong>
-                <span class="muted">Fallback view: onboarding summary is shown even when JS is disabled.</span>
+                <strong>Kiểm tra tài khoản bị khóa</strong>
+                <span class="muted">Rà soát những user cần mở khóa hoặc xử lý.</span>
+              </article>
+              <article class="activity-item">
+                <strong>Đi tới danh sách chi tiết</strong>
+                <span class="muted">Xem, sửa và xóa từng người dùng trong hệ thống.</span>
               </article>
             </div>
           </section>
-
-        </div><!-- /admin-dashboard__bottom -->
-
-      </section><!-- /admin-dashboard -->
-    </main>
-  </div><!-- /data-super-dashboard-root -->
-
-
-  <!-- TEMPLATES -->
-
-  <!--
-    Governance activity item template.
-    JS usage:
-      const tpl   = document.getElementById('admin-activity-item-template');
-      const clone = tpl.content.cloneNode(true);
-      clone.querySelector('[data-activity-title]').textContent  = event.title;
-      clone.querySelector('[data-activity-detail]').textContent = event.detail;
-      document.getElementById('admin-activity-list').appendChild(clone);
-  -->
-  <template id="admin-activity-item-template">
-    <article class="activity-item">
-      <strong data-activity-title></strong>
-      <span class="muted" data-activity-detail></span>
-    </article>
-  </template>
-
-
-  <!-- MODAL - structural chrome only -->
-  <div class="modal admin-modal" data-admin-modal id="admin-modal"
-       aria-modal="true" role="dialog" aria-labelledby="admin-modal-title">
-    <div class="modal__dialog">
-      <div class="modal__header">
-        <div class="stack" style="gap:0.25rem;">
-          <h2 data-admin-modal-title id="admin-modal-title">Modal</h2>
-          <span class="muted" data-admin-modal-copy>Update details and save instantly.</span>
         </div>
-        <button class="btn btn-outline" type="button" data-admin-close-modal id="btn-close-modal">Close</button>
-      </div>
-      <form data-admin-form class="admin-modal__grid" id="admin-modal-form" novalidate></form>
-    </div>
+
+        
+      </section>
+    </main>
   </div>
 
-  <div class="toast-stack" data-admin-toast-stack id="admin-toast-stack"></div>
-
-  <!--
-    Path resolution:
-      Spring MVC: <mvc:resources mapping="/resources/**" location="/resources/" />
-      Served from: webapp/resources/admin/js/dashboard.js
-      URL in browser: /[context-root]/resources/admin/js/dashboard.js
-  -->
-<script src="js/admin/dashboard.js" defer></script>
-  </body>
+  </body> 
 </html>
-
-
-
 

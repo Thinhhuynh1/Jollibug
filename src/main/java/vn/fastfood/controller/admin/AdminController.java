@@ -16,4 +16,41 @@ public class AdminController {
         return "admin/manage-users";
     }
 
+    @GetMapping("/admin/users/block")
+    public String getUsersBlockPage() {
+        return "admin/block";
+    }
+
+    @GetMapping("/admin/users/create")
+    public String getCreateUserPage() {
+        return "admin/function/create";
+    }
+
+    @GetMapping("/admin/users/detail")
+    public String getDetailPage() {
+        return "admin/function/detail";
+    }
+    
+    @GetMapping("/admin/users/update")
+    public String getUpdateUserPage() {
+        return "admin/function/update";
+    }
+
+    @GetMapping("/admin/users/delete")
+    public String getDeleteUserPage() {
+        return "admin/function/delete";
+    }
+
+    @GetMapping("/admin/users/ban")
+    public String getBanUserPage() {
+        return "admin/function/ban";
+    }
+
+    @GetMapping("/admin/users/unban")
+    public String getUnbanUserPage() {
+        return "admin/function/unban";
+    }
+
+
+
 }

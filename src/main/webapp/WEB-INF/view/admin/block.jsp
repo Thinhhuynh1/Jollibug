@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -87,53 +87,38 @@
             </thead>
             <tbody id="users-table-body">
               <tr>
-                <td>Nguyễn Minh Quân</td>
-                <td>quan.nguyen@jollibug.vn</td>
-                <td>Quản lý</td>
-                <td>Đang hoạt động</td>
-                <td>12/01/2026</td>
-                <td>
-                  <a href="/admin/users/detail" class="btn btn-ghost" type="button">Xem</a>
-                  <a href="/admin/users/update" class="btn btn-ghost" type="button">Sửa</a>
-                  <a href="/admin/users/delete" class="btn btn-ghost" type="button">Xóa</a>
-                  <a href="/admin/users/ban" class="btn btn-ghost" type="button">Khóa</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Trần Thu Hà</td>
-                <td>ha.tran@jollibug.vn</td>
-                <td>Nhân viên</td>
-                <td>Đang hoạt động</td>
-                <td>25/11/2025</td>
-                <td>
-                  <a href="/admin/users/detail" class="btn btn-ghost" type="button">Xem</a>
-                  <a href="/admin/users/update" class="btn btn-ghost" type="button">Sửa</a>
-                  <a href="/admin/users/delete" class="btn btn-ghost" type="button">Xóa</a>
-                  <a href="/admin/users/ban" class="btn btn-ghost" type="button">Khóa</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Lê Hoàng Phúc</td>
-                <td>phuc.le@gmail.com</td>
+                <td>Phạm Gia Huy</td>
+                <td>huy.pham@yahoo.com</td>
                 <td>Khách hàng</td>
-                <td>Đang hoạt động</td>
-                <td>03/08/2025</td>
+                <td>Bị khóa</td>
+                <td>17/06/2025</td>
                 <td>
                   <a href="/admin/users/detail" class="btn btn-ghost" type="button">Xem</a>
                   <a href="/admin/users/update" class="btn btn-ghost" type="button">Sửa</a>
                   <a href="/admin/users/delete" class="btn btn-ghost" type="button">Xóa</a>
-                  <a href="/admin/users/ban" class="btn btn-ghost" type="button">Khóa</button>
+                  <a href="/admin/users/unban" class="btn btn-ghost" type="button">Mở khóa</a>
+                </td>
+              </tr>
+              <tr>
+                <td>Đỗ Khánh Linh</td>
+                <td>linh.do@jollibug.vn</td>
+                <td>Nhân viên</td>
+                <td>Bị khóa</td>
+                <td>30/09/2025</td>
+                <td>
+                  <a href="/admin/users/detail" class="btn btn-ghost" type="button">Xem</a>
+                  <a href="/admin/users/update" class="btn btn-ghost" type="button">Sửa</a>
+                  <a href="/admin/users/delete" class="btn btn-ghost" type="button">Xóa</a>
+                  <a href="/admin/users/unban" class="btn btn-ghost" type="button">Mở khóa</a>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
-      </main>
-  </div><!-- /data-admin-table-root -->
 
-
-  <!-- Toast stack -->
+    </main>
+  </div>
   </body>
 </html>
 

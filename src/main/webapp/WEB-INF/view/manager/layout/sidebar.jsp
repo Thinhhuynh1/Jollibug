@@ -15,9 +15,12 @@
 
     <nav class="admin-nav">
         <span class="admin-nav__section">Workspace</span>
-        <a class="is-active" href="/manager">Dashboard</a>
-        <a href="/manager/categories">Quản lý danh mục</a>
-        <a href="/manager/products">Quản lý món ăn</a>
+        <a class="is-active" href="<c:url value='/manager'/>">Dashboard</a>
+        <a href="<c:url value='/manager/categories'/>">Quản lý danh mục</a>
+        <a href="<c:url value='/manager/products'/>">Quản lý món ăn</a>
+        <a href="<c:url value='/manager/coupons'/>">Quản lý mã giảm giá</a>
+        <a href="<c:url value='/manager/promotions'/>">Quản lý khuyến mãi</a>
+        <a href="<c:url value='/manager/flash-sales'/>">Flash Sale</a>
     </nav>
     </div>
 </aside>
