@@ -2,7 +2,7 @@ package vn.fastfood.controller.admin;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
 
 @Controller
 public class AdminController {
@@ -12,13 +12,15 @@ public class AdminController {
     }
 
     @GetMapping("/admin/users")
-    public String getUsersPage() {
+    public String getUsersPage(Model model) {
+        model.addAttribute("userTab", "active");
         return "admin/manage-users";
     }
 
     @GetMapping("/admin/users/block")
-    public String getUsersBlockPage() {
-        return "admin/block";
+    public String getUsersBlockPage(Model model) {
+        model.addAttribute("userTab", "blocked");
+        return "admin/manage-users";
     }
 
     @GetMapping("/admin/users/create")
@@ -30,7 +32,7 @@ public class AdminController {
     public String getDetailPage() {
         return "admin/function/detail";
     }
-    
+
     @GetMapping("/admin/users/update")
     public String getUpdateUserPage() {
         return "admin/function/update";
@@ -50,7 +52,5 @@ public class AdminController {
     public String getUnbanUserPage() {
         return "admin/function/unban";
     }
-
-
 
 }

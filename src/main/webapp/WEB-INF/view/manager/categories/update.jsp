@@ -31,7 +31,6 @@
         <section class="profile-content">
           <section class="profile-section">
             <h1 class="profile-title">Cập nhật danh mục</h1>
-            <p class="profile-subtitle">Chỉnh sửa 2 thông tin chính của danh mục bên dưới.</p>
 
             <form action="#" method="post" class="profile-form">
               <div class="profile-grid">

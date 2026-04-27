@@ -34,7 +34,6 @@
           <div class="panel-header">
             <div class="stack" style="gap:0.25rem;">
                 <h2 class="section-title">Cập nhật người dùng</h2>
-                <p class="muted" style="margin:0;">Thông tin bên dưới là dữ liệu cũ mẫu để chỉnh sửa giao diện trước khi nối backend.</p>
             </div>
           </div>
 

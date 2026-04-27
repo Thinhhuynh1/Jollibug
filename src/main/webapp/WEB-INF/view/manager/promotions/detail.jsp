@@ -24,7 +24,6 @@
 				<section class="profile-content">
 					<section class="profile-section">
 						<h1 class="profile-title">Chi tiết khuyến mãi</h1>
-						<p class="profile-subtitle">Xem tên chương trình, mức giảm và khoảng thời gian theo ngày.</p>
 
 						<div class="profile-form">
 							<div class="profile-grid">

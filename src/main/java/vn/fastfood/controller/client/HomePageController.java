@@ -27,4 +27,9 @@ public class HomePageController {
         return "client/menu";
     }
 
+    @GetMapping("/complaint")
+    public String getComplaintPage() {
+        return "client/complaint";
+    }
+
 }

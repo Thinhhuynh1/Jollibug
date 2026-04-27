@@ -31,7 +31,6 @@
 				<section class="profile-content">
 					<section class="profile-section">
 						<h1 class="profile-title">Thêm mới sản phẩm</h1>
-						<p class="profile-subtitle">Tạo nhanh một sản phẩm mới để hiển thị trên menu.</p>
 
 						<form action="#" method="post" class="profile-form">
 							<div class="profile-grid">

@@ -598,3 +598,59 @@
   color: #fff7ef;
 }
 
+/* Support page tabs and reply forms */
+.support-tab-panel {
+  display: none;
+}
+
+.support-tab-panel.is-active {
+  display: block;
+}
+
+.order-filter-strip__pills .support-tab {
+  border-color: rgba(111, 82, 55, 0.12);
+  background: rgba(255, 248, 238, 0.9);
+  color: var(--color-ink-700);
+}
+
+.order-filter-strip__pills .support-tab.is-active,
+.order-filter-strip__pills .support-tab[aria-selected="true"] {
+  background: var(--color-red-500);
+  color: #fff7ef;
+  border-color: transparent;
+  box-shadow: 0 8px 20px rgba(217, 68, 54, 0.22);
+}
+
+.support-toolbar {
+  margin-bottom: 1rem;
+}
+
+.support-table-wrap {
+  background: rgba(255, 252, 246, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.support-reply-form {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(111, 82, 55, 0.1);
+  margin-top: 0.7rem;
+}
+
+.support-reply-form textarea {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  border-radius: 12px;
+  border: 1px solid rgba(111, 82, 55, 0.2);
+  padding: 0.75rem 0.85rem;
+  background: #fff;
+  font: inherit;
+}
+

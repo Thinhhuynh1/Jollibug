@@ -24,7 +24,6 @@
 				<section class="profile-content">
 					<section class="profile-section">
 						<h1 class="profile-title">Cập nhật khuyến mãi</h1>
-						<p class="profile-subtitle">Chỉnh sửa thông tin theo đúng cấu trúc ngày bắt đầu và ngày kết thúc.</p>
 
 						<form action="#" method="post" class="profile-form">
 							<div class="profile-grid">

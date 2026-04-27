@@ -2,6 +2,233 @@ body[data-page="profile"] {
     background: linear-gradient(180deg, #f7f4f2 0%, #f3efec 100%);
 }
 
+body[data-page="complaint"] {
+    background: linear-gradient(180deg, #f7f4f2 0%, #f3efec 100%);
+}
+
+.complaint-page {
+    padding: 2rem 0 4rem;
+}
+
+.complaint-alert {
+    margin-bottom: 1.25rem;
+    padding: 0.95rem 1rem;
+    border-radius: 16px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #065f46;
+    font-weight: 700;
+}
+
+.complaint-field textarea,
+.complaint-field input[type="file"] {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid #d1d5db;
+    background: transparent;
+    padding: 0.7rem 0 0.8rem;
+    font: inherit;
+    color: #111827;
+    outline: none;
+}
+
+.complaint-field textarea {
+    min-height: 8.5rem;
+    resize: none;
+    overflow: hidden;
+}
+
+.complaint-field textarea:focus,
+.complaint-field input[type="file"]:focus {
+    border-bottom-color: #e11b22;
+    box-shadow: 0 1px 0 0 #e11b22;
+}
+
+.complaint-note {
+    margin: 0 0 1.5rem;
+    color: #6b7280;
+    max-width: 68ch;
+}
+
+body[data-admin-page="orders"] {
+    background: linear-gradient(180deg, #f7f4f2 0%, #f3efec 100%);
+}
+
+.orders-page__panel,
+.orders-detail-card,
+.orders-action-card {
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(26, 26, 26, 0.08);
+}
+
+.orders-page__panel {
+    padding: 1.5rem;
+}
+
+.orders-page__tabs {
+    display: inline-flex;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border-radius: var(--radius-round);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(26, 26, 26, 0.08);
+}
+
+.orders-page__tabs .btn {
+    min-height: 2.8rem;
+    padding-inline: 1rem;
+    background: #6b7280;
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.orders-page__tabs .btn.is-active[data-status-tab="confirmed"] {
+    background: #16a34a;
+}
+
+.orders-page__tabs .btn.is-active[data-status-tab="unconfirmed"] {
+    background: #dc2626;
+}
+
+.orders-page__tabs .btn:not(.is-active) {
+    opacity: 0.82;
+}
+
+.orders-page__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.orders-page__filters .select-group,
+.orders-page__filters .table-search {
+    min-width: 220px;
+}
+
+.orders-page__table-wrap {
+    margin-top: 1.25rem;
+}
+
+.orders-detail-card,
+.orders-action-card {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.orders-detail-card {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.orders-section {
+    display: grid;
+    gap: 1rem;
+}
+
+.orders-section__title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.orders-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.orders-info-card {
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: #f9fafb;
+    border: 1px solid rgba(26, 26, 26, 0.08);
+    display: grid;
+    gap: 0.35rem;
+}
+
+.orders-info-card--full {
+    grid-column: 1 / -1;
+}
+
+.orders-info-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.orders-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.orders-summary-card {
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+    border: 1px solid rgba(26, 26, 26, 0.08);
+    display: grid;
+    gap: 0.35rem;
+}
+
+.orders-summary-card strong,
+.orders-info-card strong {
+    color: #111827;
+}
+
+.orders-action-card {
+    display: grid;
+    gap: 1rem;
+}
+
+.orders-action-card .profile-form {
+    gap: 1rem;
+}
+
+.orders-action-card .profile-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.orders-action-note {
+    padding: 0.95rem 1rem;
+    border-radius: 16px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #065f46;
+    font-weight: 700;
+}
+
+.orders-action-note--neutral {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.15);
+    color: #1e3a8a;
+}
+
+@media (max-width: 768px) {
+    .orders-info-grid,
+    .orders-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .orders-page__panel,
+    .orders-detail-card,
+    .orders-action-card {
+        border-radius: 20px;
+    }
+}
+
 .profile-page {
     padding: 2rem 0 4rem;
 }

@@ -24,7 +24,6 @@
         <section class="profile-content">
           <section class="profile-section">
             <h1 class="profile-title">Chi tiết mã giảm giá</h1>
-            <p class="profile-subtitle">Kiểm tra mã, đặc tả, ngày bắt đầu, ngày kết thúc và số lượng còn lại.</p>
 
             <div class="profile-form">
               <div class="profile-grid">

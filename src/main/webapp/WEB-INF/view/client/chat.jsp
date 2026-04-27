@@ -24,7 +24,6 @@
       <div class="container">
         <div class="page-intro">
           <h1 class="section-title">Chat hỗ trợ</h1>
-          <p class="lead">Trao đổi trực tiếp với nhân viên Jollibug vè đơn hàng, thanh toán và giao hàng</p>
         </div>
 
         <div class="client-chat-shell">

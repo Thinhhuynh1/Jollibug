@@ -35,7 +35,6 @@
         <section class="profile-content">
           <section class="profile-section">
             <h1 class="profile-title">Thêm mới danh mục</h1>
-            <p class="profile-subtitle">Tạo nhanh một danh mục mới cho menu, sau đó có thể chỉnh sửa hoặc gắn sản phẩm sau.</p>
 
             <form action="#" method="post" class="profile-form">
               <div class="profile-grid">

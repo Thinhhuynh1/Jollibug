@@ -24,7 +24,6 @@
         <section class="profile-content">
           <section class="profile-section">
             <h1 class="profile-title">Cập nhật mã giảm giá</h1>
-            <p class="profile-subtitle">Chỉnh sửa mã, đặc tả, ngày bắt đầu, ngày kết thúc và số lượng.</p>
 
             <form action="#" method="post" class="profile-form">
               <div class="profile-grid">

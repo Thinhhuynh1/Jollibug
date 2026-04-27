@@ -31,7 +31,6 @@
 				<section class="profile-content">
 					<section class="profile-section">
 						<h1 class="profile-title">Chi tiết sản phẩm</h1>
-						<p class="profile-subtitle">Xem nhanh các thông tin chính của sản phẩm.</p>
 
 						<div class="profile-form">
 							<div class="profile-grid">

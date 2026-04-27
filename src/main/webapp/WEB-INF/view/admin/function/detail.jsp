@@ -34,7 +34,6 @@
           <div class="panel-header">
             <div class="stack" style="gap:0.25rem;">
                 <h2 class="section-title">Chi tiết người dùng</h2>
-                <p class="muted" style="margin:0;">Xem thông tin hồ sơ và trạng thái tài khoản người dùng.</p>
             </div>
           </div>
 

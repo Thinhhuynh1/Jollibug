@@ -24,7 +24,6 @@
 				<section class="profile-content">
 					<section class="profile-section">
 						<h1 class="profile-title">Thêm khuyến mãi</h1>
-						<p class="profile-subtitle">Thiết lập chiến dịch với thời gian bắt đầu và kết thúc riêng biệt theo ngày.</p>
 
 						<form action="#" method="post" class="profile-form">
 							<div class="profile-grid">

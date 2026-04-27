@@ -24,7 +24,6 @@
 				<section class="profile-content">
 					<section class="profile-section">
 						<h1 class="profile-title">Thêm mã giảm giá</h1>
-						<p class="profile-subtitle">Tạo coupon mới với mã, đặc tả, ngày bắt đầu và số lượng.</p>
 
 						<form action="#" method="post" class="profile-form">
 							<div class="profile-grid">

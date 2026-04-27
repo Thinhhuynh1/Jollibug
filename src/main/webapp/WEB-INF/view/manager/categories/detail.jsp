@@ -31,7 +31,6 @@
         <section class="profile-content">
           <section class="profile-section">
             <h1 class="profile-title">Chi tiết danh mục</h1>
-            <p class="profile-subtitle">Xem nhanh các thông tin chính của danh mục bên dưới.</p>
 
             <div class="profile-form">
               <div class="profile-grid">
