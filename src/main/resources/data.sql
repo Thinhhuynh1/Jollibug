@@ -1,0 +1,22 @@
+INSERT INTO users (username, password, email, fullname, sdt) 
+VALUES 
+('user1', 'pass1', 'user1@fastfood.vn', 'User A', '0900000001'),
+('user2', 'pass2', 'user2@fastfood.vn', 'User B', '0900000002'),
+('user3', 'pass3', 'user3@fastfood.vn', 'User C', '0900000003'),
+('user4', 'pass4', 'user4@fastfood.vn', 'User D', '0900000004'),
+('user5', 'pass5', 'user5@fastfood.vn', 'User E', '0900000005'),
+('user6', 'pass6', 'user6@fastfood.vn', 'User F', '0900000006'),
+('user7', 'pass7', 'user7@fastfood.vn', 'User G', '0900000007'),
+('user8', 'pass8', 'user8@fastfood.vn', 'User H', '0900000008'),
+('user9', 'pass9', 'user9@fastfood.vn', 'User I', '0900000009'),
+('user10', 'pass10', 'user10@fastfood.vn', 'User J', '0900000010'),
+('user11', 'pass11', 'user11@fastfood.vn', 'User K', '0900000011'),
+('user12', 'pass12', 'user12@fastfood.vn', 'User L', '0900000012'),
+('user13', 'pass13', 'user13@fastfood.vn', 'User M', '0900000013'),
+('user14', 'pass14', 'user14@fastfood.vn', 'User N', '0900000014'),
+('user15', 'pass15', 'user15@fastfood.vn', 'User O', '0900000015'),
+('user16', 'pass16', 'user16@fastfood.vn', 'User P', '0900000016'),
+('user17', 'pass17', 'user17@fastfood.vn', 'User Q', '0900000017'),
+('user18', 'pass18', 'user18@fastfood.vn', 'User R', '0900000018'),
+('user19', 'pass19', 'user19@fastfood.vn', 'User S', '0900000019'),
+('user20', 'pass20', 'user20@fastfood.vn', 'User T', '0900000020');

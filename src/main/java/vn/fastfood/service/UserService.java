@@ -45,4 +45,18 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    public User Login(User user){
+        List<String> errors = new ArrayList<>();
+        User x = userRepository.findByEmail(user.getEmail());
+        if (x == null) {
+            throw new RuntimeException("Email không tồn tại");      
+        }
+        else {
+            if (!passwordEncoder.matches(user.getPassword(), x.getPassword())){
+                throw new RuntimeException("Mật khẩu sai");
+            }
+        }  
+        return user;
+    }
 }

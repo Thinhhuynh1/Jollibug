@@ -1077,19 +1077,19 @@
 }
 
 .profile-nav a {
+  display: block;
   padding: 0.9rem 1rem;
   border-radius: var(--radius-md);
-  color: var(--color-ink-700);
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.7);
-  transition: background var(--transition-base), transform var(--transition-base), color var(--transition-base);
+  color: rgb(255, 255, 255);
+  font-weight: 10000;
+  background: rgb(246, 70, 70);
 }
 
 .profile-nav a:hover,
 .profile-nav a.is-active {
-  background: var(--color-surface-strong);
-  color: var(--color-red-600);
-  transform: translateX(3px);
+  background: rgb(150, 31, 31);
+  color: rgb(0, 0, 0);
+  transform: translateX(5px);
 }
 
 .profile-content {

@@ -304,21 +304,22 @@ body[data-admin-page="orders"] {
     display: block;
     padding: 0.95rem 1rem;
     border-radius: 14px;
-    color: #9ca3af;
+    color: #000000;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 1000;
+    background: rgb(227, 65, 65);
     transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
 }
 
 .profile-nav a:hover {
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.06);
-    transform: translateX(2px);
+    background: rgb(114, 17, 17);
+    transform: translateX(5px);
 }
 
 .profile-nav a.is-active {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.1);
+    color: #fefefe;
+    background: rgb(116, 27, 27);
 }
 
 .profile-content {
@@ -631,7 +632,6 @@ body[data-page="orders"] .order-detail__total strong {
         min-width: 240px;
     }
 
-    }
 }
 
 /* ── Order Cancellation ── */
