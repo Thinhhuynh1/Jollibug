@@ -6,197 +6,272 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Premium Fast-Food Experience</title>
-  <meta name="description" content="Jollibug - bold comfort food elevated with a polished ordering experience. Order from our signature menu and get delivery in 25 minutes." />
+  <title>Jollibug | Thức Ăn Nhanh Ngon - Giao Hàng Tận Nơi</title>
+  <meta name="description" content="Jollibug - Burger thơm ngon, gà giòn rụm, combo hấp dẫn. Đặt món ngay và nhận giao hàng trong 30 phút. Hương vị đậm đà, giá cả phải chăng!" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-
-  <link rel="stylesheet" href="css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/components.css" />
 </head>
 
 <body data-page="home">
 
+  <%-- 1. NAVBAR (shared header) --%>
   <jsp:include page="layout/header.jsp"/>
-  <!-- /SHARED HEADER -->
 
-
-  <!-- SECTION -->
   <main class="page-shell">
 
-    <!-- Hero Section -->
-    <section class="section">
+    <%-- 2. HERO --%>
+    <section class="hp-hero">
       <div class="container">
-        <div class="hero-banner reveal-up">
-          <div class="hero-banner__grid">
-            <div class="hero-copy">
-              <span class="eyebrow">Premium Fast-Food Brand Feel</span>
-              <h1>Bold comfort food, elevated with a polished ordering experience.</h1>
-              <p>Jollibug is crafted to feel playful, premium, and production-ready, blending the appetite appeal of top global quick-service brands with a clean frontend architecture ready for backend integration.</p>
-              <div class="hero-cta">
-                <a class="btn btn-primary" href="/menu">Order the menu</a>
-                <a class="btn btn-secondary" href="/about">Explore the story</a>
+        <div class="hp-hero__grid">
+          <div class="hp-hero__copy reveal-up">
+            <span class="eyebrow">🍔 Thức Ăn Nhanh #1 Việt Nam</span>
+            <h1>Đói bụng? <span>Jollibug</span> giao ngay trong 30 phút!</h1>
+            <p>Burger thơm ngon, gà giòn rụm, combo hấp dẫn — tất cả đều được chế biến tươi mỗi ngày và giao tận tay bạn khi còn nóng hổi.</p>
+            <div class="hp-hero__cta">
+              <a class="btn btn-primary" href="/menu" id="hero-order-btn">Đặt Món Ngay</a>
+              <a class="btn btn-secondary" href="/menu" id="hero-menu-btn">Xem Thực Đơn</a>
+            </div>
+            <div class="hp-stats">
+              <div class="hp-stats__item">
+                <strong>30 phút</strong>
+                <span>Giao hàng nhanh</span>
               </div>
-              <div class="stats-ribbon">
-                <article class="stats-ribbon__item"><span class="muted">Delivery promise</span><strong>25 min</strong></article>
-                <article class="stats-ribbon__item"><span class="muted">Signature bundles</span><strong>12+</strong></article>
-                <article class="stats-ribbon__item"><span class="muted">Guest rating</span><strong>4.9/5</strong></article>
+              <div class="hp-stats__item">
+                <strong>50+</strong>
+                <span>Món ngon đa dạng</span>
+              </div>
+              <div class="hp-stats__item">
+                <strong>4.9 ★</strong>
+                <span>Đánh giá khách hàng</span>
+              </div>
+              <div class="hp-stats__item">
+                <strong>10.000+</strong>
+                <span>Khách hài lòng</span>
               </div>
             </div>
-            <div class="hero-media">
-              <article class="hero-card hero-card--primary">
-                <div class="hero-card__bg hero-card__bg--peach"></div>
-                <img class="hero-card__media" src="/webapp/resources/shared/images/brand-feast.svg" alt="Jollibug combo illustration" />
-                <span class="hero-card__label">Family combo spotlight</span>
-              </article>
-              <article class="hero-card">
-                <div class="hero-card__bg hero-card__bg--butter"></div>
-                <img class="hero-card__media" src="/webapp/resources/shared/images/meal-drink.svg" alt="Jollibug float drink" />
-                <span class="hero-card__label">Seasonal mango float</span>
-              </article>
+          </div>
+          <div class="hp-hero__image reveal-up">
+            <div class="hp-hero__img-wrap">
+              <img src="/webapp/resources/shared/images/brand-feast.svg" alt="Jollibug combo ngon" />
             </div>
           </div>
         </div>
       </div>
     </section>
-
-    <!-- SECTION -->
-    <section class="section-tight">
+<!-- 
+    <%-- 3. CATEGORY BAR --%>
+    <section class="hp-cat">
       <div class="container">
-        <div class="promo-strip">
-          <article class="promo-tile reveal-up">
-            <strong>Built for cravings</strong>
-            <p class="muted">Large product cards, warm gradients, and generous spacing make every dish feel desirable.</p>
-          </article>
-          <article class="promo-tile reveal-up">
-            <strong>Ready for Spring MVC</strong>
-            <p class="muted">Pages stay clean and semantic while shared JS/CSS handle repeated UI structure.</p>
-          </article>
-          <article class="promo-tile reveal-up">
-            <strong>Slide-in cart UX</strong>
-            <p class="muted">Guests can add items from anywhere and review totals instantly without losing context.</p>
-          </article>
-        </div>
+        <nav class="hp-cat__list" aria-label="Danh mục thực đơn">
+          <a class="hp-cat__item active" href="/menu?category=burger" id="cat-burger">
+            <span class="hp-cat__icon">🍔</span>
+            Burger
+          </a>
+          <a class="hp-cat__item" href="/menu?category=chicken" id="cat-chicken">
+            <span class="hp-cat__icon">🍗</span>
+            Gà Rán
+          </a>
+          <a class="hp-cat__item" href="/menu?category=combo" id="cat-combo">
+            <span class="hp-cat__icon">🍱</span>
+            Combo
+          </a>
+          <a class="hp-cat__item" href="/menu?category=drink" id="cat-drink">
+            <span class="hp-cat__icon">🥤</span>
+            Thức Uống
+          </a>
+          <a class="hp-cat__item" href="/menu?category=dessert" id="cat-dessert">
+            <span class="hp-cat__icon">🍦</span>
+            Tráng Miệng
+          </a>
+          <a class="hp-cat__item" href="/menu?category=fries" id="cat-fries">
+            <span class="hp-cat__icon">🍟</span>
+            Khoai Chiên
+          </a>
+        </nav>
       </div>
-    </section>
+    </section> -->
 
-    <!-- SECTION -->
+    <%-- 4. MENU GRID — 6 món nổi bật (2×3) --%>
     <section class="section">
       <div class="container">
         <div class="page-intro reveal-up">
-          <span class="eyebrow">Top Picks</span>
-          <h2 class="section-title">Guest favorites designed to convert fast.</h2>
-          <p class="lead">A premium storefront needs a menu grid that feels energetic but intentional. These cards are driven from a shared catalog and can later be populated from your backend.</p>
+          <h2 class="section-title">Những món được yêu thích nhất</h2>
+          <p class="lead">Được chọn lọc từ hàng nghìn đánh giá thực tế của khách hàng — đây là những món bạn không thể bỏ qua.</p>
         </div>
-        <!--
-          JS (main.js -> renderHomeFeatured):
-          Clones #product-card-template for each featured product
-          and appends clones into this container.
-        -->
-        <div class="card-grid" data-home-featured id="home-featured-grid">
-          <article class="card product-card reveal-up">
-            <div class="product-card__media" style="background:rgba(255,248,238,0.92);">
-              <span class="product-card__chip">Best seller</span>
-              <img src="/webapp/resources/shared/images/meal-burger.svg" alt="Smoky double burger" />
+
+        <div class="hp-menu-grid">
+
+          <%-- Món 1 --%>
+          <article class="hp-prod-card reveal-up">
+            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);">
+              <span class="hp-prod-card__badge">Bán Chạy</span>
+              🍔
             </div>
-            <div class="stack">
-              <div class="product-card__meta"><span>Burger</span><span>4.9</span></div>
-              <h3 class="product-card__title">Smoky Double Burger</h3>
-              <p class="muted">Two grilled patties, cheddar, caramelized onion and house sauce.</p>
-              <div class="price-row"><span class="price">$9.90</span></div>
-              <div class="card-actions">
-                <a class="btn btn-outline" href="/product">Details</a>
-                <button class="btn btn-primary" type="button" id = "add-to-cart">Add to cart</button>
+            <div class="hp-prod-card__body">
+              <div class="hp-prod-card__meta">
+                <span>Burger</span>
+                <span class="stars">★ 4.9</span>
+              </div>
+              <div class="hp-prod-card__name">Burger Bò Phô Mai Đôi</div>
+              <div class="hp-prod-card__desc">Hai miếng bò nướng, phô mai cheddar tan chảy, rau tươi và sốt đặc biệt.</div>
+              <div class="hp-prod-card__footer">
+                <span class="hp-prod-card__price">89.000 ₫</span>
+                <button class="hp-prod-card__btn" type="button" id="add-burger-double">+ Thêm</button>
               </div>
             </div>
           </article>
-          <article class="card product-card reveal-up">
-            <div class="product-card__media" style="background:rgba(245,250,255,0.92);">
-              <span class="product-card__chip">Combo</span>
-              <img src="/webapp/resources/shared/images/meal-drink.svg" alt="Crispy combo with drink" />
+
+          <%-- Món 2 --%>
+          <article class="hp-prod-card reveal-up">
+            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+              <span class="hp-prod-card__badge">Mới</span>
+              🍗
             </div>
-            <div class="stack">
-              <div class="product-card__meta"><span>Combo</span><span>4.8</span></div>
-              <h3 class="product-card__title">Crispy Combo Meal</h3>
-              <p class="muted">Crispy chicken, waffle fries and mango float in one value set.</p>
-              <div class="price-row"><span class="price">$12.50</span></div>
-              <div class="card-actions">
-                <a class="btn btn-outline" href="/menu">Browse</a>
-                <button class="btn btn-primary" type="button">Add to cart</button>
+            <div class="hp-prod-card__body">
+              <div class="hp-prod-card__meta">
+                <span>Gà Rán</span>
+                <span class="stars">★ 4.8</span>
+              </div>
+              <div class="hp-prod-card__name">Gà Giòn Vị Cay</div>
+              <div class="hp-prod-card__desc">Vỏ ngoài giòn tan, thịt bên trong mềm ngọt với gia vị cay đặc trưng Jollibug.</div>
+              <div class="hp-prod-card__footer">
+                <span class="hp-prod-card__price">59.000 ₫</span>
+                <button class="hp-prod-card__btn" type="button" id="add-spicy-chicken">+ Thêm</button>
               </div>
             </div>
           </article>
+
+          <%-- Món 3 --%>
+          <article class="hp-prod-card reveal-up">
+            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);">
+              <span class="hp-prod-card__badge">Tiết Kiệm</span>
+              🍱
+            </div>
+            <div class="hp-prod-card__body">
+              <div class="hp-prod-card__meta">
+                <span>Combo</span>
+                <span class="stars">★ 4.9</span>
+              </div>
+              <div class="hp-prod-card__name">Combo Gia Đình 4 Người</div>
+              <div class="hp-prod-card__desc">4 burger, 4 phần khoai chiên lớn, 4 nước uống và 1 phần nugget miễn phí.</div>
+              <div class="hp-prod-card__footer">
+                <span class="hp-prod-card__price">299.000 ₫</span>
+                <button class="hp-prod-card__btn" type="button" id="add-family-combo">+ Thêm</button>
+              </div>
+            </div>
+          </article>
+
+          <%-- Món 4 --%>
+          <article class="hp-prod-card reveal-up">
+            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);">
+              🥤
+            </div>
+            <div class="hp-prod-card__body">
+              <div class="hp-prod-card__meta">
+                <span>Thức Uống</span>
+                <span class="stars">★ 4.7</span>
+              </div>
+              <div class="hp-prod-card__name">Trà Sữa Xoài Tươi</div>
+              <div class="hp-prod-card__desc">Trà sữa kem tươi kết hợp xoài Cát Hòa Lộc nguyên chất, mát lạnh sảng khoái.</div>
+              <div class="hp-prod-card__footer">
+                <span class="hp-prod-card__price">39.000 ₫</span>
+                <button class="hp-prod-card__btn" type="button" id="add-mango-milk-tea">+ Thêm</button>
+              </div>
+            </div>
+          </article>
+
+          <%-- Món 5 --%>
+          <article class="hp-prod-card reveal-up">
+            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#fff8e1,#ffecb3);">
+              🍟
+            </div>
+            <div class="hp-prod-card__body">
+              <div class="hp-prod-card__meta">
+                <span>Khoai Chiên</span>
+                <span class="stars">★ 4.8</span>
+              </div>
+              <div class="hp-prod-card__name">Khoai Chiên Phô Mai Núi Lửa</div>
+              <div class="hp-prod-card__desc">Khoai chiên vàng giòn phủ sốt phô mai nóng chảy và tương ớt ngọt đặc biệt.</div>
+              <div class="hp-prod-card__footer">
+                <span class="hp-prod-card__price">45.000 ₫</span>
+                <button class="hp-prod-card__btn" type="button" id="add-cheese-fries">+ Thêm</button>
+              </div>
+            </div>
+          </article>
+
+          <%-- Món 6 --%>
+          <article class="hp-prod-card reveal-up">
+            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#f3e5f5,#e1bee7);">
+              🍦
+            </div>
+            <div class="hp-prod-card__body">
+              <div class="hp-prod-card__meta">
+                <span>Tráng Miệng</span>
+                <span class="stars">★ 4.9</span>
+              </div>
+              <div class="hp-prod-card__name">Sundae Dâu Tây Creamy</div>
+              <div class="hp-prod-card__desc">Kem vani mịn màng, sốt dâu tươi và bánh waffle giòn — kết thúc bữa ăn hoàn hảo.</div>
+              <div class="hp-prod-card__footer">
+                <span class="hp-prod-card__price">29.000 ₫</span>
+                <button class="hp-prod-card__btn" type="button" id="add-strawberry-sundae">+ Thêm</button>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+        <div style="text-align:center; margin-top:2rem;">
+          <a class="btn btn-outline" href="/menu" id="view-all-menu-btn">Xem Toàn Bộ Thực Đơn →</a>
         </div>
       </div>
     </section>
 
-    <!-- Story + Cravings -->
-    <section class="section-tight">
+    <%-- 5. BANNER KHUYẾN MÃI --%>
+    <section class="hp-promo">
       <div class="container">
-        <div class="story-grid">
-          <article class="story-block reveal-up">
-            <span class="eyebrow">Why It Feels Premium</span>
-            <h2 class="section-title">Pastel stages, floating food, and a brand language that feels alive.</h2>
-            <p class="lead">Instead of generic cards on a flat white page, Jollibug uses layered surfaces, soft shadows, playful rounded typography, and local food illustrations to create a more intentional F&amp;B identity.</p>
-            <div class="cluster">
-              <a class="btn btn-primary" href="/menu">See all menu items</a>
-              <a class="btn btn-outline" href="/contact">Book a tasting session</a>
-            </div>
-          </article>
-          <article class="split-card story-highlight reveal-up">
-            <div class="page-intro" style="margin-bottom:0;">
-              <span class="eyebrow">Crave Moments</span>
-              <h3 class="section-title">Jollibug signature moodboard</h3>
-            </div>
-            <!--
-              JS (main.js -> renderHomeCravings):
-              Clones #promo-tile-template for each burger/combo
-              and appends into this grid.
-            -->
-            <div class="grid" data-home-cravings id="home-cravings-grid">
-              <article class="promo-tile reveal-up">
-                <strong>Truffle Smash</strong>
-                <p class="muted">Soft potato bun, truffle aioli, double beef patty.</p>
-              </article>
-              <article class="promo-tile reveal-up">
-                <strong>Cheese Volcano Fries</strong>
-                <p class="muted">Crispy fries covered with signature cheddar lava sauce.</p>
-              </article>
-              <article class="promo-tile reveal-up">
-                <strong>Tropical Float</strong>
-                <p class="muted">Mango soda float for a cool and sweet finish.</p>
-              </article>
-            </div>
-          </article>
+        <div class="hp-promo__inner">
+          <div class="hp-promo__content">
+            <div class="hp-promo__tag">🔥 Ưu Đãi Hôm Nay</div>
+            <div class="hp-promo__title">Giảm 30% cho đơn hàng<br>đầu tiên của bạn!</div>
+            <div class="hp-promo__sub">Nhập mã <strong>JOLLIBUG30</strong> khi thanh toán. Áp dụng cho tất cả các món trong thực đơn, có giá trị đến hết ngày 30/04/2026.</div>
+          </div>
+          <div class="hp-promo__cta">
+            <a class="hp-promo__btn" href="/menu" id="promo-order-btn">Đặt Ngay &amp; Tiết Kiệm</a>
+            <div class="hp-promo__note">* Điều kiện áp dụng. Xem chi tiết.</div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION -->
+    <%-- 6. TẠI SAO CHỌN CHÚNG TÔI --%>
     <section class="section">
       <div class="container">
-        <div class="page-intro reveal-up">
-          <span class="eyebrow">Brand Pillars</span>
-          <h2 class="section-title">A frontend system that supports both delight and scale.</h2>
+        <div class="page-intro reveal-up" style="text-align:center; justify-items:center;">
+          <span class="eyebrow">💡 Vì Sao Chọn Jollibug?</span>
+          <h2 class="section-title">Chất lượng — Tốc độ — Hương vị</h2>
+          <p class="lead" style="text-align:center;">Chúng tôi không chỉ bán thức ăn nhanh, chúng tôi mang đến trải nghiệm ẩm thực tuyệt vời nhất cho bạn.</p>
         </div>
-        <div class="card-grid">
-          <article class="card feature-card reveal-up">
-            <div class="feature-card__icon">01</div>
-            <h3>Consistent across pages</h3>
-            <p class="muted">Navbar, footer, button behavior, and product data all come from shared assets instead of duplicated snippets.</p>
+
+        <div class="hp-why__grid">
+          <article class="hp-why__card reveal-up">
+            <div class="hp-why__icon">🚀</div>
+            <div class="hp-why__title">Giao Hàng Siêu Tốc</div>
+            <div class="hp-why__desc">Đội ngũ giao hàng chuyên nghiệp cam kết giao đến tay bạn trong vòng 30 phút, đảm bảo đồ ăn luôn nóng hổi.</div>
           </article>
-          <article class="card feature-card reveal-up">
-            <div class="feature-card__icon">02</div>
-            <h3>Natural admin separation</h3>
-            <p class="muted">Managers and super admins get distinct sidebars and workflows without branching the entire design language.</p>
+          <article class="hp-why__card reveal-up">
+            <div class="hp-why__icon">🥩</div>
+            <div class="hp-why__title">Nguyên Liệu Tươi Mỗi Ngày</div>
+            <div class="hp-why__desc">100% nguyên liệu được nhập từ các nhà cung cấp uy tín, chế biến tươi mỗi ngày, không dùng chất bảo quản.</div>
           </article>
-          <article class="card feature-card reveal-up">
-            <div class="feature-card__icon">03</div>
-            <h3>Conversion-minded details</h3>
-            <p class="muted">Search-first menu, floating auth forms, a Shopee-style address book, and quick cart access all reduce friction.</p>
+          <article class="hp-why__card reveal-up">
+            <div class="hp-why__icon">💰</div>
+            <div class="hp-why__title">Giá Cả Phải Chăng</div>
+            <div class="hp-why__desc">Chất lượng cao không đồng nghĩa với giá cao. Jollibug luôn có ưu đãi hấp dẫn giúp bạn ăn ngon mà không lo chi phí.</div>
           </article>
         </div>
       </div>
@@ -204,169 +279,18 @@
 
   </main>
 
+  <%-- 7. FOOTER (shared) --%>
+  <jsp:include page="layout/footer.jsp" />
 
-  <!-- SECTION
-       SHARED FOOTER
-       Future Spring MVC: 
-  -->
-  <footer class="site-footer" id="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="stack">
-          <div class="brand">
-            <span class="brand__mark">JB</span>
-            <span class="brand__copy">
-              <span class="brand__title">Jollibug</span>
-              <span class="brand__tag">Crave-worthy comfort, delivered fast</span>
-            </span>
-          </div>
-          <p>Jollibug pairs playful energy with polished quick-service UX, ready for a Spring MVC storefront.</p>
-        </div>
-        <div>
-          <h3>Explore</h3>
-          <div class="footer-links">
-            <a href="/menu">Signature Menu</a>
-            <a href="/about">Brand Story</a>
-            <a href="/contact">Store Locator</a>
-            <a href="/profile">Profile &amp; Address Book</a>
-          </div>
-        </div>
-        <div>
-          <h3>Support</h3>
-          <div class="footer-links">
-            <a href="/cart">Cart &amp; Checkout</a>
-            <a href="/forgot-password">Reset Password</a>
-            <a href="/register">Create Account</a>
-            <a href="/admin">Admin Center</a>
-          </div>
-        </div>
-        <div>
-          <h3>Contact</h3>
-          <div class="footer-links">
-            <span>88 Flavor Avenue, Ho Chi Minh City</span>
-            <span>+84 28 5555 8899</span>
-            <span>hello@Jollibug.vn</span>
-            <span>Open daily, 09:00 - 23:00</span>
-          </div>
-        </div>
-      </div>
-      <div class="footer-note">
-        <span>&copy; <span data-current-year id="footer-year"></span> Jollibug. Built for premium quick-service ordering.</span>
-        <span>Freshly made. Smoothly managed. Ready for backend integration.</span>
-      </div>
-    </div>
-  </footer>
-  <!-- /SHARED FOOTER -->
+  <script>
+    /* Category bar active toggle */
+    document.querySelectorAll('.hp-cat__item').forEach(function(el) {
+      el.addEventListener('click', function() {
+        document.querySelectorAll('.hp-cat__item').forEach(function(i){ i.classList.remove('active'); });
+        el.classList.add('active');
+      });
+    });
+  </script>
 
-
-
-  <div class="drawer-backdrop" data-drawer-backdrop id="drawer-backdrop"></div>
-  <aside class="cart-drawer" data-cart-drawer id="cart-drawer" aria-label="Shopping cart drawer">
-    <div class="cart-drawer__header">
-      <div class="card-actions">
-        <div class="stack">
-          <strong>Your order</strong>
-          <span class="muted">Fresh picks, saved instantly.</span>
-        </div>
-        <button class="btn btn-outline" type="button" data-action="close-cart" id="btn-close-cart">Close</button>
-      </div>
-    </div>
-    <!--
-      JS (main.js -> renderDrawerCart):
-      Clones #mini-cart-item-template for each cart item.
-      Shows #cart-drawer-empty-template when cart is empty.
-    -->
-    <div class="cart-drawer__body" data-drawer-items id="drawer-items"></div>
-    <div class="cart-drawer__footer stack">
-      <div class="summary-line">
-        <span>Total</span>
-        <strong data-drawer-total id="drawer-total">$0.00</strong>
-      </div>
-      <div class="cluster">
-        <a class="btn btn-outline" href="/cart">Full Cart</a>
-        <button class="btn btn-primary" type="button" data-action="checkout-demo" id="btn-checkout-demo">Checkout Demo</button>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Toast notification stack -->
-  <div class="toast-stack" data-toast-stack id="toast-stack"></div>
-
-  <template id="product-card-template">
-    <article class="card product-card reveal-up">
-      <div class="product-card__media" data-product-tone>
-        <span class="product-card__chip" data-product-badge></span>
-        <img data-product-image alt="" />
-      </div>
-      <div class="stack">
-        <div class="product-card__meta">
-          <span data-product-category></span>
-          <span data-product-rating></span>
-        </div>
-        <h3 class="product-card__title" data-product-name></h3>
-        <p class="muted" data-product-description></p>
-        <div class="price-row">
-          <div class="stack" style="gap:0.15rem;">
-            <span class="price" data-product-price></span>
-            <span class="muted" data-product-note></span>
-          </div>
-        </div>
-        <div class="card-actions">
-          <a class="btn btn-outline" data-product-detail-link href="#">Details</a>
-          <button class="btn btn-primary" type="button" data-action="add-product" data-product-id="">Add to cart</button>
-        </div>
-      </div>
-    </article>
-  </template>
-
-  <!--
-    Promo tile template - used by renderHomeCravings()
-  -->
-  <template id="promo-tile-template">
-    <article class="promo-tile reveal-up">
-      <strong data-promo-name></strong>
-      <p class="muted" data-promo-description></p>
-    </article>
-  </template>
-
-  <!--
-    Mini cart item template - used by renderDrawerCart()
-  -->
-  <template id="mini-cart-item-template">
-    <article class="mini-cart-item">
-      <div class="mini-cart-item__media" style="background:rgba(255,248,238,0.92);">
-        <img data-item-image alt="" />
-      </div>
-      <div class="stack" style="gap:0.2rem;">
-        <strong data-item-name></strong>
-        <span class="muted" data-item-price-qty></span>
-      </div>
-      <button class="btn btn-outline" type="button" data-action="remove-cart-item" data-cart-id="">Remove</button>
-    </article>
-  </template>
-
-  <!--
-    Empty drawer state template
-  -->
-  <template id="cart-drawer-empty-template">
-    <div class="empty-state">
-      <h3>Your cart is still warming up.</h3>
-      <p class="muted">Add a burger, combo, or drink to start your order.</p>
-      <a class="btn btn-secondary" href="/menu">Browse menu</a>
-    </div>
-  </template>
-
-  <!--
-    CSS and JS paths relative to Spring MVC context root.
-    store.js must load before main.js because it initializes the shared store object.
-  -->
-<script src="js/client/nav.js" defer></script>
-  <script src="js/client/store.js"></script>
-  <script src="js/client/main.js" defer></script>
-  </body>
+</body>
 </html>
-
-
-
-
-

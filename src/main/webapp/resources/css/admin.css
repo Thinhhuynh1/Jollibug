@@ -366,9 +366,7 @@
     grid-template-columns: 18.5rem minmax(0, 1fr);
   }
 
-  .admin-main {
-    padding: 1rem 1rem 1rem 0;
-  }
+
 }
 
 /* SECTION */
@@ -1197,7 +1195,6 @@
   background: rgba(255, 243, 220, 0.95);
   color: var(--color-ink-800);
   border: 1.5px solid rgba(190, 140, 80, 0.28);
-  box-shadow: 0 2px 8px rgba(190, 120, 40, 0.1);
 }
 
 .btn-secondary:hover {

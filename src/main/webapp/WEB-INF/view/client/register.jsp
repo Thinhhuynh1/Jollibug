@@ -24,49 +24,36 @@
 
   <main class="page-shell">
     <section class="section">
-      <div class="container">
+      <div class="container" style="width: min(700px, calc(100% - 1.5rem * 2));">
 
 
           <article class="auth-panel reveal-up">
             <div class="auth-panel__content">
               <div class="page-intro" style="margin-bottom:0;">
-                <span class="eyebrow">Register</span>
-                <h2 class="section-title">Set up your Jollibug account</h2>
+                <h2 class="section-title">Đăng ký Jollibug</h2>
               </div>
-              <div class="social-grid">
-                <button class="btn btn-outline social-btn" type="button">Sign up with Google</button>
-                <button class="btn btn-outline social-btn" type="button">Sign up with Facebook</button>
-              </div>
-              <div class="divider">or create with email</div>
-              <form class="floating-grid" action="/register" method="post" id="register-form" novalidate>
+              <form class="floating-grid" >
                 <div class="floating-field">
-                  <input id="register-fullname" name="fullname" type="text" placeholder=" " required />
-                  <label for="register-fullname">Full name</label>
-                </div>
-                <div class="floating-field">
-                  <input id="register-username" name="username" type="text" placeholder=" " required />
-                  <label for="register-username">Username</label>
+                  <input id="register-name" name="name" type="text" placeholder=" " required />
+                  <label for="register-name">Họ tên</label>
                 </div>
                 <div class="floating-field">
                   <input id="register-email" name="email" type="email" placeholder=" " required />
-                  <label for="register-email">Email address</label>
+                  <label for="register-email">Địa chỉ email</label>
                 </div>
                 <div class="floating-field">
-                  <input id="register-sdt" name="sdt" type="tel" placeholder=" " required />
-                  <label for="register-sdt">Phone number</label>
+                  <input id="register-phone" name="phone" type="tel" placeholder=" " required />
+                  <label for="register-phone">Số điện thoại</label>
                 </div>
                 <div class="floating-field">
                   <input id="register-password" name="password" type="password" placeholder=" " required minlength="6" />
-                  <label for="register-password">Create password</label>
+                  <label for="register-password">Tạo mật khẩu</label>
                 </div>
-                <c:if test="${not empty error}">
-                  <div class="alert alert-danger">${error}</div>
-                </c:if>
-                <button class="btn btn-primary btn-block" type="submit">Create account</button>
+                <button class="btn btn-primary btn-block" type="submit">Tạo tài khoản</button>
               </form>
               <div class="card-actions">
-                <span class="muted">Already a member?</span>
-                <a href="/login">Sign in here</a>
+                <a href="/login">Bạn đã có tài khoản? Đăng nhập</a>
+                <a href="/forgot-password">Quên mật khẩu</a>
               </div>
             </div>
           </article>
@@ -75,36 +62,7 @@
     </section>
   </main>
 
-  <!-- SHARED FOOTER -->
-  <footer class="site-footer" id="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="stack"><div class="brand"><span class="brand__mark">JB</span><span class="brand__copy"><span class="brand__title">Jollibug</span></span></div></div>
-        <div><h3>Explore</h3><div class="footer-links"><a href="/menu">Menu</a></div></div>
-        <div><h3>Auth</h3><div class="footer-links"><a href="/login">Sign In</a><a href="/forgot-password">Reset Password</a></div></div>
-        <div><h3>Contact</h3><div class="footer-links"><span>hello@Jollibug.vn</span></div></div>
-      </div>
-      <div class="footer-note"><span>&copy; <span data-current-year id="footer-year"></span> Jollibug.</span></div>
-    </div>
-  </footer>
-
-  <div class="drawer-backdrop" data-drawer-backdrop id="drawer-backdrop"></div>
-  <aside class="cart-drawer" data-cart-drawer id="cart-drawer" aria-label="Shopping cart drawer">
-    <div class="cart-drawer__header"><div class="card-actions"><div class="stack"><strong>Your order</strong><span class="muted">Fresh picks, saved instantly.</span></div><button class="btn btn-outline" type="button" data-action="close-cart">Close</button></div></div>
-    <div class="cart-drawer__body" data-drawer-items id="drawer-items"></div>
-    <div class="cart-drawer__footer stack"><div class="summary-line"><span>Total</span><strong data-drawer-total id="drawer-total">$0.00</strong></div><div class="cluster"><a class="btn btn-outline" href="/cart">Full Cart</a><button class="btn btn-primary" type="button" data-action="checkout-demo">Checkout Demo</button></div></div>
-  </aside>
-  <div class="toast-stack" data-toast-stack id="toast-stack"></div>
-
-  <template id="mini-cart-item-template">
-    <article class="mini-cart-item"><div class="mini-cart-item__media" style="background:rgba(255,248,238,0.92);"><img data-item-image alt="" /></div><div class="stack" style="gap:0.2rem;"><strong data-item-name></strong><span class="muted" data-item-price-qty></span></div><button class="btn btn-outline" type="button" data-action="remove-cart-item" data-cart-id="">Remove</button></article>
-  </template>
-  <template id="cart-drawer-empty-template">
-    <div class="empty-state"><h3>Your cart is still warming up.</h3><p class="muted">Add a burger, combo, or drink.</p><a class="btn btn-secondary" href="/menu">Browse menu</a></div>
-  </template>
-<script src="js/client/nav.js" defer></script>
-  <script src="js/client/store.js"></script>
-<script src="js/client/main.js" defer></script>
+    <jsp:include page="layout/footer.jsp" />
   </body>
 </html>
 

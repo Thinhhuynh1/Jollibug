@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="client/css/profile.css">
+  <link rel="stylesheet" href="css/client/profile.css">
 
   
 </head>
@@ -23,13 +23,12 @@
   <jsp:include page="layout/header.jsp" />
 
   <main class="profile-page">
-    <div class="container">
+    <div class="container container--account-wide">
       <div class="profile-layout">
-        <jsp:include page="layout/profile-sidebar.jsp" />
+        <jsp:include page="layout/sidebar-profile.jsp" />
 
         <section class="profile-content">
           <h1 class="profile-title">Chi tiết tài khoản</h1>
-          <p class="profile-subtitle">Cập nhật thông tin cá nhân của bạn để trải nghiệm đặt món và giao hàng nhanh hơn.</p>
 
           <form class="profile-form" action="#" method="post">
             <div class="profile-grid">

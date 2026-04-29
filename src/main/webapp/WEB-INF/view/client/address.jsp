@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="client/css/profile.css">
+  <link rel="stylesheet" href="css/client/profile.css">
 
   
 </head>
@@ -23,9 +23,21 @@
   <jsp:include page="layout/header.jsp" />
 
   <main class="profile-page">
-    <div class="container">
+    <div class="container container--account-wide">
       <div class="profile-layout">
-        <jsp:include page="layout/profile-sidebar.jsp" />
+        <aside class="profile-sidebar">
+          <div class="profile-sidebar__avatar">U</div>
+          <div class="profile-sidebar__greeting">Xin chào,</div>
+          <div class="profile-sidebar__name">User Demo!</div>
+          <a class="profile-sidebar__logout" href="/logout">Đăng xuất</a>
+
+          <nav class="profile-nav" aria-label="Profile navigation">
+            <a href="/orders">Đơn hàng</a>
+            <a href="/address">Địa chỉ của bạn</a>
+            <a class="is-active" href="/profile">Chi tiết tài khoản</a>
+            <a href="/forgot-password">Đặt lại mật khẩu</a>
+          </nav>
+        </aside>
 
         <section class="profile-content">
           <div class="panel-header">
@@ -43,6 +55,7 @@
       </div>
     </div>
   </main>
-
-</body>
+      <!-- SHARED FOOTER -->
+  <jsp:include page="layout/footer.jsp" />
+</body> 
 </html>
