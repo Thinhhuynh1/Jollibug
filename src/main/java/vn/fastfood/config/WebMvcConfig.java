@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -43,4 +44,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
     // Khi gọi trên website là /css/style.css
     // -> spring lấy file /resource/css/style.css
+
+    // Quản lý Request | Cho phép Những request có đủ quyền và chặn những cái k có
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new SessionInterceptor()).excludePathPatterns("/**/*.css", "/**/*.js");
+    }
 }

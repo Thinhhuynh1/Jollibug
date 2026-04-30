@@ -1,81 +1,75 @@
 package vn.fastfood.entity;
 
+import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@ToString
+@Setter
+@Getter
 @Entity
-@Table(name = "users")
+@Table(name = "USER")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private long id;
 
-    @Column(nullable = false, unique = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MaTK")
+    private Long maTK;
+
+    @Column(name = "Username", length = 50)
     private String username;
 
-    @Column(nullable= false)
+    @Column(name = "Password", nullable = false)
     private String password;
 
-    @Column(nullable = false, unique= true)
-    private String email;
+    @Column(name = "HoTen", nullable = false, length = 100)
+    private String hoTen;
 
-    @Column(nullable= false)
-    private String fullname;
-
-    @Column(nullable= false, unique= true)
+    @Column(name = "SDT", length = 15)
     private String sdt;
 
-    public long getId() {
-        return id;
-    }
+    @Column(name = "Email", nullable = false, unique = true, length = 100)
+    private String email;
 
-    public void setId(long id) {
-        this.id = id;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TrangThai")
+    private UserStatus trangThai;
 
-    public String getUsername() {
-        return username;
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MaVT", referencedColumnName = "MaVT")
+    private VaiTro vaiTro;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    // Tự động lấy giờ hiện tại khi tạo mới
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    public String getPassword() {
-        return password;
-    }
+    // Tự động lấy giờ hiện tại mỗi khi có thao tác sửa dữ liệu
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFullname() {
-        return fullname;
-    }
-
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
-    }
-
-    public String getSdt() {
-        return sdt;
-    }
-
-    public void setSdt(String sdt) {
-        this.sdt = sdt;
-    }
-
-    
 }
