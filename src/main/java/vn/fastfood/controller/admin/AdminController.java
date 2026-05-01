@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import vn.fastfood.entity.User;
+import vn.fastfood.entity.UserStatus;
 import vn.fastfood.repository.RoleRepository;
 import vn.fastfood.repository.UserRepository;
 import vn.fastfood.service.UserService;
@@ -30,7 +31,14 @@ public class AdminController {
     }
 
     @GetMapping("/admin")
-    public String getDashboard() {
+    public String getDashboard(Model model) {
+        model.addAttribute("countAdmin", this.userRepository.count("Admin", null));
+        model.addAttribute("countManager", this.userRepository.count("Manager", null));
+        model.addAttribute("countStaff", this.userRepository.count("Staff", null));
+        model.addAttribute("countClient", this.userRepository.count("Client", null));
+        model.addAttribute("countActive", this.userRepository.count(null, UserStatus.ACTIVE));
+        model.addAttribute("countBan", this.userRepository.count(null, UserStatus.BANNED));
+
         return "admin/dashboard";
     }
 
@@ -41,9 +49,9 @@ public class AdminController {
         List<User> listUserActive;
 
         if ((role != null && !role.equals("All")) || (keyword != null && !keyword.isEmpty())) {
-            listUserActive = this.userRepository.search(role, keyword, "ACTIVE");
+            listUserActive = this.userRepository.search(role, keyword, UserStatus.ACTIVE);
         } else {
-            listUserActive = this.userService.findByTrangThai("ACTIVE");
+            listUserActive = this.userService.findByTrangThai(UserStatus.ACTIVE);
         }
 
         model.addAttribute("lisUsers", listUserActive);
@@ -63,9 +71,9 @@ public class AdminController {
         List<User> listUserBlocked;
 
         if ((role != null && !role.equals("All")) || (keyword != null && !keyword.isEmpty())) {
-            listUserBlocked = this.userRepository.search(role, keyword, "BANNED");
+            listUserBlocked = this.userRepository.search(role, keyword, UserStatus.BANNED);
         } else {
-            listUserBlocked = this.userService.findByTrangThai("BANNED");
+            listUserBlocked = this.userService.findByTrangThai(UserStatus.BANNED);
         }
 
         model.addAttribute("lisUsers", listUserBlocked);
@@ -87,7 +95,7 @@ public class AdminController {
             @RequestParam("Email") String email,
             @RequestParam("Password") String password,
             @RequestParam("SDT") String sdt,
-            @RequestParam(value = "TrangThai", defaultValue = "ACTIVE") String trangThai,
+            @RequestParam(value = "TrangThai", defaultValue = "ACTIVE") UserStatus trangThai,
             @RequestParam(value = "TenVT", required = false) String tenVT) {
 
         User user = new User();
@@ -106,32 +114,32 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    @GetMapping("/admin/users/{maTk}")
-    public String getDetailPage(@PathVariable long maTk, Model model) {
-        User user = this.userRepository.findById(maTk).orElse(null);
+    @GetMapping("/admin/users/{maTK}")
+    public String getDetailPage(@PathVariable long maTK, Model model) {
+        User user = this.userRepository.findById(maTK).orElse(null);
         model.addAttribute("user", user);
-        model.addAttribute("maTk", maTk);
+        model.addAttribute("maTK", maTK);
         return "admin/function/detail";
     }
 
-    @GetMapping("/admin/users/update/{maTk}")
+    @GetMapping("/admin/users/update/{maTK}")
     public String getUpdateUserPage(Model model,
-            @PathVariable long maTk) {
-        User user = this.userRepository.findById(maTk).orElse(null);
+            @PathVariable long maTK) {
+        User user = this.userRepository.findById(maTK).orElse(null);
         model.addAttribute("user", user);
 
         return "admin/function/update";
     }
 
-    @PostMapping("/admin/users/update/{maTk}")
+    @PostMapping("/admin/users/update/{maTK}")
     public String postUpdateUser(
-            @PathVariable long maTk,
+            @PathVariable long maTK,
             @RequestParam("HoTen") String hoTen,
             @RequestParam(value = "Password", required = false) String password,
             @RequestParam("SDT") String sdt,
             @RequestParam(value = "role", required = false) String role) {
 
-        User user = this.userRepository.findById(maTk).orElse(null);
+        User user = this.userRepository.findById(maTK).orElse(null);
         if (user != null) {
             user.setHoTen(hoTen);
             user.setSdt(sdt);
@@ -150,51 +158,51 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    @GetMapping("/admin/users/delete/{maTk}")
+    @GetMapping("/admin/users/delete/{maTK}")
     public String getDeleteUserPage(Model model,
-            @PathVariable long maTk) {
-        User user = this.userRepository.findById(maTk).orElse(null);
+            @PathVariable long maTK) {
+        User user = this.userRepository.findById(maTK).orElse(null);
         model.addAttribute("user", user);
 
         return "admin/function/delete";
     }
 
-    @PostMapping("/admin/users/delete/{maTk}")
-    public String postDeleteUser(@PathVariable long maTk) {
-        this.userService.deleteUser(maTk);
+    @PostMapping("/admin/users/delete/{maTK}")
+    public String postDeleteUser(@PathVariable long maTK) {
+        this.userService.deleteUser(maTK);
         return "redirect:/admin/users";
     }
 
-    @GetMapping("/admin/users/ban/{maTk}")
+    @GetMapping("/admin/users/ban/{maTK}")
     public String getBanUserPage(Model model,
-            @PathVariable long maTk) {
-        User user = this.userRepository.findById(maTk).orElse(null);
+            @PathVariable long maTK) {
+        User user = this.userRepository.findById(maTK).orElse(null);
         model.addAttribute("user", user);
-        model.addAttribute("maTk", maTk);
+        model.addAttribute("maTK", maTK);
         return "admin/function/ban";
     }
 
-    @PostMapping("/admin/users/ban/{maTk}")
-    public String postBanUser(@PathVariable long maTk) {
-        User user = this.userRepository.findById(maTk).orElse(null);
-        user.setTrangThai("BANNED");
+    @PostMapping("/admin/users/ban/{maTK}")
+    public String postBanUser(@PathVariable long maTK) {
+        User user = this.userRepository.findById(maTK).orElse(null);
+        user.setTrangThai(UserStatus.BANNED);
         this.userService.saveUser(user);
         return "redirect:/admin/users";
     }
 
-    @GetMapping("/admin/users/unban/{maTk}")
+    @GetMapping("/admin/users/unban/{maTK}")
     public String getUnbanUserPage(Model model,
-            @PathVariable long maTk) {
-        User user = this.userRepository.findById(maTk).orElse(null);
+            @PathVariable long maTK) {
+        User user = this.userRepository.findById(maTK).orElse(null);
         model.addAttribute("user", user);
-        model.addAttribute("maTk", maTk);
+        model.addAttribute("maTK", maTK);
         return "admin/function/unban";
     }
 
-    @PostMapping("/admin/users/unban/{maTk}")
-    public String postUnbanUser(@PathVariable long maTk) {
-        User user = this.userRepository.findById(maTk).orElse(null);
-        user.setTrangThai("ACTIVE");
+    @PostMapping("/admin/users/unban/{maTK}")
+    public String postUnbanUser(@PathVariable long maTK) {
+        User user = this.userRepository.findById(maTK).orElse(null);
+        user.setTrangThai(UserStatus.ACTIVE);
         this.userService.saveUser(user);
         return "redirect:/admin/users/block";
     }

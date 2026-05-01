@@ -41,7 +41,7 @@
                         <div class="profile-field">
                             <span>Mã người dùng</span>
                             <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
-                                <c:out value="${user.maTk}" default="-" />
+                                <c:out value="${user.maTK}" default="-" />
                             </div>
                         </div>
 
@@ -69,7 +69,7 @@
                         <div class="profile-field">
                             <span>Vai trò</span>
                             <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
-                                <c:out value="${user.vaiTro.tenVt}" default="-" />
+                                <c:out value="${user.vaiTro.tenVT}" default="-" />
                             </div>
                         </div>
 

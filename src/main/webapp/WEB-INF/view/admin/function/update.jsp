@@ -37,7 +37,7 @@
             </div>
           </div>
 
-          <form action="/admin/users/update/${user.maTk}" method="POST" class="admin-card" style="margin-top:1rem; padding: 1.75rem;">
+          <form action="/admin/users/update/${user.maTK}" method="POST" class="admin-card" style="margin-top:1rem; padding: 1.75rem;">
               <div class="profile-grid">
                   <!-- Hàng 1: Họ tên + Số điện thoại -->
                   <label class="profile-field">
@@ -65,7 +65,7 @@
                   <label class="profile-field">
                       <span>Vai trò <span style="color:var(--color-red-500);">*</span></span>
                       <select name="role" required style="width: 100%; border: 1px solid rgba(111,82,55,0.14); border-radius: var(--radius-md); padding: 0.65rem 1rem; font-family: var(--font-body); font-size: 0.9rem; background: #fff; outline: none; transition: border-color 0.15s;">
-                        <option value="${user.vaiTro.tenVt}" selected>${user.vaiTro.tenVt}</option>  
+                        <option value="${user.vaiTro.tenVT}" selected>${user.vaiTro.tenVT}</option>  
                         <option value="Client">Khách hàng</option>
                         <option value="Staff">Nhân viên</option>
                         <option value="Manager">Quản lý</option>
@@ -75,7 +75,7 @@
                   
                   <label class="profile-field">
                       <span>Mã người dùng</span>
-                      <input type="text" value="${user.maTk}" disabled />
+                      <input type="text" value="${user.maTK}" disabled />
                   </label>
 
               </div>

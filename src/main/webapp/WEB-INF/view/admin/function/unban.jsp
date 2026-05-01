@@ -33,14 +33,14 @@
           <div style="max-width: 48rem; margin: 0 auto; width: 100%;">
             <div class="panel-header">
               <div class="stack" style="gap:0.25rem;">
-                <h2 class="section-title">Xóa người dùng #${user.maTk}</h2>
+                <h2 class="section-title">Xóa người dùng #${user.maTK}</h2>
                 <p class="muted" style="margin:0;">Xác nhận mở khóa tài khoản người dùng này.</p>
               </div>
             </div>
             <div style="margin-top:1.25rem; padding:0.9rem 1rem; border:1px solid #c4f1e3; background:#fff4f5; border-radius: var(--radius-md); color:#249f32;">
                 Bạn có chắc chắn muốn mở khóa người dùng này không?
               </div>
-              <form action="/admin/users/unban/${user.maTk}" method="post">
+              <form action="/admin/users/unban/${user.maTK}" method="post">
                 <div class="modal__actions" style="margin-top: 2rem; justify-content: flex-end;">
                   <a href="/admin/users" class="btn btn-ghost">Hủy</a>
                   <button type="submit" class="btn btn-primary" style="background:#d32f2f; border-color:#d32f2f;">

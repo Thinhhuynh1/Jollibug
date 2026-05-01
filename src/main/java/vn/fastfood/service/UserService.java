@@ -7,8 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import vn.fastfood.entity.Role;
+import vn.fastfood.entity.VaiTro;
 import vn.fastfood.entity.User;
+import vn.fastfood.entity.UserStatus;
 import vn.fastfood.repository.RoleRepository;
 import vn.fastfood.repository.UserRepository;
 
@@ -66,20 +67,20 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
-    public Role getRoleByName(String name) {
-        return this.roleRepository.findByTenVt(name);
+    public VaiTro getRoleByName(String name) {
+        return this.roleRepository.findByTenVT(name);
     }
 
     public List<User> fetchUserActive() {
         return this.userRepository.findAll();
     }
 
-    public List<User> findByTrangThai(String trangThai) {
+    public List<User> findByTrangThai(UserStatus trangThai) {
         return this.userRepository.findByTrangThai(trangThai);
     }
 
-    public void deleteUser(long maTk) {
-        this.userRepository.deleteById(maTk);
+    public void deleteUser(long maTK) {
+        this.userRepository.deleteById(maTK);
     }
 
 }

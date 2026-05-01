@@ -96,13 +96,13 @@
                       <tr>
                         <td>${user.hoTen}</td>
                         <td>${user.email}</td>
-                        <td>${user.vaiTro.tenVt}</td>
+                        <td>${user.vaiTro.tenVT}</td>
                         <td><span class="status-badge" data-status="out-of-stock">${user.trangThai}</span></td>
                         <td>
-                          <a href="/admin/users/${user.maTk}" class="btn btn-ghost" type="button">Xem</a>
-                          <a href="/admin/users/update/${user.maTk}" class="btn btn-ghost" type="button">Sửa</a>
-                          <a href="/admin/users/delete/${user.maTk}" class="btn btn-ghost" type="button">Xóa</a>
-                          <a href="/admin/users/unban/${user.maTk}" class="btn btn-ghost" type="button">Mở khóa</a>
+                          <a href="/admin/users/${user.maTK}" class="btn btn-ghost" type="button">Xem</a>
+                          <a href="/admin/users/update/${user.maTK}" class="btn btn-ghost" type="button">Sửa</a>
+                          <a href="/admin/users/delete/${user.maTK}" class="btn btn-ghost" type="button">Xóa</a>
+                          <a href="/admin/users/unban/${user.maTK}" class="btn btn-ghost" type="button">Mở khóa</a>
                         </td>
                       </tr>
                     </c:forEach>
@@ -113,13 +113,13 @@
                       <tr>
                         <td>${user.hoTen}</td>
                         <td>${user.email}</td>
-                        <td>${user.vaiTro.tenVt}</td>
+                        <td>${user.vaiTro.tenVT}</td>
                         <td><span class="status-badge" data-status="active">${user.trangThai}</span></td>
                         <td>
-                          <a href="/admin/users/${user.maTk}" class="btn btn-ghost" type="button">Xem</a>
-                          <a href="/admin/users/update/${user.maTk}" class="btn btn-ghost" type="button">Sửa</a>
-                          <a href="/admin/users/delete/${user.maTk}" class="btn btn-ghost" type="button">Xóa</a>
-                          <a href="/admin/users/ban/${user.maTk}" class="btn btn-ghost" type="button">Khóa</a>
+                          <a href="/admin/users/${user.maTK}" class="btn btn-ghost" type="button">Xem</a>
+                          <a href="/admin/users/update/${user.maTK}" class="btn btn-ghost" type="button">Sửa</a>
+                          <a href="/admin/users/delete/${user.maTK}" class="btn btn-ghost" type="button">Xóa</a>
+                          <a href="/admin/users/ban/${user.maTK}" class="btn btn-ghost" type="button">Khóa</a>
                         </td>
                       </tr>
                     </c:forEach>
