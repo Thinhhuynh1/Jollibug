@@ -27,14 +27,20 @@
       <div class="container" style="width: min(700px, calc(100% - 1.5rem * 2));">
 
 
-          <article class="auth-panel reveal-up">
+          <article class="auth-panel">
             <div class="auth-panel__content">
               <div class="page-intro" style="margin-bottom:0;">
                 <h2 class="section-title">Đăng ký Jollibug</h2>
               </div>
-              <form class="floating-grid" >
+              <c:if test="${not empty error}">
+                <div style="background-color: #eda7ad; border: 1px solid #e91d32; color: #ff0019; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
+                  <!-- lấy lỗi từ dưới controller nếu có sẽ hiển thị ở đây -->
+                  ${error} 
+                </div>
+              </c:if>
+              <form class="floating-grid" action="/register" method="POST">
                 <div class="floating-field">
-                  <input id="register-name" name="name" type="text" placeholder=" " required />
+                  <input id="register-name" name="hoTen" type="text" placeholder=" " required />
                   <label for="register-name">Họ tên</label>
                 </div>
                 <div class="floating-field">
@@ -42,13 +48,14 @@
                   <label for="register-email">Địa chỉ email</label>
                 </div>
                 <div class="floating-field">
-                  <input id="register-phone" name="phone" type="tel" placeholder=" " required />
+                  <input id="register-phone" name="sdt" type="tel" placeholder=" " required />
                   <label for="register-phone">Số điện thoại</label>
                 </div>
                 <div class="floating-field">
                   <input id="register-password" name="password" type="password" placeholder=" " required minlength="6" />
                   <label for="register-password">Tạo mật khẩu</label>
                 </div>
+                <!-- type summit kích hoạt action của form này đóng gói và gửi lên /register để post -->
                 <button class="btn btn-primary btn-block" type="submit">Tạo tài khoản</button>
               </form>
               <div class="card-actions">

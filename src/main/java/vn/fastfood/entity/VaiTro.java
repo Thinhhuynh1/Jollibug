@@ -7,8 +7,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "VAITRO")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

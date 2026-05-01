@@ -22,9 +22,6 @@ public class User {
     @Column(name = "MaTK")
     private Long maTK;
 
-    @Column(name = "Username", length = 50)
-    private String username;
-
     @Column(name = "Password", nullable = false)
     private String password;
 
@@ -62,4 +59,4 @@ public class User {
     public String getUpdatedAtDisplay() {
         return updatedAt == null ? "-" : updatedAt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
-} 
+}

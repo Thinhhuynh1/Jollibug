@@ -1,6 +1,5 @@
 package vn.fastfood.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import vn.fastfood.entity.User;
 import vn.fastfood.entity.UserStatus;
 import vn.fastfood.repository.RoleRepository;
 import vn.fastfood.repository.UserRepository;
+import vn.fastfood.repository.VaiTroRepository;
 
 @Service
 public class UserService {
@@ -22,6 +22,9 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private VaiTroRepository vaiTroRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     UserService(RoleRepository roleRepository) {
@@ -29,36 +32,33 @@ public class UserService {
     }
 
     public User registerNewUser(User user) {
-        List<String> errors = new ArrayList<>();
-
-        // Check for duplicate email
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            errors.add("Email đã được đăng ký");
+            throw new RuntimeException("Email đã được đăng ký");
         }
 
         if (userRepository.findBySdt(user.getSdt()) != null) {
-            errors.add("Số điện thoại đã được đăng ký");
-        }
-
-        if (!errors.isEmpty()) {
-            throw new RuntimeException(String.join(" | ", errors));
+            throw new RuntimeException("Số điện thoại đã được đăng ký");
         }
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
+        // Set vi trò default là khách hàng (ROLE_CLIENT)
+        user.setVaiTro(vaiTroRepository.findByTenVT("Client"));
+
+        // Set trạng thái default là ACTIVE
+        user.setTrangThai(UserStatus.ACTIVE);
+
         return userRepository.save(user);
     }
 
-    public User Login(User user) {
-        List<String> errors = new ArrayList<>();
-        User x = userRepository.findByEmail(user.getEmail());
-        if (x == null) {
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
             throw new RuntimeException("Email không tồn tại");
-        } else {
-            if (!passwordEncoder.matches(user.getPassword(), x.getPassword())) {
-                throw new RuntimeException("Mật khẩu sai");
-            }
+        }
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Mật khẩu sai");
         }
         return user;
     }

@@ -217,6 +217,7 @@ body[data-admin-page="orders"] {
 }
 
 @media (max-width: 768px) {
+
     .orders-info-grid,
     .orders-summary {
         grid-template-columns: 1fr;
@@ -271,7 +272,7 @@ body[data-admin-page="orders"] {
 .profile-sidebar__greeting {
     text-align: center;
     text-transform: uppercase;
-    font-size: 0.95rem;
+    font-size: 1.2rem;
     font-weight: 900;
     letter-spacing: 0.08em;
     margin-bottom: 0.6rem;
@@ -279,7 +280,7 @@ body[data-admin-page="orders"] {
 
 .profile-sidebar__name {
     text-align: center;
-    font-size: 1.15rem;
+    font-size: 1.6rem;
     font-weight: 800;
     margin-bottom: 0.75rem;
 }
@@ -288,10 +289,18 @@ body[data-admin-page="orders"] {
     display: block;
     text-align: center;
     color: #ffffff;
-    text-decoration: underline;
-    text-underline-offset: 0.2rem;
-    font-weight: 700;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 800;
     margin-bottom: 1.5rem;
+    background: rgb(197, 26, 26);
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.profile-sidebar__logout:hover {
+    background: rgb(160, 20, 20);
 }
 
 .profile-nav {
@@ -378,7 +387,7 @@ body[data-admin-page="orders"] {
     gap: 0.45rem;
 }
 
-.profile-field > span {
+.profile-field>span {
     font-size: 0.82rem;
     font-weight: 700;
     color: #6b7280;
@@ -442,30 +451,30 @@ body[data-admin-page="orders"] {
 
 @media (max-width: 1024px) {
     .profile-layout {
-    grid-template-columns: 1fr;
+        grid-template-columns: 1fr;
     }
 
     .container--account-wide {
-    width: min(var(--max-width), calc(100% - 1.5rem * 2));
+        width: min(var(--max-width), calc(100% - 1.5rem * 2));
     }
 
     .profile-sidebar {
-    position: static;
+        position: static;
     }
 }
 
 @media (max-width: 768px) {
     .profile-content {
-    padding: 1.25rem;
+        padding: 1.25rem;
     }
 
     .profile-grid,
     .profile-grid--three {
-    grid-template-columns: 1fr;
+        grid-template-columns: 1fr;
     }
 
     .profile-submit {
-    max-width: none;
+        max-width: none;
     }
 }
 
@@ -623,6 +632,7 @@ body[data-page="orders"] .order-detail__total strong {
 }
 
 @media (max-width: 768px) {
+
     body[data-page="orders"] .order-detail__summary,
     body[data-page="orders"] .order-detail__info-grid {
         grid-template-columns: 1fr;
@@ -638,7 +648,8 @@ body[data-page="orders"] .order-detail__total strong {
 .cancellation-reasons {
     margin-top: 1.5rem;
     display: grid;
-    gap: 16px; /* Increased from 12px */
+    gap: 16px;
+    /* Increased from 12px */
 }
 
 .reason-item {
@@ -705,4 +716,3 @@ body[data-page="orders"] .order-detail__total strong {
     font-size: 0.9rem;
     margin-top: 4px;
 }
-

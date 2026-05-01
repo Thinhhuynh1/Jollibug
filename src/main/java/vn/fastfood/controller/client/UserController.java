@@ -6,7 +6,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import vn.fastfood.entity.User;
 import vn.fastfood.service.UserService;
 
@@ -46,14 +49,38 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String processLogin(@ModelAttribute("user") User user, Model model) {
+    public String processLogin(@RequestParam("email") String email, @RequestParam("password") String password,
+            Model model, HttpSession session) {
         try {
-            userService.Login(user);
-            return "redirect:/login";
+            User user = userService.login(email, password);
+            session.setAttribute("user", user);
+            session.setAttribute("userId", user.getMaTK());
+
+            String roleName = user.getVaiTro().getTenVT();
+            session.setAttribute("userRole", roleName);
+
+            if ("Admin".equals(roleName)) {
+                return "redirect:/admin";
+            } else if ("Manager".equals(roleName)) {
+                return "redirect:/manager";
+            } else if ("Staff".equals(roleName)) {
+                return "redirect:/staff";
+            }
+
+            return "redirect:/";
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            return "client/";
+            return "client/login";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session, HttpServletResponse response) {
+        // Hủy dữ liệu trong session
+        if (session != null) {
+            session.invalidate();
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/forgot-password")
