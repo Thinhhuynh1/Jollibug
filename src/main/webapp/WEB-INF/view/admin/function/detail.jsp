@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Admin â€” Manage Users</title>
+  <title>Jollibug | ADMIN</title>
   <meta name="description" content="Jollibug Super Admin â€” centralized user management for all roles: Staff, Manager, and Client." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,21 +41,21 @@
                         <div class="profile-field">
                             <span>Mã người dùng</span>
                             <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
-                                <c:out value="${user.id}" default="-" />
+                                <c:out value="${user.maTk}" default="-" />
                             </div>
                         </div>
 
                         <div class="profile-field">
                             <span>Họ và tên</span>
                             <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
-                                <c:out value="${user.fullName}" default="-" />
+                                <c:out value="${user.hoTen}" default="-" />
                             </div>
                         </div>
 
                         <div class="profile-field">
                             <span>Số điện thoại</span>
                             <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
-                                <c:out value="${user.phone}" default="-" />
+                                <c:out value="${user.sdt}" default="-" />
                             </div>
                         </div>
 
@@ -69,21 +69,28 @@
                         <div class="profile-field">
                             <span>Vai trò</span>
                             <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
-                                <c:out value="${user.role}" default="-" />
+                                <c:out value="${user.vaiTro.tenVt}" default="-" />
                             </div>
                         </div>
 
                         <div class="profile-field">
                             <span>Trạng thái</span>
                             <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
-                                <c:out value="${user.status}" default="-" />
+                                <c:out value="${user.trangThai}" default="-" />
                             </div>
                         </div>
 
                         <div class="profile-field">
-                            <span>Ngày tham gia</span>
+                            <span>Ngày tạo</span>
                             <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
-                                <c:out value="${user.createdAt}" default="-" />
+                                <c:out value="${user.createdAtDisplay}" default="-" />
+                            </div>
+                        </div>
+
+                        <div class="profile-field">
+                            <span>Ngày cập nhật</span>
+                            <div style="margin-top:0.45rem; padding:0.65rem 1rem; border:1px solid rgba(111,82,55,0.14); border-radius:var(--radius-md); background:#fff; color:var(--color-text-strong);">
+                                <c:out value="${user.updatedAtDisplay}" default="-" />
                             </div>
                         </div>
 

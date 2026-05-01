@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import vn.fastfood.entity.User;
 import vn.fastfood.service.UserService;
 
-
 @Controller
 public class UserController {
 
@@ -24,14 +23,16 @@ public class UserController {
     }
 
     // Phần đăng kí
-    //Model tạo 1 cái thùng chứa dữ liệu trống để khi nhập vào form trong jsp sẽ lưu vào đây
+    // Model tạo 1 cái thùng chứa dữ liệu trống để khi nhập vào form trong jsp sẽ
+    // lưu vào đây
     @GetMapping("/register")
     public String getRegisterPage(Model model) {
         model.addAttribute("user", new User());
         return "client/register";
     }
 
-    //Gọi user dựa trên model tạo ở trên, gọi lại model dó để add thêm thuộc tính nếu lỗi 
+    // Gọi user dựa trên model tạo ở trên, gọi lại model dó để add thêm thuộc tính
+    // nếu lỗi
     @PostMapping("/register")
     public String processRegister(@ModelAttribute("user") User user, Model model) {
         try {
@@ -39,12 +40,12 @@ public class UserController {
             return "redirect:/login";
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("user", user); 
+            model.addAttribute("user", user);
             return "client/register";
         }
     }
-    
-        @PostMapping("/login")
+
+    @PostMapping("/login")
     public String processLogin(@ModelAttribute("user") User user, Model model) {
         try {
             userService.Login(user);
@@ -54,7 +55,6 @@ public class UserController {
             return "client/";
         }
     }
-    
 
     @GetMapping("/forgot-password")
     public String getForgotPasswordPage() {

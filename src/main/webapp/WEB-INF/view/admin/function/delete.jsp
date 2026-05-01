@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Admin â€” Manage Users</title>
+  <title>Jollibug | ADMIN</title>
   <meta name="description" content="Jollibug Super Admin â€” centralized user management for all roles: Staff, Manager, and Client." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -33,7 +33,7 @@
           <div style="max-width: 48rem; margin: 0 auto; width: 100%;">
             <div class="panel-header">
               <div class="stack" style="gap:0.25rem;">
-                <h2 class="section-title">Xóa người dùng #ND001</h2>
+                <h2 class="section-title">Xóa người dùng #${user.maTk}</h2>
                 <p class="muted" style="margin:0;">Xác nhận xóa tài khoản người dùng khỏi hệ thống quản trị.</p>
               </div>
             </div>
@@ -41,12 +41,14 @@
                 Bạn có chắc chắn muốn xóa người dùng này không? Hành động này không thể hoàn tác.
               </div>
 
+            <form method="post" action="/admin/users/delete/${user.maTk}">
               <div class="modal__actions" style="margin-top: 2rem; justify-content: flex-end;">
                 <a href="/admin/users" class="btn btn-ghost">Hủy</a>
                 <button type="submit" class="btn btn-primary" style="background:#d32f2f; border-color:#d32f2f;">
                   Xác nhận
                 </button>
               </div>
+            </form>
           </div>
         </section>
 

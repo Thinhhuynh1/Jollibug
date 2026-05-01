@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Admin â€” Manage Users</title>
+  <title>Jollibug | ADMIN</title>
   <meta name="description" content="Jollibug Super Admin â€” centralized user management for all roles: Staff, Manager, and Client." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,7 +19,7 @@
 </head>
 
 <!--
-  data-admin-role="admin"       â†’ Spring Security: ROLE_SUPER_ADMIN
+  data-admin-role="admin"       â†’ Spring Security: ROLE_SUPER_ ADMIN
   data-admin-page="manage-users" â†’ manage-users.js render branch
 -->
 <body data-admin-role="admin" data-admin-page="manage-users">
@@ -51,12 +51,14 @@
               </a>
             </div>
             <!-- Role filter dropdown -->
-            <div class="select-group" style="gap:0;">
-              <select id="role-filter" aria-label="Filter by role" style="padding:0.8rem 1rem;">
-                <option value="all">Vai trò</option>
-                <option value="manager">Quản lý</option>
-                <option value="staff">Nhân viên</option>
-                <option value="client">Khách hàng</option>
+            <div class="select-group" style="gap:0;" >
+              <select id="role-filter" aria-label="Filter by role" style="padding:0.8rem 1rem;"
+                      onchange="handleRoleFilter(this.value)">
+                <option value="All" <c:if test="${selectedRole == null || selectedRole == 'All'}">selected</c:if>>Tất cả</option>
+                <option value="Manager" <c:if test="${selectedRole == 'Manager'}">selected</c:if>>Quản lý</option>
+                <option value="Staff" <c:if test="${selectedRole == 'Staff'}">selected</c:if>>Nhân viên</option>
+                <option value="Client" <c:if test="${selectedRole == 'Client'}">selected</c:if>>Khách hàng</option>
+                <option value="Admin" <c:if test="${selectedRole == 'Admin'}">selected</c:if>>Quản trị viên</option>
               </select>
             </div>
             <!-- Search -->
@@ -64,7 +66,8 @@
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
               </svg>
-              <input id="user-search" type="search" placeholder="Search name or email" />
+              <input id="user-search" type="search" placeholder="Search name or email" 
+                    onkeydown="handleSearch(event)"/>
             </label>
             <a href="<c:url value='/admin/users/create'/>" class="btn btn-primary" type="button" id="btn-add-user">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" aria-hidden="true">
@@ -83,76 +86,44 @@
                 <th>Email</th>
                 <th>Vai trò</th>
                 <th>Trạng thái</th>
-                <th>Ngày tham gia</th>
                 <th>Hành động</th>
               </tr>
             </thead>
             <tbody id="users-table-body">
               <c:choose>
                 <c:when test="${activeUserTab == 'blocked'}">
-                  <tr>
-                    <td>Phan Mỹ Linh</td>
-                    <td>linh.phan@gmail.com</td>
-                    <td>Khách hàng</td>
-                    <td><span class="status-badge" data-status="banned">Bị khóa</span></td>
-                    <td>15/03/2026</td>
-                    <td>
-                      <a href="<c:url value='/admin/users/detail'/>" class="btn btn-ghost" type="button">Xem</a>
-                      <a href="<c:url value='/admin/users/unban'/>" class="btn btn-ghost" type="button">Mở khóa</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Hoàng Anh Đức</td>
-                    <td>duc.hoang@jollibug.vn</td>
-                    <td>Nhân viên</td>
-                    <td><span class="status-badge" data-status="banned">Bị khóa</span></td>
-                    <td>08/02/2026</td>
-                    <td>
-                      <a href="<c:url value='/admin/users/detail'/>" class="btn btn-ghost" type="button">Xem</a>
-                      <a href="<c:url value='/admin/users/unban'/>" class="btn btn-ghost" type="button">Mở khóa</a>
-                    </td>
-                  </tr>
+                  <c:forEach var="user" items="${lisUsers}">
+                      <tr>
+                        <td>${user.hoTen}</td>
+                        <td>${user.email}</td>
+                        <td>${user.vaiTro.tenVt}</td>
+                        <td><span class="status-badge" data-status="out-of-stock">${user.trangThai}</span></td>
+                        <td>
+                          <a href="/admin/users/${user.maTk}" class="btn btn-ghost" type="button">Xem</a>
+                          <a href="/admin/users/update/${user.maTk}" class="btn btn-ghost" type="button">Sửa</a>
+                          <a href="/admin/users/delete/${user.maTk}" class="btn btn-ghost" type="button">Xóa</a>
+                          <a href="/admin/users/unban/${user.maTk}" class="btn btn-ghost" type="button">Mở khóa</a>
+                        </td>
+                      </tr>
+                    </c:forEach>
+
                 </c:when>
                 <c:otherwise>
-                  <tr>
-                    <td>Nguyễn Minh Quân</td>
-                    <td>quan.nguyen@jollibug.vn</td>
-                    <td>Quản lý</td>
-                    <td><span class="status-badge" data-status="active">Đang hoạt động</span></td>
-                    <td>12/01/2026</td>
-                    <td>
-                      <a href="<c:url value='/admin/users/detail'/>" class="btn btn-ghost" type="button">Xem</a>
-                      <a href="<c:url value='/admin/users/update'/>" class="btn btn-ghost" type="button">Sửa</a>
-                      <a href="<c:url value='/admin/users/delete'/>" class="btn btn-ghost" type="button">Xóa</a>
-                      <a href="<c:url value='/admin/users/ban'/>" class="btn btn-ghost" type="button">Khóa</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Trần Thu Hà</td>
-                    <td>ha.tran@jollibug.vn</td>
-                    <td>Nhân viên</td>
-                    <td><span class="status-badge" data-status="active">Đang hoạt động</span></td>
-                    <td>25/11/2025</td>
-                    <td>
-                      <a href="<c:url value='/admin/users/detail'/>" class="btn btn-ghost" type="button">Xem</a>
-                      <a href="<c:url value='/admin/users/update'/>" class="btn btn-ghost" type="button">Sửa</a>
-                      <a href="<c:url value='/admin/users/delete'/>" class="btn btn-ghost" type="button">Xóa</a>
-                      <a href="<c:url value='/admin/users/ban'/>" class="btn btn-ghost" type="button">Khóa</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Lê Hoàng Phúc</td>
-                    <td>phuc.le@gmail.com</td>
-                    <td>Khách hàng</td>
-                    <td><span class="status-badge" data-status="active">Đang hoạt động</span></td>
-                    <td>03/08/2025</td>
-                    <td>
-                      <a href="<c:url value='/admin/users/detail'/>" class="btn btn-ghost" type="button">Xem</a>
-                      <a href="<c:url value='/admin/users/update'/>" class="btn btn-ghost" type="button">Sửa</a>
-                      <a href="<c:url value='/admin/users/delete'/>" class="btn btn-ghost" type="button">Xóa</a>
-                      <a href="<c:url value='/admin/users/ban'/>" class="btn btn-ghost" type="button">Khóa</a>
-                    </td>
-                  </tr>
+                  <c:forEach var="user" items="${lisUsers}">
+                      <tr>
+                        <td>${user.hoTen}</td>
+                        <td>${user.email}</td>
+                        <td>${user.vaiTro.tenVt}</td>
+                        <td><span class="status-badge" data-status="active">${user.trangThai}</span></td>
+                        <td>
+                          <a href="/admin/users/${user.maTk}" class="btn btn-ghost" type="button">Xem</a>
+                          <a href="/admin/users/update/${user.maTk}" class="btn btn-ghost" type="button">Sửa</a>
+                          <a href="/admin/users/delete/${user.maTk}" class="btn btn-ghost" type="button">Xóa</a>
+                          <a href="/admin/users/ban/${user.maTk}" class="btn btn-ghost" type="button">Khóa</a>
+                        </td>
+                      </tr>
+                    </c:forEach>
+
                 </c:otherwise>
               </c:choose>
             </tbody>
@@ -162,6 +133,38 @@
       </main>
   </div><!-- /data-admin-table-root -->
 
+  <script>
+    function handleRoleFilter(role) {
+      const currentTab = '${userTab}' === 'blocked' ? '/block' : '';
+      const baseUrl = '/admin/users' + currentTab;
+      const url = (role === 'All') ? baseUrl : baseUrl + '?role=' + (role);
+      window.location.href = url;
+    }
+    
+    function handleSearch(e) {
+      if(e.key == "Enter"){
+        const text = e.target.value;
+        const role = document.getElementById("role-filter").value;
+
+        const currentTab = '${userTab}' === 'blocked' ? '/block' : '';
+        const basicUrl = '/admin/users' + currentTab;
+
+        let url = basicUrl;
+
+        if(role != 'All'){
+          url += '?role=' + role;
+        }
+
+        if(text && text.trim() != ''){
+          url += (url.includes('?') ? '&' : '?') + 'keyword=' + text;
+        }
+
+        window.location.href = url;
+      }
+      
+    }
+
+  </script>
 
   <!-- Toast stack -->
   </body>

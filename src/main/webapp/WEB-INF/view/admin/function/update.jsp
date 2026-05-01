@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Admin â€” Manage Users</title>
+  <title>Jollibug | ADMIN</title>
   <meta name="description" content="Jollibug Super Admin â€” centralized user management for all roles: Staff, Manager, and Client." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,59 +37,47 @@
             </div>
           </div>
 
-          <form action="/admin/users/update" method="POST" class="admin-card" style="margin-top:1rem; padding: 1.75rem;">
-              <input type="hidden" name="id" value="USR-000127" />
+          <form action="/admin/users/update/${user.maTk}" method="POST" class="admin-card" style="margin-top:1rem; padding: 1.75rem;">
               <div class="profile-grid">
                   <!-- Hàng 1: Họ tên + Số điện thoại -->
                   <label class="profile-field">
                       <span>Họ và tên <span style="color:var(--color-red-500);">*</span></span>
-                      <input type="text" name="fullName" value="Nguyễn Minh Quân" placeholder="Nhập họ và tên" required />
+                      <input type="text" name="HoTen" value="${user.hoTen}" placeholder="Nhập họ và tên" required />
                   </label>
                   
                   <label class="profile-field">
                       <span>Số điện thoại</span>
-                      <input type="tel" name="phone" value="0909123456" placeholder="Nhập số điện thoại" />
+                      <input type="tel" name="SDT" value="${user.sdt}" placeholder="Nhập số điện thoại" />
                   </label>
 
                   <!-- Hàng 2: Email + Mật khẩu mới -->
                   <label class="profile-field">
                       <span>Email <span style="color:var(--color-red-500);">*</span></span>
-                      <input type="email" name="email" value="quan.nguyen@jollibug.vn" placeholder="Ví dụ: example@jollibug.vn" required disabled />
+                      <input type="email" name="Email" value="${user.email}" required disabled />
                   </label>
                   
                   <label class="profile-field">
                       <span>Mật khẩu mới</span>
-                      <input type="password" name="password" placeholder="Để trống nếu không đổi mật khẩu" />
+                      <input type="password" name="Password" placeholder="Để trống nếu không đổi mật khẩu" />
                   </label>
                   
                   <!-- Hàng 3: Vai trò + Trạng thái -->
                   <label class="profile-field">
                       <span>Vai trò <span style="color:var(--color-red-500);">*</span></span>
                       <select name="role" required style="width: 100%; border: 1px solid rgba(111,82,55,0.14); border-radius: var(--radius-md); padding: 0.65rem 1rem; font-family: var(--font-body); font-size: 0.9rem; background: #fff; outline: none; transition: border-color 0.15s;">
-                          <option value="CLIENT">Khách hàng</option>
-                          <option value="STAFF">Nhân viên (Staff)</option>
-                          <option value="MANAGER" selected>Quản lý (Manager)</option>
-                          <option value="ADMIN">Quản trị viên (Admin)</option>
+                        <option value="${user.vaiTro.tenVt}" selected>${user.vaiTro.tenVt}</option>  
+                        <option value="Client">Khách hàng</option>
+                        <option value="Staff">Nhân viên</option>
+                        <option value="Manager">Quản lý</option>
+                        <option value="Admin">Quản trị viên</option>
                       </select>
                   </label>
                   
                   <label class="profile-field">
-                      <span>Trạng thái</span>
-                      <select name="status" style="width: 100%; border: 1px solid rgba(111,82,55,0.14); border-radius: var(--radius-md); padding: 0.65rem 1rem; font-family: var(--font-body); font-size: 0.9rem; background: #fff; outline: none; transition: border-color 0.15s;">
-                          <option value="ACTIVE" selected>Đang hoạt động</option>
-                          <option value="BLOCKED">Khóa</option>
-                      </select>
-                  </label>
-
-                  <label class="profile-field">
                       <span>Mã người dùng</span>
-                      <input type="text" value="USR-000127" disabled />
+                      <input type="text" value="${user.maTk}" disabled />
                   </label>
 
-                  <label class="profile-field">
-                      <span>Ngày tham gia</span>
-                      <input type="text" value="12/01/2026" disabled />
-                  </label>
               </div>
               
               <div class="modal__actions" style="margin-top: 2.5rem; justify-content: flex-end;">
