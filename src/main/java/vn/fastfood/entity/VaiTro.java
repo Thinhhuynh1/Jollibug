@@ -1,34 +1,26 @@
 package vn.fastfood.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import java.util.List;
 
-@ToString
-@Setter
-@EqualsAndHashCode
-@Getter
+import jakarta.persistence.*;
+import lombok.*;
+
 @Entity
 @Table(name = "VAITRO")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class VaiTro {
 
     @Id
-    @Column(name = "MaVT", length = 20)
-    private String maVT;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MaVT")
+    private Long maVT;
 
-    @Column(name = "TenVT", length = 50, nullable = false)
+    @Column(name = "TenVT", nullable = false)
     private String tenVT;
 
-    
+    @OneToMany(mappedBy = "vaiTro")
+    private List<User> users;
 }

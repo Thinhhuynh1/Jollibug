@@ -55,7 +55,7 @@ public class UserController {
             User user = userService.login(email, password);
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getMaTK());
-            session.setAttribute("userRole", user.getVaiTro().getMaVT());
+            session.setAttribute("userRole", String.valueOf(user.getVaiTro().getMaVT()));
             return "redirect:/";
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());

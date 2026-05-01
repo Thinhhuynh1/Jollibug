@@ -34,7 +34,7 @@ public class UserService {
         user.setPassword(encodedPassword);
         
         // Set vi trò default là khách hàng (ROLE_CLIENT - MaVT = 2)
-        user.setVaiTro(vaiTroRepository.findByMaVT("2"));
+        user.setVaiTro(vaiTroRepository.findByMaVT(2L));
         
         // Set trạng thái default là ACTIVE
         user.setTrangThai(UserStatus.ACTIVE);

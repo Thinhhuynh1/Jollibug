@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository;
 import vn.fastfood.entity.VaiTro;
 
 @Repository
-public interface VaiTroRepository extends JpaRepository<VaiTro, String> {
+public interface VaiTroRepository extends JpaRepository<VaiTro, Long> {
 
-    VaiTro findByMaVT(String maVT);
+    VaiTro findByMaVT(Long maVT);
     
 }
