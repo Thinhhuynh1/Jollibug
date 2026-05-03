@@ -3,7 +3,7 @@ package vn.fastfood.model;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-public class DonHang {
+public class Order {
     private long maDH;
     private long maTKKH;
     private Long maTKNV;
@@ -16,7 +16,7 @@ public class DonHang {
     private Long maGG;
     private String ghiChu;
 
-    public DonHang() {}
+    public Order() {}
 
     public long getMaDH() {
         return maDH;
@@ -104,5 +104,16 @@ public class DonHang {
 
     public void setGhiChu(String ghiChu) {
         this.ghiChu = ghiChu;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "maDH=" + maDH +
+                ", maTKKH=" + maTKKH +
+                ", ngayDat=" + ngayDat +
+                ", thanhTien=" + thanhTien +
+                ", trangThaiDon='" + trangThaiDon + '\'' +
+                '}';
     }
 }
