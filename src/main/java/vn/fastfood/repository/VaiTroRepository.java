@@ -8,6 +8,6 @@ import vn.fastfood.entity.VaiTro;
 @Repository
 public interface VaiTroRepository extends JpaRepository<VaiTro, Long> {
 
-    VaiTro findByTenVT(String maVT);
+    VaiTro findByTenVT(String tenVT);
 
 }

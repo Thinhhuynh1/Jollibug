@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 import vn.fastfood.entity.VaiTro;
 import vn.fastfood.entity.User;
 import vn.fastfood.entity.UserStatus;
-import vn.fastfood.repository.RoleRepository;
+import vn.fastfood.repository.VaiTroRepository;
 import vn.fastfood.repository.UserRepository;
 import vn.fastfood.repository.VaiTroRepository;
 
 @Service
 public class UserService {
 
-    private final RoleRepository roleRepository;
+    private final VaiTroRepository roleRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -27,7 +27,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    UserService(RoleRepository roleRepository) {
+    UserService(VaiTroRepository roleRepository) {
         this.roleRepository = roleRepository;
     }
 

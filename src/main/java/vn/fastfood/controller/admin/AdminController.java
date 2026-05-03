@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import vn.fastfood.entity.User;
 import vn.fastfood.entity.UserStatus;
-import vn.fastfood.repository.RoleRepository;
+import vn.fastfood.repository.VaiTroRepository;
 import vn.fastfood.repository.UserRepository;
 import vn.fastfood.service.UserService;
 
@@ -29,7 +29,7 @@ public class AdminController {
 
     AdminController(UserRepository userRepository,
             UserService userService,
-            RoleRepository roleRepository) {
+            VaiTroRepository roleRepository) {
         this.userRepository = userRepository;
         this.userService = userService;
     }
