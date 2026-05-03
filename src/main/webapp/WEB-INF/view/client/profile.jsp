@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="client/css/profile.css">
+  <link rel="stylesheet" href="css/client/profile.css">
 
   
 </head>
@@ -23,25 +23,12 @@
   <jsp:include page="layout/header.jsp" />
 
   <main class="profile-page">
-    <div class="container">
+    <div class="container container--account-wide">
       <div class="profile-layout">
-        <aside class="profile-sidebar">
-          <div class="profile-sidebar__avatar">U</div>
-          <div class="profile-sidebar__greeting">Xin chào,</div>
-          <div class="profile-sidebar__name">User Demo!</div>
-          <a class="profile-sidebar__logout" href="/logout">Đăng xuất</a>
-
-          <nav class="profile-nav" aria-label="Profile navigation">
-            <a href="/orders">Đơn hàng</a>
-            <a href="/address">Địa chỉ của bạn</a>
-            <a class="is-active" href="/profile">Chi tiết tài khoản</a>
-            <a href="/forgot-password">Đặt lại mật khẩu</a>
-          </nav>
-        </aside>
+        <jsp:include page="layout/sidebar-profile.jsp" />
 
         <section class="profile-content">
           <h1 class="profile-title">Chi tiết tài khoản</h1>
-          <p class="profile-subtitle">Cập nhật thông tin cá nhân của bạn để trải nghiệm đặt món và giao hàng nhanh hơn.</p>
 
           <form class="profile-form" action="#" method="post">
             <div class="profile-grid">

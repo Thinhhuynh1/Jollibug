@@ -37,65 +37,16 @@
   <div class="admin-shell admin-body" data-manager-dashboard-root>
 
     <!-- SECTION -->
-    <aside class="admin-sidebar">
-      <div class="admin-sidebar__inner">
-        <div class="admin-brand">
-          <div class="brand">
-            <span class="brand__mark">JB</span>
-            <span class="brand__copy">
-              <span class="brand__title">Jollibug Admin</span>
-              <span class="brand__tag">Control Center</span>
-            </span>
-          </div>
-          <span class="admin-role">Manager</span>
-          <p>Menu, catalog, and order operations</p>
-        </div>
-
-        <nav class="admin-nav">
-          <span class="admin-nav__section">Workspace</span>
-          <a class="is-active" href="/admin">Dashboard</a>
-          <a href="/categories">Manage Categories</a>
-          <a href="/products">Manage Products</a>
-          <a href="manager-orders.html">Manage Orders</a>
-          <span class="admin-nav__section">Quick links</span>
-          <a href="index.html">Back to site</a>
-        </nav>
-      </div>
-    </aside>
+    <jsp:include page="layout/sidebar.jsp" />
 
     <!-- SECTION -->
     <main class="admin-main">
 
       <!-- Top bar -->
-      <div class="admin-topbar">
-        <div class="admin-topbar__copy">
-          <strong>Jollibug Control Center</strong>
-          <span class="muted">Live admin-ready UI with modal CRUD and role-based navigation.</span>
-        </div>
-        <div class="admin-topbar__user">
-          <span class="admin-role">Manager</span>
-          <!--
-            JS will populate initials + name at runtime.
-            These IDs are the injection targets.
-          -->
-          <div class="admin-avatar" id="topbar-user-initials">--</div>
-          <div class="stack" style="gap:0.15rem;">
-            <strong id="topbar-user-name">Loading...</strong>
-            <span class="muted" id="topbar-user-role">Manager</span>
-          </div>
-          <button class="btn btn-outline" type="button" data-admin-logout id="btn-logout">Logout</button>
-        </div>
-      </div>
+      <jsp:include page="layout/topbar.jsp" />
 
       <!-- SECTION -->
       <section class="admin-dashboard">
-
-        <!-- SECTION -->
-        <div class="page-intro">
-          <span class="eyebrow">Manager View</span>
-          <h1 class="section-title">Run daily menu and order operations with confidence.</h1>
-          <p class="lead">A focused dashboard for category hygiene, product availability, and live service flow.</p>
-        </div>
 
         <!-- SECTION -->
         <div class="stats-ribbon" style="margin-bottom:var(--space-5);">

@@ -21,14 +21,4 @@ public class UserController {
         return "client/forgot-password";
     }
 
-    @GetMapping("/profile")
-    public String getProfilePage() {
-        return "client/profile";
-    }
-
-    @GetMapping("/address")
-    public String getAddressPage() {
-        return "client/address";
-    }
-
 }

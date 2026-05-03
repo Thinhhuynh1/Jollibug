@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,35 +23,48 @@
     <section class="section">
       <div class="container">
         <div class="page-intro">
-          <span class="eyebrow">Support Desk</span>
-          <h1 class="section-title">Live Support Chat</h1>
-          <p class="lead">Tell us what you need and we will assist you right away.</p>
+          <h1 class="section-title">Chat hỗ trợ</h1>
         </div>
 
         <div class="client-chat-shell">
-          <aside class="support-topics" aria-label="Support topics">
-            <header class="support-topics__head">
-              <strong>Topics</strong>
-              <span class="badge">Online</span>
-            </header>
-            <div class="support-topic-list" id="support-topic-list"></div>
-          </aside>
 
           <section class="support-chat" aria-label="Chat conversation">
             <header class="support-chat__head">
-              <div class="support-chat__avatar">FB</div>
+              <div class="support-chat__avatar">JT</div>
               <div class="support-chat__meta">
-                <strong id="chat-title">Jollibug Support</strong>
-                <span id="chat-subtitle">Select a topic to begin.</span>
+                <strong>Nhân viên Jollibug</strong>
+                <span>Đang hoạt động</span>
               </div>
             </header>
 
-            <div class="support-chat__messages" id="support-messages" aria-live="polite"></div>
+            <div class="support-chat__messages" aria-live="polite">
+              <div class="support-chat__day">Hôm nay</div>
 
-            <form class="support-chat__composer" id="support-chat-form">
-              <label class="sr-only" for="support-chat-input">Message</label>
-              <input id="support-chat-input" type="text" placeholder="Type your message..." autocomplete="off" />
-              <button class="btn btn-primary" type="submit">Send</button>
+              <article class="support-msg support-msg--agent">
+                <div class="support-msg__bubble">Xin ch&#224;o, m&#236;nh l&#224; nh&#226;n vi&#234;n h&#7895; tr&#7907; c&#7911;a Jollibug. M&#236;nh c&#243; th&#7875; gi&#250;p g&#236; cho b&#7841;n?</div>
+                <span class="support-msg__time">09:28</span>
+              </article>
+
+              <article class="support-msg support-msg--user">
+                <div class="support-msg__bubble">M&#236;nh mu&#7889;n ki&#7875;m tra &#273;&#417;n h&#224;ng #JB2026. &#272;&#417;n n&#224;y &#273;&#227; giao ch&#432;a?</div>
+                <span class="support-msg__time">09:29</span>
+              </article>
+
+              <article class="support-msg support-msg--agent">
+                <div class="support-msg__bubble">B&#7841;n vui l&#242;ng ch&#7901; trong gi&#226;y l&#225;t, m&#236;nh &#273;ang ki&#7875;m tra tr&#7841;ng th&#225;i &#273;&#417;n h&#224;ng.</div>
+                <span class="support-msg__time">09:29</span>
+              </article>
+
+              <article class="support-msg support-msg--agent">
+                <div class="support-msg__bubble">&#272;&#417;n h&#224;ng c&#7911;a b&#7841;n &#273;ang &#273;&#432;&#7907;c giao v&#224; d&#7921; ki&#7871;n &#273;&#7871;n trong 15 ph&#250;t n&#7919;a.</div>
+                <span class="support-msg__time">09:30</span>
+              </article>
+            </div>
+
+            <form class="support-chat__composer">
+              <label class="sr-only" for="support-chat-input">Tin nh&#7855;n</label>
+              <input id="support-chat-input" type="text" placeholder="Nh&#7853;p tin nh&#7855;n c&#7911;a b&#7841;n..." autocomplete="off" />
+              <button class="btn btn-primary" type="button">G&#7917;i</button>
             </form>
           </section>
         </div>
@@ -59,20 +72,8 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-note">
-        <span>&copy; 2026 Jollibug. All rights reserved.</span>
-        <a href="/">Back to Home</a>
-      </div>
-    </div>
-  </footer>
+    <!-- SHARED FOOTER -->
+  <jsp:include page="layout/footer.jsp" />
 
-  <script src="js/client/nav.js" defer></script>
-  <script src="js/client/chat.js" defer></script>
-  </body>
+</body>
 </html>
-
-
-
-
