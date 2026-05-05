@@ -89,7 +89,6 @@ public class AdminController {
 
     @GetMapping("/admin/users/create")
     public String getCreateUserPage(Model model) {
-        model.addAttribute("newUser", new User());
         return "admin/function/create";
     }
 

@@ -2,6 +2,7 @@ package vn.fastfood.entity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -59,4 +60,7 @@ public class User {
     public String getUpdatedAtDisplay() {
         return updatedAt == null ? "-" : updatedAt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
+
+    @OneToMany(mappedBy = "user")
+    private List<DiaChi> diaChi;
 }

@@ -15,26 +15,6 @@ public class ProfileController {
         return "client/profile";
     }
 
-    @GetMapping("/address")
-    public String getAddressPage() {
-        return "client/address/show";
-    }
-
-    @GetMapping("/address/create")
-    public String getAddressCreate() {
-        return "client/address/create";
-    }
-
-    @GetMapping("/address/update")
-    public String getAddressUpdate() {
-        return "client/address/update";
-    }
-
-    @GetMapping("/address/delete")
-    public String getAddressDelete() {
-        return "client/address/delete";
-    }
-
     @GetMapping("/orders")
     public String getOrderPage() {
         return "client/orders/show";

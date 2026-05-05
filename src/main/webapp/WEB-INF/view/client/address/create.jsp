@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -35,26 +35,45 @@
           
 
           <article class="address-card" style="margin-top:1rem;">
-            <div class="profile-grid">
-              <label class="profile-field">
-                <span>Tên người nhận</span>
-                <input type="text" id="delivery-name" placeholder="Ví dụ: Nguyễn Văn A" />
-              </label>
-              <label class="profile-field">
-                <span>Số điện thoại</span>
-                <input type="text" id="delivery-phone" placeholder="Ví dụ: 0903 123 456" />
-              </label>
-            </div>
-            <label class="profile-field" style="position: relative;">
-              <span>Địa chỉ</span>
-              <input type="text" id="delivery-address" autocomplete="off" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" />
-              <!-- Dropdown gợi ý địa chỉ -->
-              <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
-            </label>
-            <div class="modal__actions">
-              <a href="/address" class="btn btn-ghost">Hủy</a>
-              <button type="button" class="btn btn-primary">Lưu địa chỉ</button>
-            </div>
+            <form method="post" action="/address/create">
+              <div class="profile-grid">
+                <label class="profile-field">
+                  <span>Tên người nhận</span>
+                  <input name="tenNguoiNhan" type="text" id="delivery-name" placeholder="Ví dụ: Nguyễn Văn A" required />
+                </label>
+                <label class="profile-field">
+                  <span>Số điện thoại</span>
+                  <input type="text" name="sdtNguoiNhan" id="delivery-phone" placeholder="Ví dụ: 0903 123 456" required />
+                </label>
+              </div>
+              <div class="profile-grid" style="margin-top:1rem;">
+                <label class="profile-field">
+                  <span>Tên địa chỉ</span>
+                  <input type="text" id="ten-dia-chi" name="tenDiaChi" maxlength="100" placeholder="Ví dụ: Nhà riêng, Công ty" required />
+                </label>
+                <label for=""></label>
+                <label class="profile-field">
+                  <span>Tỉnh/Thành</span>
+                  <input type="text" id="tinh-thanh" name="tinhThanh" placeholder="Ví dụ: Hồ Chí Minh" required />
+                </label>
+                <label class="profile-field">
+                  <span>Quận/Huyện</span>
+                  <input type="text" id="quan-huyen" name="quanHuyen" placeholder="Ví dụ: Quận 1" required />
+                </label>
+                <label class="profile-field">
+                  <span>Phường/Xã</span>
+                  <input type="text" id="phuong-xa" name="phuongXa" placeholder="Ví dụ: Phường Bến Nghé" required />
+                </label>
+                  <label class="profile-field">
+                  <span>Địa chỉ cụ thể</span>
+                  <input type="text" id="dia-chi-cu-the" name="diaChiCuThe" placeholder="Số nhà, tên đường..." required />
+                </label>
+              </div>
+              <div class="modal__actions">
+                <a href="/address" class="btn btn-ghost">Hủy</a>
+                <button type="submit" class="btn btn-primary">Lưu địa chỉ</button>
+              </div>
+            </form>
           </article>
 
         </section>
