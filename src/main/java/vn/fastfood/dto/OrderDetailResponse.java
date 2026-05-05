@@ -1,33 +1,35 @@
 package vn.fastfood.dto;
 
-import vn.fastfood.model.OrderItem;
 import vn.fastfood.model.Order;
+import vn.fastfood.model.OrderItem;
+
 import java.util.List;
 
 public class OrderDetailResponse {
-    private Order dh;
-    private List<OrderItem> ctDH;
+    private Order order;
+    private List<OrderItem> orderItems;
 
-    public OrderDetailResponse() {}
-
-    public OrderDetailResponse(Order dh, List<OrderItem> ctDH) {
-        this.dh = dh;
-        this.ctDH = ctDH;
+    public OrderDetailResponse() {
     }
 
-    public Order getDonHang() {
-        return dh;
+    public OrderDetailResponse(Order order, List<OrderItem> orderItems) {
+        this.order = order;
+        this.orderItems = orderItems;
     }
 
-    public void setDonHang(Order dh) {
-        this.dh = dh;
+    public Order getOrder() {
+        return order;
     }
 
-    public List<OrderItem> getChiTietDH() {
-        return ctDH;
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
-    public void setChiTietDH(List<OrderItem> ctDH) {
-        this.ctDH = ctDH;
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }
