@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Lịch sử mua hàng</title>
-    <link rel="stylesheet" href="/resources/css/client/order.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/client/order.css">
 </head>
 <body>
 <div class="page">
@@ -34,6 +34,6 @@
     </table>
 </div>
 
-<script src="/resources/js/client/order-history.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/client/order-history.js"></script>
 </body>
 </html>

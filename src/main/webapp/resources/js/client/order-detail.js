@@ -54,6 +54,7 @@ async function loadOrderDetail() {
                 <td>${item.soLuong}</td>
                 <td>${formatMoney(item.donGia)}</td>
                 <td>${formatMoney(item.thanhTien)}</td>
+                <td>${renderReviewButton(order.trangThaiDon, item.maMon)}</td>
             `;
 
             itemBody.appendChild(row);
