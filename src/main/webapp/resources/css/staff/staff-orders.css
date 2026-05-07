@@ -1,0 +1,412 @@
+body[data-admin-page="orders"] .staff-orders-board {
+    display: grid;
+    gap: var(--space-5);
+}
+
+body[data-admin-page="orders"] .staff-orders-board__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+body[data-admin-page="orders"] .staff-orders-board__header .eyebrow {
+    background: rgba(230, 0, 0, 0.1);
+}
+
+body[data-admin-page="orders"] .filter-card,
+body[data-admin-page="orders"] .table-card {
+    border: 1px solid rgba(111, 82, 55, 0.08);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 252, 246, 0.92);
+    box-shadow: var(--shadow-sm);
+}
+
+body[data-admin-page="orders"] .filter-card {
+    padding: 1rem;
+}
+
+body[data-admin-page="orders"] .table-card {
+    display: grid;
+    gap: var(--space-4);
+    padding: 1.1rem;
+}
+
+body[data-admin-page="orders"] .table-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+body[data-admin-page="orders"] .table-card__header h2 {
+    margin: 0;
+    color: var(--color-ink-900);
+    font-size: 1.12rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+body[data-admin-page="orders"] .filter-grid {
+    display: grid;
+    grid-template-columns: minmax(160px, 0.9fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(240px, 1.25fr) auto;
+    gap: 0.85rem;
+    align-items: end;
+}
+
+body[data-admin-page="orders"] .form-group {
+    display: grid;
+    gap: 0.4rem;
+}
+
+body[data-admin-page="orders"] .form-group label {
+    color: var(--color-ink-500);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+body[data-admin-page="orders"] .form-group input,
+body[data-admin-page="orders"] .form-group select {
+    width: 100%;
+    min-height: 3rem;
+    border: 1px solid rgba(111, 82, 55, 0.12);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    color: var(--color-ink-900);
+    padding: 0.75rem 0.9rem;
+    transition: border-color var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
+}
+
+body[data-admin-page="orders"] .form-group input:focus,
+body[data-admin-page="orders"] .form-group select:focus {
+    border-color: var(--color-red-500);
+    box-shadow: 0 0 0 3px rgba(230, 0, 0, 0.1);
+    background: #fff;
+}
+
+body[data-admin-page="orders"] .filter-actions,
+body[data-admin-page="orders"] .modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+body[data-admin-page="orders"] .filter-actions {
+    justify-content: flex-end;
+}
+
+body[data-admin-page="orders"] .primary-btn,
+body[data-admin-page="orders"] .secondary-btn,
+body[data-admin-page="orders"] .close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-round);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 800;
+    line-height: 1.1;
+    transition: transform var(--transition-base), box-shadow var(--transition-base), background var(--transition-base), border-color var(--transition-base), color var(--transition-base);
+}
+
+body[data-admin-page="orders"] .primary-btn,
+body[data-admin-page="orders"] .secondary-btn {
+    padding: 0.72rem 1rem;
+}
+
+body[data-admin-page="orders"] .primary-btn {
+    background: var(--color-red-500);
+    color: #ffffff;
+}
+
+body[data-admin-page="orders"] .primary-btn:hover {
+    background: var(--color-red-600);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(230, 0, 0, 0.16);
+}
+
+body[data-admin-page="orders"] .secondary-btn {
+    background: #fff8ef;
+    border-color: rgba(111, 82, 55, 0.14);
+    color: var(--color-ink-700);
+}
+
+body[data-admin-page="orders"] .secondary-btn:hover {
+    border-color: var(--color-red-500);
+    color: var(--color-red-600);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+body[data-admin-page="orders"] .close-btn {
+    width: 2.45rem;
+    min-height: 2.45rem;
+    padding: 0;
+    border-color: rgba(111, 82, 55, 0.12);
+    background: #fffaf8;
+    color: var(--color-ink-700);
+    font-size: 1.35rem;
+}
+
+body[data-admin-page="orders"] .close-btn:hover {
+    color: var(--color-red-600);
+    transform: scale(1.04);
+}
+
+body[data-admin-page="orders"] .message {
+    min-height: 1.2rem;
+    color: var(--color-danger);
+    font-weight: 800;
+}
+
+body[data-admin-page="orders"] .message:not(:empty) {
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(201, 58, 55, 0.18);
+    border-radius: var(--radius-md);
+    background: rgba(201, 58, 55, 0.08);
+}
+
+body[data-admin-page="orders"] .staff-order-table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+}
+
+body[data-admin-page="orders"] .staff-order-table th,
+body[data-admin-page="orders"] .staff-order-table td {
+    vertical-align: middle;
+}
+
+body[data-admin-page="orders"] .staff-order-table th {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+body[data-admin-page="orders"] .staff-order-table td {
+    color: var(--color-ink-700);
+    font-weight: 700;
+}
+
+body[data-admin-page="orders"] .staff-order-table td:nth-child(5),
+body[data-admin-page="orders"] .staff-order-table th:nth-child(5) {
+    text-align: right;
+}
+
+body[data-admin-page="orders"] .staff-order-table td:nth-child(6),
+body[data-admin-page="orders"] .staff-order-table th:nth-child(6) {
+    text-align: center;
+}
+
+body[data-admin-page="orders"] .staff-order-table td:nth-child(8),
+body[data-admin-page="orders"] .staff-order-table th:nth-child(8) {
+    text-align: right;
+}
+
+body[data-admin-page="orders"] .staff-order-table--items {
+    min-width: 620px;
+}
+
+body[data-admin-page="orders"] .staff-order-table--items td:nth-child(2),
+body[data-admin-page="orders"] .staff-order-table--items th:nth-child(2) {
+    text-align: center;
+}
+
+body[data-admin-page="orders"] .staff-order-table--items td:nth-child(3),
+body[data-admin-page="orders"] .staff-order-table--items td:nth-child(4),
+body[data-admin-page="orders"] .staff-order-table--items th:nth-child(3),
+body[data-admin-page="orders"] .staff-order-table--items th:nth-child(4) {
+    text-align: right;
+}
+
+body[data-admin-page="orders"] .actions {
+    text-align: right;
+    white-space: normal;
+}
+
+body[data-admin-page="orders"] .actions .primary-btn,
+body[data-admin-page="orders"] .actions .secondary-btn {
+    min-height: 2.35rem;
+    margin: 0.16rem 0 0.16rem 0.35rem;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.84rem;
+}
+
+body[data-admin-page="orders"] .status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2rem;
+    padding: 0.36rem 0.72rem;
+    border-radius: var(--radius-round);
+    font-size: 0.78rem;
+    font-weight: 900;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+body[data-admin-page="orders"] .status.pending {
+    background: rgba(217, 119, 6, 0.14);
+    color: #a15c05;
+}
+
+body[data-admin-page="orders"] .status.confirmed {
+    background: rgba(61, 122, 214, 0.14);
+    color: var(--color-info);
+}
+
+body[data-admin-page="orders"] .status.shipping {
+    background: rgba(61, 122, 214, 0.16);
+    color: #2d6bc4;
+}
+
+body[data-admin-page="orders"] .status.delivered {
+    background: rgba(47, 158, 102, 0.15);
+    color: var(--color-success);
+}
+
+body[data-admin-page="orders"] .status.cancel-requested {
+    background: rgba(230, 0, 0, 0.1);
+    color: var(--color-red-600);
+}
+
+body[data-admin-page="orders"] .status.cancelled {
+    background: rgba(201, 58, 55, 0.13);
+    color: var(--color-danger);
+}
+
+body[data-admin-page="orders"] .hidden {
+    display: none !important;
+}
+
+body[data-admin-page="orders"] .modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(24, 12, 4, 0.48);
+    backdrop-filter: blur(3px);
+}
+
+body[data-admin-page="orders"] .modal-box {
+    width: min(100%, 480px);
+    max-height: calc(100vh - 2rem);
+    overflow: auto;
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid rgba(111, 82, 55, 0.12);
+    border-radius: var(--radius-lg);
+    background: #fffefb;
+    box-shadow: var(--shadow-lg);
+}
+
+body[data-admin-page="orders"] .modal-box.large {
+    width: min(100%, 900px);
+}
+
+body[data-admin-page="orders"] .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(111, 82, 55, 0.08);
+}
+
+body[data-admin-page="orders"] .modal-header h2 {
+    margin: 0;
+    color: var(--color-ink-900);
+    font-size: 1.35rem;
+    font-weight: 900;
+}
+
+body[data-admin-page="orders"] .modal-section {
+    display: grid;
+    gap: 0.85rem;
+}
+
+body[data-admin-page="orders"] .modal-section h3 {
+    margin: 0;
+    color: var(--color-ink-900);
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+body[data-admin-page="orders"] .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+body[data-admin-page="orders"] .detail-grid p {
+    margin: 0;
+    min-height: 4rem;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid rgba(111, 82, 55, 0.08);
+    border-radius: var(--radius-md);
+    background: #fff8ef;
+    color: var(--color-ink-700);
+    font-weight: 700;
+}
+
+body[data-admin-page="orders"] .detail-grid .full {
+    grid-column: 1 / -1;
+}
+
+body[data-admin-page="orders"] .detail-grid strong {
+    color: var(--color-ink-900);
+    font-weight: 900;
+}
+
+body[data-admin-page="orders"] .status-form {
+    display: grid;
+    gap: 1rem;
+}
+
+body[data-admin-page="orders"] .modal-actions {
+    justify-content: flex-end;
+    padding-top: 0.25rem;
+}
+
+@media (max-width: 1080px) {
+    body[data-admin-page="orders"] .filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body[data-admin-page="orders"] .filter-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 720px) {
+    body[data-admin-page="orders"] .staff-orders-board__header,
+    body[data-admin-page="orders"] .table-card__header {
+        flex-direction: column;
+    }
+
+    body[data-admin-page="orders"] .filter-grid,
+    body[data-admin-page="orders"] .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body[data-admin-page="orders"] .staff-orders-board__header .primary-btn,
+    body[data-admin-page="orders"] .filter-actions button,
+    body[data-admin-page="orders"] .modal-actions button {
+        width: 100%;
+    }
+
+    body[data-admin-page="orders"] .modal-box {
+        padding: 1rem;
+    }
+}
