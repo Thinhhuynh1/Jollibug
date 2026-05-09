@@ -7,7 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vn.fastfood.entity.User;
-import vn.fastfood.entity.UserStatus;
 import vn.fastfood.entity.VaiTro;
 import vn.fastfood.repository.UserRepository;
 import vn.fastfood.repository.VaiTroRepository;
@@ -43,10 +42,10 @@ public class UserService {
         user.setPassword(encodedPassword);
 
         // Set vi trò default là khách hàng (ROLE_CLIENT)
-        user.setVaiTro(vaiTroRepository.findByTenVT("Client"));
+        user.setVaiTro(vaiTroRepository.findByTenVT(""));
 
         // Set trạng thái default là ACTIVE
-        user.setTrangThai(UserStatus.ACTIVE);
+        user.setTrangThai("ACTIVE");
 
         return userRepository.save(user);
     }
@@ -74,7 +73,7 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    public List<User> findByTrangThai(UserStatus trangThai) {
+    public List<User> findByTrangThai(String trangThai) {
         return this.userRepository.findByTrangThai(trangThai);
     }
 

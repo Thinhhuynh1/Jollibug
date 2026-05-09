@@ -48,6 +48,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     // Quản lý Request | Cho phép Những request có đủ quyền và chặn những cái k có
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new SessionInterceptor()).excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.svg");
+        registry.addInterceptor(new SessionInterceptor())
+                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.svg", "/**/*.png", "/**/*.jpg", "/**/*.jpeg",
+                        "/**/*.gif", "/**/*.webp", "/**/*.ico");
     }
 }

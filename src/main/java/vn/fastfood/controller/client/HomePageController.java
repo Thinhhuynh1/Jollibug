@@ -22,11 +22,6 @@ public class HomePageController {
         return "client/chat";
     }
 
-    @GetMapping("/menu")
-    public String getMenuPage() {
-        return "client/menu";
-    }
-
     @GetMapping("/complaint")
     public String getComplaintPage() {
         return "client/complaint";

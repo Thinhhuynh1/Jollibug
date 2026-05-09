@@ -2,58 +2,53 @@ package vn.fastfood.entity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
-@Table(name = "USERS")
-public class User {
-
+@Table(name = "MONAN")
+@Data
+public class MonAn {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MaTK")
-    private Long maTK;
+    @Column(name = "MaMon")
+    private long maMon;
 
-    @Column(name = "Password", nullable = false)
-    private String password;
+    @Column(name = "TenMon")
+    private String tenMon;
 
-    @Column(name = "HoTen", nullable = false)
-    private String hoTen;
+    @Column(name = "MoTa")
+    private String moTa;
 
-    @Column(name = "SDT", length = 15)
-    private String sdt;
+    @Column(name = "Gia")
+    private long gia;
 
-    @Column(name = "Email", nullable = false, unique = true, length = 100)
-    private String email;
+    @Column(name = "SoLuongTon")
+    private long soLuongTon;
 
-    @Column(name = "TrangThai")
-    private String trangThai;
+    @Column(name = "SoLuongDaBan")
+    private long soLuongDaBan;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "MaVT", referencedColumnName = "MaVT")
-    private VaiTro vaiTro;
+    // @Column(name = "GiaGiam")
+    // private long giaGiam = 0;
+
+    @Column(name = "image_url")
+    private String img;
+
+    @Column(name = "IsAvailable")
+    private boolean available = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -73,6 +68,8 @@ public class User {
         return updatedAt == null ? "-" : updatedAt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
 
-    @OneToMany(mappedBy = "user")
-    private List<DiaChi> diaChi;
+    @ManyToOne
+    @JoinColumn(name = "MaDM")
+    private DanhMuc danhMuc;
+
 }
