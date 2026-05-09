@@ -14,7 +14,9 @@ public interface MonAnRepository extends JpaRepository<MonAn, Long> {
     @Query("""
                 Select ma from MonAn ma
                 where (:maDM is NULL OR ma.danhMuc.maDM = :maDM)
-                and (:keyword is NULL OR :keyword = '')
+                and (:keyword is NULL OR :keyword = ''
+                     OR lower(ma.tenMon) like lower(concat('%', :keyword, '%'))
+                     OR lower(ma.moTa) like lower(concat('%', :keyword, '%')))
             """)
     List<MonAn> findMonAn(@Param("maDM") Long maDM, @Param("keyword") String keyword);
 
