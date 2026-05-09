@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +28,7 @@ public class AdminController {
 
     AdminController(UserRepository userRepository,
             UserService userService,
-            VaiTroRepository vaiTroRepository) {
+            VaiTroRepository roleRepository) {
         this.userRepository = userRepository;
         this.userService = userService;
     }
@@ -89,7 +88,6 @@ public class AdminController {
 
     @GetMapping("/admin/users/create")
     public String getCreateUserPage(Model model) {
-        model.addAttribute("newUser", new User());
         return "admin/function/create";
     }
 

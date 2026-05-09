@@ -36,20 +36,25 @@
           </div>
 
           <div class="address-grid">
-            <article class="address-card">
-              <div class="address-card__header">
-                <strong>Nguyễn Minh Khôi</strong>
-                <span class="tag-default">Mặc định</span>
-              </div>
-              <p>0903 456 789</p>
-              <p>128 Nguyễn Trãi, Phường 3, Quận 5, TP. Hồ Chí Minh</p>
-              <div >
-                <a class="btn btn-outline" href="/address/update">Sửa</a>
-                <a class="btn btn-ghost" href="/address/delete">Xóa</a>
-              </div>
-            </article>
-
-            </article>
+            <c:forEach var="address" items="${listAddress}">
+              <article class="address-card">
+                <div class="address-card__header">
+                    <p><strong>Người nhận: </strong> ${address.tenNguoiNhan} - ${address.sdtNguoiNhan}</p>
+                  <c:if test="${address.defaultAddress == true}"><span class="tag-default">Mặc định</span></c:if>
+                </div>
+                <P><strong>Nơi nhận: </strong> ${address.tenDiaChi}</P>
+                <p><strong>Đia chỉ: </strong> ${address.diaChiCuThe}, ${address.phuongXa}, ${address.quanHuyen}, ${address.tinhThanh}</p>
+                <div >
+                  <a class="btn btn-outline" href="/address/update/${address.maDC}">Sửa</a>
+                  <a class="btn btn-ghost" href="/address/delete/${address.maDC}">Xóa</a>
+                  <c:if test="${!address.defaultAddress}">
+                    <form method="post" action="/address/default/${address.maDC}" style="display:inline">
+                      <button type="submit" class="btn btn-ghost">Chọn làm mặc định</button>
+                    </form>
+                  </c:if>
+                </div>
+              </article>
+            </c:forEach>
           </div>
 
         </section>

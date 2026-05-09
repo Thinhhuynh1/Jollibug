@@ -15,6 +15,8 @@ import vn.fastfood.repository.VaiTroRepository;
 @Service
 public class UserService {
 
+    private final VaiTroRepository roleRepository;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -24,8 +26,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    UserService(VaiTroRepository vaiTroRepository) {
-        this.vaiTroRepository = vaiTroRepository;
+    UserService(VaiTroRepository roleRepository) {
+        this.roleRepository = roleRepository;
     }
 
     public User registerNewUser(User user) {
