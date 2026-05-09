@@ -59,11 +59,12 @@ public class UserController {
             String roleName = user.getVaiTro().getTenVT();
             session.setAttribute("userRole", roleName);
 
-            if ("Admin".equals(roleName)) {
+            System.out.println("Role: " +roleName);
+            if ("ADMIN".equals(roleName)) {
                 return "redirect:/admin";
-            } else if ("Manager".equals(roleName)) {
+            } else if ("MANAGER".equals(roleName)) {
                 return "redirect:/manager";
-            } else if ("Staff".equals(roleName)) {
+            } else if ("STAFF".equals(roleName)) {
                 return "redirect:/staff";
             }
 
@@ -77,9 +78,14 @@ public class UserController {
     @GetMapping("/logout")
     public String logout(HttpSession session, HttpServletResponse response) {
         // Hủy dữ liệu trong session
+        User user = (User) session.getAttribute("user");
+        String TenVT = (user != null ? user.getVaiTro().getTenVT() : "");
+        
         if (session != null) {
             session.invalidate();
         }
+
+        if (TenVT.equals("CLIENT")) return "redirect:/";
         return "redirect:/login";
     }
 

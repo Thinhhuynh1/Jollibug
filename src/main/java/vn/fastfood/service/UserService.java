@@ -6,17 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import vn.fastfood.entity.VaiTro;
 import vn.fastfood.entity.User;
 import vn.fastfood.entity.UserStatus;
-import vn.fastfood.repository.RoleRepository;
+import vn.fastfood.entity.VaiTro;
 import vn.fastfood.repository.UserRepository;
 import vn.fastfood.repository.VaiTroRepository;
 
 @Service
 public class UserService {
-
-    private final RoleRepository roleRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -27,8 +24,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    UserService(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
+    UserService(VaiTroRepository vaiTroRepository) {
+        this.vaiTroRepository = vaiTroRepository;
     }
 
     public User registerNewUser(User user) {
@@ -68,10 +65,10 @@ public class UserService {
     }
 
     public VaiTro getRoleByName(String name) {
-        return this.roleRepository.findByTenVT(name);
+        return this.vaiTroRepository.findByTenVT(name);
     }
 
-    public List<User> fetchUserActive() {
+    public List<User> getUserActive() {
         return this.userRepository.findAll();
     }
 
@@ -81,6 +78,10 @@ public class UserService {
 
     public void deleteUser(long maTK) {
         this.userRepository.deleteById(maTK);
+    }
+
+    public User getUserByMaTK(Long id) {
+        return this.userRepository.findById(id).orElse(null);
     }
 
 }

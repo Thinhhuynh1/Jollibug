@@ -11,7 +11,7 @@
             <strong id="topbar-user-name">Kha</strong>
             <span class="muted" id="topbar-user-role">Quản lý</span>
           </div>
-          <button class="btn btn-outline" type="button" id="btn-logout">Đăng xuất</button>
+          <button class="btn btn-outline" type="button" id="btn-logout" onclick="window.location.href = '/logout'">Đăng xuất</button>
         </div>
 
 </div>

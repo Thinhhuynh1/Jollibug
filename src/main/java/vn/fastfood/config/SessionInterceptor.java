@@ -34,14 +34,12 @@ public class SessionInterceptor implements HandlerInterceptor {
                 || requestURI.startsWith("/product")
                 || requestURI.startsWith("/about")
                 || requestURI.startsWith("/contact")
-                || requestURI.startsWith("/resources")
-                || requestURI.startsWith("/admin")) {
+                || requestURI.startsWith("/resources")) {
             return true;
         }
 
         // Tất cả request khác PHẢI có session hợp lệ
         if (session == null || session.getAttribute("user") == null)
-
         {
             response.sendRedirect("/login");
             return false;
@@ -50,21 +48,21 @@ public class SessionInterceptor implements HandlerInterceptor {
         String userRole = (String) session.getAttribute("userRole");
 
         if (requestURI.startsWith("/admin")) {
-            if (!"Admin".equals(userRole)) {
+            if (!"ADMIN".equals(userRole)) {
                 response.sendRedirect("/");
                 return false;
             }
         }
 
         if (requestURI.startsWith("/manager")) {
-            if (!("Admin".equals(userRole) || "Manager".equals(userRole))) {
+            if (!("ADMIN".equals(userRole) || "MANAGER".equals(userRole))) {
                 response.sendRedirect("/");
                 return false;
             }
         }
 
         if (requestURI.startsWith("/staff")) {
-            if (!("Admin".equals(userRole) || "Manager".equals(userRole) || "Staff".equals(userRole))) {
+            if (!("ADMIN".equals(userRole) || "MANAGER".equals(userRole) || "STAFF".equals(userRole))) {
                 response.sendRedirect("/");
                 return false;
             }

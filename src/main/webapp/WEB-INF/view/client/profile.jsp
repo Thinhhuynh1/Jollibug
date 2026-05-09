@@ -15,8 +15,6 @@
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/client/profile.css">
-
-  
 </head>
 <body data-page="profile">
 
@@ -30,75 +28,38 @@
         <section class="profile-content">
           <h1 class="profile-title">Chi tiết tài khoản</h1>
 
-          <form class="profile-form" action="#" method="post">
+          <c:if test="${not empty successMsg}">
+              <div style="color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 12px; margin-bottom: 20px; border-radius: 5px; font-weight: 600;">
+                  ${successMsg}
+              </div>
+          </c:if>
+
+          <c:if test="${not empty errorMsg}">
+              <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 12px; margin-bottom: 20px; border-radius: 5px; font-weight: 600;">
+                  ${errorMsg}
+              </div>
+          </c:if>
+          <form class="profile-form" action="${pageContext.request.contextPath}/profile/update" method="post">
+            
             <div class="profile-grid">
               <label class="profile-field">
-                <span>Họ của bạn</span>
-                <input type="text" name="lastName" placeholder="Nhập họ của bạn" />
-              </label>
-
-              <label class="profile-field">
-                <span>Tên của bạn</span>
-                <input type="text" name="firstName" placeholder="Nhập tên của bạn" />
+                <span>Họ và Tên</span>
+                <input type="text" name="hoTen" value="${user.hoTen}" placeholder="Nhập tên" />
               </label>
             </div>
 
             <div class="profile-grid">
               <label class="profile-field">
                 <span>Số điện thoại</span>
-                <input type="tel" name="phone" placeholder="Nhập số điện thoại" />
+                <input type="tel" name="sdt" value="${user.sdt}" placeholder="Nhập số điện thoại" />
               </label>
 
               <label class="profile-field">
                 <span>Địa chỉ email</span>
-                <input type="email" name="email" value="userdemo@jollibug.vn" readonly disabled />
+                <input type="email" name="email" value="${user.email}" readonly style="background-color: #f5f5f5;" />
               </label>
-            </div>
-
-            <div class="profile-grid">
-              <label class="profile-field">
-                <span>Giới tính</span>
-                <select name="gender">
-                  <option value="">Chọn giới tính</option>
-                  <option value="male">Nam</option>
-                  <option value="female">Nữ</option>
-                  <option value="other">Khác</option>
-                </select>
-              </label>
-
-              <div class="profile-field">
-                <span>Ngày sinh</span>
-                <div class="profile-grid profile-grid--three">
-                  <select name="birthDay">
-                    <option value="">Ngày</option>
-                    <c:forEach begin="1" end="31" var="day">
-                      <option value="${day}">${day}</option>
-                    </c:forEach>
-                  </select>
-                  <select name="birthMonth">
-                    <option value="">Tháng</option>
-                    <c:forEach begin="1" end="12" var="month">
-                      <option value="${month}">${month}</option>
-                    </c:forEach>
-                  </select>
-                  <select name="birthYear">
-                    <option value="">Năm</option>
-                    <c:forEach begin="1950" end="2026" var="year">
-                      <option value="${year}">${year}</option>
-                    </c:forEach>
-                  </select>
-                </div>
-              </div>
             </div>
 
             <div class="profile-actions">
               <button class="profile-submit" type="submit">Cập nhật tài khoản</button>
             </div>
-          </form>
-        </section>
-      </div>
-    </div>
-  </main>
-
-</body>
-</html>

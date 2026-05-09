@@ -54,6 +54,7 @@
                   </form>
                   <div class="card-actions">
                     <a href="/register">Bạn chưa có tài khoản? Đăng ký</a>
+                    <a href="/forgot-password">Quên mật khẩu</a>
                   </div>
                 </div>
               </article>
