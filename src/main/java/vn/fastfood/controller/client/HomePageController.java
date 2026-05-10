@@ -27,11 +27,6 @@ public class HomePageController {
         return "client/menu";
     }
 
-    @GetMapping("/product")
-    public String getProductPage() {
-        return "client/product";
-    }
-
     @GetMapping("/complaint")
     public String getComplaintPage() {
         return "client/complaint";
