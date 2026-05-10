@@ -10,4 +10,9 @@ public class StaffOrderPageController {
     public String staffOrdersPage() {
         return "staff/orders/staff-orders";
     }
+
+    @GetMapping("/order-staff/orders/detail")
+    public String staffOrderDetailPage() {
+        return "staff/orders/staff-order-detail";
+    }
 }

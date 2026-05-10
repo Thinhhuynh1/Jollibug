@@ -15,11 +15,13 @@
 
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/client/cart-api.css" />
 </head>
 <body class="cart-page" data-page="cart">
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell section-tight">
+    <input type="hidden" id="customerId" value="1">
     <div class="container">
       <div class="page-intro">
         <h1 class="page-title">Giỏ hàng của tôi</h1>
@@ -28,53 +30,11 @@
       <div class="cart-shell">
         <section class="cart-column">
           <article class="cart-panel">
-            <div class="cart-item-list">
-              <article class="cart-line">
-                <div class="cart-line__thumb">
-                  <img src="https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg"
-                       alt="Combo Cung Vui"
-                       style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
-                </div>
-                <div class="cart-line__meta">
-                  <h3 class="cart-line__name">Combo Cung Vui</h3>
-                  <p class="cart-line__unit">6 x Ga Gion Cay | Tang 3 lon Pepsi</p>
-                  <div class="cart-line__controls">
-                    <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
-                    <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
-                      <div class="qty-stepper" aria-label="Chinh so luong">
-                        <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
-                        <span class="qty-stepper__value">1</span>
-                        <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
-                      </div>
-                      <strong class="cart-line__sum">199.000 VND</strong>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article class="cart-line">
-                <div class="cart-line__thumb">
-                  <img src="https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg"
-                       alt="Combo Cung Vui"
-                       style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
-                </div>
-                <div class="cart-line__meta">
-                  <h3 class="cart-line__name">Combo Cung Vui</h3>
-                  <p class="cart-line__unit">6 x Ga Gion Cay | Tang 3 lon Pepsi</p>
-                  <div class="cart-line__controls">
-                    <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
-                    <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
-                      <div class="qty-stepper" aria-label="Chinh so luong">
-                        <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
-                        <span class="qty-stepper__value">1</span>
-                        <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
-                      </div>
-                      <strong class="cart-line__sum">199.000 VND</strong>
-                    </div>
-                  </div>
-                </div>
-              </article>
+            <div class="cart-item-list" id="cartItems">
+              <!-- Cart items will be rendered by cart-api.js -->
             </div>
+
+            <div id="cartMessage" class="cart-message"></div>
           </article>
         </section>
 
@@ -91,15 +51,26 @@
               <div class="summary-line summary-line--strong"><span>Tổng tiền</span><strong id="summary-total">0 VND</strong></div>
             </div>
 
-            <a class="btn btn-primary btn-block" type="button" id="checkout-button" href="/checkout">Đặt hàng</a>
+            <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
           </article>
         </aside>
       </div>
     </div>
   </main>
 
+  <div class="delete-confirm-modal" id="deleteConfirmModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" aria-hidden="true">
+    <div class="delete-confirm-card" role="document">
+      <h2 id="deleteModalTitle">Xóa món khỏi giỏ hàng?</h2>
+      <p id="deleteModalMessage">Bạn có chắc muốn xóa món này khỏi giỏ hàng không?</p>
+      <div class="delete-confirm-actions">
+        <button class="btn btn-ghost" type="button" id="cancelDeleteBtn">Hủy</button>
+        <button class="btn btn-primary delete-confirm-btn" type="button" id="confirmDeleteBtn">Xóa món</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SHARED FOOTER -->
   <jsp:include page="layout/footer.jsp" />
-
+<script src="${pageContext.request.contextPath}/resources/js/client/cart-api.js"></script>
 </body>
 </html>

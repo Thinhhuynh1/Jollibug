@@ -171,10 +171,19 @@ body[data-admin-page="orders"] .message:not(:empty) {
     background: rgba(201, 58, 55, 0.08);
 }
 
+.staff-order-table td.note-cell {
+    max-width: 360px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+}
+
 body[data-admin-page="orders"] .staff-order-table {
     width: 100%;
     min-width: 980px;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 body[data-admin-page="orders"] .staff-order-table th,
@@ -194,6 +203,54 @@ body[data-admin-page="orders"] .staff-order-table td {
     font-weight: 700;
 }
 
+body[data-admin-page="orders"] .staff-order-table th,
+body[data-admin-page="orders"] .staff-order-table td {
+    padding: 0.95rem 0.85rem;
+    vertical-align: middle;
+}
+
+body[data-admin-page="orders"] .staff-order-table .col-order {
+    width: 8%;
+    white-space: nowrap;
+}
+
+body[data-admin-page="orders"] .staff-order-table .col-customer {
+    width: 10%;
+    white-space: nowrap;
+}
+
+body[data-admin-page="orders"] .staff-order-table .col-staff {
+    width: 10%;
+    white-space: nowrap;
+}
+
+body[data-admin-page="orders"] .staff-order-table .col-date {
+    width: 18%;
+    white-space: nowrap;
+}
+
+body[data-admin-page="orders"] .staff-order-table .col-money {
+    width: 14%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+body[data-admin-page="orders"] .staff-order-table .col-status {
+    width: 16%;
+    text-align: center;
+}
+
+body[data-admin-page="orders"] .staff-order-table .actions {
+    width: 14%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+body[data-admin-page="orders"] .update-status-btn {
+    position: relative;
+    z-index: 2;
+}
+
 body[data-admin-page="orders"] .staff-order-table td:nth-child(5),
 body[data-admin-page="orders"] .staff-order-table th:nth-child(5) {
     text-align: right;
@@ -204,13 +261,14 @@ body[data-admin-page="orders"] .staff-order-table th:nth-child(6) {
     text-align: center;
 }
 
-body[data-admin-page="orders"] .staff-order-table td:nth-child(8),
-body[data-admin-page="orders"] .staff-order-table th:nth-child(8) {
-    text-align: right;
-}
-
 body[data-admin-page="orders"] .staff-order-table--items {
     min-width: 620px;
+}
+
+body[data-admin-page="orders"] .staff-order-table--items td:first-child {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 body[data-admin-page="orders"] .staff-order-table--items td:nth-child(2),
@@ -364,6 +422,13 @@ body[data-admin-page="orders"] .detail-grid .full {
     grid-column: 1 / -1;
 }
 
+body[data-admin-page="orders"] .detail-note {
+    min-height: 5rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
 body[data-admin-page="orders"] .detail-grid strong {
     color: var(--color-ink-900);
     font-weight: 900;
@@ -377,6 +442,24 @@ body[data-admin-page="orders"] .status-form {
 body[data-admin-page="orders"] .modal-actions {
     justify-content: flex-end;
     padding-top: 0.25rem;
+}
+
+body[data-admin-page="orders"] .staff-order-detail-board {
+    display: grid;
+    gap: var(--space-5);
+}
+
+body[data-admin-page="orders"] .empty-cell {
+    text-align: center;
+    color: var(--color-ink-500);
+}
+
+.clickable-row {
+    cursor: pointer;
+}
+
+.clickable-row:hover {
+    background: #fff7ec;
 }
 
 @media (max-width: 1080px) {

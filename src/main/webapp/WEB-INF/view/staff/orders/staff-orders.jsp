@@ -88,7 +88,6 @@
                             <th>Ngày đặt</th>
                             <th>Thành tiền</th>
                             <th>Trạng thái</th>
-                            <th>Ghi chú</th>
                             <th>Thao tác</th>
                         </tr>
                         </thead>
@@ -98,34 +97,6 @@
             </section>
         </section>
     </main>
-</div>
-
-<div id="orderDetailModal" class="modal hidden">
-    <div class="modal-box large" role="dialog" aria-modal="true" aria-labelledby="orderDetailTitle">
-        <div class="modal-header">
-            <h2 id="orderDetailTitle">Chi tiết đơn hàng</h2>
-            <button onclick="closeOrderDetailModal()" class="close-btn" type="button" aria-label="Đóng">×</button>
-        </div>
-
-        <div id="orderDetailContent"></div>
-
-        <section class="modal-section">
-            <h3>Danh sách món</h3>
-            <div class="table-wrap admin-table-wrap">
-                <table class="admin-table staff-order-table staff-order-table--items">
-                    <thead>
-                    <tr>
-                        <th>Món ăn</th>
-                        <th>Số lượng</th>
-                        <th>Đơn giá</th>
-                        <th>Thành tiền</th>
-                    </tr>
-                    </thead>
-                    <tbody id="staffOrderItemBody"></tbody>
-                </table>
-            </div>
-        </section>
-    </div>
 </div>
 
 <div id="statusModal" class="modal hidden">

@@ -4,6 +4,22 @@ document.addEventListener("DOMContentLoaded", () => {
     loadStaffOrders();
 });
 
+document.addEventListener("click", (event) => {
+    const updateButton = event.target.closest(".update-status-btn");
+
+    if (!updateButton) {
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const orderId = updateButton.dataset.orderId;
+    const currentStatus = updateButton.dataset.currentStatus;
+
+    openStatusModal(orderId, currentStatus);
+});
+
 async function loadStaffOrders() {
     const status = document.getElementById("statusFilter").value;
     const keyword = document.getElementById("keywordFilter").value;
@@ -13,7 +29,9 @@ async function loadStaffOrders() {
     const message = document.getElementById("message");
     const tbody = document.getElementById("staffOrderTableBody");
 
-    message.textContent = "";
+    if (!tbody) return;
+
+    if (message) message.textContent = "";
     tbody.innerHTML = "";
 
     const params = new URLSearchParams();
@@ -43,119 +61,65 @@ async function loadStaffOrders() {
 
         orders.forEach(order => {
             const row = document.createElement("tr");
+            row.classList.add("clickable-row");
+            row.dataset.orderId = order.maDH;
 
             row.innerHTML = `
-                <td>#${order.maDH}</td>
-                <td>${order.maTKKH}</td>
-                <td>${order.maTKNV || "-"}</td>
-                <td>${formatDate(order.ngayDat)}</td>
-                <td>${formatMoney(order.thanhTien)}</td>
-                <td><span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span></td>
-                <td>${order.ghiChu || "-"}</td>
+                <td class="col-order">#${order.maDH}</td>
+                <td class="col-customer">${order.maTKKH}</td>
+                <td class="col-staff">${order.maTKNV || "-"}</td>
+                <td class="col-date">${formatDate(order.ngayDat)}</td>
+                <td class="col-money">${formatMoney(order.thanhTien)}</td>
+                <td class="col-status">
+                    <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
+                </td>
                 <td class="actions">
-                    <button onclick="openOrderDetail(${order.maDH})" class="secondary-btn">Chi tiết</button>
                     ${renderUpdateButton(order)}
                 </td>
             `;
+
+            row.addEventListener("click", (event) => {
+                if (event.target.closest("button, a, input, select, textarea")) {
+                    return;
+                }
+
+                window.location.href = `/order-staff/orders/detail?orderId=${order.maDH}`;
+            });
 
             tbody.appendChild(row);
         });
 
     } catch (error) {
-        message.textContent = error.message;
+        if (message) message.textContent = error.message;
     }
 }
 
 function renderUpdateButton(order) {
-    const nextStatuses = getNextStatuses(order.trangThaiDon);
+    const currentStatus = normalizeStatus(order.trangThaiDon);
+    const nextStatuses = getNextStatuses(currentStatus);
 
     if (nextStatuses.length === 0) {
         return "";
     }
 
-    return `<button onclick="openStatusModal(${order.maDH}, '${normalizeStatus(order.trangThaiDon)}')" class="primary-btn">Cập nhật</button>`;
+    return `
+        <button
+            type="button"
+            class="primary-btn update-status-btn"
+            data-order-id="${order.maDH}"
+            data-current-status="${currentStatus}">
+            Cập nhật
+        </button>
+    `;
 }
 
-async function openOrderDetail(orderId) {
-    const content = document.getElementById("orderDetailContent");
-    const itemBody = document.getElementById("staffOrderItemBody");
 
-    content.innerHTML = "Đang tải...";
-    itemBody.innerHTML = "";
-
-    try {
-        const response = await fetch(`${STAFF_API_BASE}/${orderId}`);
-
-        if (!response.ok) {
-            throw new Error("Không thể tải chi tiết đơn hàng.");
-        }
-
-        const data = await response.json();
-
-        const order = data.order || data.donHang;
-        const items = data.orderItems || data.chiTietDH || [];
-
-        content.innerHTML = `
-            <div class="detail-grid">
-                <p><strong>Mã đơn:</strong> #${order.maDH}</p>
-                <p><strong>Mã khách:</strong> ${order.maTKKH}</p>
-                <p><strong>Mã nhân viên:</strong> ${order.maTKNV || "-"}</p>
-                <p><strong>Ngày đặt:</strong> ${formatDate(order.ngayDat)}</p>
-                <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
-                <p><strong>Giảm giá:</strong> ${formatMoney(order.tienGiamGia)}</p>
-                <p><strong>Thành tiền:</strong> ${formatMoney(order.thanhTien)}</p>
-                <p><strong>Trạng thái:</strong> 
-                    <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
-                </p>
-                <p class="full"><strong>Ghi chú:</strong> ${order.ghiChu || "-"}</p>
-            </div>
-        `;
-
-        items.forEach(item => {
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${item.tenMon}</td>
-                <td>${item.soLuong}</td>
-                <td>${formatMoney(item.donGia)}</td>
-                <td>${formatMoney(item.thanhTien)}</td>
-            `;
-
-            itemBody.appendChild(row);
-        });
-
-        document.getElementById("orderDetailModal").classList.remove("hidden");
-
-    } catch (error) {
-        content.innerHTML = `<p class="message">${error.message}</p>`;
-        document.getElementById("orderDetailModal").classList.remove("hidden");
-    }
-}
-
-function closeOrderDetailModal() {
-    document.getElementById("orderDetailModal").classList.add("hidden");
-}
-
-function openStatusModal(orderId, currentStatus) {
-    document.getElementById("selectedOrderId").value = orderId;
-
-    const select = document.getElementById("nextStatusSelect");
-    select.innerHTML = "";
-
-    const nextStatuses = getNextStatuses(currentStatus);
-
-    nextStatuses.forEach(status => {
-        const option = document.createElement("option");
-        option.value = status;
-        option.textContent = displayStatus(status);
-        select.appendChild(option);
-    });
-
-    document.getElementById("statusModal").classList.remove("hidden");
-}
 
 function closeStatusModal() {
-    document.getElementById("statusModal").classList.add("hidden");
+    const modal = document.getElementById("statusModal");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
 }
 
 async function submitUpdateStatus() {
@@ -237,4 +201,9 @@ function formatMoney(value) {
 function formatDate(value) {
     if (!value) return "";
     return new Date(value).toLocaleString("vi-VN");
+}
+
+function formatNote(note) {
+    if (!note) return "-";
+    return note;
 }

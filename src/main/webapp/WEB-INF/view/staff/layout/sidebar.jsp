@@ -23,7 +23,8 @@
     </div>
     <nav class="admin-nav">
       <span class="admin-nav__section">Workspace</span>
-      <a class="<c:if test='${currentPath == "/staff" || fn:startsWith(currentPath, "/staff/orders")}'>is-active</c:if>" href="<c:url value='/staff'/>">
+      <a class="<c:if test='${fn:startsWith(currentPath, "/order-staff/orders")}'>is-active</c:if>" 
+        href="<c:url value='/order-staff/orders'/>">
         Quản lý đơn hàng
       </a>
       <a class="<c:if test='${fn:startsWith(currentPath, "/staff/support")}'>is-active</c:if>" href="<c:url value='/staff/support'/>">
