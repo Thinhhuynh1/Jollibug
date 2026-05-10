@@ -19,10 +19,10 @@
 <c:url var="resetPasswordUrl" value="/reset-password" />
 
 <aside class="profile-sidebar">
-    <div class="profile-sidebar__avatar">U</div>
+    <div class="profile-sidebar__avatar">${fn:substring(sessionScope.user.hoTen, 0, 1)}</div>
     <div class="profile-sidebar__greeting">Xin chào,</div>
-    <div class="profile-sidebar__name">User Demo!</div>
-    <a class="profile-sidebar__logout" href="/">Đăng xuất</a>
+    <div class="profile-sidebar__name">${sessionScope.user.hoTen}</div>
+    <a class="profile-sidebar__logout" href="/logout">Đăng xuất</a>
 
     <nav class="profile-nav" aria-label="Profile navigation">
     <a href="${ordersUrl}"<c:if test="${ordersActive}"> class="is-active"</c:if>>Đơn hàng</a>
