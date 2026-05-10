@@ -1,5 +1,7 @@
 const STAFF_API_BASE = "/api/staff/orders";
 
+let currentOrder = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     const orderId = getOrderIdFromUrl();
 
@@ -40,50 +42,119 @@ async function loadOrderDetail(orderId) {
             throw new Error("Không tìm thấy dữ liệu đơn hàng.");
         }
 
+        currentOrder = order;
+
+        let payment = null;
+        try {
+            const paymentResponse = await fetch(`/api/payments/order/${order.maDH}`);
+            if (paymentResponse.ok) {
+                payment = await paymentResponse.json();
+            }
+        } catch (e) {
+            payment = null;
+        }
+
         if (caption) {
-            caption.textContent = `Mã đơn #${order.maDH}`;
+            caption.textContent = "";
         }
 
-        content.innerHTML = `
-            <div class="detail-grid">
-                <p><strong>Mã đơn:</strong> #${order.maDH}</p>
-                <p><strong>Mã khách:</strong> ${order.maTKKH}</p>
-                <p><strong>Mã nhân viên:</strong> ${order.maTKNV || "-"}</p>
-                <p><strong>Ngày đặt:</strong> ${formatDate(order.ngayDat)}</p>
-                <p><strong>Mã địa chỉ:</strong> ${order.maDC || "-"}</p>
-                <p><strong>Mã giảm giá:</strong> ${order.maGG || "-"}</p>
-                <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
-                <p><strong>Giảm giá:</strong> ${formatMoney(order.tienGiamGia)}</p>
-                <p><strong>Thành tiền:</strong> ${formatMoney(order.thanhTien)}</p>
-                <p><strong>Trạng thái:</strong> 
-                    <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
-                </p>
-                <p class="full detail-note"><strong>Thông tin giao hàng / ghi chú:</strong><br>${order.ghiChu || "-"}</p>
-            </div>
-        `;
-
-        if (!items.length) {
-            itemBody.innerHTML = `<tr><td colspan="4" class="empty-cell">Đơn hàng chưa có món.</td></tr>`;
-            return;
-        }
-
-        items.forEach(item => {
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${item.tenMon || `Món #${item.maMon}`}</td>
-                <td>${item.soLuong || 0}</td>
-                <td>${formatMoney(item.donGia)}</td>
-                <td>${formatMoney(item.thanhTien)}</td>
-            `;
-
-            itemBody.appendChild(row);
-        });
+        renderOrderDetail(order, payment);
+        renderOrderItems(items);
+        setupDetailUpdateButton(order);
 
     } catch (error) {
         showMessage(error.message);
         if (content) content.innerHTML = "";
     }
+}
+
+function renderOrderDetail(order, payment) {
+    const content = document.getElementById("orderDetailContent");
+
+    if (!content) return;
+
+    const delivery = parseDeliveryInfo(order.ghiChu);
+    const paymentStatus = payment ? displayPaymentStatus(payment.trangThaiTT) : "Chưa có dữ liệu";
+    const paymentMethod = payment ? displayPaymentMethod(payment.maPT) : "Chưa có dữ liệu";
+
+    content.innerHTML = `
+        <div class="detail-two-columns">
+            <section class="detail-info-card">
+                <h3>Thông tin đơn hàng</h3>
+
+                <div class="detail-info-list">
+                    <p><strong>Ngày đặt:</strong> ${formatDate(order.ngayDat)}</p>
+                    <p><strong>Trạng thái đơn:</strong> 
+                        <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
+                    </p>
+                    <p><strong>Trạng thái thanh toán:</strong> ${paymentStatus}</p>
+                    <p><strong>Phương thức thanh toán:</strong> ${paymentMethod}</p>
+                    <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
+                    <p><strong>Giảm giá:</strong> ${formatMoney(order.tienGiamGia)}</p>
+                    <p><strong>Thành tiền:</strong> ${formatMoney(order.thanhTien)}</p>
+                    <p><strong>Mã giảm giá:</strong> ${order.maGG || "-"}</p>
+                </div>
+            </section>
+
+            <section class="detail-info-card">
+                <h3>Thông tin khách hàng</h3>
+
+                <div class="detail-info-list">
+                    <p><strong>Mã khách:</strong> ${order.maTKKH}</p>
+                    <p><strong>Tên khách hàng:</strong> ${delivery.name || order.tenKhachHang || order.hoTenKhachHang || "Khách hàng #" + order.maTKKH}</p>
+                    <p><strong>Số điện thoại:</strong> ${delivery.phone || order.sdtKhachHang || "-"}</p>
+                    <p><strong>Email:</strong> ${delivery.email || order.emailKhachHang || "-"}</p>
+                    <p class="full"><strong>Địa chỉ giao hàng:</strong><br>${delivery.address || order.diaChiGiaoHang || order.ghiChu || "-"}</p>
+                </div>
+            </section>
+        </div>
+    `;
+}
+
+function renderOrderItems(items) {
+    const itemBody = document.getElementById("staffOrderItemBody");
+
+    if (!itemBody) return;
+
+    itemBody.innerHTML = "";
+
+    if (!items.length) {
+        itemBody.innerHTML = `<tr><td colspan="4" class="empty-cell">Đơn hàng chưa có món.</td></tr>`;
+        return;
+    }
+
+    items.forEach(item => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${item.tenMon || `Món #${item.maMon}`}</td>
+            <td>${item.soLuong || 0}</td>
+            <td>${formatMoney(item.donGia)}</td>
+            <td>${formatMoney(item.thanhTien)}</td>
+        `;
+
+        itemBody.appendChild(row);
+    });
+}
+
+function setupDetailUpdateButton(order) {
+    const updateBtn = document.getElementById("detailUpdateStatusBtn");
+
+    if (!updateBtn) return;
+
+    const nextStatuses = getNextStatuses(order.trangThaiDon);
+
+    if (nextStatuses.length === 0) {
+        updateBtn.style.display = "none";
+        return;
+    }
+
+    updateBtn.style.display = "inline-flex";
+    updateBtn.onclick = () => {
+        openStatusModal(order.maDH, normalizeStatus(order.trangThaiDon), () => {
+            loadOrderDetail(order.maDH);
+        });
+    };
 }
 
 function showMessage(message) {
@@ -122,4 +193,52 @@ function formatMoney(value) {
 function formatDate(value) {
     if (!value) return "";
     return new Date(value).toLocaleString("vi-VN");
+}
+
+function parseDeliveryInfo(note) {
+    const result = {
+        name: "",
+        phone: "",
+        email: "",
+        address: ""
+    };
+
+    if (!note) return result;
+
+    const nameMatch = note.match(/Người nhận:\s*([^;]+)/i);
+    const phoneMatch = note.match(/SĐT:\s*([^;]+)/i);
+    const emailMatch = note.match(/Email:\s*([^;]+)/i);
+    const addressMatch = note.match(/Địa chỉ nhập:\s*([^;]+)/i) || note.match(/Địa chỉ:\s*([^;]+)/i);
+
+    result.name = nameMatch ? nameMatch[1].trim() : "";
+    result.phone = phoneMatch ? phoneMatch[1].trim() : "";
+    result.email = emailMatch ? emailMatch[1].trim() : "";
+    result.address = addressMatch ? addressMatch[1].trim() : "";
+
+    return result;
+}
+
+function displayPaymentStatus(status) {
+    const s = normalizeStatus(status);
+
+    const map = {
+        PENDING: "Chờ thanh toán",
+        PAID: "Đã thanh toán",
+        FAILED: "Thanh toán thất bại"
+    };
+
+    return map[s] || status || "-";
+}
+
+function displayPaymentMethod(method) {
+    const m = normalizeStatus(method);
+
+    const map = {
+        COD: "Thanh toán khi nhận hàng",
+        BANK: "Chuyển khoản ngân hàng",
+        EWALLET: "Ví điện tử",
+        CREDIT_CARD: "Thẻ tín dụng / Ghi nợ"
+    };
+
+    return map[m] || method || "-";
 }

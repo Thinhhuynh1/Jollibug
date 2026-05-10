@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="<c:url value='/css/staff/staff-orders.css'/>">
 </head>
 <body data-admin-role="staff" data-admin-page="orders">
+<input type="hidden" id="currentStaffId" value="${sessionScope.userId}">
 <div class="admin-shell admin-body">
     <jsp:include page="../layout/sidebar.jsp" />
 
@@ -26,9 +27,7 @@
         <section class="admin-panel staff-orders-board">
             <div class="staff-orders-board__header">
                 <div class="stack" style="gap:0.35rem;">
-                    <span class="eyebrow">Operations</span>
                     <h1 class="section-title">Quản lý đơn hàng</h1>
-                    <p class="muted">Theo dõi, lọc và cập nhật trạng thái đơn hàng trong ca làm việc.</p>
                 </div>
                 <button onclick="loadStaffOrders()" class="primary-btn" type="button">Tải lại</button>
             </div>
@@ -75,7 +74,6 @@
             <section class="table-card">
                 <div class="table-card__header">
                     <h2>Danh sách đơn</h2>
-                    <span class="muted">Sắp xếp và thao tác theo trạng thái hiện tại</span>
                 </div>
 
                 <div class="table-wrap admin-table-wrap">
@@ -84,7 +82,6 @@
                         <tr>
                             <th>Mã đơn</th>
                             <th>Mã khách</th>
-                            <th>Nhân viên</th>
                             <th>Ngày đặt</th>
                             <th>Thành tiền</th>
                             <th>Trạng thái</th>
@@ -127,6 +124,7 @@
     </div>
 </div>
 
+<script src="<c:url value='/js/staff/staff-order-status-modal.js'/>"></script>
 <script src="<c:url value='/js/staff/staff-orders.js'/>"></script>
 </body>
 </html>

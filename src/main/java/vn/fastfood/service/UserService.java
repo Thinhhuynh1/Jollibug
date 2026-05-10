@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
 import vn.fastfood.entity.User;
 import vn.fastfood.entity.VaiTro;
 import vn.fastfood.repository.UserRepository;
@@ -42,7 +43,7 @@ public class UserService {
         user.setPassword(encodedPassword);
 
         // Set vi trò default là khách hàng (ROLE_CLIENT)
-        user.setVaiTro(vaiTroRepository.findByTenVT(""));
+        user.setVaiTro(vaiTroRepository.findByTenVT("CLIENT"));
 
         // Set trạng thái default là ACTIVE
         user.setTrangThai("ACTIVE");
@@ -85,4 +86,24 @@ public class UserService {
         return this.userRepository.findById(id).orElse(null);
     }
 
+    public void resetPassword(HttpSession session, String oldPassword, String newPassword) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            throw new RuntimeException("Bạn cần đăng nhập để đổi mật khẩu");
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new RuntimeException("Không tìm thấy tài khoản");
+        }
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Mật khẩu cũ không đúng");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }

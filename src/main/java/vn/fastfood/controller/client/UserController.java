@@ -65,7 +65,7 @@ public class UserController {
             } else if ("MANAGER".equals(roleName)) {
                 return "redirect:/manager";
             } else if ("STAFF".equals(roleName)) {
-                return "redirect:/staff";
+                return "redirect:/staff/orders"; // sau khi dang nhap thi se chuyen sang trang staff order
             }
 
             return "redirect:/";

@@ -6,13 +6,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class StaffOrderPageController {
 
-    @GetMapping("/order-staff/orders")
+    @GetMapping("/staff/orders")
     public String staffOrdersPage() {
         return "staff/orders/staff-orders";
     }
 
-    @GetMapping("/order-staff/orders/detail")
+    @GetMapping("staff/order-detail")
     public String staffOrderDetailPage() {
         return "staff/orders/staff-order-detail";
+    }
+
+    @GetMapping("/order-staff/orders")
+    public String staffOrdersPageOld() {
+        return "redirect:/staff/orders";
+    }
+
+    @GetMapping("/order-staff/orders/detail")
+    public String staffOrderDetailPageOld() {
+        return "redirect:/staff/orders";
     }
 }

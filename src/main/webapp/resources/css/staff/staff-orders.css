@@ -493,3 +493,515 @@ body[data-admin-page="orders"] .empty-cell {
         padding: 1rem;
     }
 }
+
+body[data-admin-page="orders"] #statusModal:not(.hidden) {
+    display: grid !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 99999 !important;
+    place-items: center !important;
+    background: rgba(24, 12, 4, 0.48) !important;
+}
+
+body[data-admin-page="orders"] #statusModal .modal-box {
+    display: grid !important;
+    background: #fffefb !important;
+    z-index: 100000 !important;
+}
+
+#runtimeStatusModal .status-choice-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+#runtimeStatusModal .status-choice {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3.25rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(111, 82, 55, 0.14);
+    border-radius: 16px;
+    background: #fffaf8;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+#runtimeStatusModal .status-choice:hover {
+    border-color: #e60000;
+    background: #fff3f1;
+}
+
+#runtimeStatusModal .status-choice input {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #e60000;
+}
+
+#runtimeStatusModal .status-choice:has(input:checked) {
+    border-color: #e60000;
+    background: rgba(230, 0, 0, 0.08);
+    color: #c40000;
+}
+
+#runtimeCancelConfirmModal .runtime-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000000;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(24, 12, 4, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+#runtimeCancelConfirmModal .runtime-modal-box {
+    width: min(100%, 440px);
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: 24px;
+    background: #fffefb;
+    box-shadow: 0 24px 60px rgba(24, 12, 4, 0.24);
+}
+
+#runtimeCancelConfirmModal .runtime-confirm-text {
+    margin: 0;
+    color: #3b2c22;
+    line-height: 1.55;
+    font-weight: 700;
+}
+
+#runtimeStatusModal .runtime-danger-btn,
+#runtimeCancelConfirmModal .runtime-danger-btn {
+    min-height: 2.75rem;
+    border: none;
+    border-radius: 999px;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    font-weight: 900;
+    background: #c40000;
+    color: #ffffff;
+}
+
+#runtimeStatusModal,
+#runtimeCancelConfirmModal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 999999 !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 1rem !important;
+    background: rgba(24, 12, 4, 0.48) !important;
+    backdrop-filter: blur(3px) !important;
+}
+
+#runtimeStatusModal .runtime-modal-backdrop,
+#runtimeCancelConfirmModal .runtime-modal-backdrop {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    display: grid !important;
+    place-items: center !important;
+    background: transparent !important;
+    padding: 0 !important;
+}
+
+#runtimeStatusModal .runtime-modal-box,
+#runtimeCancelConfirmModal .runtime-modal-box {
+    width: min(100%, 520px) !important;
+    max-height: calc(100vh - 2rem) !important;
+    overflow: auto !important;
+    display: grid !important;
+    gap: 1rem !important;
+    padding: 1.25rem !important;
+    border-radius: 24px !important;
+    background: #fffefb !important;
+    box-shadow: 0 24px 60px rgba(24, 12, 4, 0.24) !important;
+}
+
+.runtime-modal-root {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 999999 !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 1rem !important;
+    background: rgba(24, 12, 4, 0.24) !important;
+    backdrop-filter: blur(1.5px) !important;
+}
+
+.runtime-modal-root--confirm {
+    z-index: 1000000 !important;
+    background: rgba(24, 12, 4, 0.22) !important;
+}
+
+.runtime-modal-box {
+    position: relative !important;
+    width: min(100%, 560px) !important;
+    display: grid !important;
+    gap: 1rem !important;
+    padding: 1.35rem !important;
+    border: 1px solid rgba(111, 82, 55, 0.1) !important;
+    border-radius: 26px !important;
+    background: #fffefb !important;
+    box-shadow: 0 24px 60px rgba(24, 12, 4, 0.18) !important;
+}
+
+.runtime-modal-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    padding-bottom: 0.95rem !important;
+    border-bottom: 1px solid rgba(111, 82, 55, 0.08) !important;
+}
+
+.runtime-modal-header h2 {
+    margin: 0 !important;
+    padding-right: 3rem !important;
+    color: #211a16 !important;
+    font-size: 1.55rem !important;
+    font-weight: 900 !important;
+}
+
+.runtime-close-btn {
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    width: 3rem !important;
+    height: 3rem !important;
+    border: 1px solid rgba(111, 82, 55, 0.12) !important;
+    border-radius: 999px !important;
+    background: #fffaf8 !important;
+    color: #211a16 !important;
+    cursor: pointer !important;
+    font-size: 2rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+.status-choice-list,
+.cancel-reason-list {
+    display: grid !important;
+    gap: 0.75rem !important;
+}
+
+.status-choice,
+.cancel-reason-choice {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+    min-height: 3.35rem !important;
+    padding: 0.85rem 1rem !important;
+    border: 1px solid rgba(111, 82, 55, 0.14) !important;
+    border-radius: 16px !important;
+    background: #fffaf8 !important;
+    cursor: pointer !important;
+    font-weight: 900 !important;
+}
+
+.status-choice:hover,
+.cancel-reason-choice:hover {
+    border-color: #e60000 !important;
+    background: #fff3f1 !important;
+}
+
+.status-choice input,
+.cancel-reason-choice input {
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+    accent-color: #e60000 !important;
+}
+
+.status-choice:has(input:checked),
+.cancel-reason-choice:has(input:checked) {
+    border-color: #e60000 !important;
+    background: rgba(230, 0, 0, 0.08) !important;
+    color: #c40000 !important;
+}
+
+.status-choice--disabled {
+    opacity: 0.38 !important;
+    cursor: not-allowed !important;
+    background: #f5f1ed !important;
+}
+
+.status-choice--disabled:hover {
+    border-color: rgba(111, 82, 55, 0.14) !important;
+    background: #f5f1ed !important;
+}
+
+.runtime-modal-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.7rem !important;
+    padding-top: 0.25rem !important;
+}
+
+.runtime-primary-btn,
+.runtime-danger-btn {
+    min-height: 3rem !important;
+    border: none !important;
+    border-radius: 999px !important;
+    padding: 0.8rem 1.25rem !important;
+    cursor: pointer !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+}
+
+.runtime-primary-btn {
+    background: #e60000 !important;
+}
+
+.runtime-danger-btn {
+    background: #c40000 !important;
+}
+
+.runtime-confirm-text {
+    margin: 0 !important;
+    color: #3b2c22 !important;
+    line-height: 1.55 !important;
+    font-weight: 700 !important;
+}
+
+.other-cancel-reason {
+    width: 100% !important;
+    min-height: 5.5rem !important;
+    border: 1px solid rgba(111, 82, 55, 0.14) !important;
+    border-radius: 16px !important;
+    padding: 0.9rem 1rem !important;
+    resize: vertical !important;
+    font: inherit !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.staff-detail-top-actions {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.staff-detail-top-actions .back-btn {
+    gap: 0.35rem;
+}
+
+.runtime-modal-root {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 999999 !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 1rem !important;
+    background: rgba(24, 12, 4, 0.24) !important;
+    backdrop-filter: blur(1.5px) !important;
+}
+
+.runtime-modal-root--confirm {
+    z-index: 1000000 !important;
+    background: rgba(24, 12, 4, 0.22) !important;
+}
+
+.runtime-modal-box {
+    position: relative !important;
+    width: min(100%, 560px) !important;
+    display: grid !important;
+    gap: 1rem !important;
+    padding: 1.35rem !important;
+    border: 1px solid rgba(111, 82, 55, 0.1) !important;
+    border-radius: 26px !important;
+    background: #fffefb !important;
+    box-shadow: 0 24px 60px rgba(24, 12, 4, 0.18) !important;
+}
+
+.runtime-modal-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    padding-bottom: 0.95rem !important;
+    border-bottom: 1px solid rgba(111, 82, 55, 0.08) !important;
+}
+
+.runtime-modal-header h2 {
+    margin: 0 !important;
+    padding-right: 3rem !important;
+    color: #211a16 !important;
+    font-size: 1.55rem !important;
+    font-weight: 900 !important;
+}
+
+.runtime-close-btn {
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    width: 3rem !important;
+    height: 3rem !important;
+    border: 1px solid rgba(111, 82, 55, 0.12) !important;
+    border-radius: 999px !important;
+    background: #fffaf8 !important;
+    color: #211a16 !important;
+    cursor: pointer !important;
+    font-size: 2rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+.status-choice-list,
+.cancel-reason-list {
+    display: grid !important;
+    gap: 0.75rem !important;
+}
+
+.status-choice,
+.cancel-reason-choice {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+    min-height: 3.35rem !important;
+    padding: 0.85rem 1rem !important;
+    border: 1px solid rgba(111, 82, 55, 0.14) !important;
+    border-radius: 16px !important;
+    background: #fffaf8 !important;
+    cursor: pointer !important;
+    font-weight: 900 !important;
+}
+
+.status-choice input,
+.cancel-reason-choice input {
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+    accent-color: #e60000 !important;
+}
+
+.status-choice:has(input:checked),
+.cancel-reason-choice:has(input:checked) {
+    border-color: #e60000 !important;
+    background: rgba(230, 0, 0, 0.08) !important;
+    color: #c40000 !important;
+}
+
+.status-choice--disabled {
+    opacity: 0.38 !important;
+    cursor: not-allowed !important;
+    background: #f5f1ed !important;
+}
+
+.status-choice--disabled:hover {
+    border-color: rgba(111, 82, 55, 0.14) !important;
+    background: #f5f1ed !important;
+}
+
+.runtime-modal-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.7rem !important;
+    padding-top: 0.25rem !important;
+}
+
+.runtime-modal-actions--single {
+    justify-content: flex-end !important;
+}
+
+.runtime-primary-btn,
+.runtime-danger-btn {
+    min-height: 3rem !important;
+    border: none !important;
+    border-radius: 999px !important;
+    padding: 0.8rem 1.25rem !important;
+    cursor: pointer !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+}
+
+.runtime-primary-btn {
+    background: #e60000 !important;
+}
+
+.runtime-danger-btn {
+    background: #c40000 !important;
+}
+
+.runtime-confirm-text {
+    margin: 0 !important;
+    color: #3b2c22 !important;
+    line-height: 1.55 !important;
+    font-weight: 700 !important;
+}
+
+.other-cancel-reason {
+    width: 100% !important;
+    min-height: 5.5rem !important;
+    border: 1px solid rgba(111, 82, 55, 0.14) !important;
+    border-radius: 16px !important;
+    padding: 0.9rem 1rem !important;
+    resize: vertical !important;
+    font: inherit !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.detail-two-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.detail-info-card {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border: 1px solid rgba(111, 82, 55, 0.08);
+    border-radius: 18px;
+    background: #fffaf5;
+}
+
+.detail-info-card h3 {
+    margin: 0;
+    color: #211a16;
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.detail-info-list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.detail-info-list p {
+    margin: 0;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid rgba(111, 82, 55, 0.08);
+    border-radius: 14px;
+    background: #ffffff;
+    color: #2b211b;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.detail-info-list p.full {
+    min-height: 5rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.staff-detail-top-actions {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.staff-detail-top-actions .back-btn {
+    gap: 0.35rem;
+}
+
+@media (max-width: 900px) {
+    .detail-two-columns {
+        grid-template-columns: 1fr;
+    }
+}

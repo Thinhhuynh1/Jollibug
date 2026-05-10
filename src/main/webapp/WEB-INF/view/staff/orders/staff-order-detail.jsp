@@ -23,15 +23,22 @@
         <jsp:include page="../layout/topbar.jsp" />
 
         <section class="admin-panel staff-orders-board staff-order-detail-board">
+            <input type="hidden" id="currentStaffId" value="${sessionScope.userId}">
+
+            <div class="staff-detail-top-actions">
+                <a href="${pageContext.request.contextPath}/staff/orders" class="secondary-btn back-btn">
+                    ← Quay lại danh sách
+                </a>
+            </div>
+
             <div class="staff-orders-board__header">
                 <div class="stack" style="gap:0.35rem;">
-                    <span class="eyebrow">Operations</span>
                     <h1 class="section-title">Chi tiết đơn hàng</h1>
-                    <p class="muted">Theo dõi thông tin đơn, ghi chú đầy đủ và các món đã đặt.</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/order-staff/orders" class="secondary-btn">
-                    Quay lại danh sách
-                </a>
+
+                <button type="button" id="detailUpdateStatusBtn" class="primary-btn">
+                    Cập nhật
+                </button>
             </div>
 
             <div id="message" class="message" role="status" aria-live="polite"></div>
@@ -47,7 +54,6 @@
             <section class="table-card">
                 <div class="table-card__header">
                     <h2>Danh sách món</h2>
-                    <span class="muted">Các món ăn trong đơn hàng</span>
                 </div>
 
                 <div class="table-wrap admin-table-wrap">
@@ -68,6 +74,7 @@
     </main>
 </div>
 
+<script src="<c:url value='/js/staff/staff-order-status-modal.js'/>"></script>
 <script src="<c:url value='/js/staff/staff-order-detail.js'/>"></script>
 </body>
 </html>
