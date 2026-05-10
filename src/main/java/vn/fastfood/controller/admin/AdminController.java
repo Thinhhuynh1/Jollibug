@@ -147,7 +147,7 @@ public class AdminController {
             user.setSdt(sdt);
 
             if (password != null && !password.isEmpty()) {
-                user.setPassword(password);
+                user.setPassword(passwordEncoder.encode(password));
             }
 
             if (role != null && !role.isEmpty()) {

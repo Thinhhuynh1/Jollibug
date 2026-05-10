@@ -26,7 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         @Query("""
                             SELECT u FROM User u
                             WHERE u.trangThai = :status
-                            AND (:role IS NULL OR :role = 'All' OR u.vaiTro.tenVT = :role)
+                            AND (:role IS NULL OR UPPER(:role) = 'ALL' OR UPPER(u.vaiTro.tenVT) = UPPER(:role))
                             AND (:keyword IS NULL OR
                                  LOWER(u.hoTen) LIKE LOWER(CONCAT('%', :keyword, '%'))
                                  OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')))
@@ -40,7 +40,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
         @Query("""
                             SELECT count(u) FROM User u
-                            WHERE ( :role is NULL OR u.vaiTro.tenVT = :role)
+                            WHERE ( :role is NULL OR UPPER(u.vaiTro.tenVT) = UPPER(:role))
                             AND (:status is NULL OR u.trangThai = :status)
                         """)
         long count(@Param("role") String role,
