@@ -35,12 +35,14 @@
               <p style="color: #e52b34; font-size: 0.95rem; margin-top: 4px;">* Lưu ý: Hành động này không thể hoàn tác.</p>
             </div>
 
-            <input type="hidden" name="id" value="${address.id}" />
+            <input type="hidden" name="maDC" value="${address.maDC}" />
 
-            <div class="form-actions">
-              <a href="/address" class="btn btn-secondary">Hủy bỏ</a>
-              <button type="submit" class="btn btn-primary">Xác Nhận</button>
-            </div>
+            <form method="post" action="/address/delete/${address.maDC}">
+              <div class="form-actions">
+                <a href="/address" class="btn btn-secondary">Hủy bỏ</a>
+                <button type="submit" class="btn btn-primary">Xác Nhận</button>
+              </div>
+            </form>
 
           </div>
         </section>

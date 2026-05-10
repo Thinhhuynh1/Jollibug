@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -44,22 +44,22 @@
         <div class="metric-grid" style="margin-bottom:var(--space-6);">
           <article class="metric-card">
             <span class="muted">Tổng người dùng</span>
-            <strong id="metric-total-users">128</strong>
+            <strong id="metric-total-users">${countAdmin + countManager + countStaff + countClient}</strong>
             <span class="metric-delta" data-tone="info">Tất cả vai trò</span>
           </article>
           <article class="metric-card">
             <span class="muted">Đang hoạt động</span>
-            <strong id="metric-active-users">112</strong>
+            <strong id="metric-active-users">${countActive}</strong>
             <span class="metric-delta" data-tone="up">Tài khoản live</span>
           </article>
           <article class="metric-card">
-            <span class="muted">Quản lý & Staff</span>
-            <strong id="metric-ops-users">34</strong>
+            <span class="muted">Admin & Manager & Staff</span>
+            <strong id="metric-ops-users">${countManager + countStaff}</strong>
             <span class="metric-delta" data-tone="info">Khối vận hành</span>
           </article>
           <article class="metric-card">
             <span class="muted">Tài khoản bị hạn chế</span>
-            <strong id="metric-blocked">16</strong>
+            <strong id="metric-blocked">${countBan}</strong>
             <span class="metric-delta" data-tone="warm">Cần xử lý</span>
           </article>
         </div>
@@ -75,15 +75,19 @@
             <div class="mini-stat-grid">
               <article class="mini-stat">
                 <span class="muted">Khách hàng</span>
-                <strong>94</strong>
+                <strong>${countClient}</strong>
               </article>
               <article class="mini-stat">
                 <span class="muted">Nhân viên</span>
-                <strong>22</strong>
+                <strong>${countStaff}</strong>
               </article>
               <article class="mini-stat">
                 <span class="muted">Quản lý</span>
-                <strong>12</strong>
+                <strong>${countManager}</strong>
+              </article>
+              <article class="mini-stat">
+                <span class="muted">Quản trị viên</span>
+                <strong>${countAdmin}</strong>
               </article>
             </div>
           </section>

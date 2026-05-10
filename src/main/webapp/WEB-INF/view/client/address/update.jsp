@@ -33,26 +33,45 @@
           </div>
 
           <article class="address-card">
-            <div class="profile-grid">
-              <label class="profile-field">
-                <span>Tên người nhận</span>
-                <input type="text" id="delivery-name" value="Nguyễn Minh Khôi" />
-              </label>
-              <label class="profile-field">
-                <span>Số điện thoại</span>
-                <input type="text" id="delivery-phone" value="0903 456 789" />
-              </label>
-            </div>
-            <label class="profile-field" style="position: relative;">
-              <span>Địa chỉ</span>
-              <input type="text" id="delivery-address" autocomplete="off" value="128 Nguyễn Trãi, Phường 3, Quận 5, TP. Hồ Chí Minh" />
-              <!-- Dropdown gợi ý địa chỉ -->
-              <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
-            </label>
-            <div class="modal__actions">
-              <button type="button" class="btn btn-primary">Cập nhật</button>
-              <a href="/address" class="btn btn-ghost">Hủy</a>
-            </div>
+            <form method="post" action="/address/update/${address.maDC}">
+              <div class="profile-grid">
+                <label class="profile-field">
+                  <span>Tên người nhận</span>
+                  <input name="tenNguoiNhan" type="text" id="delivery-name" value="${address.tenNguoiNhan}" required />
+                </label>
+                <label class="profile-field">
+                  <span>Số điện thoại</span>
+                  <input type="text" name="sdtNguoiNhan" id="delivery-phone" value="${address.sdtNguoiNhan}" required />
+                </label>
+              </div>
+              <div class="profile-grid" style="margin-top:1rem;">
+                <label class="profile-field">
+                  <span>Tên địa chỉ</span>
+                  <input type="text" id="ten-dia-chi" name="tenDiaChi" value="${address.tenDiaChi}" maxlength="100"  required />
+                </label>
+                <label for=""></label>
+                <label class="profile-field">
+                  <span>Tỉnh/Thành</span>
+                  <input type="text" id="tinh-thanh" name="tinhThanh" value="${address.tinhThanh}" required />
+                </label>
+                <label class="profile-field">
+                  <span>Quận/Huyện</span>
+                  <input type="text" id="quan-huyen" name="quanHuyen" value="${address.quanHuyen}" required />
+                </label>
+                <label class="profile-field">
+                  <span>Phường/Xã</span>
+                  <input type="text" id="phuong-xa" name="phuongXa" value="${address.phuongXa}" required />
+                </label>
+                  <label class="profile-field">
+                  <span>Địa chỉ cụ thể</span>
+                  <input type="text" id="dia-chi-cu-the" name="diaChiCuThe" value="${address.diaChiCuThe}" required />
+                </label>
+              </div>
+              <div class="modal__actions">
+                <a href="/address" class="btn btn-ghost">Hủy</a>
+                <button type="submit" class="btn btn-primary">Lưu địa chỉ</button>
+              </div>
+            </form>
           </article>
         </section>
       </div>

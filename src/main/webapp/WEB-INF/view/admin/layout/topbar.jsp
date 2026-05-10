@@ -10,6 +10,6 @@
         <div class="stack" style="gap:0.15rem;">
         <span class="muted" id="topbar-user-role">Quản trị viên</span>
         </div>
-        <button class="btn btn-outline" type="button" data-admin-logout id="btn-logout">Đăng xuất</button>
+        <button class="btn btn-outline" type="button" data-admin-logout id="btn-logout" onclick = "window.location.href= '/logout'">Đăng xuất</button>
     </div>
 </div>

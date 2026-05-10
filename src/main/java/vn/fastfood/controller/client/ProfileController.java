@@ -2,10 +2,22 @@ package vn.fastfood.controller.client;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.servlet.http.HttpSession;
+import vn.fastfood.entity.User;
+import vn.fastfood.service.UserService;
 
 @Controller
 public class ProfileController {
+    private final UserService userService;
+
+    ProfileController(UserService userService) {
+        this.userService = userService;
+    }
+
     @GetMapping("/reset-password")
     public String getResetPasswordPage() {
         return "client/reset-password";
@@ -16,24 +28,35 @@ public class ProfileController {
         return "client/profile";
     }
 
-    @GetMapping("/address")
-    public String getAddressPage() {
-        return "client/address/show";
+    @PostMapping("/profile/update") 
+    public String updateProfile(@ModelAttribute User user, HttpSession session, RedirectAttributes redirectAttributes) {
+    try {
+        // 1. Lấy ID của user đang đăng nhập (Giả sử bạn lưu ID lúc login với tên "loggedUserId")
+        Long id = ((User) session.getAttribute("user")).getMaTK();
+
+        if (id != null) {
+            // 2. Gọi DB lấy toàn bộ thông tin gốc của User này ra (để giữ nguyên Password, Role...)
+            User exUser = userService.getUserByMaTK(id);
+            // 3. Chỉ cập nhật những trường mà Form gửi lên
+            exUser.setHoTen(user.getHoTen());
+            exUser.setSdt(user.getSdt());
+            // existingUser.setAddress(user.getAddress());
+            // KHÔNG cập nhật email và password ở đây
+
+            // 4. Lưu lại vào Database
+            userService.saveUser(exUser);
+            session.setAttribute("user", exUser);
+
+            redirectAttributes.addFlashAttribute("successMsg", "Cập nhật tài khoản thành công");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMsg", "Vui lòng đăng nhập lại");
+        }
+
+    } catch (Exception e) {
+        redirectAttributes.addFlashAttribute("errorMsg", "Cập nhật tài khoản không thành công");
     }
 
-    @GetMapping("/address/create")
-    public String getAddressCreate() {
-        return "client/address/create";
-    }
-
-    @GetMapping("/address/update")
-    public String getAddressUpdate() {
-        return "client/address/update";
-    }
-
-    @GetMapping("/address/delete")
-    public String getAddressDelete() {
-        return "client/address/delete";
+        return "redirect:/profile"; 
     }
 
     @GetMapping("/orders")
