@@ -9,8 +9,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,7 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "USER")
+@Table(name = "USERS")
 public class User {
 
     @Id
@@ -51,8 +49,7 @@ public class User {
     private String email;
 
     @Column(name = "TrangThai")
-    @Enumerated(EnumType.STRING)
-    private UserStatus trangThai;
+    private String trangThai;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "MaVT", referencedColumnName = "MaVT")

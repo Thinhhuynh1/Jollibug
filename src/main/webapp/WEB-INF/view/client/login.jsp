@@ -40,6 +40,7 @@
                       ${error}
                     </div>
                   </c:if>
+  
                   <form class="floating-grid" action="/login" method="POST">
                     <div class="floating-field">
                       <input id="login-email" name="email" type="email" placeholder=" " required />

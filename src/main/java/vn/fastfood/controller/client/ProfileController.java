@@ -4,11 +4,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import vn.fastfood.entity.User;
 import vn.fastfood.service.UserService;
+
 
 @Controller
 public class ProfileController {
@@ -22,6 +24,28 @@ public class ProfileController {
     public String getResetPasswordPage() {
         return "client/reset-password";
     }
+
+@PostMapping("/reset-password")
+public String resetPassword(
+    @RequestParam("currentPassword") String currentPass, 
+    @RequestParam("newPassword") String newPass, 
+    @RequestParam("confirmPassword") String confirmPass,
+    RedirectAttributes redirectAttributes,
+    HttpSession session) throws Exception {
+    if (!newPass.equals(confirmPass)) {
+        redirectAttributes.addFlashAttribute("error", "Mật khẩu xác nhận không khớp!");
+        return "redirect:/reset-password";
+    }
+    try {
+        userService.resetPassword(session,currentPass, newPass);
+        redirectAttributes.addFlashAttribute("success", "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+        return "redirect:/login";
+    } catch (RuntimeException e) {
+            redirectAttributes.addAttribute("error", e.getMessage());
+            return "redirect:/profile";
+    }
+}
+    
 
     @GetMapping("/profile")
     public String getProfilePage() {

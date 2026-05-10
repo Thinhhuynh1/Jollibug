@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import vn.fastfood.entity.User;
-import vn.fastfood.entity.UserStatus;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -19,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
         User findByMaTK(long maTK);
 
-        List<User> findByTrangThai(UserStatus trangThai);
+        List<User> findByTrangThai(String trangThai);
 
         List<User> findAll();
 
@@ -34,7 +33,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                         """)
         List<User> search(@Param("role") String role,
                         @Param("keyword") String keyword,
-                        @Param("status") UserStatus status);
+                        @Param("status") String status);
 
         // find users by role name only
         List<User> findByVaiTro_TenVT(String tenVT);
@@ -45,7 +44,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                             AND (:status is NULL OR u.trangThai = :status)
                         """)
         long count(@Param("role") String role,
-                        @Param("status") UserStatus status);
+                        @Param("status") String status);
 
         void deleteById(long maTK);
 
