@@ -261,3 +261,70 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Product page quantity control and hidden input sync
+    const qtyInput = document.querySelector('[data-product-qty]');
+    const qtyHidden = document.getElementById('product-qty-input');
+    const minusBtn = document.querySelector('[data-action="product-qty-minus"]');
+    const plusBtn = document.querySelector('[data-action="product-qty-plus"]');
+
+    if (qtyInput && qtyHidden && minusBtn && plusBtn) {
+        function setQty(value) {
+            const qty = Math.max(1, value);
+            qtyInput.value = qty;
+            qtyHidden.value = qty;
+        }
+
+        minusBtn.addEventListener('click', function() {
+            setQty(Number(qtyInput.value) - 1);
+        });
+
+        plusBtn.addEventListener('click', function() {
+            setQty(Number(qtyInput.value) + 1);
+        });
+
+        // Sync initial value
+        setQty(Number(qtyInput.value));
+    }
+
+    // Menu search and sort support
+    const menuSearch = document.querySelector('[data-menu-search]');
+    const menuSort = document.querySelector('[data-menu-sort]');
+    const menuGrid = document.getElementById('menu-grid');
+
+    if (menuGrid && menuSearch && menuSort) {
+        const menuItems = Array.from(menuGrid.querySelectorAll('[data-product-id]'));
+
+        function filterMenu() {
+            const query = menuSearch.value.trim().toLowerCase();
+            menuItems.forEach(item => {
+                const name = item.dataset.productName.toLowerCase();
+                const category = item.dataset.productCategory.toLowerCase();
+                const description = item.querySelector('.muted')?.textContent.toLowerCase() || '';
+                const matches = name.includes(query) || category.includes(query) || description.includes(query);
+                item.style.display = matches ? '' : 'none';
+            });
+        }
+
+        function sortMenu() {
+            const value = menuSort.value;
+            const sorted = menuItems.slice().sort((a, b) => {
+                const priceA = parseFloat(a.dataset.productPrice || '0');
+                const priceB = parseFloat(b.dataset.productPrice || '0');
+                const ratingA = parseFloat(a.dataset.productRating || '0');
+                const ratingB = parseFloat(b.dataset.productRating || '0');
+
+                if (value === 'price-low') return priceA - priceB;
+                if (value === 'price-high') return priceB - priceA;
+                if (value === 'rating') return ratingB - ratingA;
+                return 0;
+            });
+
+            sorted.forEach(item => menuGrid.appendChild(item));
+        }
+
+        menuSearch.addEventListener('input', filterMenu);
+        menuSort.addEventListener('change', sortMenu);
+    }
+});

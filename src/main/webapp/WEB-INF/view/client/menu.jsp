@@ -82,7 +82,7 @@
         </section>
 
         <section class="card-grid" data-menu-grid id="menu-grid" aria-label="Menu items">
-          <article class="card product-card reveal-up">
+          <article class="card product-card reveal-up" data-product-id="1" data-product-name="Smoky Double Burger" data-product-category="Burger" data-product-price="9.90" data-product-rating="4.9">
             <div class="product-card__media" style="background:rgba(255,248,238,0.92);">
               <img src="/webapp/resources/shared/images/meal-burger.svg" alt="Smoky double burger" />
             </div>
@@ -92,12 +92,15 @@
               <p class="muted">Double patty, cheddar, onion jam, and signature sauce.</p>
               <div class="price-row"><span class="price">$9.90</span></div>
               <div class="card-actions">
-                <a class="btn btn-outline" href="/product">Xem chi tiết</a>
-                <button class="btn btn-primary" type="button">Thêm vào giỏ hàng</button>
+                <a class="btn btn-outline" href="/product?id=1">Xem chi tiết</a>
+                <form action="/cart/add/1" method="post" style="display:inline;">
+                  <input type="hidden" name="qty" value="1" />
+                  <button class="btn btn-primary" type="submit">Thêm vào giỏ hàng</button>
+                </form>
               </div>
             </div>
           </article>
-          <article class="card product-card reveal-up">
+          <article class="card product-card reveal-up" data-product-id="2" data-product-name="Crispy Combo Meal" data-product-category="Combo" data-product-price="12.50" data-product-rating="4.8">
             <div class="product-card__media" style="background:rgba(245,250,255,0.92);">
               <img src="/webapp/resources/shared/images/meal-drink.svg" alt="Crispy combo meal" />
             </div>
@@ -107,12 +110,15 @@
               <p class="muted">Chicken fillet burger, waffle fries, mango float.</p>
               <div class="price-row"><span class="price">$12.50</span></div>
               <div class="card-actions">
-                <a class="btn btn-outline" href="/product">Xem chi tiết</a>
-                <button class="btn btn-primary" type="button">Thêm vào giỏ hàng</button>
+                <a class="btn btn-outline" href="/product?id=2">Xem chi tiết</a>
+                <form action="/cart/add/2" method="post" style="display:inline;">
+                  <input type="hidden" name="qty" value="1" />
+                  <button class="btn btn-primary" type="submit">Thêm vào giỏ hàng</button>
+                </form>
               </div>
             </div>
           </article>
-          <article class="card product-card reveal-up">
+          <article class="card product-card reveal-up" data-product-id="3" data-product-name="Family Feast Box" data-product-category="Family" data-product-price="24.00" data-product-rating="4.7">
             <div class="product-card__media" style="background:rgba(251,244,255,0.92);">
               <img src="/webapp/resources/shared/images/brand-feast.svg" alt="Family feast" />
             </div>
@@ -122,8 +128,11 @@
               <p class="muted">A shareable box with burgers, chicken bites, and sides.</p>
               <div class="price-row"><span class="price">$24.00</span></div>
               <div class="card-actions">
-                <a class="btn btn-outline" href="/product">Xem chi tiết</a>
-                <button class="btn btn-primary" type="button">Thêm vào giỏ hàng</button>
+                <a class="btn btn-outline" href="/product?id=3">Xem chi tiết</a>
+                <form action="/cart/add/3" method="post" style="display:inline;">
+                  <input type="hidden" name="qty" value="1" />
+                  <button class="btn btn-primary" type="submit">Thêm vào giỏ hàng</button>
+                </form>
               </div>
             </div> 
           </article>

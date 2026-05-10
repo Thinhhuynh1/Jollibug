@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="css/admin.css" />
 </head>
 <body data-page="menu">
+  <c:set var="productId" value="${not empty param.id ? param.id : 1}" />
 
   <!-- SHARED HEADER -->
   <jsp:include page="layout/header.jsp"/>
@@ -48,7 +49,7 @@
           <article class="product-detail-card reveal-up">
             <div class="stack">
               <span class="badge" data-product-badge id="product-badge">Best Seller</span>
-              <h1 class="page-title" data-product-name id="product-name">Jollibug Product</h1>
+              <h1 class="page-title">${product.tenMon}</h1>
               <p class="lead" data-product-description id="product-description">Product description.</p>
 
               <div class="price-row">
@@ -78,15 +79,11 @@
                 <button type="button" data-action="product-qty-plus" id="btn-qty-plus">+</button>
               </div>
 
-              <div class="cluster">
-                <!--
-                  JS: root.querySelector('[data-action="add-product-detail"]').dataset.productId = product.id;
-                -->
-                <button class="btn btn-primary" type="button"
-                        data-action="add-product-detail" data-product-id="1"
-                        id="btn-add-to-cart">Add to cart</button>
-                <a class="btn btn-outline" href="/menu">Back to menu</a>
-              </div>
+              <form class="cluster" action="/cart/add/${productId}" method="post">
+                <input type="hidden" name="qty" id="product-qty-input" value="1" />
+                <button class="btn btn-primary" type="submit" id="btn-add-to-cart">Thêm vào giỏ hàng</button>
+                <a class="btn btn-outline" href="/menu">Quay lại</a>
+              </form>
             </div>
           </article>
 
