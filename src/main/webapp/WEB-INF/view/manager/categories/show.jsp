@@ -1,5 +1,6 @@
 ﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -37,13 +38,13 @@
             <h1 class="section-title" id="admin-table-title">Quản lý danh mục</h1>
           </div>
           <div class="panel-controls">
-            <label class="table-search">
+            <!-- <label class="table-search">
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="7"></circle>
                 <path d="m20 20-3.5-3.5"></path>
               </svg>
               <input id="admin-table-search" type="search" placeholder="Tìm danh mục hoặc slug" />
-            </label>
+            </label> -->
             <a href="/manager/categories/create" class="btn btn-primary" type="button" data-admin-open-modal id="admin-table-add-button">
               Thêm danh mục mới
             </a>
@@ -61,30 +62,24 @@
               </tr>
             </thead>
             <tbody id="admin-table-body">
-              <tr>
-                <td>Burger đặc trưng</td>
-                <td>12</td>
-                <td><span class="status-badge" data-status="active">đang hoạt động</span></td>
-                <td>
-                  <div class="action-row">
-                    <a href="/manager/categories/detail" class="btn btn-ghost icon-btn" type="button">Xem</a>
-                    <a href="/manager/categories/update" class="btn btn-ghost icon-btn" type="button">Sửa</a>
-                    <a href="/manager/categories/delete" class="btn btn-ghost icon-btn" type="button">Xóa</a>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>Đồ uống & Sinh tố</td>
-                <td>9</td>
-                <td><span class="status-badge" data-status="featured">nổi bật</span></td>
-                <td>
-                  <div class="action-row">
-                    <a href="/manager/categories/detail" class="btn btn-ghost icon-btn" type="button">Xem</a>
-                    <a href="/manager/categories/update" class="btn btn-ghost icon-btn" type="button">Sửa</a>
-                    <a href="/manager/categories/delete" class="btn btn-ghost icon-btn" type="button">Xóa</a>
-                  </div>
-                </td>
-              </tr>
+              <c:forEach var="danhMuc" items="${listDanhMuc}">
+                <tr>
+                  <td>${danhMuc.tenDM}</td>
+                  <td>${soLuongMonMap[danhMuc.maDM]}</td>
+                  <td>
+                    <c:if test="${danhMuc.available}"><span class="status-badge" data-status="active">Đang hoạt động</span></c:if>
+                    <c:if test="${!danhMuc.available}"><span class="status-badge" data-status="out-of-stock">Ẩn</span></c:if>
+                  </td>
+                  <td>
+                    <div class="action-row">
+                      <a href="/manager/categories/detail?categoryID=${danhMuc.maDM}" class="btn btn-ghost icon-btn" type="button">Xem</a>
+                      <a href="/manager/categories/update?categoryID=${danhMuc.maDM}" class="btn btn-ghost icon-btn" type="button">Sửa</a>
+                      <a href="/manager/categories/delete?categoryID=${danhMuc.maDM}" class="btn btn-ghost icon-btn" type="button">Xóa</a>
+                    </div>
+                  </td>
+                </tr>
+              </c:forEach>
+
             </tbody>
           </table>
         </div>
@@ -94,7 +89,6 @@
   
   </body>
 </html>
-
 
 
 

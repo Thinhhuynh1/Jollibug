@@ -66,10 +66,10 @@
                       <span>Vai trò <span style="color:var(--color-red-500);">*</span></span>
                       <select name="role" required style="width: 100%; border: 1px solid rgba(111,82,55,0.14); border-radius: var(--radius-md); padding: 0.65rem 1rem; font-family: var(--font-body); font-size: 0.9rem; background: #fff; outline: none; transition: border-color 0.15s;">
                         <option value="${user.vaiTro.tenVT}" selected>${user.vaiTro.tenVT}</option>  
-                        <option value="Client">Khách hàng</option>
-                        <option value="Staff">Nhân viên</option>
-                        <option value="Manager">Quản lý</option>
-                        <option value="Admin">Quản trị viên</option>
+                        <option value="CLIENT">Khách hàng</option>
+                        <option value="STAFF">Nhân viên</option>
+                        <option value="MANAGER">Quản lý</option>
+                        <option value="ADMIN">Quản trị viên</option>
                       </select>
                   </label>
                   

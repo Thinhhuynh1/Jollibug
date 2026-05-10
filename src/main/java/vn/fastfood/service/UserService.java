@@ -42,7 +42,7 @@ public class UserService {
         user.setPassword(encodedPassword);
 
         // Set vi trò default là khách hàng (ROLE_CLIENT)
-        user.setVaiTro(vaiTroRepository.findByTenVT(""));
+        user.setVaiTro(vaiTroRepository.findByTenVT("CLIENT"));
 
         // Set trạng thái default là ACTIVE
         user.setTrangThai("ACTIVE");

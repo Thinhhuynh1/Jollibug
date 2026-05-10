@@ -1,4 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -32,20 +34,25 @@
           <section class="profile-section">
             <h1 class="profile-title">Cập nhật danh mục</h1>
 
-            <form action="#" method="post" class="profile-form">
+            <form action="/manager/categories/update" method="post" class="profile-form">
+              <input type="hidden" name="categoryID" value="${danhMuc.maDM}" />
               <div class="profile-grid">
                 <label class="profile-field">
                   <span>Tên danh mục <span style="color:var(--color-red-500);">*</span></span>
-                  <input type="text" name="name" value="Burger đặc trưng" placeholder="Ví dụ: Gà rán" required />
+                  <input type="text" name="tenDM" value="${danhMuc.tenDM}" placeholder="Ví dụ: Gà rán" required />
                 </label>
 
                 <label class="profile-field">
                   <span>Trạng thái</span>
-                  <select name="status">
-                    <option value="active" selected>Đang hoạt động</option>
-                    <option value="featured">Nổi bật</option>
-                    <option value="hidden">Ẩn</option>
+                  <select name="available">
+                    <option value="true" <c:if test="${danhMuc.available == true}">selected</c:if>>Đang hoạt động</option>
+                    <option value="false" <c:if test="${danhMuc.available == false}">selected</c:if  >>Ẩn</option>
                   </select>
+                </label>
+
+                <label class="profile-field">
+                  <span>Mô tả</span>
+                  <input type="text" name="moTa" value="${danhMuc.moTa}" />
                 </label>
               </div>
 
@@ -61,6 +68,8 @@
     </main>
   </body>
 </html>
+
+
 
 
 
