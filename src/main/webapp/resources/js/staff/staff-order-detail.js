@@ -87,9 +87,8 @@ function renderOrderDetail(order, payment) {
                     <p><strong>Trạng thái đơn:</strong> 
                         <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
                     </p>
-                    <p><strong>Trạng thái thanh toán:</strong> ${paymentStatus}</p>
-                    <p><strong>Phương thức thanh toán:</strong> ${paymentMethod}</p>
-                    <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
+                    <p><strong>Phương thức thanh toán:</strong> ${order.tenPT || displayPaymentMethod(order.maPT)}</p>
+                    <p><strong>Trạng thái thanh toán:</strong> ${displayPaymentStatus(order.trangThaiTT)}</p>                    <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
                     <p><strong>Giảm giá:</strong> ${formatMoney(order.tienGiamGia)}</p>
                     <p><strong>Thành tiền:</strong> ${formatMoney(order.thanhTien)}</p>
                     <p><strong>Mã giảm giá:</strong> ${order.maGG || "-"}</p>

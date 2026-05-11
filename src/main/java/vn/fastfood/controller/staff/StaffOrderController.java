@@ -50,20 +50,21 @@ public class StaffOrderController {
     }
 
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<Map<String, Object>> updateOrderStatus(
-            @PathVariable("orderId") long orderId,
-            @RequestParam("staffId") long staffId,
-            @RequestParam("status") String status
-    ) {
-        boolean result = orderService.updateOrderStatusByStaff(orderId, staffId, status);
+        public ResponseEntity<Map<String, Object>> updateOrderStatus(
+                @PathVariable("orderId") long orderId,
+                @RequestParam("staffId") long staffId,
+                @RequestParam("status") String status,
+                @RequestParam(value = "cancelReason", required = false) String cancelReason
+        ) {
+        boolean result = orderService.updateOrderStatusByStaff(orderId, staffId, status, cancelReason);
 
         if (result) {
-            return ResponseEntity.ok(
-                    Map.of(
-                            "success", true,
-                            "message", "Cập nhật trạng thái đơn hàng thành công."
-                    )
-            );
+                return ResponseEntity.ok(
+                        Map.of(
+                                "success", true,
+                                "message", "Cập nhật trạng thái đơn hàng thành công."
+                        )
+                );
         }
 
         return ResponseEntity.badRequest().body(
@@ -72,5 +73,5 @@ public class StaffOrderController {
                         "message", "Không thể cập nhật trạng thái đơn hàng. Vui lòng kiểm tra luồng trạng thái."
                 )
         );
-    }
+        }
 }

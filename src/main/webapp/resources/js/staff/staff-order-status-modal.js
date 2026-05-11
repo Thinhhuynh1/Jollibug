@@ -170,11 +170,12 @@ function confirmCancelOrder() {
         return;
     }
 
-    if (selectedReason.dataset.other === "true" && otherReason && !otherReason.value.trim()) {
-        alert("Vui lòng nhập lý do hủy khác.");
-        otherReason.focus();
-        return;
-    }
+    let reason = selectedReason.value;
+
+    if (selectedReason.dataset.other === "true")
+        reason = otherReason.value.trim();
+
+    window.selectedCancelReason = reason;
 
     closeCancelConfirmModal();
     submitRuntimeUpdateStatus();
@@ -194,20 +195,27 @@ async function submitRuntimeUpdateStatus() {
     }
 
     try {
-        const response = await fetch(`/api/staff/orders/${orderId}/status?staffId=${staffId}&status=${status}`, {
+        const params = new URLSearchParams();
+        params.append("staffId", staffId);
+        params.append("status", status);
+
+        if (normalizeStatus(status) === "CANCELLED" && window.selectedCancelReason)
+            params.append("cancelReason", window.selectedCancelReason);
+
+        const response = await fetch(`/api/staff/orders/${orderId}/status?${params.toString()}`, {
             method: "PUT"
         });
 
         const data = await response.json();
 
         alert(data.message || "Đã cập nhật trạng thái.");
+        window.selectedCancelReason = "";
 
         if (response.ok) {
             closeRuntimeStatusModal();
 
-            if (typeof window.afterOrderStatusUpdated === "function") {
+            if (typeof window.afterOrderStatusUpdated === "function")
                 window.afterOrderStatusUpdated(orderId);
-            }
         }
 
     } catch (error) {

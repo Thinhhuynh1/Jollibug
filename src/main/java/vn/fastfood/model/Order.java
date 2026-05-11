@@ -16,6 +16,18 @@ public class Order {
     private Long maGG;
     private String ghiChu;
 
+    private String tenKhachHang;
+    private String sdtKhachHang;
+    private String emailKhachHang;
+
+    private String tenNguoiNhan;
+    private String sdtNguoiNhan;
+    private String diaChiGiaoHang;
+
+    private String maPT;
+    private String tenPT;
+    private String trangThaiTT;
+
     public Order() {}
 
     public long getMaDH() {
@@ -104,6 +116,78 @@ public class Order {
 
     public void setGhiChu(String ghiChu) {
         this.ghiChu = ghiChu;
+    }
+
+    public String getTenKhachHang() {
+        return tenKhachHang;
+    }
+
+    public void setTenKhachHang(String tenKhachHang) {
+        this.tenKhachHang = tenKhachHang;
+    }
+
+    public String getSdtKhachHang() {
+        return sdtKhachHang;
+    }
+
+    public void setSdtKhachHang(String sdtKhachHang) {
+        this.sdtKhachHang = sdtKhachHang;
+    }
+
+    public String getEmailKhachHang() {
+        return emailKhachHang;
+    }
+
+    public void setEmailKhachHang(String emailKhachHang) {
+        this.emailKhachHang = emailKhachHang;
+    }
+
+    public String getTenNguoiNhan() {
+        return tenNguoiNhan;
+    }
+
+    public void setTenNguoiNhan(String tenNguoiNhan) {
+        this.tenNguoiNhan = tenNguoiNhan;
+    }
+
+    public String getSdtNguoiNhan() {
+        return sdtNguoiNhan;
+    }
+
+    public void setSdtNguoiNhan(String sdtNguoiNhan) {
+        this.sdtNguoiNhan = sdtNguoiNhan;
+    }
+
+    public String getDiaChiGiaoHang() {
+        return diaChiGiaoHang;
+    }
+
+    public void setDiaChiGiaoHang(String diaChiGiaoHang) {
+        this.diaChiGiaoHang = diaChiGiaoHang;
+    }
+
+    public String getMaPT() {
+        return maPT;
+    }
+
+    public void setMaPT(String maPT) {
+        this.maPT = maPT;
+    }
+
+    public String getTenPT() {
+        return tenPT;
+    }
+
+    public void setTenPT(String tenPT) {
+        this.tenPT = tenPT;
+    }
+
+    public String getTrangThaiTT() {
+        return trangThaiTT;
+    }
+
+    public void setTrangThaiTT(String trangThaiTT) {
+        this.trangThaiTT = trangThaiTT;
     }
 
     @Override

@@ -76,28 +76,47 @@ public class OrderService {
         return orderDAO.getOrderByIdForStaff(orderId);
     }
 
-    public boolean updateOrderStatusByStaff(long orderId, long staffId, String nextStatus) {
+    public boolean updateOrderStatusByStaff(long orderId, long staffId, String nextStatus, String cancelReason) {
         Order order = orderDAO.getOrderByIdForStaff(orderId);
 
         if (order == null) {
-            System.out.println("Không tìm thấy đơn hàng.");
+            System.out.println("[STAFF UPDATE] Không tìm thấy đơn hàng.");
             return false;
         }
 
         String currentStatus = normalizeStatus(order.getTrangThaiDon());
         String normalizedNextStatus = normalizeStatus(nextStatus);
 
+        System.out.println("[STAFF UPDATE] orderId=" + orderId);
+        System.out.println("[STAFF UPDATE] staffId=" + staffId);
+        System.out.println("[STAFF UPDATE] currentStatus=" + currentStatus);
+        System.out.println("[STAFF UPDATE] nextStatus=" + normalizedNextStatus);
+        System.out.println("[STAFF UPDATE] cancelReason=" + cancelReason);
+
         if (!isValidStaffTransition(currentStatus, normalizedNextStatus)) {
-            System.out.println("Không thể chuyển trạng thái từ " + currentStatus + " sang " + normalizedNextStatus);
+            System.out.println("[STAFF UPDATE] BLOCKED: " + currentStatus + " -> " + normalizedNextStatus);
             return false;
         }
 
-        return orderDAO.updateOrderStatusAndStaff(orderId, staffId, normalizedNextStatus);
+        boolean result;
+
+        if ("CANCELLED".equals(normalizedNextStatus)) {
+            result = orderDAO.updateOrderStatusStaffAndCancelReason(orderId, staffId, normalizedNextStatus, cancelReason);
+        } else {
+            result = orderDAO.updateOrderStatusAndStaff(orderId, staffId, normalizedNextStatus);
+        }
+
+        System.out.println("[STAFF UPDATE] result=" + result);
+        return result;
     }
 
     private boolean isValidStaffTransition(String current, String next) {
         if ("PENDING".equals(current) && "CONFIRMED".equals(next)) return true;
+        if ("PENDING".equals(current) && "CANCELLED".equals(next)) return true;
+
         if ("CONFIRMED".equals(current) && "SHIPPING".equals(next)) return true;
+        if ("CONFIRMED".equals(current) && "CANCELLED".equals(next)) return true;
+
         if ("SHIPPING".equals(current) && "DELIVERED".equals(next)) return true;
 
         if ("CANCEL_REQUESTED".equals(current) && "CANCELLED".equals(next)) return true;
