@@ -45,4 +45,11 @@ public class MenuController {
         model.addAttribute("danhMuc", this.danhMucRepository.findAll());
         return "client/menu";
     }
+
+    @GetMapping("/product")
+    public String getProductDetail(Model model,
+            @RequestParam("productID") Long productID) {
+        model.addAttribute("monAn", this.monAnRepository.findProduct(productID));
+        return "client/product";
+    }
 }

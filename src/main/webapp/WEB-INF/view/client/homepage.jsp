@@ -108,7 +108,7 @@
           <c:forEach var="monAn" items="${listMonAn}" end="5">
             <article class="hp-prod-card reveal-up">
               <div class="hp-prod-card__img">
-              <img src="${monAn.img}" alt="${monAn.tenMon}" />
+              <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
             </div>
               <div class="hp-prod-card__body">
                 <div class="hp-prod-card__meta">
@@ -121,7 +121,9 @@
                 </div>
                 <div class="hp-prod-card__footer">
                   <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
-                  <button class="hp-prod-card__btn" type="button">+ Thêm</button>
+                  <c:if test="${not empty sessionScope.user}">
+                    <button class="hp-prod-card__btn" type="button">+ Thêm</button>
+                  </c:if >
                 </div>
               </div>
             </article>
@@ -186,7 +188,7 @@
   <%-- 7. FOOTER (shared) --%>
   <jsp:include page="layout/footer.jsp" />
 
-  <script>
+  <!-- <script>
     /* Category bar active toggle */
     document.querySelectorAll('.hp-cat__item').forEach(function(el) {
       el.addEventListener('click', function() {
@@ -194,7 +196,7 @@
         el.classList.add('active');
       });
     });
-  </script>
+  </script> -->
 
 </body>
 </html>

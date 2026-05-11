@@ -70,7 +70,7 @@
           <c:forEach var="monAn" items="${listMonAn}">
             <article class="hp-prod-card reveal-up">
             <div class="hp-prod-card__img">
-              <img src="${monAn.img}" alt="${monAn.tenMon}" />
+              <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
             </div>
             <div class="hp-prod-card__body">
               <div class="hp-prod-card__meta">
@@ -84,8 +84,10 @@
               <div class="hp-prod-card__desc">${monAn.moTa}</div>
               <div class="hp-prod-card__footer">
                 
-                <a class="hp-prod-card__btn" href="/product">Xem chi tiết</a>
-                <button class="hp-prod-card__btn" type="button">+ Thêm</button>
+                <a class="hp-prod-card__btn" href="/product?productID=${monAn.maMon}">Xem chi tiết</a>
+                <c:if test="${not empty sessionScope.user}">
+                  <button class="hp-prod-card__btn" type="button">+ Thêm</button>
+                </c:if>
               </div>
             </div>
           </article>
