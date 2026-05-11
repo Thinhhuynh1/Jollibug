@@ -44,6 +44,10 @@ async function loadOrderDetail(orderId) {
 
         currentOrder = order;
 
+        const pageTitle = document.getElementById("detailPageTitle");
+        if (pageTitle)
+            pageTitle.textContent = `Chi tiết đơn hàng #${order.maDH}`;
+
         let payment = null;
         try {
             const paymentResponse = await fetch(`/api/payments/order/${order.maDH}`);

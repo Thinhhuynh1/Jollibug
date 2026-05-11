@@ -33,7 +33,7 @@
 
             <div class="staff-orders-board__header">
                 <div class="stack" style="gap:0.35rem;">
-                    <h1 class="section-title">Chi tiết đơn hàng</h1>
+                    <h1 class="section-title" id="detailPageTitle">Chi tiết đơn hàng</h1>
                 </div>
 
                 <button type="button" id="detailUpdateStatusBtn" class="primary-btn">
@@ -43,11 +43,7 @@
 
             <div id="message" class="message" role="status" aria-live="polite"></div>
 
-            <section class="table-card">
-                <div class="table-card__header">
-                    <h2>Thông tin đơn</h2>
-                    <span class="muted" id="detailOrderCaption"></span>
-                </div>
+            <section class="table-card detail-card">
                 <div id="orderDetailContent"></div>
             </section>
 

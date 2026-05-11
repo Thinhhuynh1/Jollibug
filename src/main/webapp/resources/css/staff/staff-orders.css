@@ -1005,3 +1005,67 @@ body[data-admin-page="orders"] #statusModal .modal-box {
         grid-template-columns: 1fr;
     }
 }
+
+body[data-admin-page="orders"] .staff-order-detail-board {
+    gap: 1.25rem !important;
+}
+
+body[data-admin-page="orders"] .staff-order-detail-board .staff-detail-top-actions {
+    margin-bottom: 0.25rem !important;
+}
+
+body[data-admin-page="orders"] .staff-order-detail-board .staff-orders-board__header {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+body[data-admin-page="orders"] .staff-order-detail-board .section-title {
+    margin-bottom: 0 !important;
+}
+
+body[data-admin-page="orders"] .staff-order-detail-board .detail-card {
+    margin-top: 0 !important;
+}
+
+body[data-admin-page="orders"] .staff-order-detail-board .table-card {
+    margin-top: 0 !important;
+}
+
+body[data-admin-page="orders"] .staff-order-detail-board {
+    padding-top: 1.25rem !important;
+}
+
+body[data-admin-page="orders"] .staff-order-detail-board > * {
+    margin-top: 0 !important;
+}
+
+body[data-admin-page="orders"] .detail-info-card {
+    align-content: start !important;
+    align-items: start !important;
+    gap: 0.85rem !important;
+    padding: 1rem 1.1rem !important;
+}
+
+body[data-admin-page="orders"] .detail-info-card h3 {
+    margin: 0 0 0.25rem 0 !important;
+}
+
+body[data-admin-page="orders"] .detail-info-list {
+    width: 100% !important;
+    display: grid !important;
+    gap: 0.75rem !important;
+    align-content: start !important;
+}
+
+body[data-admin-page="orders"] .detail-info-list p {
+    margin: 0 !important;
+    min-height: auto !important;
+}
+
+body[data-admin-page="orders"] .detail-two-columns {
+    align-items: start !important;
+}
+
+body[data-admin-page="orders"] .detail-info-card {
+    height: auto !important;
+}
