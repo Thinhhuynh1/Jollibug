@@ -1,18 +1,27 @@
 package vn.fastfood.controller.client;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import jakarta.servlet.http.HttpSession;
+import vn.fastfood.entity.ChatRecord;
+import vn.fastfood.entity.User;
+import vn.fastfood.repository.ChatRecordRepository;
 import vn.fastfood.repository.MonAnRepository;
 
 @Controller
 public class HomePageController {
-    // home,about,contact
 
     private final MonAnRepository monAnRepository;
+    private final ChatRecordRepository chatRecordRepository;
 
-    HomePageController(MonAnRepository monAnRepository) {
+    HomePageController(MonAnRepository monAnRepository,
+                       ChatRecordRepository chatRecordRepository) {
         this.monAnRepository = monAnRepository;
+        this.chatRecordRepository = chatRecordRepository;
     }
 
     @GetMapping("/")
@@ -27,7 +36,16 @@ public class HomePageController {
     }
 
     @GetMapping("/chat")
-    public String getContactPage() {
+    public String getChatPage(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user != null) {
+            String conversationId = String.valueOf(user.getMaTK());
+            List<ChatRecord> history = chatRecordRepository
+                    .findByConversationIdOrderByCreatedAtAsc(conversationId);
+            model.addAttribute("chatHistory", history);
+        } else {
+            model.addAttribute("chatHistory", List.of());
+        }
         return "client/chat";
     }
 
@@ -35,5 +53,4 @@ public class HomePageController {
     public String getComplaintPage() {
         return "client/complaint";
     }
-
 }

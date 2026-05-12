@@ -51,8 +51,8 @@ public class User {
     @Column(name = "TrangThai")
     private String trangThai;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "MaVT", referencedColumnName = "MaVT")
+    @ManyToOne()
+    @JoinColumn(name = "MaVT")
     private VaiTro vaiTro;
 
     @CreationTimestamp

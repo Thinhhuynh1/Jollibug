@@ -297,12 +297,12 @@
 }
 
 .chat-bubble--staff {
-  align-self: flex-start;
+  align-self: flex-end;
+  flex-direction: row-reverse;
 }
 
 .chat-bubble--client {
-  align-self: flex-end;
-  flex-direction: row-reverse;
+  align-self: flex-start;
 }
 
 .chat-bubble__avatar {
@@ -320,7 +320,7 @@
 }
 
 .chat-bubble--client .chat-bubble__avatar {
-  background: var(--color-surface-strong);
+  background: var(--color-ink-500);
 }
 
 .chat-bubble__body {
@@ -336,17 +336,17 @@
 }
 
 .chat-bubble--staff .chat-bubble__text {
+  background: var(--color-red-500);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+  text-align: right;
+}
+
+.chat-bubble--client .chat-bubble__text {
   background: rgba(255, 248, 238, 0.95);
   border: 1px solid rgba(111, 82, 55, 0.1);
   border-bottom-left-radius: 4px;
   color: var(--color-ink-900);
-}
-
-.chat-bubble--client .chat-bubble__text {
-  background: var(--color-surface-strong);
-  color: #fff7ef;
-  border-bottom-right-radius: 4px;
-  text-align: right;
 }
 
 .chat-bubble__time {
@@ -354,7 +354,7 @@
   color: var(--color-ink-500);
 }
 
-.chat-bubble--client .chat-bubble__time {
+.chat-bubble--staff .chat-bubble__time {
   text-align: right;
 }
 

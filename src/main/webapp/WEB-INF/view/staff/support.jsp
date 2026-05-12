@@ -1,6 +1,7 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -16,7 +17,7 @@
   <link rel="stylesheet" href="<c:url value='/css/global.css'/>" />
   <link rel="stylesheet" href="<c:url value='/css/components.css'/>" />
   <link rel="stylesheet" href="<c:url value='/css/admin.css'/>" />
-  <link rel="stylesheet" href="<c:url value='/css/staff.css'/>" />
+  <link rel="stylesheet" href="<c:url value='/css/staff.css?v=2'/>" />
 </head>
 
 <body data-admin-role="staff" data-admin-page="support">
@@ -56,55 +57,85 @@
             <aside class="ticket-list-panel">
               <div class="ticket-list-panel__header">
                 <strong>Hội thoại đang mở</strong>
-                <span class="status-badge" data-status="active">2 online</span>
+                <span class="status-badge" data-status="active">${onlineCount} online</span>
               </div>
               <div class="ticket-list">
-                <article class="ticket-item is-active">
-                  <div class="ticket-item__header">
-                    <span class="ticket-item__name">Nguyễn Minh Quân</span>
-                    <span class="ticket-item__time">10:31</span>
-                  </div>
-                  <p class="ticket-item__preview">Cho mình hỏi đơn #JB-123 đã giao chưa?</p>
-                </article>
-                <article class="ticket-item">
-                  <div class="ticket-item__header">
-                    <span class="ticket-item__name">Trần Thu Hà</span>
-                    <span class="ticket-item__time">10:22</span>
-                  </div>
-                  <p class="ticket-item__preview">Mình muốn đổi địa chỉ nhận đơn.</p>
-                </article>
+                <c:choose>
+                  <c:when test="${empty tickets}">
+                    <p style="padding:1rem;color:var(--color-text-muted)">Chưa có hội thoại nào.</p>
+                  </c:when>
+                  <c:otherwise>
+                    <c:forEach var="ticket" items="${tickets}">
+                      <article class="ticket-item<c:if test='${ticket.conversationId == activeConvId}'> is-active</c:if>"
+                               data-conversation-id="${ticket.conversationId}">
+                        <div class="ticket-item__header">
+                          <span class="ticket-item__name"><c:out value="${ticket.clientName}"/></span>
+                          <span class="ticket-item__time">
+                            ${ticket.latestTimeDisplay}
+                          </span>
+                        </div>
+                        <p class="ticket-item__preview"><c:out value="${ticket.latestMessage}"/></p>
+                      </article>
+                    </c:forEach>
+                  </c:otherwise>
+                </c:choose>
               </div>
             </aside>
 
             <section class="chat-workspace">
-              <article class="chat-panel">
+              <article class="chat-panel"
+                       data-chat-root
+                       data-chat-variant="staff"
+                       data-chat-role="staff"
+                       data-chat-sender="${sessionScope.user.hoTen}"
+                       data-chat-conversation-id="${activeConvId}">
                 <header class="chat-panel__header">
-                  <div class="chat-panel__avatar">MQ</div>
+                  <div class="chat-panel__avatar">
+                    <c:choose>
+                      <c:when test="${not empty activeClientName}">
+                        ${fn:substring(activeClientName, 0, 2)}
+                      </c:when>
+                      <c:otherwise>--</c:otherwise>
+                    </c:choose>
+                  </div>
                   <div class="chat-panel__meta">
-                    <strong>Nguyễn Minh Quân</strong>
+                    <strong><c:out value="${not empty activeClientName ? activeClientName : 'Chọn hội thoại'}"/></strong>
                     <span>Đang hoạt động</span>
                   </div>
                 </header>
 
-                <div class="chat-messages">
-                  <div class="chat-bubble chat-bubble--client">
-                    <div class="chat-bubble__avatar">MQ</div>
-                    <div class="chat-bubble__body">
-                      <div class="chat-bubble__text">Cho mình hỏi đơn #JB-123 đã giao chưa?</div>
-                      <span class="chat-bubble__time">10:29</span>
-                    </div>
-                  </div>
-                  <div class="chat-bubble chat-bubble--staff">
-                    <div class="chat-bubble__avatar">ST</div>
-                    <div class="chat-bubble__body">
-                      <div class="chat-bubble__text">Đơn của bạn đang trên đường giao và dự kiến 15 phút nữa sẽ đến.</div>
-                      <span class="chat-bubble__time">10:30</span>
-                    </div>
-                  </div>
+                <div class="chat-messages" data-chat-messages>
+                  <c:forEach var="msg" items="${chatHistory}">
+                    <c:choose>
+                      <c:when test="${msg.senderRole == 'client'}">
+                        <div class="chat-bubble chat-bubble--client">
+                          <div class="chat-bubble__avatar">
+                            ${fn:substring(activeClientName, 0, 2)}
+                          </div>
+                          <div class="chat-bubble__body">
+                            <div class="chat-bubble__text"><c:out value="${msg.content}"/></div>
+                            <span class="chat-bubble__time">${msg.timeDisplay}</span>
+                          </div>
+                        </div>
+                      </c:when>
+                      <c:otherwise>
+                        <div class="chat-bubble chat-bubble--staff">
+                          <div class="chat-bubble__avatar">NV</div>
+                          <div class="chat-bubble__body">
+                            <div class="chat-bubble__text"><c:out value="${msg.content}"/></div>
+                            <span class="chat-bubble__time">${msg.timeDisplay}</span>
+                          </div>
+                        </div>
+                      </c:otherwise>
+                    </c:choose>
+                  </c:forEach>
+                  <c:if test="${empty chatHistory and not empty activeConvId}">
+                    <p style="padding:1rem;color:var(--color-text-muted);text-align:center">Chưa có tin nhắn nào.</p>
+                  </c:if>
                 </div>
 
-                <form class="chat-input-bar" action="<c:url value='/staff/support/chat/send'/>" method="post">
-                  <input id="chat-input" name="message" type="text" placeholder="Nhập phản hồi cho khách hàng..." required />
+                <form class="chat-input-bar" data-chat-form>
+                  <input id="chat-input" data-chat-input name="message" type="text" placeholder="Nhập phản hồi cho khách hàng..." required />
                   <button class="chat-send-btn" type="submit" aria-label="Gửi tin nhắn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="m22 2-7 20-4-9-9-4z" />
@@ -211,6 +242,10 @@
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <script src="<c:url value='/js/chat.js?v=2'/>"></script>
+  <script src="<c:url value='/js/staff/support.js'/>"></script>
 </body>
 </html>
 
