@@ -41,7 +41,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
-        // Set vi trò default là khách hàng (ROLE_CLIENT)
+        // Set vai trò default là khách hàng (ROLE_CLIENT)
         user.setVaiTro(vaiTroRepository.findByTenVT(""));
 
         // Set trạng thái default là ACTIVE
@@ -83,6 +83,23 @@ public class UserService {
 
     public User getUserByMaTK(Long id) {
         return this.userRepository.findById(id).orElse(null);
+    }
+
+    public void resetPassword(jakarta.servlet.http.HttpSession session, String currentPassword, String newPassword) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            throw new RuntimeException("Vui lòng đăng nhập lại");
+        }
+        User dbUser = userRepository.findByMaTK(user.getMaTK());
+        if (dbUser == null) {
+            throw new RuntimeException("Không tìm thấy tài khoản");
+        }
+        if (!passwordEncoder.matches(currentPassword, dbUser.getPassword())) {
+            throw new RuntimeException("Mật khẩu hiện tại không đúng");
+        }
+        dbUser.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(dbUser);
+        session.removeAttribute("user");
     }
 
 }

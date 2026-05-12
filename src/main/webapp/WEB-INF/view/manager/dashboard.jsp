@@ -50,40 +50,42 @@
 
         <!-- SECTION -->
         <div class="stats-ribbon" style="margin-bottom:var(--space-5);">
-          <div class="stats-ribbon__item">
-            <span class="muted">Today's Revenue</span>
-            <strong id="rev-today">$0.00</strong>
-          </div>
-          <div class="stats-ribbon__item">
-            <span class="muted">This Week</span>
-            <strong id="rev-week">$0.00</strong>
-          </div>
-          <div class="stats-ribbon__item">
-            <span class="muted">This Month</span>
-            <strong id="rev-month">$0.00</strong>
-          </div>
-          <div class="stats-ribbon__item">
-            <span class="muted">Avg Order Value</span>
-            <strong id="rev-avg">$0.00</strong>
-          </div>
+          <a class="stats-ribbon__item" style="text-decoration:none;color:inherit;cursor:pointer;" href="<c:url value='/manager/statistics/revenue?period=today'/>">
+            <span class="muted">Doanh thu hôm nay</span>
+            <strong id="rev-today">0</strong>
+          </a>
+          <a class="stats-ribbon__item" style="text-decoration:none;color:inherit;cursor:pointer;" href="<c:url value='/manager/statistics/revenue?period=week'/>">
+            <span class="muted">Doanh thu 7 ngày</span>
+            <strong id="rev-week">0</strong>
+          </a>
+          <a class="stats-ribbon__item" style="text-decoration:none;color:inherit;cursor:pointer;" href="<c:url value='/manager/statistics/revenue?period=month'/>">
+            <span class="muted">Doanh thu 30 ngày</span>
+            <strong id="rev-month">0</strong>
+          </a>
+          <a class="stats-ribbon__item" style="text-decoration:none;color:inherit;cursor:pointer;" href="<c:url value='/manager/statistics/revenue'/>">
+            <span class="muted">Giá trị đơn trung bình</span>
+            <strong id="rev-avg">0</strong>
+          </a>
         </div>
 
         <!-- SECTION -->
         <div class="metric-grid">
 
           <article class="metric-card">
-            <span class="muted">Active Products</span>
-            <strong id="active-products-count">0</strong>
+              <span class="muted">Sản phẩm đang hoạt động</span>
+              <strong id="active-products-count">0</strong>
             <span class="metric-delta" data-tone="up">
               <span id="total-products-count">0</span> total products
             </span>
           </article>
 
-          <article class="metric-card">
-            <span class="muted">Open Orders</span>
+          <a href="<c:url value='/manager/statistics/orders?period=today'/>" style="text-decoration:none; color:inherit; display:block;">
+            <article class="metric-card">
+            <span class="muted">Đơn hàng cần xử lý</span>
             <strong id="open-orders-count">0</strong>
-            <span class="metric-delta" data-tone="warm">Rush window live</span>
-          </article>
+              <span class="metric-delta" data-tone="warm">Rush window live</span>
+            </article>
+          </a>
 
           <article class="metric-card">
             <span class="muted">Categories</span>
@@ -122,46 +124,50 @@
           </section>
 
           <!-- Order Status Donut -->
-          <section class="admin-panel">
-            <div class="panel-header">
-              <div class="stack" style="gap:0.2rem;">
-                <strong>Order Status Breakdown</strong>
-                <span class="muted">Distribution of today's orders by status.</span>
+          <a href="<c:url value='/manager/statistics/orders?period=today'/>" style="text-decoration:none; color:inherit; display:block;">
+            <section class="admin-panel">
+              <div class="panel-header">
+                <div class="stack" style="gap:0.2rem;">
+                  <strong>Order Status Breakdown</strong>
+                  <span class="muted">Distribution of today's orders by status.</span>
+                </div>
               </div>
-            </div>
-            <div style="position:relative; height:220px; display:grid; place-items:center;">
-              <canvas id="chart-orders" aria-label="Order status donut chart" role="img" style="max-height:220px;"></canvas>
-            </div>
-          </section>
+              <div style="position:relative; height:220px; display:grid; place-items:center;">
+                <canvas id="chart-orders" aria-label="Order status donut chart" role="img" style="max-height:220px;"></canvas>
+              </div>
+            </section>
+          </a>
 
         </div><!-- /chart-row -->
 
         <!-- SECTION -->
         <div class="admin-dashboard__bottom">
 
-          <!-- Operations Snapshot panel -->
-          <section class="admin-panel">
-            <div class="panel-header">
-              <div class="stack" style="gap:0.2rem;">
-                <strong>Operations snapshot</strong>
-                <span class="muted">A lightweight overview of today's service health.</span>
+          <!-- Operations Snapshot panel (link to customers stats) -->
+          <a href="<c:url value='/manager/statistics/customers?period=today'/>" style="text-decoration:none; color:inherit; display:block;">
+            <section class="admin-panel">
+              <div class="panel-header">
+                <div class="stack" style="gap:0.2rem;">
+                  <strong>Operations snapshot</strong>
+                  <span class="muted">A lightweight overview of today's service health.</span>
+                </div>
               </div>
-            </div>
-            <div class="mini-stat-grid">
-              <article class="mini-stat">
-                <span class="muted">Featured Menu Items</span>
-                <strong id="featured-products-count">0</strong>
-              </article>
-              <article class="mini-stat">
-                <span class="muted">Out of Stock</span>
-                <strong id="out-of-stock-count">0</strong>
-              </article>
-              <article class="mini-stat">
-                <span class="muted">Pending Orders</span>
-                <strong id="pending-orders-count">0</strong>
-              </article>
-            </div>
-          </section>
+              <div class="mini-stat-grid">
+                <article class="mini-stat">
+                  <span class="muted">Featured Menu Items</span>
+                  <strong id="featured-products-count">0</strong>
+                </article>
+                <article class="mini-stat">
+                  <span class="muted">Out of Stock</span>
+                  <strong id="out-of-stock-count">0</strong>
+                </article>
+                <article class="mini-stat">
+                  <span class="muted">Pending Orders</span>
+                  <strong id="pending-orders-count">0</strong>
+                </article>
+              </div>
+            </section>
+          </a>
 
           <!-- Recent Activity panel -->
           <section class="admin-activity">
