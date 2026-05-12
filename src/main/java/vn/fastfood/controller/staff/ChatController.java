@@ -1,4 +1,4 @@
-package vn.fastfood.controller;
+package vn.fastfood.controller.staff;
 
 import java.util.List;
 
