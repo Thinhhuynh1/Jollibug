@@ -2,7 +2,6 @@ const CLIENT_ORDER_API = "/api/orders";
 
 document.addEventListener("DOMContentLoaded", () => {
     const orderId = getOrderIdFromUrl();
-    setupReviewStars();
 
     if (!orderId) {
         showMessage("Thiếu mã đơn hàng.");
@@ -40,32 +39,15 @@ async function loadOrderDetail(orderId) {
 
         const order = data.order || data.donHang;
         const items = data.orderItems || data.chiTietDH || [];
-        const statusHistory = await fetchOrderStatusHistory(orderId, customerId);
 
-        renderOrderTimeline(order.trangThaiDon, statusHistory, order);
         renderOrderInfo(order);
+        renderOrderTimeline(order.trangThaiDon);
         renderOrderItems(items, order.trangThaiDon);
         renderOrderActions(order);
 
     } catch (error) {
         showMessage(error.message);
         if (detailContent) detailContent.innerHTML = "";
-    }
-}
-
-async function fetchOrderStatusHistory(orderId, customerId) {
-    try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/status-history?customerId=${customerId}`);
-
-        if (!response.ok) {
-            return [];
-        }
-
-        const data = await response.json();
-        return Array.isArray(data) ? data : [];
-
-    } catch (error) {
-        return [];
     }
 }
 
@@ -244,11 +226,11 @@ function normalizeStatus(status) {
 
 function displayStatus(status) {
     const map = {
-        PENDING: "Đã đặt hàng",
+        PENDING: "Chờ xác nhận",
         CONFIRMED: "Đã xác nhận",
         SHIPPING: "Đang giao",
         DELIVERED: "Đã giao",
-        CANCEL_REQUESTED: "Yêu cầu hủy",
+        CANCEL_REQUESTED: "Đang yêu cầu hủy",
         CANCELLED: "Đã hủy"
     };
 
@@ -274,8 +256,6 @@ function openReviewModal(maMon) {
     const maMonInput = document.getElementById("reviewMaMon");
     const noiDungInput = document.getElementById("reviewNoiDung");
     const saoInput = document.getElementById("reviewSao");
-    const imageInput = document.getElementById("reviewImageInput");
-    const imagePreview = document.getElementById("reviewImagePreview");
 
     if (!modal || !maMonInput) return;
 
@@ -283,13 +263,6 @@ function openReviewModal(maMon) {
 
     if (noiDungInput) noiDungInput.value = "";
     if (saoInput) saoInput.value = "5";
-    if (imageInput) imageInput.value = "";
-    if (imagePreview) {
-        imagePreview.innerHTML = "";
-        imagePreview.classList.add("hidden");
-    }
-
-    setReviewRating(5);
 
     modal.classList.remove("hidden");
 }
@@ -297,108 +270,6 @@ function openReviewModal(maMon) {
 function closeReviewModal() {
     const modal = document.getElementById("reviewModal");
     if (modal) modal.classList.add("hidden");
-}
-
-function setupReviewStars() {
-    const stars = document.querySelectorAll(".review-star");
-
-    stars.forEach(star => {
-        const rating = Number(star.dataset.rating || 0);
-
-        star.addEventListener("click", () => setReviewRating(rating));
-        star.addEventListener("mouseenter", () => highlightReviewStars(rating));
-        star.addEventListener("focus", () => highlightReviewStars(rating));
-    });
-
-    const ratingBox = document.getElementById("reviewStarRating");
-    if (ratingBox) {
-        ratingBox.addEventListener("mouseleave", () => {
-            const input = document.getElementById("reviewSao");
-            highlightReviewStars(Number(input ? input.value : 5));
-        });
-    }
-
-    setReviewRating(5);
-}
-
-function setReviewRating(rating) {
-    const normalizedRating = Math.min(Math.max(Number(rating) || 5, 1), 5);
-    const input = document.getElementById("reviewSao");
-
-    if (input) {
-        input.value = String(normalizedRating);
-    }
-
-    highlightReviewStars(normalizedRating);
-}
-
-function highlightReviewStars(rating) {
-    document.querySelectorAll(".review-star").forEach(star => {
-        const starRating = Number(star.dataset.rating || 0);
-        star.classList.toggle("is-active", starRating <= rating);
-    });
-}
-
-function previewReviewImage(event) {
-    const input = event && event.target ? event.target : document.getElementById("reviewImageInput");
-    const preview = document.getElementById("reviewImagePreview");
-
-    if (!input || !preview) return;
-
-    const file = input.files && input.files[0];
-
-    if (!file) {
-        preview.innerHTML = "";
-        preview.classList.add("hidden");
-        return;
-    }
-
-    const imageUrl = URL.createObjectURL(file);
-    preview.innerHTML = `<img src="${imageUrl}" alt="Preview ảnh đánh giá">`;
-    preview.classList.remove("hidden");
-}
-
-async function submitReview() {
-    const orderId = getOrderIdFromUrl();
-    const customerId = getCurrentCustomerId();
-    const maMonInput = document.getElementById("reviewMaMon");
-    const saoInput = document.getElementById("reviewSao");
-    const noiDungInput = document.getElementById("reviewNoiDung");
-
-    const maMon = maMonInput ? maMonInput.value : "";
-    const sao = saoInput ? saoInput.value : "5";
-    const noiDung = noiDungInput ? noiDungInput.value : "";
-
-    if (!noiDung.trim()) {
-        alert("Vui long nhap noi dung danh gia.");
-        return;
-    }
-
-    try {
-        // TODO: send reviewImageInput.files[0] with FormData when the backend supports persisted review images.
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/reviews`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                customerId: Number(customerId),
-                maMon: Number(maMon),
-                sao: Number(sao),
-                noiDung: noiDung.trim()
-            })
-        });
-
-        const data = await response.json();
-        alert(data.message || "Da gui danh gia.");
-
-        if (response.ok) {
-            closeReviewModal();
-        }
-
-    } catch (error) {
-        alert("Loi khi gui danh gia.");
-    }
 }
 
 function displayPaymentStatus(status) {
@@ -448,227 +319,58 @@ function parseDeliveryInfo(note) {
     return result;
 }
 
-const ORDER_TIMELINE_BASE = [
-    { key: "PENDING", label: "Đã đặt hàng" },
-    { key: "CONFIRMED", label: "Đã xác nhận" },
-    { key: "SHIPPING", label: "Đang giao" },
-    { key: "DELIVERED", label: "Đã giao" }
-];
-
-function renderOrderTimeline(status, history = [], order = null) {
+function renderOrderTimeline(status) {
     const timeline = document.getElementById("orderTimeline");
     if (!timeline) return;
 
     const currentStatus = normalizeStatus(status);
-    const timelineState = buildTimelineState(currentStatus, history);
-    const steps = timelineState.steps;
-    const currentIndex = timelineState.currentIndex;
 
-    timeline.style.gridTemplateColumns = `repeat(${Math.max(steps.length, 1)}, minmax(0, 1fr))`;
-
-    timeline.innerHTML = steps.map((step, index) => {
-        const classes = ["timeline-step"];
-        const stateClass = getTimelineStepState(step, index, currentIndex, currentStatus);
-
-        if (stateClass) classes.push(stateClass);
-        if (index === currentIndex) classes.push("is-current");
-
-        const label = step.label || displayStatus(step.key);
-
-        return `
-            <div
-                class="${classes.join(" ")}"
-                data-tooltip="${escapeHtml(label)}"
-                title="${escapeHtml(label)}"
-                aria-label="${escapeHtml(label)}"
-                tabindex="0"
-            >
-                <span class="timeline-step__dot"></span>
-            </div>
-        `;
-    }).join("");
-
-    renderCancellationInfo(currentStatus, history, order);
-}
-
-function getTimelineStepState(step, index, currentIndex, currentStatus) {
-    if (step.key === "CANCELLED") return "is-cancelled";
-
-    if (index < currentIndex) return "is-complete";
-
-    if (index === currentIndex) {
-        if (currentStatus === "SHIPPING" || currentStatus === "CANCEL_REQUESTED") {
-            return "is-active";
-        }
-
-        return "is-complete";
-    }
-
-    return "";
-}
-
-function buildTimelineState(currentStatus, history) {
-    const normalizedHistory = Array.isArray(history)
-        ? history.filter(item => normalizeStatus(item.newStatus))
-        : [];
-
-    if (!normalizedHistory.length) {
-        return buildFallbackTimelineState(currentStatus);
-    }
-
-    const steps = [];
-
-    normalizedHistory.forEach(item => {
-        const oldStatus = normalizeStatus(item.oldStatus);
-        const newStatus = normalizeStatus(item.newStatus);
-
-        if (oldStatus && (!steps.length || steps[steps.length - 1].key !== oldStatus)) {
-            pushTimelineStep(steps, oldStatus, null);
-        }
-
-        pushTimelineStep(steps, newStatus, item);
-    });
-
-    if (!steps.length) {
-        return buildFallbackTimelineState(currentStatus);
-    }
-
-    if (findLastStepIndex(steps, currentStatus) === -1) {
-        pushTimelineStep(steps, currentStatus, null);
-    }
-
-    appendFutureTimelineSteps(steps, currentStatus);
-
-    return {
-        steps,
-        currentIndex: Math.max(findLastStepIndex(steps, currentStatus), 0)
-    };
-}
-
-function buildFallbackTimelineState(currentStatus) {
-    let steps;
+    let steps = [
+        { key: "PENDING", label: "Chờ xác nhận" },
+        { key: "CONFIRMED", label: "Đã xác nhận" },
+        { key: "SHIPPING", label: "Đang giao" },
+        { key: "DELIVERED", label: "Đã giao" }
+    ];
 
     if (currentStatus === "CANCEL_REQUESTED") {
         steps = [
-            { key: "PENDING", label: displayStatus("PENDING") },
-            { key: "CONFIRMED", label: displayStatus("CONFIRMED") },
-            { key: "CANCEL_REQUESTED", label: displayStatus("CANCEL_REQUESTED") }
+            { key: "PENDING", label: "Chờ xác nhận" },
+            { key: "CONFIRMED", label: "Đã xác nhận" },
+            { key: "CANCEL_REQUESTED", label: "Yêu cầu hủy" }
         ];
-    } else if (currentStatus === "CANCELLED") {
+    }
+
+    if (currentStatus === "CANCELLED") {
         steps = [
-            { key: "PENDING", label: displayStatus("PENDING") },
-            { key: "CANCELLED", label: displayStatus("CANCELLED") }
+            { key: "PENDING", label: "Chờ xác nhận" },
+            { key: "CANCELLED", label: "Đã hủy" }
         ];
-    } else {
-        steps = ORDER_TIMELINE_BASE.map(step => ({
-            key: step.key,
-            label: displayStatus(step.key)
-        }));
     }
 
-    let currentIndex = steps.findIndex(step => step.key === currentStatus);
-    if (currentIndex < 0) currentIndex = 0;
+    const currentIndex = steps.findIndex(step => step.key === currentStatus);
 
-    return { steps, currentIndex };
-}
+    timeline.innerHTML = steps.map((step, index) => {
+        let stateClass = "";
 
-function pushTimelineStep(steps, status, historyItem) {
-    if (!status) return;
-
-    const label = displayStatus(status);
-
-    if (steps.length && steps[steps.length - 1].key === status) {
-        steps[steps.length - 1] = { key: status, label, historyItem };
-        return;
-    }
-
-    steps.push({ key: status, label, historyItem });
-}
-
-function appendFutureTimelineSteps(steps, currentStatus) {
-    if (currentStatus === "CANCELLED" || currentStatus === "CANCEL_REQUESTED") {
-        return;
-    }
-
-    const baseIndex = ORDER_TIMELINE_BASE.findIndex(step => step.key === currentStatus);
-    if (baseIndex < 0) return;
-
-    for (let i = baseIndex + 1; i < ORDER_TIMELINE_BASE.length; i++) {
-        pushTimelineStep(steps, ORDER_TIMELINE_BASE[i].key, null);
-    }
-}
-
-function findLastStepIndex(steps, status) {
-    for (let i = steps.length - 1; i >= 0; i--) {
-        if (steps[i].key === status) {
-            return i;
+        if (index < currentIndex) {
+            stateClass = "is-done";
+        } else if (index === currentIndex) {
+            stateClass = "is-current";
         }
-    }
 
-    return -1;
-}
+        if (currentStatus === "CANCELLED" && step.key === "CANCELLED") {
+            stateClass = "is-cancelled";
+        }
 
-function renderCancellationInfo(currentStatus, history, order) {
-    const info = document.getElementById("orderTimelineCancelInfo");
-    if (!info) return;
-
-    const cancellation = Array.isArray(history)
-        ? [...history].reverse().find(item => normalizeStatus(item.newStatus) === "CANCELLED")
-        : null;
-
-    if (!cancellation && currentStatus !== "CANCELLED") {
-        info.classList.add("hidden");
-        info.innerHTML = "";
-        return;
-    }
-
-    if (!cancellation) {
-        const fallbackActor = order && order.maTKNV ? "nhân viên" : "khách hàng";
-        const fallbackReason = order && order.ghiChu ? parseCancelReasonFromNote(order.ghiChu) : "";
-
-        info.innerHTML = `
-            <strong>Đơn hàng được hủy bởi ${fallbackActor}</strong>
-            ${fallbackReason ? `<span>Lý do: ${escapeHtml(fallbackReason)}</span>` : ""}
+        return `
+            <div class="timeline-step ${stateClass}">
+                <div class="timeline-step__dot">
+                    ${index < currentIndex ? "✓" : ""}
+                </div>
+                <div class="timeline-step__content">
+                    <strong>${step.label}</strong>
+                </div>
+            </div>
         `;
-        info.classList.remove("hidden");
-        return;
-    }
-
-    const actor = displayActorType(cancellation.actorType);
-    const reason = cancellation.reason && cancellation.reason.trim()
-        ? cancellation.reason.trim()
-        : "";
-
-    info.innerHTML = `
-        <strong>Đơn hàng được hủy bởi ${escapeHtml(actor)}</strong>
-        ${reason ? `<span>Lý do: ${escapeHtml(reason)}</span>` : ""}
-        ${cancellation.createdAt ? `<span>Thời gian hủy: ${escapeHtml(formatDate(cancellation.createdAt))}</span>` : ""}
-    `;
-    info.classList.remove("hidden");
-}
-
-function displayActorType(actorType) {
-    const actor = normalizeStatus(actorType);
-
-    if (actor === "CUSTOMER") return "khách hàng";
-    if (actor === "STAFF") return "nhân viên";
-    if (actor === "MANAGER") return "quản lý";
-    if (actor === "ADMIN") return "quản trị viên";
-    return "hệ thống";
-}
-
-function parseCancelReasonFromNote(note) {
-    if (!note) return "";
-
-    const match = note.match(/\[(?:Hủy đơn|Hủy đơn hàng)\]\s*Lý do:\s*([^\n]+)/i);
-    return match ? match[1].trim() : "";
-}
-
-function escapeHtml(value) {
-    return String(value || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    }).join("");
 }
