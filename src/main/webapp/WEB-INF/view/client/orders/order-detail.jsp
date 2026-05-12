@@ -22,24 +22,31 @@
 <main class="profile-page order-page">
     <div class="container container--account-wide">
         <section class="profile-content orders-content">
-            <button onclick="history.back()" class="btn btn-outline order-back-btn" type="button">Quay lại</button>
+            <input type="hidden" id="currentCustomerId" value="${sessionScope.userId}">
 
-            <div class="orders-header orders-header--detail">
+            <div class="client-order-top-actions">
+                <a class="btn btn-outline order-back-btn" href="<c:url value='/orders'/>">
+                    ← Quay lại lịch sử
+                </a>
+
+                <div id="orderDetailActions" class="client-order-main-actions"></div>
+            </div>
+
+            <div class="orders-header orders-header--detail client-order-detail-header">
                 <div>
-                    <span class="eyebrow">Theo dõi đơn hàng</span>
-                    <h1 class="profile-title">Chi tiết đơn hàng</h1>
-                    <p class="profile-subtitle">Kiểm tra thông tin đơn, món đã đặt và gửi đánh giá sau khi đơn được giao.</p>
+                    <h1 class="profile-title" id="orderDetailTitle">Chi tiết đơn hàng</h1>
                 </div>
             </div>
 
             <div id="message" class="message" role="status" aria-live="polite"></div>
 
-            <section class="orders-card order-detail-card">
-                <div class="orders-card__header">
-                    <h2>Thông tin đơn</h2>
-                    <span class="orders-card__hint">Tóm tắt trạng thái và thanh toán</span>
-                </div>
-                <div id="orderInfo" class="order-info"></div>
+            <section class="orders-card order-timeline-card" aria-label="Order status timeline">
+                <div id="orderTimeline" class="order-timeline"></div>
+                <div id="orderTimelineCancelInfo" class="order-timeline-cancel-info hidden"></div>
+            </section>
+
+            <section class="orders-card order-detail-card client-order-detail-card">
+                <div id="orderDetailContent" class="client-order-detail-content"></div>
             </section>
 
             <section class="orders-card">
@@ -72,18 +79,23 @@
         <h2 id="reviewModalTitle">Đánh giá món ăn</h2>
 
         <input type="hidden" id="reviewMaMon">
+        <input type="hidden" id="reviewSao" value="5">
 
-        <label for="reviewSao">Số sao</label>
-        <select id="reviewSao">
-            <option value="5">5 sao - Rất hài lòng</option>
-            <option value="4">4 sao - Hài lòng</option>
-            <option value="3">3 sao - Bình thường</option>
-            <option value="2">2 sao - Chưa hài lòng</option>
-            <option value="1">1 sao - Không hài lòng</option>
-        </select>
+        <label>Chọn sao</label>
+        <div id="reviewStarRating" class="review-star-rating" role="radiogroup" aria-label="Chọn số sao đánh giá">
+            <button type="button" class="review-star" data-rating="1" aria-label="1 sao">★</button>
+            <button type="button" class="review-star" data-rating="2" aria-label="2 sao">★</button>
+            <button type="button" class="review-star" data-rating="3" aria-label="3 sao">★</button>
+            <button type="button" class="review-star" data-rating="4" aria-label="4 sao">★</button>
+            <button type="button" class="review-star" data-rating="5" aria-label="5 sao">★</button>
+        </div>
 
         <label for="reviewNoiDung">Nội dung đánh giá</label>
         <textarea id="reviewNoiDung" rows="4" placeholder="Nhập cảm nhận của bạn..."></textarea>
+
+        <label for="reviewImageInput">Ảnh đánh giá</label>
+        <input id="reviewImageInput" class="review-image-input" type="file" accept="image/*" onchange="previewReviewImage(event)">
+        <div id="reviewImagePreview" class="review-image-preview hidden"></div>
 
         <div class="modal-actions">
             <button onclick="submitReview()" class="primary" type="button">Gửi đánh giá</button>

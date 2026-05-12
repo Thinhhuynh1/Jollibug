@@ -366,6 +366,14 @@ function confirmCancelOrder() {
         return;
     }
 
+    let reason = selectedReason.value;
+
+    if (selectedReason.dataset.other === "true" && otherReason) {
+        reason = otherReason.value.trim();
+    }
+
+    window.selectedCancelReason = reason;
+
     closeCancelConfirmModal();
     submitRuntimeUpdateStatus();
 }

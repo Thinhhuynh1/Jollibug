@@ -2,6 +2,7 @@ package vn.fastfood.service;
 
 import vn.fastfood.dao.CartDAO;
 import vn.fastfood.dao.CheckoutDAO;
+import vn.fastfood.dao.OrderDAO;
 import vn.fastfood.dto.CheckoutRequest;
 import vn.fastfood.dto.CheckoutResponse;
 import vn.fastfood.model.CheckoutCartItem;
@@ -13,6 +14,7 @@ import java.util.List;
 public class CheckoutService {
     private final CheckoutDAO checkoutDAO = new CheckoutDAO();
     private final CartDAO cartDAO = new CartDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
 
     public CheckoutResponse checkout(CheckoutRequest request) {
         if (request == null) {
@@ -69,6 +71,19 @@ public class CheckoutService {
                     maGG,
                     request.getGhiChu()
             );
+
+            boolean historyRecorded = orderDAO.insertOrderStatusHistory(
+                    orderId,
+                    null,
+                    "PENDING",
+                    "CUSTOMER",
+                    customerId,
+                    null
+            );
+
+            if (!historyRecorded) {
+                System.out.println("[ORDER HISTORY] Could not record initial PENDING history for orderId=" + orderId);
+            }
 
             for (CheckoutCartItem item : items) {
                 checkoutDAO.createOrderItem(orderId, item);

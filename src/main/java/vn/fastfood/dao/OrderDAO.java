@@ -3,7 +3,11 @@ package vn.fastfood.dao;
 import vn.fastfood.config.DBConnection;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
+import vn.fastfood.model.OrderStatusHistory;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -227,6 +231,151 @@ public class OrderDAO {
         return items;
     }
 
+    public boolean insertOrderStatusHistory(
+            long orderId,
+            String oldStatus,
+            String newStatus,
+            String actorType,
+            Long actorId,
+            String reason
+    ) {
+        String sql = """
+            INSERT INTO LICHSUTRANGTHAIDH (
+                MaDH,
+                TrangThaiCu,
+                TrangThaiMoi,
+                NguoiThucHienLoai,
+                MaNguoiThucHien,
+                LyDo,
+                ThoiGian
+            )
+            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, orderId);
+            setNullableVarchar(ps, 2, oldStatus);
+            ps.setString(3, newStatus);
+            ps.setString(4, actorType);
+
+            if (actorId == null) {
+                ps.setNull(5, Types.NUMERIC);
+            } else {
+                ps.setLong(5, actorId);
+            }
+
+            setNullableClob(ps, 6, reason);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public List<OrderStatusHistory> getOrderStatusHistory(long orderId) {
+        List<OrderStatusHistory> history = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                MaLS,
+                MaDH,
+                TrangThaiCu,
+                TrangThaiMoi,
+                NguoiThucHienLoai,
+                MaNguoiThucHien,
+                LyDo,
+                ThoiGian
+            FROM LICHSUTRANGTHAIDH
+            WHERE MaDH = ?
+            ORDER BY ThoiGian ASC, MaLS ASC
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, orderId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    history.add(mapResultSetToOrderStatusHistory(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return history;
+    }
+
+    public int addOrderItemsToCart(long orderId, long customerId) {
+        String orderItemsSql = """
+            SELECT MaMon, SoLuong
+            FROM CHITIETDH
+            WHERE MaDH = ?
+            ORDER BY MaMon
+        """;
+
+        String mergeCartItemSql = """
+            MERGE INTO CHITIETGH ct
+            USING (
+                SELECT ? AS MaGH, ? AS MaMon, ? AS SLuong
+                FROM dual
+            ) src
+            ON (ct.MaGH = src.MaGH AND ct.MaMon = src.MaMon)
+            WHEN MATCHED THEN
+                UPDATE SET ct.SLuong = ct.SLuong + src.SLuong
+            WHEN NOT MATCHED THEN
+                INSERT (MaGH, MaMon, SLuong, added_at)
+                VALUES (src.MaGH, src.MaMon, src.SLuong, CURRENT_TIMESTAMP)
+        """;
+
+        try (Connection conn = DBConnection.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+
+            try {
+                Long cartId = getOrCreateCartId(conn, customerId);
+                int itemCount = 0;
+
+                try (PreparedStatement itemPs = conn.prepareStatement(orderItemsSql);
+                     PreparedStatement mergePs = conn.prepareStatement(mergeCartItemSql)) {
+
+                    itemPs.setLong(1, orderId);
+
+                    try (ResultSet rs = itemPs.executeQuery()) {
+                        while (rs.next()) {
+                            mergePs.setLong(1, cartId);
+                            mergePs.setLong(2, rs.getLong("MaMon"));
+                            mergePs.setInt(3, rs.getInt("SoLuong"));
+                            mergePs.executeUpdate();
+                            itemCount++;
+                        }
+                    }
+                }
+
+                conn.commit();
+                conn.setAutoCommit(originalAutoCommit);
+                return itemCount;
+
+            } catch (SQLException e) {
+                conn.rollback();
+                conn.setAutoCommit(originalAutoCommit);
+                throw e;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
     public boolean updateOrderStatus(long orderId, String newStatus) {
         String sql = """
             UPDATE DONHANG
@@ -279,6 +428,71 @@ public class OrderDAO {
         }
     }
 
+    private void setNullableVarchar(PreparedStatement ps, int index, String value) throws SQLException {
+        if (value == null || value.trim().isEmpty()) {
+            ps.setNull(index, Types.VARCHAR);
+            return;
+        }
+
+        ps.setString(index, value.trim());
+    }
+
+    private void setNullableClob(PreparedStatement ps, int index, String value) throws SQLException {
+        if (value == null || value.trim().isEmpty()) {
+            ps.setNull(index, Types.CLOB);
+            return;
+        }
+
+        String trimmedValue = value.trim();
+        ps.setCharacterStream(index, new StringReader(trimmedValue), trimmedValue.length());
+    }
+
+    private Long getOrCreateCartId(Connection conn, long customerId) throws SQLException {
+        String findSql = """
+            SELECT MaGH
+            FROM GIOHANG
+            WHERE MaTK = ?
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(findSql)) {
+            ps.setLong(1, customerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong("MaGH");
+                }
+            }
+        }
+
+        String insertSql = """
+            INSERT INTO GIOHANG (MaTK, created_at)
+            VALUES (?, CURRENT_TIMESTAMP)
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(insertSql, new String[]{"MaGH"})) {
+            ps.setLong(1, customerId);
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(findSql)) {
+            ps.setLong(1, customerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong("MaGH");
+                }
+            }
+        }
+
+        throw new SQLException("Could not create cart for customerId=" + customerId);
+    }
+
     private Order mapResultSetToOrder(ResultSet rs) throws SQLException {
         Order order = new Order();
 
@@ -322,6 +536,46 @@ public class OrderDAO {
         order.setTrangThaiTT(rs.getString("TrangThaiTT"));
 
         return order;
+    }
+
+    private OrderStatusHistory mapResultSetToOrderStatusHistory(ResultSet rs) throws SQLException {
+        OrderStatusHistory history = new OrderStatusHistory();
+
+        history.setMaLS(rs.getLong("MaLS"));
+        history.setMaDH(rs.getLong("MaDH"));
+        history.setTrangThaiCu(rs.getString("TrangThaiCu"));
+        history.setTrangThaiMoi(rs.getString("TrangThaiMoi"));
+        history.setNguoiThucHienLoai(rs.getString("NguoiThucHienLoai"));
+
+        long actorId = rs.getLong("MaNguoiThucHien");
+        history.setMaNguoiThucHien(rs.wasNull() ? null : actorId);
+
+        history.setLyDo(readClob(rs.getClob("LyDo")));
+        history.setThoiGian(rs.getTimestamp("ThoiGian"));
+
+        return history;
+    }
+
+    private String readClob(Clob clob) throws SQLException {
+        if (clob == null) {
+            return null;
+        }
+
+        StringBuilder value = new StringBuilder();
+
+        try (Reader reader = clob.getCharacterStream()) {
+            char[] buffer = new char[4096];
+            int charsRead;
+
+            while ((charsRead = reader.read(buffer)) != -1) {
+                value.append(buffer, 0, charsRead);
+            }
+
+            return value.toString();
+
+        } catch (IOException e) {
+            throw new SQLException("Could not read order status history CLOB.", e);
+        }
     }
 
     public boolean updateOrderStatusStaffAndCancelReason(long orderId, long staffId, String newStatus, String cancelReason) {

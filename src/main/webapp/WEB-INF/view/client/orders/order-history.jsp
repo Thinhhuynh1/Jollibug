@@ -24,45 +24,36 @@
         <section class="profile-content orders-content">
             <div class="orders-header">
                 <div>
-                    <span class="eyebrow">Đơn hàng của tôi</span>
                     <h1 class="profile-title">Lịch sử mua hàng</h1>
-                    <p class="profile-subtitle">Theo dõi các đơn đã đặt, trạng thái giao hàng và thao tác với đơn khi cần.</p>
                 </div>
-                <a class="btn btn-outline orders-header__action" href="<c:url value='/menu'/>">Tiếp tục đặt món</a>
+
+                <a class="btn btn-outline orders-header__action" href="<c:url value='/menu'/>">
+                    Tiếp tục đặt món
+                </a>
             </div>
 
-            <div class="order-toolbar">
-                <label class="order-field" for="customerIdInput">
-                    <span>Mã khách hàng</span>
-                    <input id="customerIdInput" type="number" value="1">
-                </label>
-                <button class="btn btn-primary order-toolbar__submit" type="button" onclick="loadOrders()">Tải đơn hàng</button>
+            <input type="hidden" id="currentCustomerId" value="${sessionScope.userId}">
+
+            <div class="order-tabs" role="tablist" aria-label="Order tabs">
+                <button class="order-tab is-active" type="button" data-tab="active" onclick="switchOrderTab('active')">
+                    Đơn đang đến
+                </button>
+                <button class="order-tab" type="button" data-tab="history" onclick="switchOrderTab('history')">
+                    Lịch sử
+                </button>
+                <button class="order-tab" type="button" data-tab="review" onclick="switchOrderTab('review')">
+                    Đánh giá
+                </button>
             </div>
 
             <div id="message" class="message" role="status" aria-live="polite"></div>
 
-            <section class="orders-card">
+            <section class="orders-card order-card-section">
                 <div class="orders-card__header">
-                    <h2>Danh sách đơn hàng</h2>
-                    <span class="orders-card__hint">Cập nhật theo dữ liệu mới nhất từ hệ thống</span>
+                    <h2 id="orderSectionTitle">Đơn đang đến</h2>
                 </div>
 
-                <div class="orders-table-wrap">
-                    <table class="order-table order-table--history">
-                        <thead>
-                        <tr>
-                            <th>Mã đơn</th>
-                            <th>Ngày đặt</th>
-                            <th>Tổng tiền món</th>
-                            <th>Giảm giá</th>
-                            <th>Thành tiền</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody id="orderTableBody"></tbody>
-                    </table>
-                </div>
+                <div id="orderCardList" class="order-card-list"></div>
             </section>
         </section>
     </div>

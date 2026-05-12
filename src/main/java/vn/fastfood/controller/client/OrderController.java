@@ -1,6 +1,7 @@
 package vn.fastfood.controller.client;
 
 import vn.fastfood.dto.OrderDetailResponse;
+import vn.fastfood.dto.OrderStatusHistoryResponse;
 import vn.fastfood.model.OrderItem;
 import vn.fastfood.model.Order;
 import vn.fastfood.service.OrderService;
@@ -88,6 +89,49 @@ public class OrderController {
             Map.of(
                 "success", false,
                 "message", "Không thể xác nhận đã nhận hàng cho đơn này."
+            )
+        );
+    }
+
+    @GetMapping("/{orderId}/status-history")
+    public ResponseEntity<?> getOrderStatusHistory(
+        @PathVariable("orderId") long orderId,
+        @RequestParam("customerId") long customerId
+    ) {
+        List<OrderStatusHistoryResponse> history = orderService.getOrderStatusHistoryForCustomer(orderId, customerId);
+
+        if (history == null) {
+            return ResponseEntity.status(404).body(
+                Map.of(
+                    "success", false,
+                    "message", "Order not found for this customer."
+                )
+            );
+        }
+
+        return ResponseEntity.ok(history);
+    }
+
+    @PostMapping("/{orderId}/reorder")
+    public ResponseEntity<Map<String, Object>> reorder(
+        @PathVariable("orderId") long orderId,
+        @RequestParam("customerId") long customerId
+    ) {
+        boolean result = orderService.reorder(orderId, customerId);
+
+        if (result) {
+            return ResponseEntity.ok(
+                Map.of(
+                    "success", true,
+                    "message", "\u0110\u00e3 th\u00eam l\u1ea1i c\u00e1c m\u00f3n trong \u0111\u01a1n v\u00e0o gi\u1ecf h\u00e0ng."
+                )
+            );
+        }
+
+        return ResponseEntity.badRequest().body(
+            Map.of(
+                "success", false,
+                "message", "Kh\u00f4ng th\u1ec3 \u0111\u1eb7t l\u1ea1i \u0111\u01a1n h\u00e0ng n\u00e0y."
             )
         );
     }

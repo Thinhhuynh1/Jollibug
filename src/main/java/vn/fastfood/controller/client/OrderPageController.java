@@ -5,13 +5,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class OrderPageController {
+
     @GetMapping("/client/orders")
     public String orderHistoryPage() {
-        return "client/orders/order-history";
+        return "redirect:/orders";
     }
 
     @GetMapping("/client/orders/detail")
     public String orderDetailPage() {
-        return "client/orders/order-detail";
+        return "redirect:/orders/detail";
     }
 }
