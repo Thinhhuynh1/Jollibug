@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,7 +21,10 @@ public class ManagerController {
     }
 
     @GetMapping("/manager")
-    public String getDashBoardPage() {
+    public String getDashBoardPage(Model model) {
+        model.addAttribute("revenueStats", thongKeService.getRevenueStats("month"));
+        model.addAttribute("orderStats", thongKeService.getOrderStats("month"));
+        model.addAttribute("customerStats", thongKeService.getCustomerStats("month"));
         return "manager/dashboard";
     }
 

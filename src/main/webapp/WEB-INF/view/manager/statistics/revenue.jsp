@@ -66,7 +66,12 @@
           <article class="metric-card">
             <span class="muted">Tổng doanh thu (kỳ chọn)</span>
             <strong><fmt:formatNumber value="${stats.totalRevenue}" pattern="#,###"/>đ</strong>
-            <span class="metric-delta" data-tone="up">Chỉ tính đơn đã giao</span>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span class="badge badge--${stats.revenueGrowth >= 0 ? 'success' : 'danger'}" style="font-size: 0.8rem;">
+                    ${stats.revenueGrowth >= 0 ? '↑' : '↓'} <fmt:formatNumber value="${stats.revenueGrowth}" maxFractionDigits="1"/>%
+                </span>
+                <span class="muted" style="font-size: 0.8rem;">so với kỳ trước (<fmt:formatNumber value="${stats.prevTotalRevenue}" pattern="#,###"/>đ)</span>
+            </div>
           </article>
         </div>
 

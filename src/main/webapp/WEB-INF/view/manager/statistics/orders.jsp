@@ -46,7 +46,12 @@
           <article class="metric-card">
             <span class="muted">Tổng đơn hàng</span>
             <strong>${stats.totalOrders}</strong>
-            <span class="metric-delta" data-tone="info">Trong kỳ đã chọn</span>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span class="badge badge--${stats.ordersGrowth >= 0 ? 'success' : 'danger'}" style="font-size: 0.8rem;">
+                    ${stats.ordersGrowth >= 0 ? '↑' : '↓'} <fmt:formatNumber value="${stats.ordersGrowth}" maxFractionDigits="1"/>%
+                </span>
+                <span class="muted" style="font-size: 0.8rem;">so với kỳ trước (${stats.prevTotalOrders})</span>
+            </div>
           </article>
           <article class="metric-card">
             <span class="muted">Chờ xác nhận</span>
