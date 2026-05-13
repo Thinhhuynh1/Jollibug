@@ -40,6 +40,13 @@
                       ${error}
                     </div>
                   </c:if>
+                  <c:if test="${not empty success}">
+                    <div
+                      style="background-color: #f8fff9; border: 1px solid #e1f5e5; color: #1e7e34; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
+                      ${success}
+                    </div>
+                  </c:if>
+  
                   <form class="floating-grid" action="/login" method="POST">
                     <div class="floating-field">
                       <input id="login-email" name="email" type="email" placeholder=" " required />

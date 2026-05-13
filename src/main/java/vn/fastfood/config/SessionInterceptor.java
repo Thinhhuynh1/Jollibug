@@ -29,18 +29,22 @@ public class SessionInterceptor implements HandlerInterceptor {
                 || requestURI.startsWith("/login")
                 || requestURI.startsWith("/register")
                 || requestURI.startsWith("/forgot-password")
+                || requestURI.startsWith("/verify")
+                || requestURI.startsWith("/new-password")
                 || requestURI.startsWith("/logout")
                 || requestURI.startsWith("/menu")
                 || requestURI.startsWith("/product")
                 || requestURI.startsWith("/about")
                 || requestURI.startsWith("/contact")
-                || requestURI.startsWith("/resources")) {
+                || requestURI.startsWith("/resources")
+                || requestURI.startsWith("/images")
+                || requestURI.startsWith("/css")
+                || requestURI.startsWith("/js")) {
             return true;
         }
 
         // Tất cả request khác PHẢI có session hợp lệ
-        if (session == null || session.getAttribute("user") == null)
-        {
+        if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("/login");
             return false;
         }

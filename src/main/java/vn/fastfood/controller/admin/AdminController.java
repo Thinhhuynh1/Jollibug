@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import vn.fastfood.entity.User;
-import vn.fastfood.entity.UserStatus;
 import vn.fastfood.repository.UserRepository;
 import vn.fastfood.repository.VaiTroRepository;
 import vn.fastfood.service.UserService;
@@ -39,8 +38,8 @@ public class AdminController {
         model.addAttribute("countManager", this.userRepository.count("Manager", null));
         model.addAttribute("countStaff", this.userRepository.count("Staff", null));
         model.addAttribute("countClient", this.userRepository.count("Client", null));
-        model.addAttribute("countActive", this.userRepository.count(null, UserStatus.ACTIVE));
-        model.addAttribute("countBan", this.userRepository.count(null, UserStatus.BANNED));
+        model.addAttribute("countActive", this.userRepository.count(null, "ACTIVE"));
+        model.addAttribute("countBan", this.userRepository.count(null, "ACTIVE"));
 
         return "admin/dashboard";
     }
@@ -52,9 +51,9 @@ public class AdminController {
         List<User> listUserActive;
 
         if ((role != null && !role.equals("All")) || (keyword != null && !keyword.isEmpty())) {
-            listUserActive = this.userRepository.search(role, keyword, UserStatus.ACTIVE);
+            listUserActive = this.userRepository.search(role, keyword, "ACTIVE");
         } else {
-            listUserActive = this.userService.findByTrangThai(UserStatus.ACTIVE);
+            listUserActive = this.userService.findByTrangThai("ACTIVE");
         }
 
         model.addAttribute("lisUsers", listUserActive);
@@ -74,9 +73,9 @@ public class AdminController {
         List<User> listUserBlocked;
 
         if ((role != null && !role.equals("All")) || (keyword != null && !keyword.isEmpty())) {
-            listUserBlocked = this.userRepository.search(role, keyword, UserStatus.BANNED);
+            listUserBlocked = this.userRepository.search(role, keyword, "BANNED");
         } else {
-            listUserBlocked = this.userService.findByTrangThai(UserStatus.BANNED);
+            listUserBlocked = this.userService.findByTrangThai("BANNED");
         }
 
         model.addAttribute("lisUsers", listUserBlocked);
@@ -97,7 +96,7 @@ public class AdminController {
             @RequestParam("Email") String email,
             @RequestParam("Password") String password,
             @RequestParam("SDT") String sdt,
-            @RequestParam(value = "TrangThai", defaultValue = "ACTIVE") UserStatus trangThai,
+            @RequestParam(value = "TrangThai", defaultValue = "ACTIVE") String trangThai,
             @RequestParam(value = "TenVT", required = false) String tenVT) {
 
         User user = new User();
@@ -148,7 +147,7 @@ public class AdminController {
             user.setSdt(sdt);
 
             if (password != null && !password.isEmpty()) {
-                user.setPassword(password);
+                user.setPassword(passwordEncoder.encode(password));
             }
 
             if (role != null && !role.isEmpty()) {
@@ -188,7 +187,7 @@ public class AdminController {
     @PostMapping("/admin/users/ban/{maTK}")
     public String postBanUser(@PathVariable long maTK) {
         User user = this.userRepository.findById(maTK).orElse(null);
-        user.setTrangThai(UserStatus.BANNED);
+        user.setTrangThai("BANNED");
         this.userService.saveUser(user);
         return "redirect:/admin/users";
     }
@@ -205,7 +204,7 @@ public class AdminController {
     @PostMapping("/admin/users/unban/{maTK}")
     public String postUnbanUser(@PathVariable long maTK) {
         User user = this.userRepository.findById(maTK).orElse(null);
-        user.setTrangThai(UserStatus.ACTIVE);
+        user.setTrangThai("ACTIVE");
         this.userService.saveUser(user);
         return "redirect:/admin/users/block";
     }

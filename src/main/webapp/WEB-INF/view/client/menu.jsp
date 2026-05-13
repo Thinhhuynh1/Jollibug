@@ -82,51 +82,22 @@
         </section>
 
         <section class="card-grid" data-menu-grid id="menu-grid" aria-label="Menu items">
-          <article class="card product-card reveal-up">
-            <div class="product-card__media" style="background:rgba(255,248,238,0.92);">
-              <img src="/webapp/resources/shared/images/meal-burger.svg" alt="Smoky double burger" />
-            </div>
-            <div class="stack">
-              <div class="product-card__meta"><span>Burger</span><span>4.9</span></div>
-              <h3 class="product-card__title">Smoky Double Burger</h3>
-              <p class="muted">Double patty, cheddar, onion jam, and signature sauce.</p>
-              <div class="price-row"><span class="price">$9.90</span></div>
-              <div class="card-actions">
-                <a class="btn btn-outline" href="/product">Xem chi tiết</a>
-                <button class="btn btn-primary" type="button">Thêm vào giỏ hàng</button>
+          <c:forEach var="monAn" items="${listMonAn}">
+            <article class="card product-card reveal-up">
+              <div class="product-card__media" style="background:rgba(255,248,238,0.92);">
+                <img src="${monAn.img}" alt="${monAn.tenMon}" />
               </div>
-            </div>
-          </article>
-          <article class="card product-card reveal-up">
-            <div class="product-card__media" style="background:rgba(245,250,255,0.92);">
-              <img src="/webapp/resources/shared/images/meal-drink.svg" alt="Crispy combo meal" />
-            </div>
-            <div class="stack">
-              <div class="product-card__meta"><span>Combo</span><span>4.8</span></div>
-              <h3 class="product-card__title">Crispy Combo Meal</h3>
-              <p class="muted">Chicken fillet burger, waffle fries, mango float.</p>
-              <div class="price-row"><span class="price">$12.50</span></div>
-              <div class="card-actions">
-                <a class="btn btn-outline" href="/product">Xem chi tiết</a>
-                <button class="btn btn-primary" type="button">Thêm vào giỏ hàng</button>
+              <div class="stack">
+                <div class="product-card__meta"><span>${monAn.danhMuc.tenDM}</span><span>4.9</span></div>
+                <h3 class="product-card__title">${monAn.tenMon}</h3>
+                <div class="price-row"><span class="price">${monAn.gia}</span></div>
+                <div class="card-actions">
+                  <a class="btn btn-outline" href="/product">Xem chi tiết</a>
+                  <button class="btn btn-primary" type="button">Thêm vào giỏ hàng</button>
+                </div>
               </div>
-            </div>
-          </article>
-          <article class="card product-card reveal-up">
-            <div class="product-card__media" style="background:rgba(251,244,255,0.92);">
-              <img src="/webapp/resources/shared/images/brand-feast.svg" alt="Family feast" />
-            </div>
-            <div class="stack">
-              <div class="product-card__meta"><span>Family</span><span>4.7</span></div>
-              <h3 class="product-card__title">Family Feast Box</h3>
-              <p class="muted">A shareable box with burgers, chicken bites, and sides.</p>
-              <div class="price-row"><span class="price">$24.00</span></div>
-              <div class="card-actions">
-                <a class="btn btn-outline" href="/product">Xem chi tiết</a>
-                <button class="btn btn-primary" type="button">Thêm vào giỏ hàng</button>
-              </div>
-            </div> 
-          </article>
+            </article>
+          </c:forEach>
         </section>
       </div>
     </section>
