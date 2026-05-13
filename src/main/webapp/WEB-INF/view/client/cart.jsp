@@ -29,51 +29,34 @@
         <section class="cart-column">
           <article class="cart-panel">
             <div class="cart-item-list">
-              <article class="cart-line">
-                <div class="cart-line__thumb">
-                  <img src="https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg"
-                       alt="Combo Cung Vui"
-                       style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
-                </div>
-                <div class="cart-line__meta">
-                  <h3 class="cart-line__name">Combo Cung Vui</h3>
-                  <p class="cart-line__unit">6 x Ga Gion Cay | Tang 3 lon Pepsi</p>
-                  <div class="cart-line__controls">
-                    <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
-                    <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
-                      <div class="qty-stepper" aria-label="Chinh so luong">
-                        <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
-                        <span class="qty-stepper__value">1</span>
-                        <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
+              <c:set var="tongSoLuong" value="0" />
+              <c:set var="tongTien" value="0" />
+              <c:forEach var="cartItem" items="${sessionScope.cart}">
+                <c:set var="tongSoLuong" value="${tongSoLuong + cartItem.soLuong}"/>
+                <c:set var="tongTien" value="${tongTien + cartItem.thanhTien}" />
+                <article class="cart-line">
+                  <div class="cart-line__thumb">
+                    <img src="/images/${cartItem.imageUrl}"
+                         style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+                  </div>
+                  <div class="cart-line__meta">
+                    <h3 class="cart-line__name">${cartItem.tenMon}</h3>
+                    <div class="cart-line__controls">
+                      <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
+                      <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
+                        <div class="qty-stepper" aria-label="Chinh so luong">
+                          <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
+                          <span class="qty-stepper__value">${cartItem.soLuong}</span>
+                          <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
+                        </div>
+                        <strong class="cart-line__sum">
+                          <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> đ
+                        </strong>
                       </div>
-                      <strong class="cart-line__sum">199.000 VND</strong>
                     </div>
                   </div>
-                </div>
-              </article>
-
-              <article class="cart-line">
-                <div class="cart-line__thumb">
-                  <img src="https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg"
-                       alt="Combo Cung Vui"
-                       style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
-                </div>
-                <div class="cart-line__meta">
-                  <h3 class="cart-line__name">Combo Cung Vui</h3>
-                  <p class="cart-line__unit">6 x Ga Gion Cay | Tang 3 lon Pepsi</p>
-                  <div class="cart-line__controls">
-                    <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
-                    <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
-                      <div class="qty-stepper" aria-label="Chinh so luong">
-                        <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
-                        <span class="qty-stepper__value">1</span>
-                        <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
-                      </div>
-                      <strong class="cart-line__sum">199.000 VND</strong>
-                    </div>
-                  </div>
-                </div>
-              </article>
+                </article>
+              </c:forEach>
             </div>
           </article>
         </section>
@@ -82,13 +65,19 @@
           <article class="summary-panel">
             <div style="display:flex; align-items:center; width:100%;">
               <h2 class="summary-panel__title">Tổng sản phẩm </h2>
-              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">0 MÓN</h2>
+              
+              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">${tongSoLuong} MÓN</h2>
             </div>
 
 
 
             <div class="summary-lines">
-              <div class="summary-line summary-line--strong"><span>Tổng tiền</span><strong id="summary-total">0 VND</strong></div>
+              <div class="summary-line summary-line--strong">
+                <span>Tổng tiền</span>
+                <strong id="summary-total">
+                  <fmt:formatNumber type="number" value="${tongTien}"/> đ
+                </strong>
+              </div>
             </div>
 
             <a class="btn btn-primary btn-block" type="button" id="checkout-button" href="/checkout">Đặt hàng</a>
