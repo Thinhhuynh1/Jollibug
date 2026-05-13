@@ -48,6 +48,62 @@
 </label>
 </div>
 
+<div class="promo-apply-panel">
+    <div class="promo-apply-header">
+        <span>Phạm vi áp dụng</span>
+        <small>Chọn mức áp dụng phù hợp nhất cho chương trình giảm giá</small>
+    </div>
+    <div class="promo-apply-options">
+        <label class="promo-option-card">
+            <input type="radio" name="phamViApDung" value="ALL" checked />
+            <div>
+                <strong>Tất cả món</strong>
+                <small>Áp dụng giảm giá cho toàn bộ thực đơn.</small>
+            </div>
+        </label>
+
+        <label class="promo-option-card">
+            <input type="radio" name="phamViApDung" value="CATEGORY" />
+            <div>
+                <strong>Theo danh mục</strong>
+                <small>Chỉ áp dụng cho một danh mục món ăn cụ thể.</small>
+            </div>
+        </label>
+
+        <label class="promo-option-card">
+            <input type="radio" name="phamViApDung" value="ITEM" />
+            <div>
+                <strong>Chọn món</strong>
+                <small>Lựa chọn riêng từng món để áp dụng khuyến mãi.</small>
+            </div>
+        </label>
+    </div>
+
+    <div id="apply-category" class="promo-apply-details">
+        <label class="promo-detail-label">Danh mục áp dụng</label>
+        <div class="promo-category-select">
+            <select name="maDM">
+                <option value="">-- Chọn danh mục --</option>
+                <c:forEach items="${danhMucList}" var="category">
+                    <option value="${category.maDM}">${category.tenDM}</option>
+                </c:forEach>
+            </select>
+        </div>
+    </div>
+
+    <div id="apply-items" class="promo-apply-details">
+        <label class="promo-detail-label">Chọn món áp dụng</label>
+        <div class="promo-items-list">
+            <c:forEach items="${monAnList}" var="monAn">
+                <label class="promo-item-card">
+                    <input type="checkbox" name="selectedMonAnIds" value="${monAn.maMon}" />
+                    <span>${monAn.tenMon}</span>
+                </label>
+            </c:forEach>
+        </div>
+    </div>
+</div>
+
 <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
 <a href="<c:url value='/manager/promotions'/>" class="btn btn-ghost">Hủy</a>
 <button type="submit" class="profile-submit" style="max-width:180px;">Lưu khuyến mãi</button>
@@ -58,5 +114,22 @@
 </div>
 </main>
 </div>
+<script>
+const applyTypeRadios = document.querySelectorAll('input[name="phamViApDung"]');
+const optionCards = document.querySelectorAll('.promo-option-card');
+const categorySection = document.getElementById('apply-category');
+const itemsSection = document.getElementById('apply-items');
+function updateApplySections() {
+  const selected = document.querySelector('input[name="phamViApDung"]:checked');
+  optionCards.forEach(card => {
+    const radio = card.querySelector('input[type="radio"]');
+    card.classList.toggle('active', radio === selected);
+  });
+  categorySection.classList.toggle('active', selected.value === 'CATEGORY');
+  itemsSection.classList.toggle('active', selected.value === 'ITEM');
+}
+applyTypeRadios.forEach(radio => radio.addEventListener('change', updateApplySections));
+updateApplySections();
+</script>
 </body>
 </html>

@@ -3,6 +3,10 @@ package vn.fastfood.entity;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,6 +32,15 @@ public class ChuongTrinhGiamGia {
     @Column(name = "TenCT", nullable = false, length = 100)
     private String tenCT;
 
+    @Column(name = "PhamViApDung", length = 20)
+    private String phamViApDung;
+
+    @Column(name = "MaDM")
+    private Long maDM;
+
+    @Column(name = "DanhSachMonAn", length = 1000)
+    private String danhSachMonAn;
+
     @Column(name = "NgayBatDau")
     private LocalDateTime ngayBatDau;
 
@@ -43,6 +56,30 @@ public class ChuongTrinhGiamGia {
             return String.format("%d%%", phanTramGiam.longValue());
         }
         return String.format("%s%%", phanTramGiam);
+    }
+
+    @Transient
+    public List<Long> getDanhSachMonAnIds() {
+        if (danhSachMonAn == null || danhSachMonAn.isBlank()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(danhSachMonAn.split(","))
+                .map(String::trim)
+                .filter(entry -> !entry.isBlank())
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
+    }
+
+    @Transient
+    public String getPhamViApDungDisplay() {
+        if (phamViApDung == null || phamViApDung.isBlank()) {
+            return "Tất cả món";
+        }
+        return switch (phamViApDung) {
+            case "CATEGORY" -> "Theo danh mục";
+            case "ITEM" -> "Chọn món";
+            default -> "Tất cả món";
+        };
     }
 
     @Transient

@@ -51,6 +51,28 @@
 <span>Trạng thái</span>
 <input type="text" value="${promotion.status}" readonly />
 </label>
+
+<label class="profile-field">
+<span>Phạm vi áp dụng</span>
+<input type="text" value="${phamViLabel}" readonly />
+</label>
+
+<c:if test="${not empty apDungDanhMuc}">
+<label class="profile-field" style="grid-column:1/-1;">
+<span>Danh mục áp dụng</span>
+<input type="text" value="${apDungDanhMuc.tenDM}" readonly />
+</label>
+</c:if>
+
+<c:if test="${not empty apDungMonAnList}">
+<label class="profile-field" style="grid-column:1/-1;">
+<span>Danh sách món</span>
+<textarea rows="5" readonly style="width:100%;">
+<c:forEach items="${apDungMonAnList}" var="food">${food.tenMon}
+</c:forEach>
+</textarea>
+</label>
+</c:if>
 </div>
 
 <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
