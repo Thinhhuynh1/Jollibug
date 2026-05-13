@@ -23,7 +23,7 @@ public class StaffController {
     private final UserRepository userRepository;
 
     public StaffController(ChatRecordRepository chatRecordRepository,
-                           UserRepository userRepository) {
+            UserRepository userRepository) {
         this.chatRecordRepository = chatRecordRepository;
         this.userRepository = userRepository;
     }
@@ -62,7 +62,7 @@ public class StaffController {
 
     @GetMapping("/staff/support")
     public String getSupportPage(@RequestParam(value = "conversationId", required = false) String conversationId,
-                                  Model model) {
+            Model model) {
 
         // --- Lấy danh sách conversation (client đã từng nhắn) ---
         List<String> convIds = chatRecordRepository.findDistinctConversationIds();
@@ -78,13 +78,15 @@ public class StaffController {
             try {
                 long maTK = Long.parseLong(cid);
                 User u = userRepository.findByMaTK(maTK);
-                if (u != null) clientName = u.getHoTen();
-            } catch (NumberFormatException ignored) {}
+                if (u != null)
+                    clientName = u.getHoTen();
+            } catch (NumberFormatException ignored) {
+            }
 
             ticket.put("clientName", clientName);
 
             ChatRecord latest = chatRecordRepository.findTop1ByConversationIdOrderByCreatedAtDesc(cid);
-            ticket.put("latestMessage",     latest != null ? latest.getContent() : "");
+            ticket.put("latestMessage", latest != null ? latest.getContent() : "");
             // Pre-format time for JSP (fmt:formatDate doesn't support LocalDateTime)
             if (latest != null && latest.getCreatedAt() != null) {
                 ticket.put("latestTimeDisplay", latest.getCreatedAt()
@@ -108,8 +110,10 @@ public class StaffController {
             try {
                 long maTK = Long.parseLong(activeConvId);
                 User u = userRepository.findByMaTK(maTK);
-                if (u != null) activeClientName = u.getHoTen();
-            } catch (NumberFormatException ignored) {}
+                if (u != null)
+                    activeClientName = u.getHoTen();
+            } catch (NumberFormatException ignored) {
+            }
 
             List<ChatRecord> history = chatRecordRepository
                     .findByConversationIdOrderByCreatedAtAsc(activeConvId);

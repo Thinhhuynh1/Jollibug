@@ -86,7 +86,10 @@
                 
                 <a class="hp-prod-card__btn" href="/product?productID=${monAn.maMon}">Xem chi tiết</a>
                 <c:if test="${not empty sessionScope.user}">
-                  <button class="hp-prod-card__btn" type="button">+ Thêm</button>
+                  <form method="post" action="/addCart" >
+                    <input type="hidden" name="productID" value="${monAn.maMon}">
+                    <button class="hp-prod-card__btn" type="submit">+ Thêm</button>
+                  </form>
                 </c:if>
               </div>
             </div>

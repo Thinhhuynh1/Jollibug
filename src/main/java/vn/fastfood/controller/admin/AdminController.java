@@ -26,8 +26,7 @@ public class AdminController {
     private PasswordEncoder passwordEncoder;
 
     AdminController(UserRepository userRepository,
-            UserService userService,
-            VaiTroRepository roleRepository) {
+            UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
     }

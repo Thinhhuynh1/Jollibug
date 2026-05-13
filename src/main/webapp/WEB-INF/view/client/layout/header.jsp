@@ -41,7 +41,11 @@
             <div class="header-actions">
               <c:if test="${not empty sessionScope.user}">
                 <a class="btn btn-primary" href="${cartUrl}">
-                  Giỏ hàng: <span data-cart-count id="header-cart-count">0</span>
+                  <c:set var="cartCount" value="0" />
+                  <c:forEach var="item" items="${sessionScope.cart}">
+                    <c:set var="cartCount" value="${cartCount + item.soLuong}" />
+                  </c:forEach>
+                  Giỏ hàng: <span data-cart-count id="header-cart-count">${cartCount}</span>
                 </a>
                 <a class="btn btn-outline" href="${profileUrl}">Tài khoản</a>
               </c:if>

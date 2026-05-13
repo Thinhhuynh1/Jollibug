@@ -66,9 +66,12 @@
 
               <div class="cluster">
                 <a class="btn btn-outline" href="/menu">Quay lại</a>
-                <button class="btn btn-primary" type="button"
-                        data-action="add-product-detail" data-product-id="1"
-                        id="btn-add-to-cart">+ Thêm</button>
+                <c:if test="${not empty sessionScope.user}">
+                  <form method="post" action="/addCart" >
+                    <input type="hidden" name="productID" value="${monAn.maMon}">
+                    <button class="btn btn-primary" type="submit">+ Thêm</button>
+                  </form>
+                </c:if>
               </div>
             </div>
           </article>
