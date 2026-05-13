@@ -72,4 +72,19 @@ public class MonAn {
     @JoinColumn(name = "MaDM")
     private DanhMuc danhMuc;
 
+    @Transient
+    private long giaGiam;
+
+    @Transient
+    private double phanTramGiam;
+
+    @Transient
+    private boolean hasGiamGia;
+
+    public long getGiaGiam() {
+        if (hasGiamGia) {
+            return giaGiam;
+        }
+        return gia;
+    }
 }

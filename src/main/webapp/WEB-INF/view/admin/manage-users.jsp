@@ -137,8 +137,18 @@
     function handleRoleFilter(role) {
       const currentTab = '${userTab}' === 'blocked' ? '/block' : '';
       const baseUrl = '/admin/users' + currentTab;
-      const url = (role === 'All') ? baseUrl : baseUrl + '?role=' + (role);
-      window.location.href = url;
+      const keyword = document.getElementById("user-search")?.value?.trim() || "";
+      const params = new URLSearchParams();
+
+      if (role && role !== 'All') {
+        params.set('role', role);
+      }
+      if (keyword) {
+        params.set('keyword', keyword);
+      }
+
+      const query = params.toString();
+      window.location.href = query ? (baseUrl + '?' + query) : baseUrl;
     }
     
     function handleSearch(e) {

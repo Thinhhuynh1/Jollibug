@@ -34,12 +34,12 @@ public class AdminController {
 
     @GetMapping("/admin")
     public String getDashboard(Model model) {
-        model.addAttribute("countAdmin", this.userRepository.count("ADMIN", null));
-        model.addAttribute("countManager", this.userRepository.count("MANAGER", null));
-        model.addAttribute("countStaff", this.userRepository.count("STAFF", null));
-        model.addAttribute("countClient", this.userRepository.count("CLIENT", null));
+        model.addAttribute("countAdmin", this.userRepository.count("Admin", null));
+        model.addAttribute("countManager", this.userRepository.count("Manager", null));
+        model.addAttribute("countStaff", this.userRepository.count("Staff", null));
+        model.addAttribute("countClient", this.userRepository.count("Client", null));
         model.addAttribute("countActive", this.userRepository.count(null, "ACTIVE"));
-        model.addAttribute("countBan", this.userRepository.count(null, "BANNED"));
+        model.addAttribute("countBan", this.userRepository.count(null, "ACTIVE"));
 
         return "admin/dashboard";
     }
