@@ -115,7 +115,26 @@ public class ThongKeService {
         stats.put("avgOrderValue", donHangRepository.avgOrderValue(from, to));
 
         // Đơn hàng gần đây nhất (10 đơn)
-        stats.put("recentOrders", donHangRepository.findRecentOrders(PageRequest.of(0, 10)));
+        List<vn.fastfood.entity.DonHang> recentOrderEntities = donHangRepository.findRecentOrders(PageRequest.of(0, 10));
+        List<Map<String, Object>> recentOrders = new ArrayList<>();
+        for (vn.fastfood.entity.DonHang order : recentOrderEntities) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("maDH", order.getMaDH());
+            item.put("tongTien", order.getTongTien());
+            item.put("trangThai", order.getTrangThai());
+            item.put("ngayDat", order.getNgayDat() != null ? order.getNgayDat().toString() : null);
+            if (order.getUser() != null) {
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("hoTen", order.getUser().getHoTen());
+                userInfo.put("email", order.getUser().getEmail());
+                userInfo.put("sdt", order.getUser().getSdt());
+                item.put("user", userInfo);
+            } else {
+                item.put("user", Map.of("hoTen", "Không xác định", "email", "", "sdt", ""));
+            }
+            recentOrders.add(item);
+        }
+        stats.put("recentOrders", recentOrders);
 
         return stats;
     }
