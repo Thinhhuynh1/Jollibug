@@ -4,27 +4,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import vn.fastfood.repository.MonAnRepository;
-import vn.fastfood.service.PromotionService;
-import java.util.List;
-import vn.fastfood.entity.MonAn;
 
 @Controller
 public class HomePageController {
     // home,about,contact
 
     private final MonAnRepository monAnRepository;
-    private final PromotionService promotionService;
 
-    public HomePageController(MonAnRepository monAnRepository, PromotionService promotionService) {
+    HomePageController(MonAnRepository monAnRepository) {
         this.monAnRepository = monAnRepository;
-        this.promotionService = promotionService;
     }
 
     @GetMapping("/")
     public String getHomePage(Model model) {
-        List<MonAn> listMonAn = this.monAnRepository.findMonAnBestSeller(null, "");
-        this.promotionService.applyPromotions(listMonAn);
-        model.addAttribute("listMonAn", listMonAn);
+        model.addAttribute("listMonAn", this.monAnRepository.findMonAnBestSeller(null, ""));
         return "client/homepage";
     }
 

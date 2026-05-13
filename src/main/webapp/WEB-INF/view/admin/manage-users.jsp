@@ -43,10 +43,16 @@
           <div class="panel-controls">
             <!-- Status tabs -->
             <div class="order-filter-strip__pills" role="tablist" aria-label="Filter by account status" style="gap:0.35rem;">
-              <a href="<c:url value='/admin/users'/>" class="btn btn-primary" style="background-color: green; color: white;">
+              <a href="<c:url value='/admin/users'/>"
+                 class="btn status-tab ${activeUserTab == 'active' ? 'is-active' : ''}"
+                 data-tone="active"
+                 aria-current="${activeUserTab == 'active' ? 'page' : 'false'}">
                 Đang hoạt động
               </a>
-              <a href="<c:url value='/admin/users/block'/>" class="btn btn-primary" style="background-color: red; color: white;">
+              <a href="<c:url value='/admin/users/block'/>"
+                 class="btn status-tab ${activeUserTab == 'blocked' ? 'is-active' : ''}"
+                 data-tone="blocked"
+                 aria-current="${activeUserTab == 'blocked' ? 'page' : 'false'}">
                 Bị khóa
               </a>
             </div>

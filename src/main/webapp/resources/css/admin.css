@@ -186,6 +186,32 @@
   gap: var(--space-3);
 }
 
+.status-tab {
+  border-radius: var(--radius-round);
+  padding: 0.65rem 1.1rem;
+  font-weight: 700;
+  background: rgba(255, 252, 246, 0.9);
+  border: 1px solid rgba(111, 82, 55, 0.18);
+  color: var(--color-ink-700);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
+}
+
+.status-tab.is-active {
+  color: #ffffff;
+  box-shadow: 0 12px 26px rgba(26, 26, 26, 0.18);
+  transform: translateY(-1px);
+}
+
+.status-tab.is-active[data-tone="active"] {
+  background: #2f9e66;
+  border-color: #2f9e66;
+}
+
+.status-tab.is-active[data-tone="blocked"] {
+  background: #e03131;
+  border-color: #e03131;
+}
+
 .table-search {
   min-width: min(100%, 19rem);
   display: flex;

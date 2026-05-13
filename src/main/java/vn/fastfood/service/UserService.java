@@ -41,8 +41,8 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
-        // Set vai trò default là khách hàng (ROLE_CLIENT)
-        user.setVaiTro(vaiTroRepository.findByTenVT(""));
+        // Set vi trò default là khách hàng (ROLE_CLIENT)
+        user.setVaiTro(vaiTroRepository.findByTenVT("CLIENT"));
 
         // Set trạng thái default là ACTIVE
         user.setTrangThai("ACTIVE");

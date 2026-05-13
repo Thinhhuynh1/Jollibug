@@ -12,10 +12,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/global.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="/css/client/menu.css" />
   <link rel="stylesheet" href="/css/client/menu.css" />
 </head>
 <body data-page="menu">
+  <fmt:setLocale value="vi_VN" />
   <fmt:setLocale value="vi_VN" />
 
   <!-- SECTION -->
@@ -33,6 +36,8 @@
           
           <form class="toolbar-row" method="get" action="/menu">
             <input type="hidden" name="categoryID" value="${selectCategoryID}" />
+          <form class="toolbar-row" method="get" action="/menu">
+            <input type="hidden" name="categoryID" value="${selectCategoryID}" />
             <div class="searchbar">
               <!--
                 main.js attaches an 'input' listener to this element.
@@ -44,6 +49,9 @@
               <input type="search" placeholder="Tìm kiếm món ăn?"
                       name="keyword" value="${keyword}"
                       onkeydown="if(event.key === 'Enter'){ event.preventDefault(); this.form.submit(); }"/>
+              <input type="search" placeholder="Tìm kiếm món ăn?"
+                      name="keyword" value="${keyword}"
+                      onkeydown="if(event.key === 'Enter'){ event.preventDefault(); this.form.submit(); }"/>
             </div>
 
             <select id="menu-sort" name="filter" data-menu-sort onchange="this.form.submit()">
@@ -51,12 +59,22 @@
               <option value="price-low" ${selectedFilter == 'price-low' ? 'selected' : ''}>Giá: thấp đến cao</option>
               <option value="price-high" ${selectedFilter == 'price-high' ? 'selected' : ''}>Giá: cao đến thấp</option>
               <option value="rating" ${selectedFilter == 'rating' ? 'selected' : ''}>Bán chạy</option>
+            <select id="menu-sort" name="filter" data-menu-sort onchange="this.form.submit()">
+              <option value="popular" ${selectedFilter == 'popular' ? 'selected' : ''}>Bộ lọc</option>
+              <option value="price-low" ${selectedFilter == 'price-low' ? 'selected' : ''}>Giá: thấp đến cao</option>
+              <option value="price-high" ${selectedFilter == 'price-high' ? 'selected' : ''}>Giá: cao đến thấp</option>
+              <option value="rating" ${selectedFilter == 'rating' ? 'selected' : ''}>Bán chạy</option>
             </select>
+          </form>
           </form>
 
           <div class="category-nav" aria-label="Menu categories">
             <button class="category-nav__arrow" type="button" data-cat-arrow="prev" aria-label="Previous categories">&#10094;</button>
             <div class="category-strip" data-menu-cats id="menu-categories">
+              <a class="filter-pill ${selectCategoryID == null ? 'is-active' :''}" href="/menu?filter=${selectedFilter}&keyword=${keyword}">All</a>
+              <c:forEach var="dm" items="${danhMuc}">
+                <a class="filter-pill ${selectCategoryID != null && selectCategoryID == dm.maDM ? 'is-active' : ''}" href="/menu?categoryID=${dm.maDM}&filter=${selectedFilter}&keyword=${keyword}" >${dm.tenDM}</a>
+              </c:forEach>
               <a class="filter-pill ${selectCategoryID == null ? 'is-active' :''}" href="/menu?filter=${selectedFilter}&keyword=${keyword}">All</a>
               <c:forEach var="dm" items="${danhMuc}">
                 <a class="filter-pill ${selectCategoryID != null && selectCategoryID == dm.maDM ? 'is-active' : ''}" href="/menu?categoryID=${dm.maDM}&filter=${selectedFilter}&keyword=${keyword}" >${dm.tenDM}</a>

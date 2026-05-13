@@ -108,6 +108,29 @@
           <c:forEach var="monAn" items="${listMonAn}" end="5">
             <article class="hp-prod-card reveal-up">
               <div class="hp-prod-card__img">
+              <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
+            </div>
+              <div class="hp-prod-card__body">
+                <div class="hp-prod-card__meta">
+                  <span>${monAn.danhMuc.tenDM}</span>
+                  <span class="stars">★ 4.9</span>
+                </div>
+                <div class="hp-prod-card__name">${monAn.tenMon}</div>
+                <div class="hp-prod-card__desc">
+                  ${monAn.moTa}
+                </div>
+                <div class="hp-prod-card__footer">
+                  <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                  <c:if test="${not empty sessionScope.user}">
+                    <button class="hp-prod-card__btn" type="button">+ Thêm</button>
+                  </c:if >
+                </div>
+              </div>
+            </article>
+          </c:forEach>
+          <c:forEach var="monAn" items="${listMonAn}" end="5">
+            <article class="hp-prod-card reveal-up">
+              <div class="hp-prod-card__img">
                 <img src="${monAn.img}" alt="${monAn.tenMon}" />
                 <c:if test="${monAn.hasGiamGia}">
                   <span class="hp-prod-card__badge">-${monAn.phanTramGiam}%</span>
@@ -199,7 +222,7 @@
   <%-- 7. FOOTER (shared) --%>
   <jsp:include page="layout/footer.jsp" />
 
-  <script>
+  <!-- <script>
     /* Category bar active toggle */
     document.querySelectorAll('.hp-cat__item').forEach(function(el) {
       el.addEventListener('click', function() {
@@ -207,7 +230,7 @@
         el.classList.add('active');
       });
     });
-  </script>
+  </script> -->
 
 </body>
 </html>
