@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
 import vn.fastfood.entity.User;
 import vn.fastfood.entity.VaiTro;
 import vn.fastfood.repository.UserRepository;
@@ -41,8 +42,8 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
-        // Set vi trò default là khách hàng (ROLE_CLIENT)
-        user.setVaiTro(this.vaiTroRepository.findByTenVT("CLIENT"));
+        // Set vai trò default là khách hàng (ROLE_CLIENT)
+        user.setVaiTro(vaiTroRepository.findByTenVT("CLIENT"));
 
         // Set trạng thái default là ACTIVE
         user.setTrangThai("ACTIVE");
@@ -88,4 +89,51 @@ public class UserService {
         return this.userRepository.findById(id).orElse(null);
     }
 
+    public String resetPassword(HttpSession session, String currentPass, String newPass) throws Exception {
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser == null) {
+            return "redirect:/login";
+        }
+
+        User user = userRepository.findById(sessionUser.getMaTK())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy User"));
+        if (!passwordEncoder.matches(currentPass, user.getPassword())) {
+            throw new RuntimeException("Mật khẩu sai");
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPass);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+        session.setAttribute("user", user);
+
+        return "redirect:/login";
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public String changePassword(HttpSession session, String newPass) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/forgot-password";
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPass);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+        session.setAttribute("user", user);
+        return "redirect:/login";
+    }
+
+    public void changePasswordByEmail(String email, String newPass) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("Không tìm thấy tài khoản cần đặt lại mật khẩu");
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPass);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+    }
 }

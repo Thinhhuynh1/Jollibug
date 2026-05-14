@@ -31,7 +31,7 @@
               <div class="page-intro" style="margin-bottom:0;">
                 <h2 class="section-title">Đặt lại mật khẩu</h2>
               </div>
-              <form class="floating-grid" >
+              <form class="floating-grid" method="POST" >
                 <div class="floating-field">
                   <input id="current-password" name="currentPassword" type="password" placeholder=" " required minlength="6" />
                   <label for="current-password">Mật khẩu hiện tại</label>

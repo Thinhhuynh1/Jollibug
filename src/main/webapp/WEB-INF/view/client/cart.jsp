@@ -15,11 +15,13 @@
 
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/client/cart-api.css" />
 </head>
 <body class="cart-page" data-page="cart">
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell section-tight">
+    <input type="hidden" id="customerId" value="1">
     <div class="container">
       <div class="page-intro">
         <h1 class="page-title">Giỏ hàng của tôi</h1>
@@ -58,6 +60,8 @@
                 </article>
               </c:forEach>
             </div>
+
+            <div id="cartMessage" class="cart-message"></div>
           </article>
         </section>
 
@@ -80,15 +84,26 @@
               </div>
             </div>
 
-            <a class="btn btn-primary btn-block" type="button" id="checkout-button" href="/checkout">Đặt hàng</a>
+            <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
           </article>
         </aside>
       </div>
     </div>
   </main>
 
+  <div class="delete-confirm-modal" id="deleteConfirmModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" aria-hidden="true">
+    <div class="delete-confirm-card" role="document">
+      <h2 id="deleteModalTitle">Xóa món khỏi giỏ hàng?</h2>
+      <p id="deleteModalMessage">Bạn có chắc muốn xóa món này khỏi giỏ hàng không?</p>
+      <div class="delete-confirm-actions">
+        <button class="btn btn-ghost" type="button" id="cancelDeleteBtn">Hủy</button>
+        <button class="btn btn-primary delete-confirm-btn" type="button" id="confirmDeleteBtn">Xóa món</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SHARED FOOTER -->
   <jsp:include page="layout/footer.jsp" />
-
+<script src="${pageContext.request.contextPath}/resources/js/client/cart-api.js"></script>
 </body>
 </html>

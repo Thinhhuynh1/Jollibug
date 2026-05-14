@@ -62,33 +62,76 @@
         <section class="checkout-card">
           <h2 class="checkout-card__title">Chọn địa chỉ giao hàng</h2>
           
-          <div class="address-picker-list">
+          <!-- <div class="address-picker-list"> -->
             <!-- Fake Address 1 -->
-            <div class="address-picker-item">
+            <!-- <div class="address-picker-item">
                 <div class="address-picker-info">
                     <p class="address-picker-title"><strong>Nguyễn Văn A</strong> - 0123456789</p>
                     <p class="address-picker-desc">123 Đường Số 1, Phường 2, Quận 3, TP.HCM</p>
                 </div>
                 <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
-            </div>
+            </div> -->
 
             <!-- Fake Address 2 -->
-            <div class="address-picker-item">
+            <!-- <div class="address-picker-item">
                 <div class="address-picker-info">
                     <p class="address-picker-title"><strong>Trần Thị B</strong> - 0987654321</p>
                     <p class="address-picker-desc">456 Đường Số 4, Phường 5, Quận 6, TP.HCM</p>
                 </div>
                 <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
-            </div>
+            </div> -->
             
             <!-- Fake Address 3 -->
-            <div class="address-picker-item">
+            <!-- <div class="address-picker-item">
                 <div class="address-picker-info">
                     <p class="address-picker-title"><strong>Lê Văn C</strong> - 0909090909</p>
                     <p class="address-picker-desc">789 Đường Láng, Đống Đa, Hà Nội</p>
                 </div>
                 <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
             </div>
+          </div> -->
+          <div class="address-picker-list">
+          <!-- Fake Address 1 -->
+              <div class="address-picker-item"
+                  data-madc="1"
+                  data-name="Nguyễn Văn A"
+                  data-phone="0123456789"
+                  data-email="a@example.com"
+                  data-address="123 Đường Số 1, Phường 2, Quận 3, TP.HCM">
+                  <div class="address-picker-info">
+                      <p class="address-picker-title"><strong>Nguyễn Văn A</strong> - 0123456789</p>
+                      <p class="address-picker-desc">123 Đường Số 1, Phường 2, Quận 3, TP.HCM</p>
+                  </div>
+                  <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
+              </div>
+
+              <!-- Fake Address 2 -->
+              <div class="address-picker-item"
+                  data-madc="2"
+                  data-name="Trần Thị B"
+                  data-phone="0987654321"
+                  data-email="b@example.com"
+                  data-address="456 Đường Số 4, Phường 5, Quận 6, TP.HCM">
+                  <div class="address-picker-info">
+                      <p class="address-picker-title"><strong>Trần Thị B</strong> - 0987654321</p>
+                      <p class="address-picker-desc">456 Đường Số 4, Phường 5, Quận 6, TP.HCM</p>
+                  </div>
+                  <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
+              </div>
+              
+              <!-- Fake Address 3 -->
+              <div class="address-picker-item"
+                  data-madc="3"
+                  data-name="Lê Văn C"
+                  data-phone="0909090909"
+                  data-email="c@example.com"
+                  data-address="789 Đường Láng, Đống Đa, Hà Nội">
+                  <div class="address-picker-info">
+                      <p class="address-picker-title"><strong>Lê Văn C</strong> - 0909090909</p>
+                      <p class="address-picker-desc">789 Đường Láng, Đống Đa, Hà Nội</p>
+                  </div>
+                  <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
+              </div>
           </div>
 
           <div class="address-picker-actions">
@@ -108,6 +151,27 @@
   <jsp:include page="../layout/footer.jsp" />
 
   <script src="/js/client/main.js"></script>
+  <script>
+  function selectAddress(button) {
+      const item = button.closest(".address-picker-item");
+
+      if (!item) {
+          return;
+      }
+
+      const selectedAddress = {
+          maDC: item.dataset.madc,
+          name: item.dataset.name,
+          phone: item.dataset.phone,
+          email: item.dataset.email,
+          address: item.dataset.address
+      };
+
+      localStorage.setItem("selectedCheckoutAddress", JSON.stringify(selectedAddress));
+
+      window.location.href = "/checkout";
+  }
+  </script>
 </body>
 </html>
 

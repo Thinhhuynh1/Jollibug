@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+src/main/java/vn/fastfood/test/
+sampledbjava
+DBConnection.java
