@@ -52,7 +52,8 @@ public class PromotionService {
             return true;
         }
         if ("CATEGORY".equals(promo.getPhamViApDung())) {
-            return product.getDanhMuc() != null && promo.getMaDM() != null && product.getDanhMuc().getMaDM() == promo.getMaDM();
+            return product.getDanhMuc() != null && promo.getMaDM() != null
+                    && product.getDanhMuc().getMaDM() == promo.getMaDM();
         }
         if ("ITEM".equals(promo.getPhamViApDung())) {
             List<Long> monAnIds = promo.getDanhSachMonAnIds();
