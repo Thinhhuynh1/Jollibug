@@ -82,18 +82,9 @@
         </section>
         <section class="checkout-card">
           <h2 class="checkout-card__title">Tóm tắt đơn hàng</h2>
-          <div>
-            <div class="invoice-line ">
-              <strong>1xGa</strong>
-              <strong>0 VND</strong>
-            </div>
-            <div class="invoice-line ">
-              <strong>2xHamburger</strong>
-              <strong>0 VND</strong>
-            </div>
-            <div class="invoice-line ">
-              <strong>10xPizza</strong>
-              <strong>0 VND</strong>
+          <div id="order-items">
+            <div class="invoice-line">
+              <span>Giỏ hàng của bạn đang được cập nhật...</span>
             </div>
           </div>
 
@@ -104,6 +95,7 @@
               <input id="voucher-code" type="text" placeholder="Nhập mã giảm giá" style="min-width: 0; box-sizing: border-box;" />
               <button class="btn btn-outline voucher-inline__apply" id="voucher-apply" type="button">Áp dụng</button>
             </div>
+            <div id="voucher-message" style="min-height: 1.4rem; margin-top: 0.75rem; font-size: 0.95rem;"></div>
 
             
             <!-- Danh sách Voucher có sẵn -->

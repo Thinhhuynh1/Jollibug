@@ -25,12 +25,22 @@
 <h1 class="section-title" style="margin:0;">Quản lý khuyến mãi</h1>
 </div>
 <div class="panel-controls">
-<form action="<c:url value='/manager/promotions'/>" method="get" class="table-search" style="margin-right:1rem;">
-<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
-<circle cx="11" cy="11" r="7"></circle>
-<path d="m20 20-3.5-3.5"></path>
-</svg>
-<input type="search" name="keyword" placeholder="Tìm tên chiến dịch hoặc trạng thái" value="${keyword}" />
+<form action="<c:url value='/manager/promotions'/>" method="get" class="table-search" style="display:flex; align-items:center; gap:0.5rem; width:auto;">
+  <div style="position:relative; display:flex; align-items:center;">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute; left:0.75rem; width:1.1rem; height:1.1rem; color:var(--text-muted);">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+    <input type="search" name="keyword" placeholder="Tìm tên chiến dịch hoặc trạng thái" value="${keyword}" style="padding-left:2.5rem; width:250px;" />
+    <c:if test="${not empty keyword}">
+      <a href="<c:url value='/manager/promotions'/>" title="Xóa tìm kiếm" style="position:absolute; right:0.75rem; color:var(--text-muted); display:flex; align-items:center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:1rem; height:1rem;">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </a>
+    </c:if>
+  </div>
+  <button type="submit" class="btn btn-ghost" style="padding: 0.5rem 1rem;">Tìm</button>
 </form>
 <a href="<c:url value='/manager/promotions/create'/>" class="btn btn-primary">Thêm khuyến mãi</a>
 </div>
@@ -56,7 +66,7 @@
 <td>${promotion.discountDisplay}</td>
 <td>${promotion.thoiGianDisplay}</td>
 <td>
-<span class="status-badge" data-status="${promotion.status}">${promotion.status}</span>
+<span class="status-badge" data-status="${promotion.status == 'Đang hoạt động' ? 'active' : (promotion.status == 'Sắp diễn ra' ? 'featured' : 'inactive')}">${promotion.status}</span>
 </td>
 <td>
 <div class="action-row">
