@@ -47,6 +47,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/staff/**").addResourceLocations("/resources/staff/");
         registry.addResourceHandler("/manager/**").addResourceLocations("/resources/manager/");
         registry.addResourceHandler("/admin/**").addResourceLocations("/resources/admin/");
+        registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
     }
     // Khi gọi trên website là /css/style.css
     // -> spring lấy file /resource/css/style.css
