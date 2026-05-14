@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import vn.fastfood.entity.MonAn;
 
 @Repository
-public interface MonAnRepository extends JpaRepository<MonAn, String> {
+public interface MonAnRepository extends JpaRepository<MonAn, Long> {
 
 }
