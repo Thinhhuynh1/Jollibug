@@ -42,7 +42,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
-        // Set vi trò default là khách hàng (ROLE_CLIENT)
+        // Set vai trò default là khách hàng (ROLE_CLIENT)
         user.setVaiTro(vaiTroRepository.findByTenVT("CLIENT"));
 
         // Set trạng thái default là ACTIVE
@@ -91,17 +91,18 @@ public class UserService {
         if (sessionUser == null) {
             return "redirect:/login";
         }
+
         User user = userRepository.findById(sessionUser.getMaTK())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy User"));
         if (!passwordEncoder.matches(currentPass, user.getPassword())) {
             throw new RuntimeException("Mật khẩu sai");
-        } else {
-            String encodedPassword = passwordEncoder.encode(newPass);
-            user.setPassword(encodedPassword);
-
-            userRepository.save(user);
-            session.setAttribute("user", user);
         }
+
+        String encodedPassword = passwordEncoder.encode(newPass);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+        session.setAttribute("user", user);
+
         return "redirect:/login";
     }
 
@@ -114,9 +115,9 @@ public class UserService {
         if (user == null) {
             return "redirect:/forgot-password";
         }
+
         String encodedPassword = passwordEncoder.encode(newPass);
         user.setPassword(encodedPassword);
-
         userRepository.save(user);
         session.setAttribute("user", user);
         return "redirect:/login";
@@ -132,6 +133,4 @@ public class UserService {
         user.setPassword(encodedPassword);
         userRepository.save(user);
     }
-
 }
-

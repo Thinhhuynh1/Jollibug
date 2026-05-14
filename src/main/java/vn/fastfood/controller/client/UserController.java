@@ -64,7 +64,7 @@ public class UserController {
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, @RequestParam("password") String password,
             Model model, HttpSession session) {
-        try {
+        try {            
             User user = userService.login(email, password);
 
             List<Object> loggedInUsers = sessionRegistry.getAllPrincipals();
