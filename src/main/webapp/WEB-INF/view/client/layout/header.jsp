@@ -55,24 +55,4 @@
     </div>
   </header>
 
-  <script>
-    (function () {
-      var cartCountEl = document.getElementById("header-cart-count");
-      if (!cartCountEl) return;
 
-      fetch("${pageContext.request.contextPath}/api/cart?customerId=1")
-        .then(function (response) {
-          return response.ok ? response.json() : [];
-        })
-        .then(function (items) {
-          var totalQuantity = Array.isArray(items)
-            ? items.reduce(function (total, item) {
-                return total + Number(item.soLuong || 0);
-              }, 0)
-            : 0;
-
-          cartCountEl.textContent = totalQuantity;
-        })
-        .catch(function () {});
-    })();
-  </script>

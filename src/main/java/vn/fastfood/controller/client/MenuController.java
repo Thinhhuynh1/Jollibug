@@ -16,6 +16,7 @@ import vn.fastfood.entity.MonAn;
 import vn.fastfood.model.CartItem;
 import vn.fastfood.repository.DanhMucRepository;
 import vn.fastfood.repository.MonAnRepository;
+import vn.fastfood.service.PromotionService;
 
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -24,11 +25,14 @@ import java.net.MalformedURLException;
 public class MenuController {
     private final MonAnRepository monAnRepository;
     private final DanhMucRepository danhMucRepository;
+    private final PromotionService promotionService;
 
     public MenuController(MonAnRepository monAnRepository,
-            DanhMucRepository danhMucRepository) {
+            DanhMucRepository danhMucRepository,
+            PromotionService promotionService) {
         this.monAnRepository = monAnRepository;
         this.danhMucRepository = danhMucRepository;
+        this.promotionService = promotionService;
     }
 
     @GetMapping("/menu")
@@ -47,6 +51,8 @@ public class MenuController {
         } else {
             list = this.monAnRepository.findMonAn(categoryID, keyword);
         }
+
+        this.promotionService.applyPromotions(list);
 
         model.addAttribute("listMonAn", list);
         model.addAttribute("selectCategoryID", categoryID);

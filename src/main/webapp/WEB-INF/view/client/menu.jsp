@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -71,6 +71,9 @@
             <article class="hp-prod-card reveal-up">
             <div class="hp-prod-card__img">
               <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
+              <c:if test="${monAn.hasGiamGia}">
+                <span class="hp-prod-card__badge">-${monAn.phanTramGiam}%</span>
+              </c:if>
             </div>
             <div class="hp-prod-card__body">
               <div class="hp-prod-card__meta">
@@ -79,7 +82,17 @@
               </div>
               <div class="hp-prod-card__name">
                 <div>${monAn.tenMon}</div>
-                <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                <div class="hp-prod-card__price-container">
+                  <c:choose>
+                    <c:when test="${monAn.hasGiamGia}">
+                      <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.giaGiam}" type="number" />đ</span>
+                      <span class="hp-prod-card__old-price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                    </c:when>
+                    <c:otherwise>
+                      <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                    </c:otherwise>
+                  </c:choose>
+                </div>
               </div>
               <div class="hp-prod-card__desc">${monAn.moTa}</div>
               <div class="hp-prod-card__footer">

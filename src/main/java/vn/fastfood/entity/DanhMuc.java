@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Nationalized;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
@@ -27,9 +28,11 @@ public class DanhMuc {
     private long maDM;
 
     @Column(name = "TenDM")
+    @Nationalized
     private String tenDM;
 
     @Column(name = "MoTa")
+    @Nationalized
     private String moTa;
 
     @Column(name = "isAvailable")

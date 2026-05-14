@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-FastFoodApplication<fast-food>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "vn.fastfood.FastFoodApplication",
+      "projectName": "fast-food",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

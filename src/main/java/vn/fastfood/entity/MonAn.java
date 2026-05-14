@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Nationalized;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
@@ -27,9 +28,11 @@ public class MonAn {
     private long maMon;
 
     @Column(name = "TenMon")
+    @Nationalized
     private String tenMon;
 
     @Column(name = "MoTa")
+    @Nationalized
     private String moTa;
 
     @Column(name = "Gia")
@@ -40,9 +43,6 @@ public class MonAn {
 
     @Column(name = "SoLuongDaBan")
     private long soLuongDaBan;
-
-    // @Column(name = "GiaGiam")
-    // private long giaGiam = 0;
 
     @Column(name = "image_url")
     private String img;
@@ -72,4 +72,19 @@ public class MonAn {
     @JoinColumn(name = "MaDM")
     private DanhMuc danhMuc;
 
+    @Transient
+    private long giaGiam;
+
+    @Transient
+    private double phanTramGiam;
+
+    @Transient
+    private boolean hasGiamGia;
+
+    public long getGiaGiam() {
+        if (hasGiamGia) {
+            return giaGiam;
+        }
+        return gia;
+    }
 }

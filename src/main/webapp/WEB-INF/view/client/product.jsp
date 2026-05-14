@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="css/admin.css" />
 </head>
 <body data-page="menu">
+  <c:set var="productId" value="${not empty param.id ? param.id : 1}" />
 
   <!-- SHARED HEADER -->
   <jsp:include page="layout/header.jsp"/>
@@ -39,8 +40,20 @@
           <!-- Product details slots -->
           <article class="product-detail-card reveal-up">
             <div class="stack">
+              <h1 class="page-title">${product.tenMon}</h1>
               <h1 class="page-title" data-product-name id="product-name">${monAn.tenMon}</h1>
               <p class="lead" data-product-description id="product-description">${monAn.moTa}</p>
+
+              <div class="product-specs">
+                <article class="product-spec">
+                  <span class="muted">Guest rating</span>
+                  <strong data-product-rating id="product-rating">0</strong>
+                </article>
+                <article class="product-spec">
+                  <span class="muted">Danh mục</span>
+                  <strong data-product-category id="product-category">${monAn.danhMuc.tenDM}</strong>
+                </article>
+              </div>
 
               <div class="price-row">
                 <span class="price" data-product-price id="product-price">
@@ -48,21 +61,7 @@
                 </span>
               </div>
 
-              <div class="product-specs">
-                <!-- <article class="product-spec">
-                  <span class="muted">Guest rating</span>
-                  <strong data-product-rating id="product-rating">0</strong>
-                </article>
-                <article class="product-spec">
-                  <span class="muted">Reorder rate</span>
-                  <strong data-product-popularity id="product-popularity">0</strong>
-                </article> -->
-                <article class="product-spec">
-                  <span class="muted">Danh mục</span>
-                  <strong data-product-category id="product-category">${monAn.danhMuc.tenDM}</strong>
-                </article>
-              </div>
-
+              <!-- SECTION -->
 
               <div class="cluster">
                 <a class="btn btn-outline" href="/menu">Quay lại</a>

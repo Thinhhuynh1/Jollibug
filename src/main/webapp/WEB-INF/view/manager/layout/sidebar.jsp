@@ -28,6 +28,11 @@
       <a class="<c:if test='${fn:startsWith(currentPath, "/manager/products")}'>is-active</c:if>" href="<c:url value='/manager/products'/>">Quản lý món ăn</a>
       <a class="<c:if test='${fn:startsWith(currentPath, "/manager/coupons")}'>is-active</c:if>" href="<c:url value='/manager/coupons'/>">Quản lý mã giảm giá</a>
       <a class="<c:if test='${fn:startsWith(currentPath, "/manager/promotions")}'>is-active</c:if>" href="<c:url value='/manager/promotions'/>">Quản lý khuyến mãi</a>
+
+      <span class="admin-nav__section">Thống kê</span>
+      <a class="<c:if test='${fn:startsWith(currentPath, "/manager/statistics/revenue")}'>is-active</c:if>" href="<c:url value='/manager/statistics/revenue'/>">Thống kê doanh thu</a>
+      <a class="<c:if test='${fn:startsWith(currentPath, "/manager/statistics/orders")}'>is-active</c:if>" href="<c:url value='/manager/statistics/orders'/>">Thống kê đơn hàng</a>
+      <a class="<c:if test='${fn:startsWith(currentPath, "/manager/statistics/customers")}'>is-active</c:if>" href="<c:url value='/manager/statistics/customers'/>">Thống kê khách hàng</a>
     </nav>
   </div>
 </aside>

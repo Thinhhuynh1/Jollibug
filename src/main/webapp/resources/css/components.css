@@ -2717,3 +2717,17 @@ body[data-page="home"] .hp-stats__item:nth-child(4) strong {
   color: var(--color-ink-500);
   line-height: 1.6;
 }
+
+.hp-prod-card__price-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.hp-prod-card__old-price {
+  font-size: 0.85rem;
+  color: var(--color-ink-400);
+  text-decoration: line-through;
+  font-weight: 500;
+}
