@@ -85,32 +85,32 @@ public String resetPassword(
 
     @GetMapping("/orders")
     public String getOrderPage() {
-        return "client/orders/show";
+        return "client/orders/order-history";
     }
 
     @GetMapping("/orders/pending")
     public String getOrderPending() {
-        return "client/orders/pending";
+        return "client/orders/order-history";
     }
 
     @GetMapping("/orders/confirmed")
     public String getOrderConfirmed() {
-        return "client/orders/confirmed";
+        return "client/orders/order-history";
     }
 
     @GetMapping("/orders/shipping")
     public String getOrderShipping() {
-        return "client/orders/shipping";
+        return "client/orders/order-history";
     }
 
     @GetMapping("/orders/delivered")
     public String getOrderDelivered() {
-        return "client/orders/delivered";
+        return "client/orders/order-history";
     }
 
     @GetMapping("/orders/cancelled")
     public String getOrderCancelled() {
-        return "client/orders/cancelled";
+        return "client/orders/order-history";
     }
 
     @GetMapping("/orders/cancel")
@@ -120,7 +120,7 @@ public String resetPassword(
 
     @GetMapping("/orders/detail")
     public String getOrderDetail() {
-        return "client/orders/detail";
+        return "client/orders/order-detail";
     }
 
     @GetMapping("/orders/reviews")

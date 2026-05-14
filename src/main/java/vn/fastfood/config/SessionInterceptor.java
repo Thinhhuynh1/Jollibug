@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpSession;
 
 public class SessionInterceptor implements HandlerInterceptor {
 
-    // override preHandle | func này sẽ ktra xem có req được k | check xem có quyền
+    // override preHandle | func này sẽ ktra xem có req được không | check xem có quyền
     // không
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -19,16 +19,18 @@ public class SessionInterceptor implements HandlerInterceptor {
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
 
-        // lấy session | false là vì nếu k có session thì sẽ trả về null thay vì tạo
+        // lấy session | false là vì nếu không có session thì sẽ trả về null thay vì tạo
         // session mới
         HttpSession session = request.getSession(false);
         String requestURI = request.getRequestURI();
 
-        // Những request k cần đăng nhập
+        // Những request không cần đăng nhập
         if (requestURI.equals("/")
                 || requestURI.startsWith("/login")
                 || requestURI.startsWith("/register")
                 || requestURI.startsWith("/forgot-password")
+                || requestURI.startsWith("/verify")
+                || requestURI.startsWith("/new-password")
                 || requestURI.startsWith("/logout")
                 || requestURI.startsWith("/menu")
                 || requestURI.startsWith("/product")
@@ -37,8 +39,7 @@ public class SessionInterceptor implements HandlerInterceptor {
                 || requestURI.startsWith("/resources")
                 || requestURI.startsWith("/images")
                 || requestURI.startsWith("/css")
-                || requestURI.startsWith("/js")
-                || requestURI.startsWith("/admin")) {
+                || requestURI.startsWith("/js")) {
             return true;
         }
 
