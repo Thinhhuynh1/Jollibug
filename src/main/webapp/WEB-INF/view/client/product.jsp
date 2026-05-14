@@ -40,11 +40,20 @@
           <!-- Product details slots -->
           <article class="product-detail-card reveal-up">
             <div class="stack">
-              <span class="badge" data-product-badge id="product-badge">Best Seller</span>
               <h1 class="page-title">${product.tenMon}</h1>
-              <p class="lead" data-product-description id="product-description">Product description.</p>
               <h1 class="page-title" data-product-name id="product-name">${monAn.tenMon}</h1>
               <p class="lead" data-product-description id="product-description">${monAn.moTa}</p>
+
+              <div class="product-specs">
+                <article class="product-spec">
+                  <span class="muted">Guest rating</span>
+                  <strong data-product-rating id="product-rating">0</strong>
+                </article>
+                <article class="product-spec">
+                  <span class="muted">Danh mục</span>
+                  <strong data-product-category id="product-category">${monAn.danhMuc.tenDM}</strong>
+                </article>
+              </div>
 
               <div class="price-row">
                 <span class="price" data-product-price id="product-price">
@@ -52,39 +61,17 @@
                 </span>
               </div>
 
-              <div class="product-specs">
-                <!-- <article class="product-spec">
-                  <span class="muted">Guest rating</span>
-                  <strong data-product-rating id="product-rating">0</strong>
-                </article>
-                <article class="product-spec">
-                  <span class="muted">Reorder rate</span>
-                  <strong data-product-popularity id="product-popularity">0</strong>
-                </article> -->
-                <article class="product-spec">
-                  <span class="muted">Danh mục</span>
-                  <strong data-product-category id="product-category">${monAn.danhMuc.tenDM}</strong>
-                </article>
-              </div>
-
               <!-- SECTION -->
-              <div class="qty-control">
-                <button type="button" data-action="product-qty-minus" id="btn-qty-minus">-</button>
-                <input data-product-qty id="product-qty" value="1" readonly aria-label="Product quantity" />
-                <button type="button" data-action="product-qty-plus" id="btn-qty-plus">+</button>
-              </div>
 
               <div class="cluster">
                 <a class="btn btn-outline" href="/menu">Quay lại</a>
-                <button class="btn btn-primary" type="button"
-                        data-action="add-product-detail" data-product-id="1"
-                        id="btn-add-to-cart">+ Thêm</button>
+                <c:if test="${not empty sessionScope.user}">
+                  <form method="post" action="/addCart" >
+                    <input type="hidden" name="productID" value="${monAn.maMon}">
+                    <button class="btn btn-primary" type="submit">+ Thêm</button>
+                  </form>
+                </c:if>
               </div>
-              <form class="cluster" action="/cart/add/${productId}" method="post">
-                <input type="hidden" name="qty" id="product-qty-input" value="1" />
-                <button class="btn btn-primary" type="submit" id="btn-add-to-cart">Thêm vào giỏ hàng</button>
-                <a class="btn btn-outline" href="/menu">Quay lại</a>
-              </form>
             </div>
           </article>
 

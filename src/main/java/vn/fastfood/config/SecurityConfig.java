@@ -21,31 +21,28 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            .anyRequest().permitAll()
-        )
-        .sessionManagement(session -> session
-            .maximumSessions(1) 
-            .maxSessionsPreventsLogin(true) 
-        );
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll())
+                .sessionManagement(session -> session
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true));
         return http.build();
     }
 
-    //Lưu session người dùng vào RAM (không nên dùng cho máy chủ lớn)
+    // Lưu session người dùng vào RAM (không nên dùng cho máy chủ lớn)
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
     }
 
-    //Đóng vai listener lắng nghe khi out session hay vào (khi vào xóa sessionRegistry)
+    // Đóng vai listener lắng nghe khi out session hay vào (khi vào xóa
+    // sessionRegistry)
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
     }
 }
-
