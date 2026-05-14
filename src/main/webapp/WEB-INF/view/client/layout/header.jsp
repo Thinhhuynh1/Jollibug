@@ -52,13 +52,6 @@
             </div>
           </div>
         </header>
-      <div class="header-actions">
-        <a class="btn btn-primary" href="${cartUrl}"  >
-          Giỏ hàng: <span data-cart-count id="header-cart-count">0</span>
-        </a>
-        <a class="btn btn-outline" href="${loginUrl}">Đăng nhập</a>
-        <a class="btn btn-ghost" href="${profileUrl}">Tài khoản</a>
-      </div>
     </div>
   </header>
 
