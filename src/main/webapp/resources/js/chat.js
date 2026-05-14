@@ -1,28 +1,25 @@
 (function () {
   "use strict";
 
-  function $(sel, root) { return (root || document).querySelector(sel); }
-
   function formatTime(ts) {
     if (!ts) return "";
     return new Date(ts).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
   }
 
-  /** Scroll messages container to bottom */
   function scrollBottom(el) {
     if (el) el.scrollTop = el.scrollHeight;
   }
 
-  /** Tạo bubble DOM cho phía staff */
+  /** Tạo bubble DOM cho giao diện Staff */
   function buildStaffBubble(message, activeClientName) {
-    var isClient = message.senderRole === "client";
+    var isKhach = message.vaiTroGui === "Khach";
     var bubble = document.createElement("div");
-    bubble.className = isClient ? "chat-bubble chat-bubble--client" : "chat-bubble chat-bubble--staff";
+    bubble.className = isKhach ? "chat-bubble chat-bubble--client" : "chat-bubble chat-bubble--staff";
 
     var avatar = document.createElement("div");
     avatar.className = "chat-bubble__avatar";
-    if (isClient) {
-      var name = activeClientName || message.sender || "?";
+    if (isKhach) {
+      var name = activeClientName || message.tenNguoiGui || "KH";
       avatar.textContent = name.trim().substring(0, 2).toUpperCase();
     } else {
       avatar.textContent = "NV";
@@ -33,7 +30,7 @@
 
     var text = document.createElement("div");
     text.className = "chat-bubble__text";
-    text.textContent = message.content;
+    text.textContent = message.noiDung;
 
     var time = document.createElement("span");
     time.className = "chat-bubble__time";
@@ -46,15 +43,15 @@
     return bubble;
   }
 
-  /** Tạo article DOM cho phía client */
+  /** Tạo article DOM cho giao diện Client */
   function buildClientMsg(message) {
-    var isAgent = message.senderRole !== "client";
+    var isAgent = message.vaiTroGui !== "Khach";
     var article = document.createElement("article");
     article.className = isAgent ? "support-msg support-msg--agent" : "support-msg support-msg--user";
 
     var bubble = document.createElement("div");
     bubble.className = "support-msg__bubble";
-    bubble.textContent = message.content;
+    bubble.textContent = message.noiDung;
 
     var time = document.createElement("span");
     time.className = "support-msg__time";
@@ -80,16 +77,20 @@
       return;
     }
 
-    var conversationId = root.dataset.chatConversationId;
-    var role           = root.dataset.chatRole     || "client";
-    var sender         = root.dataset.chatSender   || "";
-    var variant        = root.dataset.chatVariant  || "client";
-    // Tên khách hiển thị trên avatar (chỉ cần cho staff view)
-    var activeClientName = root.querySelector(".chat-panel__meta strong")
-                           ? root.querySelector(".chat-panel__meta strong").textContent.trim()
-                           : "";
+    // Đọc các data-attribute từ JSP
+    var maYC          = root.dataset.chatMayc;        // ID của YeuCauHoTro
+    var maTKGui       = root.dataset.chatMaTkGui;      // MaTK người dùng
+    var vaiTroGui     = root.dataset.chatVaitrogui;    // "Khach" | "NhanVien"
+    var tenNguoiGui   = root.dataset.chatTen || "";
+    var variant       = root.dataset.chatVariant || "client";
+    var activeClientName = "";
 
-    console.log("[Chat] init — convId:", conversationId, "role:", role, "variant:", variant);
+    if (variant === "staff") {
+      var metaEl = root.querySelector(".chat-panel__meta strong");
+      if (metaEl) activeClientName = metaEl.textContent.trim();
+    }
+
+    console.log("[Chat] init — maYC:", maYC, "vaiTroGui:", vaiTroGui, "variant:", variant);
 
     var messagesEl = root.querySelector("[data-chat-messages]");
     var formEl     = root.querySelector("[data-chat-form]");
@@ -100,43 +101,33 @@
       return;
     }
 
-    // Client bắt buộc phải có conversationId (là mã tài khoản)
-    if (variant === "client" && !conversationId) {
-      console.warn("[Chat] Client missing conversationId");
+    if (variant === "client" && !maYC) {
+      console.warn("[Chat] Client missing maYC");
       return;
     }
 
-    // Scroll xuống dưới với lịch sử đã render từ server
     scrollBottom(messagesEl);
 
     // --- Kết nối WebSocket ---
     var socket = new SockJS("/ws");
     var stompClient = Stomp.over(socket);
-    stompClient.debug = null; // tắt log STOMP spam
+    stompClient.debug = null;
 
     stompClient.connect({}, function () {
-      console.log("[Chat] Connected.");
+      console.log("[Chat] STOMP connected.");
 
-      // Lắng nghe tin nhắn của hội thoại hiện tại
-      if (conversationId) {
-        stompClient.subscribe("/topic/conversations/" + conversationId, function (frame) {
-          try {
-            var msg = JSON.parse(frame.body || "{}");
-            console.log("[Chat] Received:", msg);
-            appendMessage(msg);
-          } catch (e) {
-            console.error("[Chat] Parse error:", e);
-          }
-        });
+      // Dò kênh của phòng chat hiện tại
+      if (maYC) {
+        subscribeToChat(maYC);
       }
 
-      // Nếu là Staff, lắng nghe thêm kênh global để cập nhật danh sách hội thoại mới
+      // Staff dò thêm kênh global để biết có yêu cầu mới
       if (variant === "staff") {
         stompClient.subscribe("/topic/staff/chat", function (frame) {
           try {
             var msg = JSON.parse(frame.body || "{}");
-            // Nếu tin nhắn mới không thuộc hội thoại đang mở, reload trang để cập nhật sidebar
-            if (msg.conversationId !== conversationId) {
+            // Nếu tin nhắn thuộc phòng khác → reload sidebar
+            if (String(msg.maYC) !== String(maYC)) {
               window.location.reload();
             }
           } catch (e) {}
@@ -147,37 +138,69 @@
       console.error("[Chat] STOMP error:", err);
     });
 
-    // --- Gửi tin nhắn ---
-    formEl.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var text = inputEl.value.trim();
-      
-      // Không gửi nếu rỗng, chưa kết nối, hoặc chưa chọn hội thoại
-      if (!text || !stompClient.connected || !conversationId) return;
+    function subscribeToChat(channelId) {
+      stompClient.subscribe("/topic/chat/" + channelId, function (frame) {
+        try {
+          var msg = JSON.parse(frame.body || "{}");
+          console.log("[Chat] Received:", msg);
+          appendMessage(msg);
+        } catch (e) {
+          console.error("[Chat] Parse error:", e);
+        }
+      });
+    }
 
+    function sendStompMessage(text) {
+      if (!maYC) return;
       var outgoing = {
-        type:           "CHAT",
-        conversationId: conversationId,
-        sender:         sender,
-        senderRole:     role,
-        content:        text,
-        timestamp:      Date.now()
+        type:         "CHAT",
+        maYC:         parseInt(maYC, 10),
+        maTKGui:      maTKGui ? parseInt(maTKGui, 10) : null,
+        vaiTroGui:    vaiTroGui,
+        noiDung:      text,
+        tenNguoiGui:  tenNguoiGui,
+        timestamp:    Date.now()
       };
 
       console.log("[Chat] Sending:", outgoing);
       stompClient.send("/app/chat.send", {}, JSON.stringify(outgoing));
       inputEl.value = "";
       inputEl.focus();
+    }
+
+    // --- Gửi tin nhắn ---
+    formEl.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var text = inputEl.value.trim();
+      if (!text || !stompClient.connected || !maYC) return;
+      sendStompMessage(text);
     });
 
-    // --- Thêm tin nhắn mới vào DOM (chỉ dùng cho realtime, không dùng cho lịch sử) ---
+    // --- Thêm tin nhắn mới vào DOM (realtime) ---
     function appendMessage(message) {
-      if (!message || !message.content) return;
+      if (!message || !message.noiDung) return;
       var el = variant === "staff"
         ? buildStaffBubble(message, activeClientName)
         : buildClientMsg(message);
       messagesEl.appendChild(el);
       scrollBottom(messagesEl);
+
+      // Nếu Client đang bị khóa chat (do trạng thái Pending), mở khóa khi có tin nhắn từ Staff
+      if (variant === "client" && message.vaiTroGui !== "Khach") {
+        if (inputEl.disabled) {
+          inputEl.disabled = false;
+          inputEl.placeholder = "Nhập tin nhắn của bạn...";
+          var btnEl = formEl.querySelector("button[type='submit']");
+          if (btnEl) btnEl.disabled = false;
+
+          // Cập nhật trạng thái hiển thị trên màn hình từ Pending -> Processing
+          var statusEl = document.querySelector(".page-intro p span");
+          if (statusEl && statusEl.textContent === "Pending") {
+            statusEl.textContent = "Processing";
+            statusEl.style.color = "#2563eb"; // Đổi màu xanh
+          }
+        }
+      }
     }
   }
 

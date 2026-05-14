@@ -1,19 +1,42 @@
 package vn.fastfood.entity;
 
+/**
+ * DTO trung gian cho WebSocket STOMP.
+ * JS ở trình duyệt gửi JSON theo cấu trúc này lên server.
+ *
+ * maYC = ID của YeuCauHoTro (phòng chat)
+ * maTKGui = MaTK của người gửi
+ * vaiTroGui = "Khach" hoặc "NhanVien"
+ * noiDung = nội dung tin nhắn
+ * tenNguoiGui = tên hiển thị (lấy từ session)
+ */
 public class ChatMessage {
-    private MessageType type;
-    private String conversationId;
-    private String content;
-    private String sender;
-    private String senderRole;
-    private long timestamp;
 
     public enum MessageType {
-        CHAT,
-        JOIN,
-        LEAVE
+        CHAT, JOIN, LEAVE
     }
 
+    private MessageType type;
+
+    /** ID phòng chat = MaYC của YeuCauHoTro */
+    private Long maYC;
+
+    /** MaTK của người gửi */
+    private Long maTKGui;
+
+    /** "Khach" hoặc "NhanVien" */
+    private String vaiTroGui;
+
+    /** Nội dung tin nhắn */
+    private String noiDung;
+
+    /** Tên hiển thị – dùng để vẽ DOM phía JS */
+    private String tenNguoiGui;
+
+    /** Timestamp server-side (ms epoch) */
+    private long timestamp;
+
+    // --- Getters & Setters ---
     public MessageType getType() {
         return type;
     }
@@ -22,36 +45,44 @@ public class ChatMessage {
         this.type = type;
     }
 
-    public String getContent() {
-        return content;
+    public Long getMaYC() {
+        return maYC;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setMaYC(Long maYC) {
+        this.maYC = maYC;
     }
 
-    public String getSender() {
-        return sender;
+    public Long getMaTKGui() {
+        return maTKGui;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setMaTKGui(Long maTKGui) {
+        this.maTKGui = maTKGui;
     }
 
-    public String getConversationId() {
-        return conversationId;
+    public String getVaiTroGui() {
+        return vaiTroGui;
     }
 
-    public void setConversationId(String conversationId) {
-        this.conversationId = conversationId;
+    public void setVaiTroGui(String vaiTroGui) {
+        this.vaiTroGui = vaiTroGui;
     }
 
-    public String getSenderRole() {
-        return senderRole;
+    public String getNoiDung() {
+        return noiDung;
     }
 
-    public void setSenderRole(String senderRole) {
-        this.senderRole = senderRole;
+    public void setNoiDung(String noiDung) {
+        this.noiDung = noiDung;
+    }
+
+    public String getTenNguoiGui() {
+        return tenNguoiGui;
+    }
+
+    public void setTenNguoiGui(String tenNguoiGui) {
+        this.tenNguoiGui = tenNguoiGui;
     }
 
     public long getTimestamp() {

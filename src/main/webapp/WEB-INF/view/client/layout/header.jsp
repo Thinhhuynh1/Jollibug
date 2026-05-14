@@ -13,7 +13,6 @@
         <c:url var="homeUrl" value="/" />
         <c:url var="menuUrl" value="/menu" />
         <c:url var="chatUrl" value="/chat" />
-        <c:url var="complaintUrl" value="/complaint" />
         <c:url var="cartUrl" value="/cart" />
         <c:url var="loginUrl" value="/login" />
         <c:url var="profileUrl" value="/profile" />
@@ -34,8 +33,6 @@
                 đơn</a>
               <a href="${chatUrl}" <c:if test="${fn:contains(currentPath, '/chat')}"> class="is-active"</c:if>>Nhắn
                 tin</a>
-              <a href="${complaintUrl}" <c:if test="${fn:contains(currentPath, '/complaint')}"> class="is-active"</c:if>
-                >Khiếu nại</a>
             </nav>
 
             <div class="header-actions">

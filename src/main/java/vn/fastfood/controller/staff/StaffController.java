@@ -1,9 +1,7 @@
 package vn.fastfood.controller.staff;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,20 +9,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import vn.fastfood.entity.ChatRecord;
+import vn.fastfood.entity.ChiTietHoTro;
 import vn.fastfood.entity.User;
-import vn.fastfood.repository.ChatRecordRepository;
+import vn.fastfood.entity.YeuCauHoTro;
+import vn.fastfood.repository.ChiTietHoTroRepository;
 import vn.fastfood.repository.UserRepository;
+import vn.fastfood.repository.YeuCauHoTroRepository;
 
 @Controller
 public class StaffController {
 
-    private final ChatRecordRepository chatRecordRepository;
+    private final YeuCauHoTroRepository yeuCauRepo;
+    private final ChiTietHoTroRepository chiTietRepo;
     private final UserRepository userRepository;
 
-    public StaffController(ChatRecordRepository chatRecordRepository,
-            UserRepository userRepository) {
-        this.chatRecordRepository = chatRecordRepository;
+    public StaffController(YeuCauHoTroRepository yeuCauRepo,
+                           ChiTietHoTroRepository chiTietRepo,
+                           UserRepository userRepository) {
+        this.yeuCauRepo = yeuCauRepo;
+        this.chiTietRepo = chiTietRepo;
         this.userRepository = userRepository;
     }
 
@@ -46,97 +49,53 @@ public class StaffController {
     }
 
     @GetMapping("/staff/orders/detail")
-    public String getOrderDetailPage() {
-        return "/staff/orders/detail";
-    }
+    public String getOrderDetailPage() { return "/staff/orders/detail"; }
 
     @GetMapping("/staff/orders/update-status")
-    public String getOrderUpdateStatusPage() {
-        return "/staff/orders/update-status";
-    }
+    public String getOrderUpdateStatusPage() { return "/staff/orders/update-status"; }
 
     @GetMapping("/staff/orders/confirm")
-    public String getOrderConfirmPage() {
-        return "/staff/orders/confirm";
-    }
+    public String getOrderConfirmPage() { return "/staff/orders/confirm"; }
 
+    // ----------------------------------------------------------------
+    // SUPPORT PAGE
+    // ----------------------------------------------------------------
     @GetMapping("/staff/support")
-    public String getSupportPage(@RequestParam(value = "conversationId", required = false) String conversationId,
+    public String getSupportPage(
+            @RequestParam(value = "maYC", required = false) Long maYC,
+            @RequestParam(value = "tab", defaultValue = "chat") String tab,
             Model model) {
 
-        // --- Lấy danh sách conversation (client đã từng nhắn) ---
-        List<String> convIds = chatRecordRepository.findDistinctConversationIds();
-
-        // Build danh sách ticket: mỗi ticket gồm conversationId, tên khách, tin cuối
-        List<Map<String, Object>> tickets = new ArrayList<>();
-        for (String cid : convIds) {
-            Map<String, Object> ticket = new LinkedHashMap<>();
-            ticket.put("conversationId", cid);
-
-            // Tìm tên khách dựa vào maTK (conversationId = maTK)
-            String clientName = cid; // fallback
-            try {
-                long maTK = Long.parseLong(cid);
-                User u = userRepository.findByMaTK(maTK);
-                if (u != null)
-                    clientName = u.getHoTen();
-            } catch (NumberFormatException ignored) {
-            }
-
-            ticket.put("clientName", clientName);
-
-            ChatRecord latest = chatRecordRepository.findTop1ByConversationIdOrderByCreatedAtDesc(cid);
-            ticket.put("latestMessage", latest != null ? latest.getContent() : "");
-            // Pre-format time for JSP (fmt:formatDate doesn't support LocalDateTime)
-            if (latest != null && latest.getCreatedAt() != null) {
-                ticket.put("latestTimeDisplay", latest.getCreatedAt()
-                        .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
-            } else {
-                ticket.put("latestTimeDisplay", "");
-            }
-
-            tickets.add(ticket);
-        }
+        // Danh sách yêu cầu còn active (Pending + Processing)
+        List<YeuCauHoTro> tickets = yeuCauRepo.findActiveRequests();
         model.addAttribute("tickets", tickets);
+        model.addAttribute("onlineCount", tickets.size());
 
-        // --- Lịch sử chat của conversation đang chọn ---
-        String activeConvId = conversationId;
-        if ((activeConvId == null || activeConvId.isEmpty()) && !convIds.isEmpty()) {
-            activeConvId = convIds.get(0);
+        // Nếu không chọn maYC thì lấy phòng đầu tiên
+        YeuCauHoTro activeYC = null;
+        if (maYC != null) {
+            activeYC = yeuCauRepo.findById(maYC).orElse(null);
+        } else if (!tickets.isEmpty()) {
+            activeYC = tickets.get(0);
         }
 
-        String activeClientName = "";
-        if (activeConvId != null) {
-            try {
-                long maTK = Long.parseLong(activeConvId);
-                User u = userRepository.findByMaTK(maTK);
-                if (u != null)
-                    activeClientName = u.getHoTen();
-            } catch (NumberFormatException ignored) {
-            }
-
-            List<ChatRecord> history = chatRecordRepository
-                    .findByConversationIdOrderByCreatedAtAsc(activeConvId);
+        if (activeYC != null) {
+            List<ChiTietHoTro> history = chiTietRepo
+                    .findByYeuCau_MaYCOrderByNgayGuiAsc(activeYC.getMaYC());
             model.addAttribute("chatHistory", history);
+            model.addAttribute("activeYC", activeYC);
+            model.addAttribute("activeConvId", activeYC.getMaYC());
+            model.addAttribute("activeClientName",
+                    activeYC.getKhachHang() != null ? activeYC.getKhachHang().getHoTen() : "");
         } else {
             model.addAttribute("chatHistory", List.of());
+            model.addAttribute("activeYC", null);
+            model.addAttribute("activeConvId", null);
+            model.addAttribute("activeClientName", "");
         }
 
-        model.addAttribute("activeConvId", activeConvId);
-        model.addAttribute("activeClientName", activeClientName);
-        model.addAttribute("onlineCount", convIds.size());
-
+        model.addAttribute("supportTab", tab);
         return "/staff/support";
-    }
-
-    @PostMapping("/staff/support/chat/send")
-    public String sendSupportChat(@RequestParam("message") String message) {
-        return "redirect:/staff/support?tab=chat";
-    }
-
-    @PostMapping("/staff/support/complaint/reply")
-    public String replyComplaint(@RequestParam("reply") String reply) {
-        return "redirect:/staff/support?tab=complaint";
     }
 
     @PostMapping("/staff/support/review/reply")
@@ -145,12 +104,8 @@ public class StaffController {
     }
 
     @GetMapping("/staff/clients")
-    public String getClientsPage() {
-        return "/staff/clients/show";
-    }
+    public String getClientsPage() { return "/staff/clients/show"; }
 
     @GetMapping("/staff/clients/detail")
-    public String getClientDetailPage() {
-        return "/staff/clients/detail";
-    }
+    public String getClientDetailPage() { return "/staff/clients/detail"; }
 }
