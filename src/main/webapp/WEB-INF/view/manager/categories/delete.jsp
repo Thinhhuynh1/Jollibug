@@ -30,24 +30,27 @@
       <jsp:include page="../layout/topbar.jsp" />
 
       <div style="max-width: 52rem; margin: 0 auto; width: 100%;">
-        <section class="profile-content">
-          <section class="profile-section">
-            <h1 class="profile-title">Xóa danh mục #CAT001</h1>
-            <p class="profile-subtitle">Xác nhận xóa danh mục này khỏi hệ thống quản trị.</p>
-
-
-              <div style="margin-top:1.25rem; padding:0.9rem 1rem; border:1px solid #f1c0c4; background:#fff4f5; border-radius: var(--radius-md); color:#9f1d24;">
-                Bạn có chắc chắn muốn xóa danh mục này không? Hành động này không thể hoàn tác.
-              </div>
-
-              <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
-                <a href="/manager/categories" class="btn btn-ghost">Hủy</a>
-                <button type="submit" class="profile-submit" style="max-width: 180px; background:#d32f2f; box-shadow:none;">
-                  Xác nhận xóa
-                </button>
-              </div>
+        <form action="/manager/categories/delete" method="post">
+          <section class="profile-content">
+            <section class="profile-section">
+              <h1 class="profile-title">Xóa danh mục #${danhMuc.maDM}</h1>
+               <input type="hidden" name="categoryID" value="${danhMuc.maDM}" />
+              <p class="profile-subtitle">Xác nhận xóa danh mục này khỏi hệ thống quản trị.</p>
+  
+  
+                <div style="margin-top:1.25rem; padding:0.9rem 1rem; border:1px solid #f1c0c4; background:#fff4f5; border-radius: var(--radius-md); color:#9f1d24;">
+                  Bạn có chắc chắn muốn xóa danh mục này không? Hành động này không thể hoàn tác.
+                </div>
+  
+                <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
+                  <a href="/manager/categories" class="btn btn-ghost">Hủy</a>
+                  <button type="submit" class="profile-submit" style="max-width: 180px; background:#d32f2f; box-shadow:none;">
+                    Xác nhận xóa
+                  </button>
+                </div>
+            </section>
           </section>
-        </section>
+        </form>
       </div>
 
     </main>

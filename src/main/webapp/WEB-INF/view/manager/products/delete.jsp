@@ -28,12 +28,12 @@
 			<jsp:include page="../layout/topbar.jsp" />
 
 			<div style="max-width: 52rem; margin: 0 auto; width: 100%;">
-				<section class="profile-content">
-					<section class="profile-section">
-						<h1 class="profile-title">Xóa sản phẩm #PRD001</h1>
-						<p class="profile-subtitle">Xác nhận xóa sản phẩm này khỏi hệ thống quản trị.</p>
-
-						<div class="profile-form">
+				<form action="/manager/products/delete" method="post">
+					<input type="hidden" name="productID" value="${monAn.maMon}" />
+					<section class="profile-content">
+						<section class="profile-section">
+							<h1 class="profile-title">Xóa sản phẩm #${monAn.maMon}</h1>
+							<p class="profile-subtitle">Xác nhận xóa sản phẩm "${monAn.tenMon}" khỏi hệ thống quản trị.</p>
 
 							<div style="margin-top:1.25rem; padding:0.9rem 1rem; border:1px solid #f1c0c4; background:#fff4f5; border-radius: var(--radius-md); color:#9f1d24;">
 								Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.
@@ -45,9 +45,9 @@
 									Xác nhận xóa
 								</button>
 							</div>
-						</div>
+						</section>
 					</section>
-				</section>
+				</form>
 			</div>
 
 		</main>

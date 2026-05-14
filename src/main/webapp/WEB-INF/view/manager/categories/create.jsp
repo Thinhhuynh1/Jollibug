@@ -36,21 +36,26 @@
           <section class="profile-section">
             <h1 class="profile-title">Thêm mới danh mục</h1>
 
-            <form action="#" method="post" class="profile-form">
+            <form action="/manager/categories/create" method="post" class="profile-form">
               <div class="profile-grid">
                 <label class="profile-field">
                   <span>Tên danh mục <span style="color:var(--color-red-500);">*</span></span>
-                  <input type="text" name="name" placeholder="Ví dụ: Gà rán" required />
+                  <input type="text" name="tenDM" placeholder="Ví dụ: Gà rán" required />
                 </label>
 
                 <label class="profile-field">
                   <span>Trạng thái</span>
-                  <select name="status">
-                    <option value="active" selected>Đang hoạt động</option>
-                    <option value="featured">Nổi bật</option>
-                    <option value="hidden">Ẩn</option>
+                  <select name="available">
+                    <option value="1" selected>Đang hoạt động</option>
+                    <option value="0">Ẩn</option>
                   </select>
                 </label>
+
+                <label class="profile-field">
+                  <span>Mô tả danh mục</span>
+                  <input type="text" name="moTa" />
+                </label>
+
               </div>
 
               <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">

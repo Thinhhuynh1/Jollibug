@@ -57,7 +57,7 @@
           </div>
           <div class="hp-hero__image reveal-up">
             <div class="hp-hero__img-wrap">
-              <img src="/webapp/resources/shared/images/brand-feast.svg" alt="Jollibug combo ngon" />
+              <img src="/images/homepage.png" alt="Jollibug combo ngon" />
             </div>
           </div>
         </div>
@@ -105,123 +105,63 @@
         </div>
 
         <div class="hp-menu-grid">
-
-          <%-- Món 1 --%>
-          <article class="hp-prod-card reveal-up">
-            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);">
-              <span class="hp-prod-card__badge">Bán Chạy</span>
-              🍔
+          <c:forEach var="monAn" items="${listMonAn}" end="5">
+            <article class="hp-prod-card reveal-up">
+              <div class="hp-prod-card__img">
+              <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
             </div>
-            <div class="hp-prod-card__body">
-              <div class="hp-prod-card__meta">
-                <span>Burger</span>
-                <span class="stars">★ 4.9</span>
+              <div class="hp-prod-card__body">
+                <div class="hp-prod-card__meta">
+                  <span>${monAn.danhMuc.tenDM}</span>
+                  <span class="stars">★ 4.9</span>
+                </div>
+                <div class="hp-prod-card__name">${monAn.tenMon}</div>
+                <div class="hp-prod-card__desc">
+                  ${monAn.moTa}
+                </div>
+                <div class="hp-prod-card__footer">
+                  <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                  <c:if test="${not empty sessionScope.user}">
+                    <button class="hp-prod-card__btn" type="button">+ Thêm</button>
+                  </c:if >
+                </div>
               </div>
-              <div class="hp-prod-card__name">Burger Bò Phô Mai Đôi</div>
-              <div class="hp-prod-card__desc">Hai miếng bò nướng, phô mai cheddar tan chảy, rau tươi và sốt đặc biệt.</div>
-              <div class="hp-prod-card__footer">
-                <span class="hp-prod-card__price">89.000 ₫</span>
-                <button class="hp-prod-card__btn" type="button" id="add-burger-double">+ Thêm</button>
+            </article>
+          </c:forEach>
+          <c:forEach var="monAn" items="${listMonAn}" end="5">
+            <article class="hp-prod-card reveal-up">
+              <div class="hp-prod-card__img">
+                <img src="${monAn.img}" alt="${monAn.tenMon}" />
+                <c:if test="${monAn.hasGiamGia}">
+                  <span class="hp-prod-card__badge">-${monAn.phanTramGiam}%</span>
+                </c:if>
               </div>
-            </div>
-          </article>
-
-          <%-- Món 2 --%>
-          <article class="hp-prod-card reveal-up">
-            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
-              <span class="hp-prod-card__badge">Mới</span>
-              🍗
-            </div>
-            <div class="hp-prod-card__body">
-              <div class="hp-prod-card__meta">
-                <span>Gà Rán</span>
-                <span class="stars">★ 4.8</span>
+              <div class="hp-prod-card__body">
+                <div class="hp-prod-card__meta">
+                  <span>${monAn.danhMuc.tenDM}</span>
+                  <span class="stars">★ 4.9</span>
+                </div>
+                <div class="hp-prod-card__name">${monAn.tenMon}</div>
+                <div class="hp-prod-card__desc">
+                  ${monAn.moTa}
+                </div>
+                <div class="hp-prod-card__footer">
+                  <div class="hp-prod-card__price-container">
+                    <c:choose>
+                      <c:when test="${monAn.hasGiamGia}">
+                        <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.giaGiam}" type="number" />đ</span>
+                        <span class="hp-prod-card__old-price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                      </c:when>
+                      <c:otherwise>
+                        <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+                  <button class="hp-prod-card__btn" type="button">+ Thêm</button>
+                </div>
               </div>
-              <div class="hp-prod-card__name">Gà Giòn Vị Cay</div>
-              <div class="hp-prod-card__desc">Vỏ ngoài giòn tan, thịt bên trong mềm ngọt với gia vị cay đặc trưng Jollibug.</div>
-              <div class="hp-prod-card__footer">
-                <span class="hp-prod-card__price">59.000 ₫</span>
-                <button class="hp-prod-card__btn" type="button" id="add-spicy-chicken">+ Thêm</button>
-              </div>
-            </div>
-          </article>
-
-          <%-- Món 3 --%>
-          <article class="hp-prod-card reveal-up">
-            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);">
-              <span class="hp-prod-card__badge">Tiết Kiệm</span>
-              🍱
-            </div>
-            <div class="hp-prod-card__body">
-              <div class="hp-prod-card__meta">
-                <span>Combo</span>
-                <span class="stars">★ 4.9</span>
-              </div>
-              <div class="hp-prod-card__name">Combo Gia Đình 4 Người</div>
-              <div class="hp-prod-card__desc">4 burger, 4 phần khoai chiên lớn, 4 nước uống và 1 phần nugget miễn phí.</div>
-              <div class="hp-prod-card__footer">
-                <span class="hp-prod-card__price">299.000 ₫</span>
-                <button class="hp-prod-card__btn" type="button" id="add-family-combo">+ Thêm</button>
-              </div>
-            </div>
-          </article>
-
-          <%-- Món 4 --%>
-          <article class="hp-prod-card reveal-up">
-            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);">
-              🥤
-            </div>
-            <div class="hp-prod-card__body">
-              <div class="hp-prod-card__meta">
-                <span>Thức Uống</span>
-                <span class="stars">★ 4.7</span>
-              </div>
-              <div class="hp-prod-card__name">Trà Sữa Xoài Tươi</div>
-              <div class="hp-prod-card__desc">Trà sữa kem tươi kết hợp xoài Cát Hòa Lộc nguyên chất, mát lạnh sảng khoái.</div>
-              <div class="hp-prod-card__footer">
-                <span class="hp-prod-card__price">39.000 ₫</span>
-                <button class="hp-prod-card__btn" type="button" id="add-mango-milk-tea">+ Thêm</button>
-              </div>
-            </div>
-          </article>
-
-          <%-- Món 5 --%>
-          <article class="hp-prod-card reveal-up">
-            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#fff8e1,#ffecb3);">
-              🍟
-            </div>
-            <div class="hp-prod-card__body">
-              <div class="hp-prod-card__meta">
-                <span>Khoai Chiên</span>
-                <span class="stars">★ 4.8</span>
-              </div>
-              <div class="hp-prod-card__name">Khoai Chiên Phô Mai Núi Lửa</div>
-              <div class="hp-prod-card__desc">Khoai chiên vàng giòn phủ sốt phô mai nóng chảy và tương ớt ngọt đặc biệt.</div>
-              <div class="hp-prod-card__footer">
-                <span class="hp-prod-card__price">45.000 ₫</span>
-                <button class="hp-prod-card__btn" type="button" id="add-cheese-fries">+ Thêm</button>
-              </div>
-            </div>
-          </article>
-
-          <%-- Món 6 --%>
-          <article class="hp-prod-card reveal-up">
-            <div class="hp-prod-card__img" style="background:linear-gradient(135deg,#f3e5f5,#e1bee7);">
-              🍦
-            </div>
-            <div class="hp-prod-card__body">
-              <div class="hp-prod-card__meta">
-                <span>Tráng Miệng</span>
-                <span class="stars">★ 4.9</span>
-              </div>
-              <div class="hp-prod-card__name">Sundae Dâu Tây Creamy</div>
-              <div class="hp-prod-card__desc">Kem vani mịn màng, sốt dâu tươi và bánh waffle giòn — kết thúc bữa ăn hoàn hảo.</div>
-              <div class="hp-prod-card__footer">
-                <span class="hp-prod-card__price">29.000 ₫</span>
-                <button class="hp-prod-card__btn" type="button" id="add-strawberry-sundae">+ Thêm</button>
-              </div>
-            </div>
-          </article>
+            </article>
+          </c:forEach>
 
         </div>
 
@@ -282,7 +222,7 @@
   <%-- 7. FOOTER (shared) --%>
   <jsp:include page="layout/footer.jsp" />
 
-  <script>
+  <!-- <script>
     /* Category bar active toggle */
     document.querySelectorAll('.hp-cat__item').forEach(function(el) {
       el.addEventListener('click', function() {
@@ -290,7 +230,7 @@
         el.classList.add('active');
       });
     });
-  </script>
+  </script> -->
 
 </body>
 </html>

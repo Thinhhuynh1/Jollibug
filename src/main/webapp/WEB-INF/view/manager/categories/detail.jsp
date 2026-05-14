@@ -1,4 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -32,32 +34,39 @@
           <section class="profile-section">
             <h1 class="profile-title">Chi tiết danh mục</h1>
 
-            <div class="profile-form">
-              <div class="profile-grid">
-                <label class="profile-field">
-                  <span>Tên danh mục</span>
-                  <input type="text" value="Burger đặc trưng" readonly />
-                </label>
 
-                <label class="profile-field">
-                  <span>Slug</span>
-                  <input type="text" value="burger-dac-trung" readonly />
-                </label>
+              <div class="profile-form">
+                <div class="profile-grid">
+                  <label class="profile-field">
+                    <span>Mã danh mục</span>
+                    <input type="text" value="${danhMuc.maDM}" readonly />
+                  </label>
+                  
+                  <label class="profile-field">
+                    <span>Tên danh mục</span>
+                    <input type="text" value="${danhMuc.tenDM}" readonly />
+                  </label>
+  
+                  <label class="profile-field">
+                    <span>Mô tả</span>
+                    <input type="text" value="${danhMuc.moTa}" readonly />
+                  </label>
+  
+                  <label class="profile-field">
+                    <span>Trạng thái</span>
+                    <input type="text" value="${danhMuc.available == true ? 'Đang hoạt động' : 'Ẩn'}" readonly />
+                  </label>
+  
+                  <label class="profile-field">
+                    <span>Số món</span>
+                    <input type="text" value="${soLuongMon} món" readonly />
+                  </label>
+                </div>
 
-                <label class="profile-field">
-                  <span>Trạng thái</span>
-                  <input type="text" value="Đang hoạt động" readonly />
-                </label>
-
-                <label class="profile-field">
-                  <span>Số món</span>
-                  <input type="text" value="12 món" readonly />
-                </label>
-              </div>
 
               <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
                 <a href="/manager/categories" class="btn btn-ghost">Quay lại</a>
-                <a href="/manager/categories/update" class="profile-submit" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; max-width:180px;">Chỉnh sửa</a>
+                <!-- <a href="/manager/categories/update" class="profile-submit" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; max-width:180px;">Chỉnh sửa</a> -->
               </div>
             </div>
           </section>

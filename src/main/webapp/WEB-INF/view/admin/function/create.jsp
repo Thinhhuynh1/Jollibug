@@ -67,10 +67,10 @@
                       <span>Vai trò <span style="color:var(--color-red-500);">*</span></span>
                       <select name="TenVT" required>
                           <option value="">-- Chọn Vai trò --</option>
-                          <option value="Client">Khách hàng </option>
-                          <option value="Staff">Nhân viên </option>
-                          <option value="Manager">Quản lý</option>
-                          <option value="Admin">Quản trị viên</option>
+                          <option value="CLIENT">Khách hàng </option>
+                          <option value="STAFF">Nhân viên </option>
+                          <option value="MANAGER">Quản lý</option>
+                          <option value="ADMIN">Quản trị viên</option>
                       </select>
                   </label>
                   

@@ -48,4 +48,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
         void deleteById(long maTK);
 
+        // Đếm khách hàng mới trong khoảng thời gian
+        @Query("""
+                            SELECT COUNT(u) FROM User u
+                            WHERE u.vaiTro.tenVT = 'CLIENT'
+                            AND u.createdAt BETWEEN :fromDate AND :toDate
+                        """)
+        long countNewCustomers(@Param("fromDate") java.time.LocalDateTime fromDate,
+                        @Param("toDate") java.time.LocalDateTime toDate);
+
+        // Đếm tổng khách hàng active
+        @Query("""
+                            SELECT COUNT(u) FROM User u
+                            WHERE u.vaiTro.tenVT = 'CLIENT'
+                            AND u.trangThai = 'ACTIVE'
+                        """)
+        long countActiveCustomers();
+
 }
