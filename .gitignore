@@ -33,4 +33,4 @@ build/
 .vscode/
 
 scr/java/vn/fastfood/test/
-order_test_data.sql
+sampledb.sql
