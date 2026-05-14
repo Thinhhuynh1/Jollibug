@@ -21,6 +21,9 @@
   <jsp:include page="../layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
+    <input type="hidden" id="customerId" value="1">
+    <input type="hidden" id="addressSelect" value="1">
+
     <div class="container">
       <div class="page-intro">
         <h1 class="section-title">Thông tin đặt hàng</h1>
@@ -78,23 +81,50 @@
             </div>
           </section> -->
 
-          <a class="btn btn-primary btn-block" type="button" id="btn-place-order" href="/pay" >Thanh toán</a>
+          <section class="payment-method-section">
+            <h3 class="section-subtitle">Phương thức thanh toán</h3>
+
+            <div class="payment-options" role="radiogroup" aria-label="Payment method">
+              <label class="payment-option">
+                <input type="radio" name="payment-method" value="COD" checked />
+                <div>
+                  <strong>Thanh toán khi nhận hàng (COD)</strong>
+                </div>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" name="payment-method" value="CREDIT_CARD" />
+                <div>
+                  <strong>Thẻ tín dụng / Ghi nợ</strong>
+                </div>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" name="payment-method" value="BANK" />
+                <div>
+                  <strong>Chuyển khoản ngân hàng</strong>
+                </div>
+              </label>
+
+              <label class="payment-option">
+                <input type="radio" name="payment-method" value="EWALLET" />
+                <div>
+                  <strong>Ví điện tử</strong>
+                </div>
+              </label>
+            </div>
+          </section>
+
+          <div id="checkoutMessage" class="checkout-message"></div>
+
+          <button class="btn btn-primary btn-block" type="button" id="btn-place-order">
+            Thanh toán
+          </button>
         </section>
         <section class="checkout-card">
           <h2 class="checkout-card__title">Tóm tắt đơn hàng</h2>
-          <div>
-            <div class="invoice-line ">
-              <strong>1xGa</strong>
-              <strong>0 VND</strong>
-            </div>
-            <div class="invoice-line ">
-              <strong>2xHamburger</strong>
-              <strong>0 VND</strong>
-            </div>
-            <div class="invoice-line ">
-              <strong>10xPizza</strong>
-              <strong>0 VND</strong>
-            </div>
+          <div id="checkoutItemList">
+            <!-- Checkout items will be rendered by checkout-api.js -->
           </div>
 
           <hr class="checkout-divider" />
@@ -183,6 +213,7 @@
   <jsp:include page="../layout/footer.jsp" />
 
   <script src="/js/client/main.js"></script>
+  <script src="${pageContext.request.contextPath}/resources/js/client/checkout-api.js"></script>
 </body>
 </html>
 

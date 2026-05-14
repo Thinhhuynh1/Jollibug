@@ -1,10 +1,6 @@
 package vn.fastfood.controller.client;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +18,6 @@ import vn.fastfood.service.UserService;
 
 @Controller
 public class UserController {
-
-    @Autowired
-    private SessionRegistry sessionRegistry;
 
     @Autowired
     private UserService userService;
@@ -64,21 +57,10 @@ public class UserController {
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, @RequestParam("password") String password,
             Model model, HttpSession session) {
-        try {            
+        try {
             User user = userService.login(email, password);
-
-            List<Object> loggedInUsers = sessionRegistry.getAllPrincipals();
-            for (Object principal : loggedInUsers) {
-                if (principal.equals(email)) {
-                    List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);
-                    if (!sessions.isEmpty()) {
-                    }
-                }
-            }
-
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getMaTK());
-            sessionRegistry.registerNewSession(session.getId(), email);
 
             String roleName = user.getVaiTro().getTenVT();
             session.setAttribute("userRole", roleName);
@@ -89,7 +71,7 @@ public class UserController {
             } else if ("MANAGER".equals(roleName)) {
                 return "redirect:/manager";
             } else if ("STAFF".equals(roleName)) {
-                return "redirect:/staff";
+                return "redirect:/staff/orders"; // sau khi dang nhap thi se chuyen sang trang staff order
             }
 
             return "redirect:/";

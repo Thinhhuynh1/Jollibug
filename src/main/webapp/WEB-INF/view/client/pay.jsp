@@ -21,6 +21,8 @@
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
+    <input type="hidden" id="customerId" value="1">
+    <input type="hidden" id="orderId">
     <div class="container">
       <div class="page-intro">
         <h1 class="section-title">Thanh toán đơn hàng</h1>
@@ -31,7 +33,7 @@
         <section class="checkout-card checkout-sticky">
 
           <section>
-            <h3 class="section-subtitle">Phương thức thanh toán</h3>
+            <h3 class="section-subtitle">Phương thức đã chọn</h3>
             <div class="payment-options" role="radiogroup" aria-label="Payment method">
               <label class="payment-option">
                 <input type="radio" name="payment-method" value="cod" checked />
@@ -108,32 +110,30 @@
           </section>
 
           <!-- <button class="btn btn-primary btn-block" type="button" id="btn-place-order">Thanh toán</button> -->
-          <a href="/" class="btn btn-primary btn-block">Thanh toán</a>
+          <div id="paymentMessage" class="payment-message"></div>
+
+          <button class="btn btn-primary btn-block" type="button" id="confirmPaymentBtn">
+            Xác nhận thanh toán
+          </button>
         </section>
         <section class="checkout-card">
           <h2 class="checkout-card__title">Thông tin người đặt</h2>
           <div style="font-size: 0.95rem; color: #334155; display: grid; gap: 0.6rem; line-height: 1.4;">
-            <p style="margin: 0;"><strong>Họ và tên:</strong> Nguyễn Văn A</p>
-            <p style="margin: 0;"><strong>Điện thoại:</strong> 0123456789</p>
-            <p style="margin: 0;"><strong>Giao đến:</strong> 123 Đường Số 1, Phường 2, Quận 3, TP.HCM</p>
+            <h2 class="checkout-card__title">Thông tin thanh toán</h2>
+
+            <div style="font-size: 0.95rem; color: #334155; display: grid; gap: 0.6rem; line-height: 1.4;">
+              <p style="margin: 0;"><strong>Mã đơn hàng:</strong> <span id="paymentOrderId">-</span></p>
+              <p style="margin: 0;"><strong>Phương thức:</strong> <span id="paymentMethod">-</span></p>
+              <p style="margin: 0;"><strong>Số tiền:</strong> <span id="paymentAmount">0 VND</span></p>
+              <p style="margin: 0;"><strong>Trạng thái:</strong> <span id="paymentStatus">-</span></p>
+            </div>
           </div>
 
           <hr class="checkout-divider" />
 
           <h2 class="checkout-card__title">Thông tin đơn hàng</h2>
-          <div>
-            <div class="invoice-line ">
-              <strong>1xGa</strong>
-              <strong>0 VND</strong>
-            </div>
-            <div class="invoice-line ">
-              <strong>2xHamburger</strong>
-              <strong>0 VND</strong>
-            </div>
-            <div class="invoice-line ">
-              <strong>10xPizza</strong>
-              <strong>0 VND</strong>
-            </div>
+          <div id="paymentOrderItems">
+            <!-- Order items will be rendered by payment-api.js -->
           </div>
 
           <hr class="checkout-divider" />
@@ -154,6 +154,7 @@
   <jsp:include page="layout/footer.jsp" />
 
   <script src="/js/client/main.js"></script>
+  <script src="${pageContext.request.contextPath}/resources/js/client/payment-api.js"></script>
 </body>
 </html>
 

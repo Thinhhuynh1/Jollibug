@@ -51,3 +51,34 @@
             </div>
           </div>
         </header>
+      <div class="header-actions">
+        <a class="btn btn-primary" href="${cartUrl}"  >
+          Giỏ hàng: <span data-cart-count id="header-cart-count">0</span>
+        </a>
+        <a class="btn btn-outline" href="${loginUrl}">Đăng nhập</a>
+        <a class="btn btn-ghost" href="${profileUrl}">Tài khoản</a>
+      </div>
+    </div>
+  </header>
+
+  <script>
+    (function () {
+      var cartCountEl = document.getElementById("header-cart-count");
+      if (!cartCountEl) return;
+
+      fetch("${pageContext.request.contextPath}/api/cart?customerId=1")
+        .then(function (response) {
+          return response.ok ? response.json() : [];
+        })
+        .then(function (items) {
+          var totalQuantity = Array.isArray(items)
+            ? items.reduce(function (total, item) {
+                return total + Number(item.soLuong || 0);
+              }, 0)
+            : 0;
+
+          cartCountEl.textContent = totalQuantity;
+        })
+        .catch(function () {});
+    })();
+  </script>
