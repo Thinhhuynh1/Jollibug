@@ -1,16 +1,25 @@
 package vn.fastfood.controller.client;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import vn.fastfood.entity.MonAn;
+import vn.fastfood.model.CartItem;
 import vn.fastfood.repository.DanhMucRepository;
 import vn.fastfood.repository.MonAnRepository;
 import vn.fastfood.service.PromotionService;
+
+import java.net.URL;
+import java.net.MalformedURLException;
 
 @Controller
 public class MenuController {
@@ -58,4 +67,64 @@ public class MenuController {
         model.addAttribute("monAn", this.monAnRepository.findProduct(productID));
         return "client/product";
     }
+
+    @PostMapping("/addCart")
+    public String addToCart(@RequestParam("productID") Long productID,
+            HttpServletRequest request,
+            HttpSession session) {
+
+        int quantity = 1;
+        MonAn monAn = this.monAnRepository.findProduct(productID);
+        if (monAn == null) {
+            session.setAttribute("cartError", "Sản phẩm không tồn tại");
+            return "redirect:/menu";
+        }
+
+        @SuppressWarnings("unchecked")
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart == null) {
+            cart = new ArrayList<>();
+        }
+
+        CartItem cartItem = null;
+        for (CartItem item : cart) {
+            if (item.getMaMon() == monAn.getMaMon()) {
+                cartItem = item;
+                break;
+            }
+        }
+
+        BigDecimal gia = BigDecimal.valueOf(monAn.getGia());
+        if (cartItem != null) {
+            int soLuong = cartItem.getSoLuong() + quantity;
+            cartItem.setSoLuong(soLuong);
+            cartItem.setDonGia(gia);
+            cartItem.setThanhTien(gia.multiply(BigDecimal.valueOf(soLuong)));
+        } else {
+            CartItem item = new CartItem();
+            item.setMaMon(monAn.getMaMon());
+            item.setTenMon(monAn.getTenMon());
+            item.setSoLuong(quantity);
+            item.setDonGia(gia);
+            item.setThanhTien(gia.multiply(BigDecimal.valueOf(quantity)));
+            item.setImageUrl(monAn.getImg());
+            cart.add(item);
+        }
+
+        session.setAttribute("cart", cart);
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.isBlank()) {
+            try {
+                URL url = new URL(referer);
+                String path = url.getPath();
+                String query = url.getQuery();
+                String redirectUrl = path + (query != null ? "?" + query : "");
+                return "redirect:" + redirectUrl;
+            } catch (MalformedURLException e) {
+                // fallback nếu referer không hợp lệ
+            }
+        }
+        return "redirect:/menu";
+    }
+
 }

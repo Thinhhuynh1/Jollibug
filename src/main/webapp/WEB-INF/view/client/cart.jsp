@@ -30,8 +30,35 @@
       <div class="cart-shell">
         <section class="cart-column">
           <article class="cart-panel">
-            <div class="cart-item-list" id="cartItems">
-              <!-- Cart items will be rendered by cart-api.js -->
+            <div class="cart-item-list">
+              <c:set var="tongSoLuong" value="0" />
+              <c:set var="tongTien" value="0" />
+              <c:forEach var="cartItem" items="${sessionScope.cart}">
+                <c:set var="tongSoLuong" value="${tongSoLuong + cartItem.soLuong}"/>
+                <c:set var="tongTien" value="${tongTien + cartItem.thanhTien}" />
+                <article class="cart-line">
+                  <div class="cart-line__thumb">
+                    <img src="/images/${cartItem.imageUrl}"
+                         style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+                  </div>
+                  <div class="cart-line__meta">
+                    <h3 class="cart-line__name">${cartItem.tenMon}</h3>
+                    <div class="cart-line__controls">
+                      <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
+                      <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
+                        <div class="qty-stepper" aria-label="Chinh so luong">
+                          <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
+                          <span class="qty-stepper__value">${cartItem.soLuong}</span>
+                          <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
+                        </div>
+                        <strong class="cart-line__sum">
+                          <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> đ
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </c:forEach>
             </div>
 
             <div id="cartMessage" class="cart-message"></div>
@@ -42,13 +69,19 @@
           <article class="summary-panel">
             <div style="display:flex; align-items:center; width:100%;">
               <h2 class="summary-panel__title">Tổng sản phẩm </h2>
-              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">0 MÓN</h2>
+              
+              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">${tongSoLuong} MÓN</h2>
             </div>
 
 
 
             <div class="summary-lines">
-              <div class="summary-line summary-line--strong"><span>Tổng tiền</span><strong id="summary-total">0 VND</strong></div>
+              <div class="summary-line summary-line--strong">
+                <span>Tổng tiền</span>
+                <strong id="summary-total">
+                  <fmt:formatNumber type="number" value="${tongTien}"/> đ
+                </strong>
+              </div>
             </div>
 
             <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>

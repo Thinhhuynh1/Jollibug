@@ -26,3 +26,52 @@ INSERT INTO USERS (Password, Email, HoTen, SDT, TrangThai, MaVT) VALUES ('$2a$12
 INSERT INTO USERS (Password, Email, HoTen, SDT, TrangThai, MaVT) VALUES ('$2a$12$3iN4vL5Rclp3TgCOvlYi9Ow5huS.YavR922zHw1WhfchxgPwlMq.e', 'user20@fastfood.vn', 'User T', '0900000020', 'ACTIVE', 2);
 
 COMMIT;
+
+INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Gà Rán', N'Các món gà rán giòn rụm', 1, SYSDATE, SYSDATE);
+INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Burger', N'Các loại burger hấp dẫn', 1, SYSDATE, SYSDATE);
+INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Mì Ý', N'Mì Ý đậm đà hương vị', 1, SYSDATE, SYSDATE);
+INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Đồ Ăn Kèm', N'Các món ăn kèm đa dạng', 1, SYSDATE, SYSDATE);
+INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Thức Uống', N'Đồ uống giải khát mát lạnh', 1, SYSDATE, SYSDATE);
+INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Tráng Miệng', N'Các món tráng miệng ngọt ngào', 1, SYSDATE, SYSDATE);
+COMMIT;
+
+-- MON AN
+-- DANH MỤC 1: GÀ RÁN
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Gà Rán Giòn Cay', N'Miếng gà rán rụm, tẩm ướp gia vị cay nồng đặc trưng, bên trong thịt mềm mọng nước.', 38000, 'GaRan_GionCay.png', 1, 1, 452, 85, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Gà Rán Truyền Thống', N'Gà rán với lớp vỏ mỏng giòn tan, giữ nguyên vị ngọt nguyên bản của thịt gà tươi.', 36000, 'GaRan_TruyenThong.png', 1, 1, 380, 60, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Gà Phủ Sốt Phô Mai', N'Gà rán giòn rụm được phủ một lớp sốt phô mai béo ngậy, thơm lừng.', 42000, 'GaRan_PhoMai.png', 1, 1, 215, 40, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Gà Sốt Cay Ngọt Hàn Quốc', N'Gà rán đẫm sốt cay ngọt đậm đà, rắc thêm chút mè rang thơm phức.', 42000, 'GaRan_CayNgot.png', 1, 1, 189, 55, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Gà Popcorn', N'Những viên thịt gà nhỏ tẩm bột chiên giòn, ăn vặt cực cuốn.', 35000, 'Ga_Popcorn.png', 1, 1, 275, 90, SYSDATE, SYSDATE);
+
+-- DANH MỤC 2: BURGER
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Burger Bò Phô Mai', N'Burger nhân thịt bò nướng mềm, phô mai lát tan chảy, kèm xà lách và cà chua tươi.', 45000, 'Burger_Bo.png', 2, 1, 310, 45, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Burger Gà Giòn Cay', N'Lườn gà chiên giòn cay kẹp trong vỏ bánh mì mềm, sốt mayonnaise béo ngậy.', 40000, 'Burger_Ga.png', 2, 1, 195, 50, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Burger Cá Tartar', N'Burger nhân phi lê cá tẩm bột chiên xù, ăn kèm sốt Tartar chua ngọt đặc trưng.', 45000, 'Burger_Ca.png', 2, 1, 85, 30, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Burger Bò Gấp Đôi', N'Cực đã với 2 lớp thịt bò nướng tảng, 2 lớp phô mai và sốt BBQ đậm vị.', 65000, 'Burger_2Bo.png', 2, 1, 120, 25, SYSDATE, SYSDATE);
+
+-- DANH MỤC 3: MÌ Ý
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Mì Ý Sốt Bò Băm', N'Mì Ý truyền thống với sốt cà chua thịt bò băm đậm đà, rắc phô mai Parmesan.', 40000, 'MyY_Bo.png', 3, 1, 240, 65, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Mì Ý Xúc Xích', N'Mì Ý sốt cà chua chua ngọt, ăn kèm xúc xích thái lát chiên giòn.', 35000, 'MyY_XucXich.png', 3, 1, 160, 40, SYSDATE, SYSDATE);
+
+-- DANH MỤC 4: ĐỒ ĂN KÈM
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Khoai Tây Chiên (Vừa)', N'Khoai tây cắt sợi chiên vàng giòn rụm, xóc muối mặn vừa phải.', 20000, 'KhoaiChien.png', 4, 1, 512, 120, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Khoai Tây Lắc Phô Mai', N'Khoai tây chiên giòn được xóc đều với bột phô mai mặn ngọt.', 28000, 'KhoaiLac.png', 4, 1, 340, 80, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Salad Bắp Cải Dưa Tươi', N'Salad bắp cải thái chỉ trộn sốt mayonnaise chua ngọt giúp giải ngán.', 15000, 'Salad.png', 4, 1, 95, 35, SYSDATE, SYSDATE);
+
+-- DANH MỤC 5: THỨC UỐNG
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Trà Chanh Hạt Chia', N'Trà chanh thanh mát kết hợp hạt chia bổ dưỡng.', 20000, 'Chanh.png', 5, 1, 210, 60, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Nước Ép Xoài Đào', N'Nước ép trái cây tươi mát vị xoài và đào chua ngọt.', 20000, 'XoaiDao.png', 5, 1, 145, 45, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Pepsi', N'Nước ngọt có ga sảng khoái.', 12000, 'Pepsi.png', 5, 1, 630, 200, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Mirinda', N'Nước ngọt có ga vị cam bùng nổ.', 12000, 'Mirinda.png', 5, 1, 180, 150, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'7Up', N'Nước ngọt có ga hương chanh giải nhiệt.', 12000, '7Up.png', 5, 1, 250, 180, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Cacao Sữa Đá', N'Thức uống lúa mạch vị cacao đậm đà, mát lạnh.', 20000, 'Cacao.png', 5, 1, 110, 50, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Nước Suối', N'Nước tinh khiết đóng chai.', 8000, 'Nuoc.png', 5, 1, 420, 100, SYSDATE, SYSDATE);
+
+-- DANH MỤC 6: TRÁNG MIỆNG
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Bánh Xoài Đào', N'Bánh chiên với vỏ ngoài giòn rụm, nhân xoài đào chua ngọt nóng hổi đầy hấp dẫn.', 15000, 'Banh_XoaiDao.png', 6, 1, 165, 55, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Tropical Sundae', N'Kem sữa tươi mềm mịn phủ xốt trái cây nhiệt đới thơm lừng và topping giòn tan.', 20000, 'Tropical_Sundae.png', 6, 1, 85, 30, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sundae Dâu', N'Kem sữa tươi mát lạnh kết hợp cùng xốt dâu tây chua ngọt đậm vị.', 15000, 'Sundae_Dau.png', 6, 1, 190, 40, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sundae Socola', N'Kem sữa tươi mát lạnh hòa quyện cùng xốt socola thơm béo, đậm đà.', 15000, 'Sundae_Socola.png', 6, 1, 220, 45, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sôcôla (Cúp)', N'Kem ốc quế vị sôcôla mát lạnh, sảng khoái cực đã.', 7000, 'Kem_Socola.png', 6, 1, 315, 70, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sữa Tươi (Cúp)', N'Kem ốc quế sữa tươi truyền thống, chất kem mềm mịn ngọt ngào.', 5000, 'Kem.png', 6, 1, 480, 110, SYSDATE, SYSDATE);
+COMMIT;

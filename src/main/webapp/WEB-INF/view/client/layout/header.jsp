@@ -13,7 +13,6 @@
         <c:url var="homeUrl" value="/" />
         <c:url var="menuUrl" value="/menu" />
         <c:url var="chatUrl" value="/chat" />
-        <c:url var="complaintUrl" value="/complaint" />
         <c:url var="cartUrl" value="/cart" />
         <c:url var="loginUrl" value="/login" />
         <c:url var="profileUrl" value="/profile" />
@@ -34,14 +33,16 @@
                 đơn</a>
               <a href="${chatUrl}" <c:if test="${fn:contains(currentPath, '/chat')}"> class="is-active"</c:if>>Nhắn
                 tin</a>
-              <a href="${complaintUrl}" <c:if test="${fn:contains(currentPath, '/complaint')}"> class="is-active"</c:if>
-                >Khiếu nại</a>
             </nav>
 
             <div class="header-actions">
               <c:if test="${not empty sessionScope.user}">
                 <a class="btn btn-primary" href="${cartUrl}">
-                  Giỏ hàng: <span data-cart-count id="header-cart-count">0</span>
+                  <c:set var="cartCount" value="0" />
+                  <c:forEach var="item" items="${sessionScope.cart}">
+                    <c:set var="cartCount" value="${cartCount + item.soLuong}" />
+                  </c:forEach>
+                  Giỏ hàng: <span data-cart-count id="header-cart-count">${cartCount}</span>
                 </a>
                 <a class="btn btn-outline" href="${profileUrl}">Tài khoản</a>
               </c:if>
@@ -51,34 +52,7 @@
             </div>
           </div>
         </header>
-      <div class="header-actions">
-        <a class="btn btn-primary" href="${cartUrl}"  >
-          Giỏ hàng: <span data-cart-count id="header-cart-count">0</span>
-        </a>
-        <a class="btn btn-outline" href="${loginUrl}">Đăng nhập</a>
-        <a class="btn btn-ghost" href="${profileUrl}">Tài khoản</a>
-      </div>
     </div>
   </header>
 
-  <script>
-    (function () {
-      var cartCountEl = document.getElementById("header-cart-count");
-      if (!cartCountEl) return;
 
-      fetch("${pageContext.request.contextPath}/api/cart?customerId=1")
-        .then(function (response) {
-          return response.ok ? response.json() : [];
-        })
-        .then(function (items) {
-          var totalQuantity = Array.isArray(items)
-            ? items.reduce(function (total, item) {
-                return total + Number(item.soLuong || 0);
-              }, 0)
-            : 0;
-
-          cartCountEl.textContent = totalQuantity;
-        })
-        .catch(function () {});
-    })();
-  </script>

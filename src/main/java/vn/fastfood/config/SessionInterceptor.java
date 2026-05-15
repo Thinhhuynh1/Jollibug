@@ -8,7 +8,8 @@ import jakarta.servlet.http.HttpSession;
 
 public class SessionInterceptor implements HandlerInterceptor {
 
-    // override preHandle | func này sẽ ktra xem có req được không | check xem có quyền
+    // override preHandle | func này sẽ ktra xem có req được không | check xem có
+    // quyền
     // không
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)

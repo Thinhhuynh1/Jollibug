@@ -59,6 +59,9 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Mật khẩu sai");
         }
+        if ("BANNED".equalsIgnoreCase(user.getTrangThai())) {
+            throw new RuntimeException("Tài khoản này đã bị khóa");
+        }
         return user;
     }
 
