@@ -124,8 +124,27 @@
         <section class="checkout-card">
           <h2 class="checkout-card__title">Tóm tắt đơn hàng</h2>
           <div id="checkoutItemList">
-            <!-- Checkout items will be rendered by checkout-api.js -->
-          </div>
+            <c:set var="checkoutSubtotal" value="0" />
+
+            <c:forEach var="cartItem" items="${sessionScope.cart}">
+                <c:set var="checkoutSubtotal" value="${checkoutSubtotal + cartItem.thanhTien}" />
+
+                <div class="invoice-line checkout-session-item"
+                    data-line-total="${cartItem.thanhTien}">
+                    <strong>${cartItem.soLuong}x ${cartItem.tenMon}</strong>
+                    <strong>
+                        <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> VND
+                    </strong>
+                </div>
+            </c:forEach>
+
+            <c:if test="${empty sessionScope.cart}">
+                <div class="invoice-line">
+                    <span>Giỏ hàng đang trống</span>
+                    <strong>0 VND</strong>
+                </div>
+            </c:if>
+        </div>
 
           <hr class="checkout-divider" />
           <div class="voucher-inline">
@@ -197,10 +216,29 @@
           </div>
           
           <div>
-            <div class="invoice-line "><span>Tổng tiền</span><strong id="invoice-subtotal">0 VND</strong></div>
-            <div class="invoice-line"><span>Phí giao hàng</span><strong id="invoice-delivery-fee">0 VND</strong></div>
-            <div class="invoice-line"><span>Giảm giá</span><strong id="invoice-discount">0 VND</strong></div>
-            <div class="invoice-line "><span>Tổng cộng</span><strong id="invoice-total">0 VND</strong></div>
+            <div class="invoice-line">
+                <span>Tạm tính</span>
+                <strong id="invoice-subtotal">
+                    <fmt:formatNumber type="number" value="${checkoutSubtotal}" /> VND
+                </strong>
+            </div>
+
+            <div class="invoice-line">
+                <span>Phí giao hàng</span>
+                <strong id="invoice-delivery-fee">0 VND</strong>
+            </div>
+
+            <div class="invoice-line">
+                <span>Giảm giá</span>
+                <strong id="invoice-discount">-0 VND</strong>
+            </div>
+
+            <div class="invoice-line summary-line--strong">
+                <span>Tổng cộng</span>
+                <strong id="invoice-total">
+                    <fmt:formatNumber type="number" value="${checkoutSubtotal}" /> VND
+                </strong>
+            </div>
           </div>
         </section>
       </div>

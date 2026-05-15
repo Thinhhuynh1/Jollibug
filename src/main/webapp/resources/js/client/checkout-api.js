@@ -30,59 +30,38 @@ function getCustomerId() {
     return Number(getValue("customerId") || 1);
 }
 
-async function loadCheckoutSummary() {
-    const customerId = getCustomerId();
+function loadCheckoutSummary() {
     const itemList = document.getElementById("checkoutItemList");
     const messageEl = document.getElementById("checkoutMessage");
 
-    if (itemList) itemList.innerHTML = "";
     if (messageEl) messageEl.textContent = "";
 
-    try {
-        const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
-
-        if (!response.ok) {
-            throw new Error("Không thể tải tóm tắt giỏ hàng.");
-        }
-
-        const items = await response.json();
-
-        if (!items || items.length === 0) {
-            if (itemList) {
-                itemList.innerHTML = `
-                    <div class="invoice-line">
-                        <span>Giỏ hàng đang trống</span>
-                        <strong>0 VND</strong>
-                    </div>
-                `;
-            }
-
-            updateInvoice(0, 0);
-            return;
-        }
-
-        checkoutSubtotal = 0;
-
-        items.forEach(item => {
-            const quantity = Number(item.soLuong || 0);
-            const lineTotal = Number(item.thanhTien || 0);
-            checkoutSubtotal += lineTotal;
-
-            const row = document.createElement("div");
-            row.className = "invoice-line";
-            row.innerHTML = `
-                <strong>${quantity}x ${item.tenMon || ("Món #" + item.maMon)}</strong>
-                <strong>${formatMoney(lineTotal)}</strong>
-            `;
-
-            itemList.appendChild(row);
-        });
-
-        updateInvoice(checkoutSubtotal, 0);
-
-    } catch (error) {
-        showCheckoutMessage(error.message);
+    if (!itemList) {
+        updateInvoice(0, 0);
+        return;
     }
+
+    const rows = itemList.querySelectorAll(".checkout-session-item");
+
+    if (!rows || rows.length === 0) {
+        itemList.innerHTML = `
+            <div class="invoice-line">
+                <span>Giỏ hàng đang trống</span>
+                <strong>0 VND</strong>
+            </div>
+        `;
+
+        updateInvoice(0, 0);
+        return;
+    }
+
+    let subtotal = 0;
+
+    rows.forEach(row => {
+        subtotal += Number(row.dataset.lineTotal || 0);
+    });
+
+    updateInvoice(subtotal, 0);
 }
 
 function applyVoucherPreview() {
@@ -207,53 +186,6 @@ function showCheckoutMessage(message) {
 
 function formatMoney(value) {
     return Number(value || 0).toLocaleString("vi-VN") + " VND";
-}
-
-function initSelectedAddress() {
-    const params = new URLSearchParams(window.location.search);
-
-    const maDC = params.get("maDC");
-    const address = params.get("address");
-    const name = params.get("name");
-    const phone = params.get("phone");
-    const email = params.get("email");
-
-    if (maDC) {
-        const addressSelect = document.getElementById("addressSelect");
-        if (addressSelect) addressSelect.value = maDC;
-
-        localStorage.setItem("checkout_maDC", maDC);
-    }
-
-    if (address) {
-        const addressInput = document.getElementById("delivery-address");
-        if (addressInput) addressInput.value = decodeURIComponent(address);
-
-        localStorage.setItem("checkout_address", decodeURIComponent(address));
-    }
-
-    if (name) {
-        const nameInput = document.getElementById("delivery-name");
-        if (nameInput) nameInput.value = decodeURIComponent(name);
-
-        localStorage.setItem("checkout_name", decodeURIComponent(name));
-    }
-
-    if (phone) {
-        const phoneInput = document.getElementById("delivery-phone");
-        if (phoneInput) phoneInput.value = phone;
-
-        localStorage.setItem("checkout_phone", phone);
-    }
-
-    if (email) {
-        const emailInput = document.getElementById("delivery-email");
-        if (emailInput) emailInput.value = email;
-
-        localStorage.setItem("checkout_email", email);
-    }
-
-    restoreAddressFromStorage();
 }
 
 function restoreAddressFromStorage() {
