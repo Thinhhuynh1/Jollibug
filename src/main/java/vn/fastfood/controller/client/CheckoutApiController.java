@@ -2,6 +2,8 @@ package vn.fastfood.controller.client;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpSession;
 import vn.fastfood.dto.CheckoutRequest;
 import vn.fastfood.dto.CheckoutResponse;
 import vn.fastfood.service.CheckoutService;
@@ -12,8 +14,11 @@ public class CheckoutApiController {
     private final CheckoutService checkoutService = new CheckoutService();
 
     @PostMapping
-    public ResponseEntity<CheckoutResponse> checkout(@RequestBody CheckoutRequest request) {
-        CheckoutResponse response = checkoutService.checkout(request);
+    public ResponseEntity<CheckoutResponse> checkout(
+            @RequestBody CheckoutRequest request,
+            HttpSession session
+    ) {
+        CheckoutResponse response = checkoutService.checkout(request, session);
 
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
