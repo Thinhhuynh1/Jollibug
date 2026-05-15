@@ -24,24 +24,24 @@ public interface DonHangRepository extends JpaRepository<DonHang, Long> {
                     @Param("toDate") LocalDateTime toDate);
 
     // Doanh thu theo từng ngày (cho biểu đồ) - Oracle native query
-    @Query(value = "SELECT TRUNC(d.NGAY_DAT) AS ngay, COALESCE(SUM(d.TONG_TIEN), 0) AS doanhThu " +
+    @Query(value = "SELECT TRUNC(d.NGAYDAT) AS ngay, COALESCE(SUM(d.TONGTIEN), 0) AS doanhThu " +
                "FROM DONHANG d " +
-               "WHERE d.TRANG_THAI = 'DELIVERED' " +
-               "AND d.NGAY_DAT BETWEEN :fromDate AND :toDate " +
-               "GROUP BY TRUNC(d.NGAY_DAT) " +
-               "ORDER BY TRUNC(d.NGAY_DAT)",
+               "WHERE d.TRANGTHAI = 'DELIVERED' " +
+               "AND d.NGAYDAT BETWEEN :fromDate AND :toDate " +
+               "GROUP BY TRUNC(d.NGAYDAT) " +
+               "ORDER BY TRUNC(d.NGAYDAT)",
        nativeQuery = true)
 List<Object[]> revenueByDay(@Param("fromDate") LocalDateTime fromDate,
                             @Param("toDate") LocalDateTime toDate);
 
     // Doanh thu theo tháng trong năm - Oracle native query
-    @Query(value = "SELECT EXTRACT(MONTH FROM d.NGAY_DAT) AS thang, " +
-               "COALESCE(SUM(d.TONG_TIEN), 0) AS doanhThu " +
+    @Query(value = "SELECT EXTRACT(MONTH FROM d.NGAYDAT) AS thang, " +
+               "COALESCE(SUM(d.TONGTIEN), 0) AS doanhThu " +
                "FROM DONHANG d " +
-               "WHERE d.TRANG_THAI = 'DELIVERED' " +
-               "AND EXTRACT(YEAR FROM d.NGAY_DAT) = :year " +
-               "GROUP BY EXTRACT(MONTH FROM d.NGAY_DAT) " +
-               "ORDER BY EXTRACT(MONTH FROM d.NGAY_DAT)",
+               "WHERE d.TRANGTHAI = 'DELIVERED' " +
+               "AND EXTRACT(YEAR FROM d.NGAYDAT) = :year " +
+               "GROUP BY EXTRACT(MONTH FROM d.NGAYDAT) " +
+               "ORDER BY EXTRACT(MONTH FROM d.NGAYDAT)",
        nativeQuery = true)
 List<Object[]> revenueByMonth(@Param("year") int year);
     // === THỐNG KÊ ĐƠN HÀNG ===
@@ -63,11 +63,11 @@ List<Object[]> revenueByMonth(@Param("year") int year);
                                       @Param("toDate") LocalDateTime toDate);
 
     // Số đơn theo ngày (cho biểu đồ) - Oracle native query
-    @Query(value = "SELECT TRUNC(d.NGAY_DAT) AS ngay, COUNT(*) AS soDon " +
+    @Query(value = "SELECT TRUNC(d.NGAYDAT) AS ngay, COUNT(*) AS soDon " +
                    "FROM DONHANG d " +
-                   "WHERE d.NGAY_DAT BETWEEN :fromDate AND :toDate " +
-                   "GROUP BY TRUNC(d.NGAY_DAT) " +
-                   "ORDER BY TRUNC(d.NGAY_DAT)",
+                   "WHERE d.NGAYDAT BETWEEN :fromDate AND :toDate " +
+                   "GROUP BY TRUNC(d.NGAYDAT) " +
+                   "ORDER BY TRUNC(d.NGAYDAT)",
            nativeQuery = true)
     List<Object[]> countByDay(@Param("fromDate") LocalDateTime fromDate,
                               @Param("toDate") LocalDateTime toDate);

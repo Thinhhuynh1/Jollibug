@@ -24,8 +24,8 @@ public class StaffController {
     private final UserRepository userRepository;
 
     public StaffController(YeuCauHoTroRepository yeuCauRepo,
-                           ChiTietHoTroRepository chiTietRepo,
-                           UserRepository userRepository) {
+            ChiTietHoTroRepository chiTietRepo,
+            UserRepository userRepository) {
         this.yeuCauRepo = yeuCauRepo;
         this.chiTietRepo = chiTietRepo;
         this.userRepository = userRepository;
@@ -33,7 +33,7 @@ public class StaffController {
 
     @GetMapping("/staff")
     public String getOrders() {
-        return "redirect:/staff/orders/confirmed";
+        return "redirect:/staff/orders";
     }
 
     @GetMapping("/staff/orders/confirmed")
@@ -49,13 +49,19 @@ public class StaffController {
     }
 
     @GetMapping("/staff/orders/detail")
-    public String getOrderDetailPage() { return "/staff/orders/detail"; }
+    public String getOrderDetailPage() {
+        return "/staff/orders/detail";
+    }
 
     @GetMapping("/staff/orders/update-status")
-    public String getOrderUpdateStatusPage() { return "/staff/orders/update-status"; }
+    public String getOrderUpdateStatusPage() {
+        return "/staff/orders/update-status";
+    }
 
     @GetMapping("/staff/orders/confirm")
-    public String getOrderConfirmPage() { return "/staff/orders/confirm"; }
+    public String getOrderConfirmPage() {
+        return "/staff/orders/confirm";
+    }
 
     // ----------------------------------------------------------------
     // SUPPORT PAGE
@@ -104,8 +110,12 @@ public class StaffController {
     }
 
     @GetMapping("/staff/clients")
-    public String getClientsPage() { return "/staff/clients/show"; }
+    public String getClientsPage() {
+        return "/staff/clients/show";
+    }
 
     @GetMapping("/staff/clients/detail")
-    public String getClientDetailPage() { return "/staff/clients/detail"; }
+    public String getClientDetailPage() {
+        return "/staff/clients/detail";
+    }
 }
