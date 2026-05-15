@@ -123,10 +123,8 @@
         </section>
         <section class="checkout-card">
           <h2 class="checkout-card__title">Tóm tắt đơn hàng</h2>
-          <div id="order-items">
-            <div class="invoice-line">
-              <span>Giỏ hàng của bạn đang được cập nhật...</span>
-            </div>
+          <div id="checkoutItemList">
+            <!-- Checkout items will be rendered by checkout-api.js -->
           </div>
 
           <hr class="checkout-divider" />
