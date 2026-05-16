@@ -21,8 +21,17 @@
   <jsp:include page="../layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="1">
-    <input type="hidden" id="addressSelect" value="1">
+    <input type="hidden" id="customerId" value="${sessionScope.userId}">
+    <input type="hidden" id="addressSelect" value="${defaultAddress != null ? defaultAddress.maDC : ''}">
+    <input type="hidden" id="currentUserName" value="${currentUser != null ? currentUser.hoTen : ''}">
+    <input type="hidden" id="currentUserPhone" value="${currentUser != null ? currentUser.sdt : ''}">
+    <input type="hidden" id="currentUserEmail" value="${currentUser != null ? currentUser.email : ''}">
+    <input type="hidden" id="defaultAddressName" value="${defaultAddress != null ? defaultAddress.tenNguoiNhan : ''}">
+    <input type="hidden" id="defaultAddressPhone" value="${defaultAddress != null ? defaultAddress.sdtNguoiNhan : ''}">
+    <input type="hidden" id="defaultAddressLine" value="${defaultAddress != null ? defaultAddress.diaChiCuThe : ''}">
+    <input type="hidden" id="defaultWard" value="${defaultAddress != null ? defaultAddress.phuongXa : ''}">
+    <input type="hidden" id="defaultDistrict" value="${defaultAddress != null ? defaultAddress.quanHuyen : ''}">
+    <input type="hidden" id="defaultProvince" value="${defaultAddress != null ? defaultAddress.tinhThanh : ''}">
 
     <div class="container">
       <div class="page-intro">

@@ -265,6 +265,15 @@ public class CheckoutDAO {
             return false;
         }
 
+        String normalizedMaPT = maPT.trim().toUpperCase();
+
+        if ("COD".equals(normalizedMaPT)
+                || "BANK".equals(normalizedMaPT)
+                || "EWALLET".equals(normalizedMaPT)
+                || "CREDIT_CARD".equals(normalizedMaPT)) {
+            return true;
+        }
+
         String sql = """
             SELECT COUNT(*)
             FROM PHUONGTHUCTT
@@ -274,7 +283,7 @@ public class CheckoutDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, maPT.trim().toUpperCase());
+            ps.setString(1, normalizedMaPT);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

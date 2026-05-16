@@ -21,13 +21,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+window.addEventListener("pageshow", () => {
+    loadCheckoutSummary();
+});
+
 function getValue(id) {
     const el = document.getElementById(id);
     return el ? el.value : "";
 }
 
 function getCustomerId() {
-    return Number(getValue("customerId") || 1);
+    return Number(getValue("customerId") || 0);
 }
 
 async function loadCheckoutSummary() {
@@ -37,6 +41,12 @@ async function loadCheckoutSummary() {
 
     if (itemList) itemList.innerHTML = "";
     if (messageEl) messageEl.textContent = "";
+
+    if (!customerId) {
+        showCheckoutMessage("Không tìm thấy thông tin khách hàng.");
+        updateInvoice(0, 0);
+        return;
+    }
 
     try {
         const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
@@ -79,7 +89,6 @@ async function loadCheckoutSummary() {
         });
 
         updateInvoice(checkoutSubtotal, 0);
-
     } catch (error) {
         showCheckoutMessage(error.message);
     }
@@ -95,8 +104,6 @@ function applyVoucherPreview() {
         return;
     }
 
-    // Preview tạm trên frontend để người dùng thấy thay đổi.
-    // Backend vẫn là nơi tính giảm giá chính xác khi POST /api/checkout.
     if (code === "JOLLI10") {
         checkoutDiscount = Math.round(checkoutSubtotal * 0.1);
         showCheckoutMessage("Đã áp dụng mã JOLLI10. Giảm 10% tạm tính.");
@@ -131,9 +138,13 @@ function updateInvoice(subtotal, discount) {
 
 async function submitCheckout() {
     const customerId = getCustomerId();
-    const maDC = Number(getValue("addressSelect") || 1);
+    const addressValue = getValue("addressSelect").trim();
+    const maDC = addressValue ? Number(addressValue) : null;
     const discountCode = getValue("voucher-code").trim();
-    const ghiChu = buildCheckoutNote();
+    const deliveryName = getValue("delivery-name").trim();
+    const deliveryPhone = getValue("delivery-phone").trim();
+    const email = getValue("delivery-email").trim();
+    const deliveryAddress = getValue("delivery-address").trim();
 
     const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
     const maPT = selectedPayment ? selectedPayment.value : "COD";
@@ -143,8 +154,8 @@ async function submitCheckout() {
         return;
     }
 
-    if (!maDC) {
-        showCheckoutMessage("Vui lòng chọn địa chỉ giao hàng.");
+    if (!deliveryName || !deliveryPhone || !deliveryAddress) {
+        showCheckoutMessage("Vui lòng nhập đủ thông tin giao hàng.");
         return;
     }
 
@@ -164,7 +175,11 @@ async function submitCheckout() {
                 maDC,
                 discountCode,
                 maPT,
-                ghiChu
+                ghiChu: "",
+                deliveryName,
+                deliveryPhone,
+                email,
+                deliveryAddress
             })
         });
 
@@ -182,19 +197,9 @@ async function submitCheckout() {
         } else {
             window.location.href = `/pay?orderId=${data.orderId}`;
         }
-
     } catch (error) {
         showCheckoutMessage("Lỗi khi đặt hàng. Vui lòng thử lại.");
     }
-}
-
-function buildCheckoutNote() {
-    const name = getValue("delivery-name");
-    const phone = getValue("delivery-phone");
-    const email = getValue("delivery-email");
-    const address = getValue("delivery-address");
-
-    return `Người nhận: ${name}; SĐT: ${phone}; Email: ${email}; Địa chỉ nhập: ${address}`;
 }
 
 function showCheckoutMessage(message) {
@@ -210,98 +215,40 @@ function formatMoney(value) {
 }
 
 function initSelectedAddress() {
-    const params = new URLSearchParams(window.location.search);
-
-    const maDC = params.get("maDC");
-    const address = params.get("address");
-    const name = params.get("name");
-    const phone = params.get("phone");
-    const email = params.get("email");
-
-    if (maDC) {
-        const addressSelect = document.getElementById("addressSelect");
-        if (addressSelect) addressSelect.value = maDC;
-
-        localStorage.setItem("checkout_maDC", maDC);
-    }
-
-    if (address) {
-        const addressInput = document.getElementById("delivery-address");
-        if (addressInput) addressInput.value = decodeURIComponent(address);
-
-        localStorage.setItem("checkout_address", decodeURIComponent(address));
-    }
-
-    if (name) {
-        const nameInput = document.getElementById("delivery-name");
-        if (nameInput) nameInput.value = decodeURIComponent(name);
-
-        localStorage.setItem("checkout_name", decodeURIComponent(name));
-    }
-
-    if (phone) {
-        const phoneInput = document.getElementById("delivery-phone");
-        if (phoneInput) phoneInput.value = phone;
-
-        localStorage.setItem("checkout_phone", phone);
-    }
-
-    if (email) {
-        const emailInput = document.getElementById("delivery-email");
-        if (emailInput) emailInput.value = email;
-
-        localStorage.setItem("checkout_email", email);
-    }
-
-    restoreAddressFromStorage();
-}
-
-function restoreAddressFromStorage() {
+    const selectedAddress = localStorage.getItem("selectedCheckoutAddress");
     const addressSelect = document.getElementById("addressSelect");
-    const addressInput = document.getElementById("delivery-address");
     const nameInput = document.getElementById("delivery-name");
     const phoneInput = document.getElementById("delivery-phone");
     const emailInput = document.getElementById("delivery-email");
+    const addressInput = document.getElementById("delivery-address");
 
-    if (addressSelect && localStorage.getItem("checkout_maDC")) {
-        addressSelect.value = localStorage.getItem("checkout_maDC");
-    }
+    const currentUserName = getValue("currentUserName").trim();
+    const currentUserPhone = getValue("currentUserPhone").trim();
+    const currentUserEmail = getValue("currentUserEmail").trim();
+    const defaultAddressId = getValue("addressSelect").trim();
+    const defaultAddressName = getValue("defaultAddressName").trim();
+    const defaultAddressPhone = getValue("defaultAddressPhone").trim();
+    const defaultAddressFull = [
+        getValue("defaultAddressLine").trim(),
+        getValue("defaultWard").trim(),
+        getValue("defaultDistrict").trim(),
+        getValue("defaultProvince").trim()
+    ].filter(Boolean).join(", ");
 
-    if (addressInput && localStorage.getItem("checkout_address")) {
-        addressInput.value = localStorage.getItem("checkout_address");
-    }
+    if (selectedAddress) {
+        const addressData = JSON.parse(selectedAddress);
 
-    if (nameInput && localStorage.getItem("checkout_name")) {
-        nameInput.value = localStorage.getItem("checkout_name");
-    }
-
-    if (phoneInput && localStorage.getItem("checkout_phone")) {
-        phoneInput.value = localStorage.getItem("checkout_phone");
-    }
-
-    if (emailInput && localStorage.getItem("checkout_email")) {
-        emailInput.value = localStorage.getItem("checkout_email");
-    }
-}
-
-function initSelectedAddress() {
-    const selectedAddress = localStorage.getItem("selectedCheckoutAddress");
-
-    if (!selectedAddress) {
+        if (addressSelect) addressSelect.value = addressData.maDC || "";
+        if (nameInput) nameInput.value = addressData.name || currentUserName;
+        if (phoneInput) phoneInput.value = addressData.phone || currentUserPhone;
+        if (emailInput) emailInput.value = addressData.email || currentUserEmail;
+        if (addressInput) addressInput.value = addressData.address || "";
         return;
     }
 
-    const addressData = JSON.parse(selectedAddress);
-
-    const addressSelect = document.getElementById("addressSelect");
-    const nameInput = document.getElementById("delivery-name");
-    const phoneInput = document.getElementById("delivery-phone");
-    const emailInput = document.getElementById("delivery-email");
-    const addressInput = document.getElementById("delivery-address");
-
-    if (addressSelect) addressSelect.value = addressData.maDC;
-    if (nameInput) nameInput.value = addressData.name;
-    if (phoneInput) phoneInput.value = addressData.phone;
-    if (emailInput) emailInput.value = addressData.email;
-    if (addressInput) addressInput.value = addressData.address;
+    if (addressSelect) addressSelect.value = defaultAddressId || "";
+    if (nameInput) nameInput.value = defaultAddressName || currentUserName || "";
+    if (phoneInput) phoneInput.value = defaultAddressPhone || currentUserPhone || "";
+    if (emailInput) emailInput.value = currentUserEmail || "";
+    if (addressInput) addressInput.value = defaultAddressFull || "";
 }
