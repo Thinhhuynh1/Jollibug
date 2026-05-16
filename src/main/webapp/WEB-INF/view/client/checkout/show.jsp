@@ -21,8 +21,8 @@
   <jsp:include page="../layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="1">
-    <input type="hidden" id="addressSelect" value="1">
+    <input type="hidden" id="customerId" value="${checkoutUser.maTK}" />
+    <input type="hidden" id="addressSelect" value="" />
 
     <div class="container">
       <div class="page-intro">
@@ -57,7 +57,7 @@
           </form>
 
           <div style="text-align: end;">
-            <a class="btn btn-outline" href="/checkout/changeAddress" >
+            <a class="btn btn-outline" href="${pageContext.request.contextPath}/checkout/change-address" >
               Đổi địa chỉ
             </a>
           </div>
@@ -86,28 +86,28 @@
 
             <div class="payment-options" role="radiogroup" aria-label="Payment method">
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="COD" checked />
+                <input type="radio" name="payment-method" value="COD" checked>
                 <div>
                   <strong>Thanh toán khi nhận hàng (COD)</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="CREDIT_CARD" />
+                <input type="radio" name="payment-method" value="CREDIT_CARD">
                 <div>
                   <strong>Thẻ tín dụng / Ghi nợ</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="BANK" />
+                <input type="radio" name="payment-method" value="BANK">
                 <div>
                   <strong>Chuyển khoản ngân hàng</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="EWALLET" />
+                <input type="radio" name="payment-method" value="EWALLET">
                 <div>
                   <strong>Ví điện tử</strong>
                 </div>
@@ -117,7 +117,7 @@
 
           <div id="checkoutMessage" class="checkout-message"></div>
 
-          <button class="btn btn-primary btn-block" type="button" id="btn-place-order">
+          <button type="button" id="checkoutButton" class="btn btn-primary btn-block">
             Thanh toán
           </button>
         </section>
@@ -252,7 +252,7 @@
   <jsp:include page="../layout/footer.jsp" />
 
   <script src="/js/client/main.js"></script>
-  <script src="${pageContext.request.contextPath}/resources/js/client/checkout-api.js"></script>
+  <script src="${pageContext.request.contextPath}/resources/js/client/checkout-api.js" defer></script>
 </body>
 </html>
 

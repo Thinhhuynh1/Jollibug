@@ -29,8 +29,24 @@ public class CheckoutService {
 
         long customerId = request.getCustomerId();
 
-        if (!checkoutDAO.isValidAddress(customerId, request.getMaDC())) {
-            return new CheckoutResponse(false, "Địa chỉ giao hàng không hợp lệ.", null, null, null, null);
+        /*
+         * Không bắt buộc địa chỉ phải tồn tại trong bảng DIACHI.
+         * Nếu khách chọn địa chỉ đã lưu và MaDC hợp lệ, dùng MaDC đó.
+         * Nếu MaDC không hợp lệ hoặc khách nhập địa chỉ mới, vẫn cho đặt hàng,
+         * thông tin giao hàng sẽ được lưu trong GhiChu.
+         */
+        Long maDC = request.getMaDC();
+
+        if (maDC != null && maDC <= 0) {
+            maDC = null;
+        }
+
+        if (maDC == null || maDC <= 0) {
+            return new CheckoutResponse(false, "Vui lòng chọn địa chỉ giao hàng.", null, null, null, null);
+        }
+
+        if (!checkoutDAO.isValidAddress(customerId, maDC)) {
+            return new CheckoutResponse(false, "Địa chỉ giao hàng không hợp lệ hoặc không thuộc tài khoản hiện tại.", null, null, null, null);
         }
 
         String maPT = request.getMaPT();
@@ -70,7 +86,7 @@ public class CheckoutService {
         try {
             long orderId = checkoutDAO.createOrder(
                     customerId,
-                    request.getMaDC(),
+                    maDC,
                     subtotal,
                     discountAmount,
                     total,
@@ -97,7 +113,6 @@ public class CheckoutService {
 
             checkoutDAO.createPayment(orderId, maPT, total);
 
-            // Sau khi đặt hàng thành công, xóa giỏ hàng trong session
             session.removeAttribute("cart");
 
             return new CheckoutResponse(
@@ -123,7 +138,6 @@ public class CheckoutService {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private List<CheckoutCartItem> getCheckoutItemsFromSession(HttpSession session) {
         Object cartObj = session.getAttribute("cart");
 

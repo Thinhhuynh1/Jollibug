@@ -6,20 +6,57 @@ let checkoutDiscount = 0;
 let checkoutTotal = 0;
 const deliveryFee = 0;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
     initSelectedAddress();
-    loadCheckoutSummary();
 
-    const placeOrderBtn = document.getElementById("btn-place-order");
-    if (placeOrderBtn) {
-        placeOrderBtn.addEventListener("click", submitCheckout);
-    }
+    const checkoutButton = document.getElementById("checkoutButton");
 
-    const voucherApplyBtn = document.getElementById("voucher-apply");
-    if (voucherApplyBtn) {
-        voucherApplyBtn.addEventListener("click", applyVoucherPreview);
+    if (checkoutButton) {
+        checkoutButton.addEventListener("click", submitCheckout);
+    } else {
+        console.error("[CHECKOUT] Không tìm thấy nút #checkoutButton");
     }
 });
+
+function initSelectedAddress() {
+    const selectedAddressRaw = localStorage.getItem("selectedCheckoutAddress");
+
+    if (!selectedAddressRaw) {
+        return;
+    }
+
+    try {
+        const selectedAddress = JSON.parse(selectedAddressRaw);
+
+        const addressSelect = document.getElementById("addressSelect");
+        const nameInput = document.getElementById("delivery-name");
+        const phoneInput = document.getElementById("delivery-phone");
+        const emailInput = document.getElementById("delivery-email");
+        const addressInput = document.getElementById("delivery-address");
+
+        if (addressSelect) {
+            addressSelect.value = selectedAddress.maDC || "";
+        }
+
+        if (nameInput) {
+            nameInput.value = selectedAddress.name || "";
+        }
+
+        if (phoneInput) {
+            phoneInput.value = selectedAddress.phone || "";
+        }
+
+        if (emailInput) {
+            emailInput.value = selectedAddress.email || "";
+        }
+
+        if (addressInput) {
+            addressInput.value = selectedAddress.address || "";
+        }
+    } catch (error) {
+        localStorage.removeItem("selectedCheckoutAddress");
+    }
+}
 
 function getValue(id) {
     const el = document.getElementById(id);
@@ -27,7 +64,7 @@ function getValue(id) {
 }
 
 function getCustomerId() {
-    return Number(getValue("customerId") || 1);
+    return Number(getValue("customerId"));
 }
 
 function loadCheckoutSummary() {
@@ -109,62 +146,56 @@ function updateInvoice(subtotal, discount) {
 }
 
 async function submitCheckout() {
-    const customerId = getCustomerId();
-    const maDC = Number(getValue("addressSelect") || 1);
-    const discountCode = getValue("voucher-code").trim();
-    const ghiChu = buildCheckoutNote();
+    const customerId = Number(document.getElementById("customerId")?.value);
+
+    const maDCValue = document.getElementById("addressSelect")?.value;
+    const maDC = maDCValue ? Number(maDCValue) : null;
 
     const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
     const maPT = selectedPayment ? selectedPayment.value : "COD";
 
+    console.log("[CHECKOUT FRONTEND]", {
+        customerId,
+        maDC,
+        maPT
+    });
+
     if (!customerId) {
-        showCheckoutMessage("Không tìm thấy thông tin khách hàng.");
+        alert("Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.");
         return;
     }
 
     if (!maDC) {
-        showCheckoutMessage("Vui lòng chọn địa chỉ giao hàng.");
+        alert("Vui lòng chọn địa chỉ giao hàng.");
         return;
     }
 
-    if (!maPT) {
-        showCheckoutMessage("Vui lòng chọn phương thức thanh toán.");
+    const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            customerId: customerId,
+            maDC: maDC,
+            maPT: maPT,
+            discountCode: null,
+            ghiChu: null
+        })
+    });
+
+    const data = await response.json();
+
+    console.log("[CHECKOUT RESPONSE]", data);
+
+    if (!response.ok || !data.success) {
+        alert(data.message || "Thanh toán thất bại.");
         return;
     }
 
-    try {
-        const response = await fetch(CHECKOUT_API_BASE, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                customerId,
-                maDC,
-                discountCode,
-                maPT,
-                ghiChu
-            })
-        });
+    alert("Đặt hàng thành công!");
 
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-            showCheckoutMessage(data.message || "Đặt hàng thất bại.");
-            return;
-        }
-
-        showCheckoutMessage(data.message || "Đặt hàng thành công.");
-
-        if (maPT === "COD") {
-            window.location.href = `/client/orders/detail?orderId=${data.orderId}&customerId=${customerId}`;
-        } else {
-            window.location.href = `/pay?orderId=${data.orderId}`;
-        }
-
-    } catch (error) {
-        showCheckoutMessage("Lỗi khi đặt hàng. Vui lòng thử lại.");
-    }
+    window.location.href = "/client/orders/detail?orderId=" + data.orderId + "&customerId=" + customerId;
 }
 
 function buildCheckoutNote() {
@@ -214,26 +245,4 @@ function restoreAddressFromStorage() {
     if (emailInput && localStorage.getItem("checkout_email")) {
         emailInput.value = localStorage.getItem("checkout_email");
     }
-}
-
-function initSelectedAddress() {
-    const selectedAddress = localStorage.getItem("selectedCheckoutAddress");
-
-    if (!selectedAddress) {
-        return;
-    }
-
-    const addressData = JSON.parse(selectedAddress);
-
-    const addressSelect = document.getElementById("addressSelect");
-    const nameInput = document.getElementById("delivery-name");
-    const phoneInput = document.getElementById("delivery-phone");
-    const emailInput = document.getElementById("delivery-email");
-    const addressInput = document.getElementById("delivery-address");
-
-    if (addressSelect) addressSelect.value = addressData.maDC;
-    if (nameInput) nameInput.value = addressData.name;
-    if (phoneInput) phoneInput.value = addressData.phone;
-    if (emailInput) emailInput.value = addressData.email;
-    if (addressInput) addressInput.value = addressData.address;
 }
