@@ -18,7 +18,7 @@ public class PaymentService {
         }
 
         if ("Paid".equalsIgnoreCase(payment.getTrangThaiTT())) {
-            return false;
+            return true;
         }
 
         return paymentDAO.updatePaymentStatus(orderId, "Paid");

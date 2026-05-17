@@ -62,25 +62,6 @@
             </a>
           </div>
 
-          <!-- <section>
-            <h3 class="section-subtitle">Phương thức thanh toán</h3>
-            <div class="payment-options" role="radiogroup" aria-label="Payment method">
-              <label class="payment-option">
-                <input type="radio" name="payment-method" value="cod" checked />
-                <div>
-                  <strong>Thanh toán khi nhận hàng (COD)</strong>
-                </div>
-              </label>
-
-              <label class="payment-option">
-                <input type="radio" name="payment-method" value="online" />
-                <div>
-                  <strong>Thanh toán bằng ATM/ Ví điện tử</strong>
-                </div>
-              </label>
-            </div>
-          </section> -->
-
           <section class="payment-method-section">
             <h3 class="section-subtitle">Phương thức thanh toán</h3>
 

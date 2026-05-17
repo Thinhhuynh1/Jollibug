@@ -13,8 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (checkoutButton) {
         checkoutButton.addEventListener("click", submitCheckout);
+        console.log("[CHECKOUT] Đã gắn sự kiện cho nút thanh toán.");
     } else {
-        console.error("[CHECKOUT] Không tìm thấy nút #checkoutButton");
+        console.error("[CHECKOUT] Không tìm thấy nút #checkoutButton.");
     }
 });
 
@@ -152,7 +153,9 @@ async function submitCheckout() {
     const maDC = maDCValue ? Number(maDCValue) : null;
 
     const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
-    const maPT = selectedPayment ? selectedPayment.value : "COD";
+    const maPT = selectedPayment ? selectedPayment.value : null;
+    const discountCode = getValue("voucher-code").trim() || null;
+    const ghiChu = buildCheckoutNote();
 
     console.log("[CHECKOUT FRONTEND]", {
         customerId,
@@ -170,32 +173,54 @@ async function submitCheckout() {
         return;
     }
 
-    const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            customerId: customerId,
-            maDC: maDC,
-            maPT: maPT,
-            discountCode: null,
-            ghiChu: null
-        })
-    });
-
-    const data = await response.json();
-
-    console.log("[CHECKOUT RESPONSE]", data);
-
-    if (!response.ok || !data.success) {
-        alert(data.message || "Thanh toán thất bại.");
+    if (!maPT) {
+        alert("Vui lòng chọn phương thức thanh toán.");
         return;
     }
 
-    alert("Đặt hàng thành công!");
+    try {
+        const response = await fetch("/api/checkout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                customerId,
+                maDC,
+                maPT,
+                discountCode,
+                ghiChu
+            })
+        });
 
-    window.location.href = "/client/orders/detail?orderId=" + data.orderId + "&customerId=" + customerId;
+        const data = await response.json();
+
+        console.log("[CHECKOUT RESPONSE]", data);
+
+        if (!response.ok || !data.success) {
+            alert(data.message || "Thanh toán thất bại.");
+            return;
+        }
+
+        if (maPT === "COD") {
+            alert("Đặt hàng thành công");
+
+            localStorage.removeItem("selectedCheckoutAddress");
+
+            window.location.href = "/orders/detail?orderId=" + encodeURIComponent(data.orderId);
+            return;
+        }
+
+        window.location.href = "/pay?orderId="
+            + encodeURIComponent(data.orderId)
+            + "&customerId="
+            + encodeURIComponent(customerId)
+            + "&maPT="
+            + encodeURIComponent(maPT);
+    } catch (error) {
+        console.error("[CHECKOUT ERROR]", error);
+        alert("Có lỗi xảy ra khi thanh toán. Vui lòng thử lại.");
+    }
 }
 
 function buildCheckoutNote() {

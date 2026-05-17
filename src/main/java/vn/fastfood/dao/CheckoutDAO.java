@@ -277,7 +277,7 @@ public class CheckoutDAO {
             VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
         """;
 
-        String paymentStatus = "COD".equalsIgnoreCase(maPT) ? "Pending" : "Paid";
+        String paymentStatus = "Pending";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
