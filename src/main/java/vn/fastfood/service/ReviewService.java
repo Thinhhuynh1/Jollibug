@@ -1,6 +1,9 @@
 package vn.fastfood.service;
 
 import vn.fastfood.dao.ReviewDAO;
+import vn.fastfood.model.Review;
+
+import java.util.List;
 
 public class ReviewService {
     private final ReviewDAO reviewDAO = new ReviewDAO();
@@ -32,5 +35,9 @@ public class ReviewService {
         }
 
         return reviewDAO.insertReview(orderId, customerId, maMon, sao, noiDung.trim());
+    }
+
+    public List<Review> getReviewsByCustomerId(long customerId) {
+        return reviewDAO.getReviewsByCustomerId(customerId);
     }
 }

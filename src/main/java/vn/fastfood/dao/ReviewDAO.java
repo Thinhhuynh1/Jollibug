@@ -1,11 +1,17 @@
 package vn.fastfood.dao;
 
 import vn.fastfood.config.DBConnection;
+import vn.fastfood.model.Review;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReviewDAO {
 
@@ -115,5 +121,146 @@ public class ReviewDAO {
         }
 
         return false;
+    }
+
+    public List<Review> getReviewsByCustomerId(long customerId) {
+        List<Review> reviews = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                MaDG,
+                MaTK_KH,
+                MaMon,
+                MaDH,
+                Sao,
+                NoiDung,
+                NgayDG
+            FROM DANHGIA dg
+            WHERE dg.MaTK_KH = ?
+            ORDER BY dg.NgayDG DESC, dg.MaDG DESC
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, customerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Review review = new Review();
+
+                    review.setMaDG(rs.getLong("MaDG"));
+                    review.setMaTKKH(rs.getLong("MaTK_KH"));
+                    review.setMaMon(rs.getLong("MaMon"));
+                    review.setMaDH(rs.getLong("MaDH"));
+                    review.setSao(rs.getInt("Sao"));
+                    review.setNoiDung(readClob(rs.getClob("NoiDung")));
+                    review.setNgayDG(rs.getTimestamp("NgayDG"));
+                    enrichReviewFoodInfo(conn, review);
+
+                    reviews.add(review);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
+    }
+
+    private void enrichReviewFoodInfo(Connection conn, Review review) {
+        enrichReviewFoodFromOrderItem(conn, review);
+        enrichReviewFoodFromProduct(conn, review);
+
+        if (review.getTenMon() == null || review.getTenMon().trim().isEmpty()) {
+            review.setTenMon("Món #" + review.getMaMon());
+        }
+    }
+
+    private void enrichReviewFoodFromOrderItem(Connection conn, Review review) {
+        String sql = """
+            SELECT TenMon
+            FROM CHITIETDH
+            WHERE MaDH = ?
+              AND MaMon = ?
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, review.getMaDH());
+            ps.setLong(2, review.getMaMon());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    review.setTenMon(rs.getString("TenMon"));
+                }
+            }
+        } catch (SQLException ignored) {
+            // Product name can still be loaded from MONAN.
+        }
+    }
+
+    private void enrichReviewFoodFromProduct(Connection conn, Review review) {
+        String[] sqlCandidates = {
+                """
+                    SELECT TenMon, image_url
+                    FROM MONAN
+                    WHERE MaMon = ?
+                """,
+                """
+                    SELECT TenMon
+                    FROM MONAN
+                    WHERE MaMon = ?
+                """
+        };
+
+        for (String sql : sqlCandidates) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, review.getMaMon());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        return;
+                    }
+
+                    String tenMon = rs.getString("TenMon");
+                    if (tenMon != null && !tenMon.trim().isEmpty()) {
+                        review.setTenMon(tenMon);
+                    }
+
+                    try {
+                        review.setImageUrl(rs.getString("image_url"));
+                    } catch (SQLException ignored) {
+                        review.setImageUrl(null);
+                    }
+
+                    return;
+                }
+            } catch (SQLException ignored) {
+                // Try the next schema variant.
+            }
+        }
+    }
+
+    private String readClob(Clob clob) throws SQLException {
+        if (clob == null) {
+            return null;
+        }
+
+        StringBuilder value = new StringBuilder();
+
+        try (Reader reader = clob.getCharacterStream()) {
+            char[] buffer = new char[4096];
+            int charsRead;
+
+            while ((charsRead = reader.read(buffer)) != -1) {
+                value.append(buffer, 0, charsRead);
+            }
+
+            return value.toString();
+
+        } catch (IOException e) {
+            throw new SQLException("Could not read review content.", e);
+        }
     }
 }

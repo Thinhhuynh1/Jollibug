@@ -101,6 +101,18 @@
             </div>
           </section>
 
+          <c:if test="${not empty reorderMessage}">
+            <div class="checkout-message">${reorderMessage}</div>
+          </c:if>
+
+          <c:if test="${not empty reorderSkippedItems}">
+            <div class="checkout-message">
+              <c:forEach var="skippedItem" items="${reorderSkippedItems}">
+                <div>${skippedItem}</div>
+              </c:forEach>
+            </div>
+          </c:if>
+
           <div id="checkoutMessage" class="checkout-message"></div>
 
           <button type="button" id="checkoutButton" class="btn btn-primary btn-block">

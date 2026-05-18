@@ -1,6 +1,7 @@
 const CLIENT_ORDER_API = "/api/orders";
 
 let allOrders = [];
+let allReviews = [];
 let currentTab = "active";
 const orderDetailCache = new Map();
 
@@ -34,6 +35,7 @@ async function loadOrders() {
         allOrders = Array.isArray(orders) ? orders : [];
 
         await preloadOrderSummaries(allOrders);
+        await loadCustomerReviews(customerId);
         renderOrdersByTab();
 
     } catch (error) {
@@ -79,6 +81,12 @@ function renderOrdersByTab() {
 
     if (!list) return;
 
+    if (currentTab === "reviewed") {
+        updateSectionTitle(title);
+        renderReviewedList(list);
+        return;
+    }
+
     let filteredOrders = allOrders.filter(order => {
         const status = normalizeStatus(order.trangThaiDon);
 
@@ -91,7 +99,7 @@ function renderOrdersByTab() {
         }
 
         if (currentTab === "review") {
-            return status === "DELIVERED";
+            return status === "DELIVERED" && hasPendingReviewItems(order.maDH);
         }
 
         return true;
@@ -117,6 +125,11 @@ function renderOrdersByTab() {
 function updateSectionTitle(title) {
     if (!title) return;
 
+    if (currentTab === "reviewed") {
+        title.textContent = "Đã đánh giá";
+        return;
+    }
+
     if (currentTab === "active") {
         title.textContent = "Đơn đang đến";
         return;
@@ -131,9 +144,68 @@ function updateSectionTitle(title) {
 }
 
 function getEmptyMessage() {
+    if (currentTab === "reviewed") return "Bạn chưa gửi đánh giá nào. Các đánh giá đã gửi sẽ xuất hiện tại đây.";
     if (currentTab === "active") return "Bạn chưa có đơn nào đang xử lý.";
     if (currentTab === "history") return "Bạn chưa có đơn hàng trong lịch sử.";
     return "Bạn chưa có đơn nào có thể đánh giá.";
+}
+
+function hasPendingReviewItems(orderId) {
+    const items = orderDetailCache.get(orderId) || [];
+    return items.some(item => !item.reviewed);
+}
+
+function renderReviewedList(list) {
+    if (!allReviews.length) {
+        list.innerHTML = `<p class="empty-cell">${getEmptyMessage()}</p>`;
+        return;
+    }
+
+    list.innerHTML = "";
+
+    allReviews.forEach(review => {
+        const card = document.createElement("article");
+        card.className = "customer-review-card";
+
+        const imageSrc = normalizeFoodImage(review.imageUrl || review.hinhAnh || "");
+        const orderCode = review.maDH ? `#${review.maDH}` : "-";
+
+        card.innerHTML = `
+            <div class="customer-review-card__media">
+                ${
+                    imageSrc
+                    ? `<img src="${imageSrc}" alt="${escapeHtml(review.tenMon || "Món ăn")}" loading="lazy">`
+                    : `<div class="customer-review-card__placeholder">No image</div>`
+                }
+            </div>
+            <div class="customer-review-card__body">
+                <div class="customer-review-card__top">
+                    <div>
+                        <h3>${escapeHtml(review.tenMon || `Món #${review.maMon}`)}</h3>
+                        <p>Mã đơn hàng: <strong>${escapeHtml(orderCode)}</strong></p>
+                    </div>
+                    <span class="customer-review-date">${formatDate(review.ngayDG)}</span>
+                </div>
+                <div class="customer-review-stars" aria-label="${Number(review.sao || 0)} sao">
+                    ${renderStars(review.sao)}
+                </div>
+                <p class="customer-review-content">${formatMultilineText(review.noiDung || "")}</p>
+            </div>
+        `;
+
+        list.appendChild(card);
+    });
+}
+
+function renderStars(value) {
+    const rating = Math.min(Math.max(Number(value || 0), 0), 5);
+    let html = "";
+
+    for (let index = 1; index <= 5; index++) {
+        html += `<span class="${index <= rating ? "is-active" : ""}">★</span>`;
+    }
+
+    return html;
 }
 
 function sortOrdersForCurrentTab(orders) {
@@ -249,7 +321,7 @@ function createOrderCard(order) {
 }
 
 function renderOrderItemPreview(item) {
-    const imageSrc = item.hinhAnh || item.imageUrl || getFallbackFoodImage(item.maMon);
+    const imageSrc = normalizeFoodImage(item.hinhAnh || item.imageUrl || "") || getFallbackFoodImage(item.maMon);
 
     return `
         <div class="customer-order-item">
@@ -294,9 +366,9 @@ function renderOrderAction(order) {
         `;
     }
 
-    if (currentTab === "history" && status === "DELIVERED") {
+    if (currentTab === "history" && (status === "DELIVERED" || status === "CANCELLED")) {
         return `
-            <button type="button" class="btn btn-outline reorder-btn" onclick="event.stopPropagation(); reorderOrder(${order.maDH});">
+            <button type="button" class="btn btn-outline reorder-btn" onclick="event.stopPropagation(); goToReorderCheckout(${order.maDH});">
                 Đặt lại
             </button>
         `;
@@ -305,7 +377,27 @@ function renderOrderAction(order) {
     return "";
 }
 
-async function reorderOrder(orderId) {
+async function loadCustomerReviews(customerId) {
+    try {
+        let response = await fetch(`${CLIENT_ORDER_API}/my-reviews`);
+
+        if (!response.ok) {
+            response = await fetch(`${CLIENT_ORDER_API}/reviews?customerId=${customerId}`);
+        }
+
+        if (!response.ok) {
+            allReviews = [];
+            return;
+        }
+
+        const reviews = await response.json();
+        allReviews = Array.isArray(reviews) ? reviews : [];
+    } catch (error) {
+        allReviews = [];
+    }
+}
+
+async function legacyReorderOrder(orderId) {
     const customerId = getCurrentCustomerId();
 
     try {
@@ -547,4 +639,51 @@ function getFallbackFoodImage(maMon) {
 
     const index = Math.abs(Number(maMon || 0)) % images.length;
     return images[index];
+}
+
+function normalizeFoodImage(imageUrl) {
+    const value = String(imageUrl || "").trim();
+
+    if (!value) {
+        return "";
+    }
+
+    if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("/")) {
+        return value;
+    }
+
+    return `/images/${value}`;
+}
+
+function formatMultilineText(value) {
+    return escapeHtml(value).replace(/\n/g, "<br>");
+}
+
+async function reorderOrder(orderId) {
+    const customerId = getCurrentCustomerId();
+
+    try {
+        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/reorder?customerId=${customerId}`, {
+            method: "POST"
+        });
+
+        const data = await response.json();
+        const skippedItems = Array.isArray(data.skippedItems) ? data.skippedItems : [];
+        const detailMessage = skippedItems.length ? "\n\n" + skippedItems.join("\n") : "";
+
+        if (!response.ok || !data.success) {
+            alert((data.message || "Không thể đặt lại đơn hàng này.") + detailMessage);
+            return;
+        }
+
+        alert((data.message || "Đã tạo lại giỏ hàng từ đơn cũ.") + detailMessage);
+        window.location.href = "/checkout";
+
+    } catch (error) {
+        alert("Lỗi khi đặt lại đơn hàng.");
+    }
+}
+
+function goToReorderCheckout(orderId) {
+    window.location.href = `/checkout?reorderOrderId=${encodeURIComponent(orderId)}`;
 }

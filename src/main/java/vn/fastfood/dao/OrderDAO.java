@@ -4,6 +4,7 @@ import vn.fastfood.config.DBConnection;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
 import vn.fastfood.model.OrderStatusHistory;
+import vn.fastfood.model.ReorderCartItemCandidate;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -259,7 +260,166 @@ public class OrderDAO {
             e.printStackTrace();
         }
 
+        enrichOrderItems(orderId, items);
+
         return items;
+    }
+
+    private void enrichOrderItems(long orderId, List<OrderItem> items) {
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
+        try (Connection conn = DBConnection.getConnection()) {
+            for (OrderItem item : items) {
+                enrichOrderItemImage(conn, item);
+                enrichOrderItemReviewStatus(conn, orderId, item);
+            }
+        } catch (SQLException e) {
+            System.out.println("[ORDER ITEMS] Could not enrich order items. Returning base order item data.");
+            e.printStackTrace();
+        }
+    }
+
+    private void enrichOrderItemImage(Connection conn, OrderItem item) {
+        String sql = """
+            SELECT image_url
+            FROM MONAN
+            WHERE MaMon = ?
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, item.getMaMon());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    item.setImageUrl(rs.getString("image_url"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("[ORDER ITEMS] Could not load image for maMon=" + item.getMaMon());
+        }
+    }
+
+    private void enrichOrderItemReviewStatus(Connection conn, long orderId, OrderItem item) {
+        String sql = """
+            SELECT COUNT(*)
+            FROM DANHGIA dg
+            JOIN DONHANG dh
+              ON dg.MaDH = dh.MaDH
+             AND dg.MaTK_KH = dh.MaTK_KH
+            WHERE dg.MaDH = ?
+              AND dg.MaMon = ?
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            ps.setLong(2, item.getMaMon());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    item.setReviewed(rs.getInt(1) > 0);
+                }
+            }
+        } catch (SQLException e) {
+            item.setReviewed(false);
+            System.out.println("[ORDER ITEMS] Could not load review status for maMon=" + item.getMaMon());
+        }
+    }
+
+    public List<ReorderCartItemCandidate> getReorderCartItemCandidates(long orderId) {
+        List<ReorderCartItemCandidate> items = new ArrayList<>();
+
+        String orderItemsSql = """
+            SELECT MaMon, TenMon, SoLuong
+            FROM CHITIETDH
+            WHERE MaDH = ?
+            ORDER BY MaMon
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(orderItemsSql)) {
+
+            ps.setLong(1, orderId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ReorderCartItemCandidate item = new ReorderCartItemCandidate();
+
+                    item.setMaMon(rs.getLong("MaMon"));
+                    item.setOrderTenMon(rs.getString("TenMon"));
+                    item.setRequestedQuantity(rs.getInt("SoLuong"));
+
+                    enrichReorderProduct(conn, item);
+
+                    items.add(item);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return items;
+    }
+
+    private void enrichReorderProduct(Connection conn, ReorderCartItemCandidate item) {
+        String[] sqlCandidates = {
+                """
+                    SELECT TenMon, Gia, image_url, IsAvailable, SoLuongTon AS StockQuantity
+                    FROM MONAN
+                    WHERE MaMon = ?
+                """,
+                """
+                    SELECT TenMon, Gia, image_url, IsAvailable, SLuongTon AS StockQuantity
+                    FROM MONAN
+                    WHERE MaMon = ?
+                """,
+                """
+                    SELECT TenMon, Gia, IsAvailable
+                    FROM MONAN
+                    WHERE MaMon = ?
+                """
+        };
+
+        for (String sql : sqlCandidates) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, item.getMaMon());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        item.setProductExists(false);
+                        return;
+                    }
+
+                    item.setProductExists(true);
+                    item.setCurrentTenMon(rs.getString("TenMon"));
+                    item.setCurrentPrice(rs.getBigDecimal("Gia"));
+
+                    try {
+                        item.setImageUrl(rs.getString("image_url"));
+                    } catch (SQLException ignored) {
+                        item.setImageUrl(null);
+                    }
+
+                    int isAvailable = rs.getInt("IsAvailable");
+                    item.setAvailable(!rs.wasNull() && isAvailable == 1);
+
+                    try {
+                        long stock = rs.getLong("StockQuantity");
+                        item.setAvailableQuantity(rs.wasNull() ? Long.MAX_VALUE : stock);
+                    } catch (SQLException ignored) {
+                        item.setAvailableQuantity(Long.MAX_VALUE);
+                    }
+
+                    return;
+                }
+            } catch (SQLException ignored) {
+                // Try the next schema variant.
+            }
+        }
+
+        item.setProductExists(false);
     }
 
     public boolean insertOrderStatusHistory(

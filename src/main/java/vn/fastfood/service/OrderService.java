@@ -1,10 +1,16 @@
 package vn.fastfood.service;
 
 import vn.fastfood.dao.OrderDAO;
+import vn.fastfood.dto.ReorderResponse;
+import vn.fastfood.model.CartItem;
 import vn.fastfood.dto.OrderStatusHistoryResponse;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
 import vn.fastfood.model.OrderStatusHistory;
+import vn.fastfood.model.ReorderCartItemCandidate;
+import jakarta.servlet.http.HttpSession;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +92,134 @@ public class OrderService {
         }
 
         return orderDAO.addOrderItemsToCart(orderId, customerId) > 0;
+    }
+
+    public ReorderResponse prepareReorderCheckout(long orderId, long customerId, HttpSession session) {
+        if (session == null) {
+            return new ReorderResponse(false, "Phiên làm việc không hợp lệ. Vui lòng đăng nhập lại.", null, null);
+        }
+
+        Order order = orderDAO.getOrderById(orderId, customerId);
+
+        if (order == null) {
+            return new ReorderResponse(false, "Không tìm thấy đơn hàng hoặc đơn không thuộc khách hàng hiện tại.", null, null);
+        }
+
+        String status = normalizeStatus(order.getTrangThaiDon());
+
+        if (!"CANCELLED".equals(status) && !"DELIVERED".equals(status)) {
+            return new ReorderResponse(false, "Chỉ có thể đặt lại đơn hàng đã hủy hoặc đã giao.", null, null);
+        }
+
+        List<ReorderCartItemCandidate> candidates = orderDAO.getReorderCartItemCandidates(orderId);
+        List<CartItem> cartItems = new ArrayList<>();
+        List<String> skippedItems = new ArrayList<>();
+
+        for (ReorderCartItemCandidate candidate : candidates) {
+            String itemName = getReorderItemName(candidate);
+
+            if (!candidate.isProductExists()) {
+                skippedItems.add(itemName + " không còn tồn tại.");
+                continue;
+            }
+
+            if (!candidate.isAvailable()) {
+                skippedItems.add(itemName + " đã ngừng bán.");
+                continue;
+            }
+
+            if (candidate.getAvailableQuantity() <= 0) {
+                skippedItems.add(itemName + " đã hết hàng.");
+                continue;
+            }
+
+            if (candidate.getCurrentPrice() == null || candidate.getCurrentPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                skippedItems.add(itemName + " chưa có giá bán hợp lệ.");
+                continue;
+            }
+
+            int quantity = candidate.getRequestedQuantity();
+
+            if (candidate.getAvailableQuantity() < quantity) {
+                quantity = (int) Math.min(candidate.getAvailableQuantity(), Integer.MAX_VALUE);
+                skippedItems.add(itemName + " chỉ còn " + quantity + " phần, đã điều chỉnh số lượng.");
+            }
+
+            if (quantity <= 0) {
+                skippedItems.add(itemName + " không còn số lượng hợp lệ để đặt lại.");
+                continue;
+            }
+
+            CartItem cartItem = new CartItem();
+            cartItem.setMaMon(candidate.getMaMon());
+            cartItem.setTenMon(itemName);
+            cartItem.setSoLuong(quantity);
+            cartItem.setDonGia(candidate.getCurrentPrice());
+            cartItem.setThanhTien(candidate.getCurrentPrice().multiply(BigDecimal.valueOf(quantity)));
+            cartItem.setImageUrl(candidate.getImageUrl());
+
+            cartItems.add(cartItem);
+        }
+
+        if (cartItems.isEmpty()) {
+            cartItems = buildCartFromOrderSnapshot(orderId);
+
+            if (!cartItems.isEmpty()) {
+                skippedItems.add("Không kiểm tra được trạng thái hiện tại của một số món, hệ thống tạm dùng thông tin trong đơn cũ.");
+            }
+        }
+
+        if (cartItems.isEmpty()) {
+            return new ReorderResponse(
+                    false,
+                    "Không còn món nào hợp lệ để đặt lại.",
+                    cartItems,
+                    skippedItems
+            );
+        }
+
+        session.setAttribute("cart", cartItems);
+
+        String message = skippedItems.isEmpty()
+                ? "Đã tạo lại giỏ hàng từ đơn cũ. Bạn có thể kiểm tra và thanh toán ở bước tiếp theo."
+                : "Đã tạo lại giỏ hàng với các món còn hợp lệ. Một số món đã được bỏ qua hoặc điều chỉnh.";
+
+        return new ReorderResponse(true, message, cartItems, skippedItems);
+    }
+
+    private List<CartItem> buildCartFromOrderSnapshot(long orderId) {
+        List<OrderItem> orderItems = orderDAO.getOrderItemsByOrderId(orderId);
+        List<CartItem> cartItems = new ArrayList<>();
+
+        for (OrderItem orderItem : orderItems) {
+            if (orderItem.getSoLuong() <= 0 || orderItem.getDonGia() == null) {
+                continue;
+            }
+
+            CartItem cartItem = new CartItem();
+            cartItem.setMaMon(orderItem.getMaMon());
+            cartItem.setTenMon(orderItem.getTenMon());
+            cartItem.setSoLuong(orderItem.getSoLuong());
+            cartItem.setDonGia(orderItem.getDonGia());
+            cartItem.setThanhTien(orderItem.getDonGia().multiply(BigDecimal.valueOf(orderItem.getSoLuong())));
+            cartItem.setImageUrl(orderItem.getImageUrl());
+
+            cartItems.add(cartItem);
+        }
+
+        return cartItems;
+    }
+
+    private String getReorderItemName(ReorderCartItemCandidate candidate) {
+        if (candidate.getCurrentTenMon() != null && !candidate.getCurrentTenMon().trim().isEmpty()) {
+            return candidate.getCurrentTenMon().trim();
+        }
+
+        if (candidate.getOrderTenMon() != null && !candidate.getOrderTenMon().trim().isEmpty()) {
+            return candidate.getOrderTenMon().trim();
+        }
+
+        return "Món #" + candidate.getMaMon();
     }
 
     private String normalizeStatus(String status) {

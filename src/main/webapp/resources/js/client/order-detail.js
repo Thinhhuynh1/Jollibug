@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    initReviewStars();
     loadOrderDetail(orderId);
 });
 
@@ -129,12 +130,17 @@ function renderOrderItems(items, orderStatus) {
             <td><strong>${formatMoney(item.thanhTien)}</strong></td>
             <td>
                 ${
-                    canReview
+                    canReview && !item.reviewed
                     ? `<button type="button" class="btn btn-ghost" onclick="openReviewModal(${item.maMon})">Đánh giá</button>`
                     : `<span class="order-note">Chưa thể đánh giá</span>`
                 }
             </td>
         `;
+
+        if (item.reviewed) {
+            const reviewNote = row.querySelector(".order-note");
+            if (reviewNote) reviewNote.textContent = "Đã đánh giá";
+        }
 
         itemBody.appendChild(row);
     });
@@ -166,6 +172,14 @@ function renderOrderActions(order) {
 
     if (status === "CANCEL_REQUESTED") {
         buttons += `<span class="order-note">Đang chờ nhân viên xử lý yêu cầu hủy</span>`;
+    }
+
+    if (status === "CANCELLED" || status === "DELIVERED") {
+        buttons += `
+            <button type="button" class="btn btn-outline reorder-btn" onclick="goToReorderCheckout(${order.maDH})">
+                Đặt lại
+            </button>
+        `;
     }
 
     actionBox.innerHTML = buttons;
@@ -240,6 +254,8 @@ function openReviewModal(maMon) {
     const maMonInput = document.getElementById("reviewMaMon");
     const noiDungInput = document.getElementById("reviewNoiDung");
     const saoInput = document.getElementById("reviewSao");
+    const imageInput = document.getElementById("reviewImageInput");
+    const imagePreview = document.getElementById("reviewImagePreview");
 
     if (!modal || !maMonInput) return;
 
@@ -247,6 +263,13 @@ function openReviewModal(maMon) {
 
     if (noiDungInput) noiDungInput.value = "";
     if (saoInput) saoInput.value = "5";
+    if (imageInput) imageInput.value = "";
+    if (imagePreview) {
+        imagePreview.innerHTML = "";
+        imagePreview.classList.add("hidden");
+    }
+
+    updateReviewRating(5);
 
     modal.classList.remove("hidden");
 }
@@ -254,6 +277,112 @@ function openReviewModal(maMon) {
 function closeReviewModal() {
     const modal = document.getElementById("reviewModal");
     if (modal) modal.classList.add("hidden");
+}
+
+function initReviewStars() {
+    document.querySelectorAll(".review-star").forEach(star => {
+        star.addEventListener("click", () => {
+            updateReviewRating(Number(star.dataset.rating || 5));
+        });
+    });
+
+    updateReviewRating(Number(document.getElementById("reviewSao")?.value || 5));
+}
+
+function updateReviewRating(rating) {
+    const normalizedRating = Math.min(Math.max(Number(rating || 5), 1), 5);
+    const saoInput = document.getElementById("reviewSao");
+    const label = document.getElementById("reviewRatingLabel");
+
+    if (saoInput) saoInput.value = String(normalizedRating);
+
+    document.querySelectorAll(".review-star").forEach(star => {
+        const starRating = Number(star.dataset.rating || 0);
+        star.classList.toggle("is-active", starRating <= normalizedRating);
+        star.setAttribute("aria-checked", starRating === normalizedRating ? "true" : "false");
+    });
+
+    if (label) {
+        label.textContent = getReviewRatingText(normalizedRating);
+        label.dataset.rating = String(normalizedRating);
+    }
+}
+
+function getReviewRatingText(rating) {
+    const map = {
+        1: "Rất không hài lòng",
+        2: "Không hài lòng",
+        3: "Bình thường",
+        4: "Hài lòng",
+        5: "Rất hài lòng"
+    };
+
+    return map[rating] || "Rất hài lòng";
+}
+
+async function submitReview() {
+    const orderId = getOrderIdFromUrl();
+    const customerId = getCurrentCustomerId();
+    const maMon = Number(document.getElementById("reviewMaMon")?.value);
+    const sao = Number(document.getElementById("reviewSao")?.value || 5);
+    const noiDung = document.getElementById("reviewNoiDung")?.value.trim() || "";
+
+    if (!orderId || !customerId || !maMon) {
+        alert("Thiếu thông tin đánh giá. Vui lòng tải lại trang.");
+        return;
+    }
+
+    if (!noiDung) {
+        alert("Vui lòng nhập nội dung đánh giá.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/reviews`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                customerId: Number(customerId),
+                maMon,
+                sao,
+                noiDung
+            })
+        });
+
+        const data = await response.json();
+        alert(data.message || "Đã gửi đánh giá.");
+
+        if (response.ok) {
+            closeReviewModal();
+            loadOrderDetail(orderId);
+        }
+    } catch (error) {
+        alert("Lỗi khi gửi đánh giá. Vui lòng thử lại.");
+    }
+}
+
+function previewReviewImage(event) {
+    const file = event.target.files && event.target.files[0];
+    const preview = document.getElementById("reviewImagePreview");
+
+    if (!preview) return;
+
+    preview.innerHTML = "";
+
+    if (!file) {
+        preview.classList.add("hidden");
+        return;
+    }
+
+    const image = document.createElement("img");
+    image.src = URL.createObjectURL(file);
+    image.alt = "Ảnh đánh giá";
+    image.onload = () => URL.revokeObjectURL(image.src);
+
+    preview.appendChild(image);
+    preview.classList.remove("hidden");
 }
 
 function openClientCancelConfirmModal(orderId, afterSuccessCallback) {
@@ -486,4 +615,33 @@ function renderOrderTimeline(status) {
             </div>
         `;
     }).join("");
+}
+
+async function reorderOrder(orderId) {
+    const customerId = getCurrentCustomerId();
+
+    try {
+        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/reorder?customerId=${customerId}`, {
+            method: "POST"
+        });
+
+        const data = await response.json();
+        const skippedItems = Array.isArray(data.skippedItems) ? data.skippedItems : [];
+        const detailMessage = skippedItems.length ? "\n\n" + skippedItems.join("\n") : "";
+
+        if (!response.ok || !data.success) {
+            alert((data.message || "Không thể đặt lại đơn hàng này.") + detailMessage);
+            return;
+        }
+
+        alert((data.message || "Đã tạo lại giỏ hàng từ đơn cũ.") + detailMessage);
+        window.location.href = "/checkout";
+
+    } catch (error) {
+        alert("Lỗi khi đặt lại đơn hàng.");
+    }
+}
+
+function goToReorderCheckout(orderId) {
+    window.location.href = `/checkout?reorderOrderId=${encodeURIComponent(orderId)}`;
 }
