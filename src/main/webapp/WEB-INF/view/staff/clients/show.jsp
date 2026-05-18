@@ -1,4 +1,4 @@
- <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -6,8 +6,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | ADMIN</title>
-  <meta name="description" content="Jollibug Super Admin â€” centralized user management for all roles: Staff, Manager, and Client." />
+  <title>Jollibug | Khách hàng</title>
+  <meta name="description" content="Danh sách khách hàng từ cơ sở dữ liệu." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,19 +19,16 @@
 </head>
 
 <body data-admin-role="admin" data-admin-page="manage-users">
-
   <div class="admin-shell admin-body" data-admin-table-root>
-
     <jsp:include page="../layout/sidebar.jsp" />
 
     <main class="admin-main">
-
       <jsp:include page="../layout/topbar.jsp" />
 
       <section class="admin-panel">
         <div class="panel-header">
           <div class="stack" style="gap:0.3rem;">
-            <h1 class="section-title">Quản lý người dùng</h1>
+            <h1 class="section-title">Quản lý khách hàng</h1>
           </div>
         </div>
 
@@ -41,35 +38,39 @@
               <tr>
                 <th>Người dùng</th>
                 <th>Email</th>
-                <th>Vai trò</th>
+                <th>Số điện thoại</th>
                 <th>Trạng thái</th>
                 <th>Ngày tham gia</th>
                 <th>Hành động</th>
               </tr>
             </thead>
             <tbody id="users-table-body">
-              <tr>
-                <td>Nguyễn Minh Quân</td>
-                <td>quan.nguyen@jollibug.vn</td>
-                <td>Quản lý</td>
-                <td>Đang hoạt động</td>
-                <td>12/01/2026</td>
-                <td>
-                  <a href="/staff/clients/detail" class="btn btn-ghost" type="button">Xem</a>
-
-                </td>
-              </tr>
+              <c:choose>
+                <c:when test="${not empty clients}">
+                  <c:forEach var="client" items="${clients}">
+                    <tr>
+                      <td>${client.hoTen}</td>
+                      <td>${client.email}</td>
+                      <td>${empty client.sdt ? '-' : client.sdt}</td>
+                      <td>${empty client.trangThai ? '-' : client.trangThai}</td>
+                      <td>${client.createdAtDisplay}</td>
+                      <td>
+                        <a href="<c:url value='/staff/clients/detail?clientId=${client.maTK}'/>" class="btn btn-ghost" type="button">Xem</a>
+                      </td>
+                    </tr>
+                  </c:forEach>
+                </c:when>
+                <c:otherwise>
+                  <tr>
+                    <td colspan="6" style="text-align:center;">Không có khách hàng nào.</td>
+                  </tr>
+                </c:otherwise>
+              </c:choose>
             </tbody>
           </table>
         </div>
-
-        </section>
+      </section>
     </main>
-  </div><!-- /data-admin-table-root -->
-
-
-  <!-- Toast stack -->
-
-  </body>
+  </div>
+</body>
 </html>
-

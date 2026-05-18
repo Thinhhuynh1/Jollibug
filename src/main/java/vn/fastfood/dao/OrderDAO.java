@@ -201,7 +201,7 @@ public class OrderDAO {
                 tt.TrangThaiTT AS TrangThaiTT
 
             FROM DONHANG dh
-            LEFT JOIN USERS u ON dh.MaTK_KH = u.MaTK
+            LEFT JOIN NGUOIDUNG u ON dh.MaTK_KH = u.MaTK
             LEFT JOIN DIACHI dc ON dh.MaDC = dc.MaDC
             LEFT JOIN THANHTOAN tt ON dh.MaDH = tt.MaDH
             LEFT JOIN PHUONGTHUCTT pt ON tt.MaPT = pt.MaPT

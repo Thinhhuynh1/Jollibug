@@ -8,6 +8,7 @@ const deliveryFee = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
     initSelectedAddress();
+    loadCheckoutSummary();
 
     const checkoutButton = document.getElementById("checkoutButton");
 
@@ -16,6 +17,11 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("[CHECKOUT] Đã gắn sự kiện cho nút thanh toán.");
     } else {
         console.error("[CHECKOUT] Không tìm thấy nút #checkoutButton.");
+    }
+
+    const voucherApplyButton = document.getElementById("voucher-apply");
+    if (voucherApplyButton) {
+        voucherApplyButton.addEventListener("click", applyVoucherPreview);
     }
 });
 
@@ -72,7 +78,9 @@ function loadCheckoutSummary() {
     const itemList = document.getElementById("checkoutItemList");
     const messageEl = document.getElementById("checkoutMessage");
 
-    if (messageEl) messageEl.textContent = "";
+    if (messageEl) {
+        messageEl.textContent = "";
+    }
 
     if (!itemList) {
         updateInvoice(0, 0);
@@ -112,8 +120,6 @@ function applyVoucherPreview() {
         return;
     }
 
-    // Preview tạm trên frontend để người dùng thấy thay đổi.
-    // Backend vẫn là nơi tính giảm giá chính xác khi POST /api/checkout.
     if (code === "JOLLI10") {
         checkoutDiscount = Math.round(checkoutSubtotal * 0.1);
         showCheckoutMessage("Đã áp dụng mã JOLLI10. Giảm 10% tạm tính.");
@@ -140,20 +146,32 @@ function updateInvoice(subtotal, discount) {
     checkoutDiscount = Number(discount || 0);
     checkoutTotal = Math.max(checkoutSubtotal + deliveryFee - checkoutDiscount, 0);
 
-    if (subtotalEl) subtotalEl.textContent = formatMoney(checkoutSubtotal);
-    if (deliveryFeeEl) deliveryFeeEl.textContent = formatMoney(deliveryFee);
-    if (discountEl) discountEl.textContent = "-" + formatMoney(checkoutDiscount);
-    if (totalEl) totalEl.textContent = formatMoney(checkoutTotal);
+    if (subtotalEl) {
+        subtotalEl.textContent = formatMoney(checkoutSubtotal);
+    }
+
+    if (deliveryFeeEl) {
+        deliveryFeeEl.textContent = formatMoney(deliveryFee);
+    }
+
+    if (discountEl) {
+        discountEl.textContent = "-" + formatMoney(checkoutDiscount);
+    }
+
+    if (totalEl) {
+        totalEl.textContent = formatMoney(checkoutTotal);
+    }
 }
 
 async function submitCheckout() {
-    const customerId = Number(document.getElementById("customerId")?.value);
+    const customerId = getCustomerId();
 
     const maDCValue = document.getElementById("addressSelect")?.value;
     const maDC = maDCValue ? Number(maDCValue) : null;
 
     const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
     const maPT = selectedPayment ? selectedPayment.value : null;
+
     const discountCode = getValue("voucher-code").trim() || null;
     const ghiChu = buildCheckoutNote();
 
@@ -179,7 +197,7 @@ async function submitCheckout() {
     }
 
     try {
-        const response = await fetch("/api/checkout", {
+        const response = await fetch(CHECKOUT_API_BASE, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -238,32 +256,4 @@ function showCheckoutMessage(message) {
 
 function formatMoney(value) {
     return Number(value || 0).toLocaleString("vi-VN") + " VND";
-}
-
-function restoreAddressFromStorage() {
-    const addressSelect = document.getElementById("addressSelect");
-    const addressInput = document.getElementById("delivery-address");
-    const nameInput = document.getElementById("delivery-name");
-    const phoneInput = document.getElementById("delivery-phone");
-    const emailInput = document.getElementById("delivery-email");
-
-    if (addressSelect && localStorage.getItem("checkout_maDC")) {
-        addressSelect.value = localStorage.getItem("checkout_maDC");
-    }
-
-    if (addressInput && localStorage.getItem("checkout_address")) {
-        addressInput.value = localStorage.getItem("checkout_address");
-    }
-
-    if (nameInput && localStorage.getItem("checkout_name")) {
-        nameInput.value = localStorage.getItem("checkout_name");
-    }
-
-    if (phoneInput && localStorage.getItem("checkout_phone")) {
-        phoneInput.value = localStorage.getItem("checkout_phone");
-    }
-
-    if (emailInput && localStorage.getItem("checkout_email")) {
-        emailInput.value = localStorage.getItem("checkout_email");
-    }
 }

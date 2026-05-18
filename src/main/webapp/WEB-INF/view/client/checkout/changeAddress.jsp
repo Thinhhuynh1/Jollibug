@@ -72,12 +72,13 @@
           </button>
         </section>
 
+        <!-- Cột phải: danh sách địa chỉ -->
         <section class="checkout-card">
           <h2 class="checkout-card__title">Danh sách địa chỉ</h2>
 
           <div class="address-picker-list">
             <c:choose>
-              <c:when test="${empty addresses}">
+              <c:when test="${empty listAddress}">
                 <div class="empty-state">
                   <p>Bạn chưa có địa chỉ giao hàng nào.</p>
 
@@ -92,7 +93,7 @@
               </c:when>
 
               <c:otherwise>
-                <c:forEach var="address" items="${addresses}">
+                <c:forEach var="address" items="${listAddress}">
                   <c:set
                     var="fullAddress"
                     value="${address.diaChiCuThe}, ${address.phuongXa}, ${address.quanHuyen}, ${address.tinhThanh}"
@@ -118,6 +119,9 @@
                       </p>
 
                       <p class="address-picker-desc">
+                        <c:if test="${not empty address.tenDiaChi}">
+                          <strong>${address.tenDiaChi}:</strong>
+                        </c:if>
                         ${fullAddress}
                       </p>
                     </div>
@@ -163,10 +167,10 @@
 
       const selectedAddress = {
         maDC: Number(item.dataset.madc),
-        name: item.dataset.name,
-        phone: item.dataset.phone,
-        email: item.dataset.email,
-        address: item.dataset.address
+        name: item.dataset.name || "",
+        phone: item.dataset.phone || "",
+        email: item.dataset.email || "",
+        address: item.dataset.address || ""
       };
 
       localStorage.setItem("selectedCheckoutAddress", JSON.stringify(selectedAddress));

@@ -1,5 +1,6 @@
 package vn.fastfood.service;
 
+import jakarta.servlet.http.HttpSession;
 import vn.fastfood.dao.CheckoutDAO;
 import vn.fastfood.dao.OrderDAO;
 import vn.fastfood.dto.CheckoutRequest;
@@ -7,14 +8,13 @@ import vn.fastfood.dto.CheckoutResponse;
 import vn.fastfood.model.CartItem;
 import vn.fastfood.model.CheckoutCartItem;
 
-import jakarta.servlet.http.HttpSession;
-
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CheckoutService {
+
     private final CheckoutDAO checkoutDAO = new CheckoutDAO();
     private final OrderDAO orderDAO = new OrderDAO();
 
@@ -29,6 +29,10 @@ public class CheckoutService {
 
         long customerId = request.getCustomerId();
 
+        if (customerId <= 0) {
+            return new CheckoutResponse(false, "Thông tin khách hàng không hợp lệ. Vui lòng đăng nhập lại.", null, null, null, null);
+        }
+
         /*
          * Địa chỉ giao hàng phải đến từ DIACHI/MaDC.
          * GhiChu chỉ lưu ghi chú khách nhập, không lưu người nhận/SĐT/email/địa chỉ.
@@ -39,7 +43,7 @@ public class CheckoutService {
             maDC = null;
         }
 
-        if (maDC == null || maDC <= 0) {
+        if (maDC == null) {
             return new CheckoutResponse(false, "Vui lòng chọn địa chỉ giao hàng.", null, null, null, null);
         }
 
@@ -68,17 +72,22 @@ public class CheckoutService {
         BigDecimal subtotal = BigDecimal.ZERO;
 
         for (CheckoutCartItem item : items) {
-            subtotal = subtotal.add(item.getThanhTien());
+            if (item.getThanhTien() != null) {
+                subtotal = subtotal.add(item.getThanhTien());
+            }
         }
 
         BigDecimal discountAmount = checkoutDAO.calculateDiscount(request.getDiscountCode(), subtotal);
+
+        if (discountAmount == null) {
+            discountAmount = BigDecimal.ZERO;
+        }
 
         if (discountAmount.compareTo(subtotal) > 0) {
             discountAmount = subtotal;
         }
 
         BigDecimal total = subtotal.subtract(discountAmount);
-
         Long maGG = checkoutDAO.findDiscountIdByCode(request.getDiscountCode());
 
         try {
@@ -121,7 +130,6 @@ public class CheckoutService {
                     discountAmount,
                     total
             );
-
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -143,19 +151,16 @@ public class CheckoutService {
             return new ArrayList<>();
         }
 
-        if (!(cartObj instanceof List<?>)) {
+        if (!(cartObj instanceof List<?> rawCart)) {
             return new ArrayList<>();
         }
 
-        List<?> rawCart = (List<?>) cartObj;
         List<CheckoutCartItem> checkoutItems = new ArrayList<>();
 
         for (Object obj : rawCart) {
-            if (!(obj instanceof CartItem)) {
+            if (!(obj instanceof CartItem cartItem)) {
                 continue;
             }
-
-            CartItem cartItem = (CartItem) obj;
 
             if (cartItem.getSoLuong() <= 0) {
                 continue;
@@ -172,7 +177,9 @@ public class CheckoutService {
             item.setSoLuong(cartItem.getSoLuong());
             item.setDonGia(cartItem.getDonGia());
 
-            BigDecimal thanhTien = cartItem.getDonGia().multiply(BigDecimal.valueOf(cartItem.getSoLuong()));
+            BigDecimal thanhTien = cartItem.getDonGia()
+                    .multiply(BigDecimal.valueOf(cartItem.getSoLuong()));
+
             item.setThanhTien(thanhTien);
 
             checkoutItems.add(item);
