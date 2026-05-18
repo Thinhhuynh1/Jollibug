@@ -15,6 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderService {
+    private static final String STATUS_PENDING = "PENDING";
+    private static final String STATUS_CONFIRMED = "CONFIRMED";
+    private static final String STATUS_SHIPPING = "SHIPPING";
+    private static final String STATUS_DELIVERED = "DELIVERED";
+    private static final String STATUS_RECEIVED = "RECEIVED";
+    private static final String STATUS_CANCEL_REQUESTED = "CANCEL_REQUESTED";
+    private static final String STATUS_CANCELLED = "CANCELLED";
+
     private final OrderDAO orderDAO = new OrderDAO();
 
     public List<Order> getOrdersByCustomerId(long customerId) {
@@ -43,12 +51,12 @@ public class OrderService {
         String status = normalizeStatus(dh.getTrangThaiDon());
         String reason = normalizeReason(cancelReason);
 
-        if ("PENDING".equals(status)) {
-            return updateCustomerStatus(orderId, customerId, status, "CANCELLED", reason);
+        if (STATUS_PENDING.equals(status)) {
+            return updateCustomerStatus(orderId, customerId, status, STATUS_CANCELLED, reason);
         }
 
-        if ("CONFIRMED".equals(status)) {
-            return updateCustomerStatus(orderId, customerId, status, "CANCEL_REQUESTED", reason);
+        if (STATUS_CONFIRMED.equals(status)) {
+            return updateCustomerStatus(orderId, customerId, status, STATUS_CANCEL_REQUESTED, reason);
         }
         
         System.out.println("Đơn hàng ở trạng thái " + status + " nên không thể hủy.");
@@ -65,12 +73,12 @@ public class OrderService {
 
         String status = normalizeStatus(dh.getTrangThaiDon());
 
-        if (!"SHIPPING".equals(status)) {
-            System.out.println("Chỉ có thể xác nhận hàng khi đơn đang giao.");
+        if (!STATUS_DELIVERED.equals(status)) {
+            System.out.println("Chỉ có thể xác nhận đã nhận hàng khi đơn đã giao.");
             return false;
         }
 
-        return updateCustomerStatus(orderId, customerId, status, "DELIVERED", null);
+        return updateCustomerStatus(orderId, customerId, status, STATUS_RECEIVED, null);
     }
     
     public boolean canReviewOrder(long orderId, long customerId) {
@@ -80,7 +88,7 @@ public class OrderService {
             return false;
 
         String status = normalizeStatus(dh.getTrangThaiDon());
-        return "DELIVERED".equals(status);
+        return STATUS_RECEIVED.equals(status);
     }
 
     public boolean reorder(long orderId, long customerId) {
@@ -107,8 +115,8 @@ public class OrderService {
 
         String status = normalizeStatus(order.getTrangThaiDon());
 
-        if (!"CANCELLED".equals(status) && !"DELIVERED".equals(status)) {
-            return new ReorderResponse(false, "Chỉ có thể đặt lại đơn hàng đã hủy hoặc đã giao.", null, null);
+        if (!STATUS_CANCELLED.equals(status) && !STATUS_RECEIVED.equals(status)) {
+            return new ReorderResponse(false, "Chỉ có thể đặt lại đơn hàng đã hủy hoặc đã nhận hàng.", null, null);
         }
 
         List<ReorderCartItemCandidate> candidates = orderDAO.getReorderCartItemCandidates(orderId);
@@ -297,16 +305,18 @@ public class OrderService {
 
         boolean result;
 
-        if ("CANCELLED".equals(normalizedNextStatus)) {
-            result = orderDAO.updateOrderStatusStaffAndCancelReason(orderId, staffId, normalizedNextStatus, cancelReason);
+        logOrderStatusChange(orderId, currentStatus, normalizedNextStatus, "staff");
+
+        if (STATUS_CANCELLED.equals(normalizedNextStatus)) {
+            result = orderDAO.updateOrderStatusStaffAndCancelReasonIfCurrent(orderId, staffId, currentStatus, normalizedNextStatus, cancelReason);
         } else {
-            result = orderDAO.updateOrderStatusAndStaff(orderId, staffId, normalizedNextStatus);
+            result = orderDAO.updateOrderStatusAndStaffIfCurrent(orderId, staffId, currentStatus, normalizedNextStatus);
         }
 
         System.out.println("[STAFF UPDATE] result=" + result);
 
         if (result) {
-            String historyReason = "CANCELLED".equals(normalizedNextStatus) ? cancelReason : null;
+            String historyReason = STATUS_CANCELLED.equals(normalizedNextStatus) ? cancelReason : null;
             recordOrderStatusHistory(
                     orderId,
                     currentStatus,
@@ -327,7 +337,9 @@ public class OrderService {
             String newStatus,
             String reason
     ) {
-        boolean updated = orderDAO.updateOrderStatus(orderId, newStatus);
+        logOrderStatusChange(orderId, oldStatus, newStatus, "customer");
+
+        boolean updated = orderDAO.updateCustomerOrderStatusIfCurrent(orderId, customerId, oldStatus, newStatus);
 
         if (updated) {
             recordOrderStatusHistory(orderId, oldStatus, newStatus, "CUSTOMER", customerId, reason);
@@ -358,6 +370,13 @@ public class OrderService {
         }
     }
 
+    private void logOrderStatusChange(long orderId, String oldStatus, String newStatus, String actor) {
+        System.out.println("[ORDER STATUS] orderId=" + orderId
+                + ", oldStatus=" + normalizeStatus(oldStatus)
+                + ", newStatus=" + normalizeStatus(newStatus)
+                + ", actor=" + actor);
+    }
+
     private String normalizeActorType(String actorType) {
         String normalizedActorType = actorType == null ? "" : actorType.trim().toUpperCase();
 
@@ -384,6 +403,8 @@ public class OrderService {
                 return "\u0110ang giao";
             case "DELIVERED":
                 return "\u0110\u00e3 giao";
+            case "RECEIVED":
+                return "\u0110\u00e3 nh\u1eadn h\u00e0ng";
             case "CANCEL_REQUESTED":
                 return "Y\u00eau c\u1ea7u h\u1ee7y";
             case "CANCELLED":
@@ -394,16 +415,16 @@ public class OrderService {
     }
 
     private boolean isValidStaffTransition(String current, String next) {
-        if ("PENDING".equals(current) && "CONFIRMED".equals(next)) return true;
-        if ("PENDING".equals(current) && "CANCELLED".equals(next)) return true;
+        if (STATUS_PENDING.equals(current) && STATUS_CONFIRMED.equals(next)) return true;
+        if (STATUS_PENDING.equals(current) && STATUS_CANCELLED.equals(next)) return true;
 
-        if ("CONFIRMED".equals(current) && "SHIPPING".equals(next)) return true;
-        if ("CONFIRMED".equals(current) && "CANCELLED".equals(next)) return true;
+        if (STATUS_CONFIRMED.equals(current) && STATUS_SHIPPING.equals(next)) return true;
+        if (STATUS_CONFIRMED.equals(current) && STATUS_CANCELLED.equals(next)) return true;
 
-        if ("SHIPPING".equals(current) && "DELIVERED".equals(next)) return true;
+        if (STATUS_SHIPPING.equals(current) && STATUS_DELIVERED.equals(next)) return true;
 
-        if ("CANCEL_REQUESTED".equals(current) && "CANCELLED".equals(next)) return true;
-        if ("CANCEL_REQUESTED".equals(current) && "CONFIRMED".equals(next)) return true;
+        if (STATUS_CANCEL_REQUESTED.equals(current) && STATUS_CANCELLED.equals(next)) return true;
+        if (STATUS_CANCEL_REQUESTED.equals(current) && STATUS_CONFIRMED.equals(next)) return true;
 
         return false;
     }

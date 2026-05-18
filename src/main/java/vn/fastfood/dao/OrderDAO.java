@@ -589,6 +589,37 @@ public class OrderDAO {
         return false;
     }
 
+    public boolean updateCustomerOrderStatusIfCurrent(
+            long orderId,
+            long customerId,
+            String expectedStatus,
+            String newStatus
+    ) {
+        String sql = """
+            UPDATE DONHANG
+            SET TrangThaiDon = ?
+            WHERE MaDH = ?
+              AND MaTK_KH = ?
+              AND UPPER(TrangThaiDon) = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newStatus);
+            ps.setLong(2, orderId);
+            ps.setLong(3, customerId);
+            ps.setString(4, expectedStatus);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public boolean updateOrderStatusAndStaff(long orderId, long staffId, String newStatus) {
         String sql = """
             UPDATE DONHANG
@@ -603,6 +634,37 @@ public class OrderDAO {
             ps.setString(1, newStatus);
             ps.setLong(2, staffId);
             ps.setLong(3, orderId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean updateOrderStatusAndStaffIfCurrent(
+            long orderId,
+            long staffId,
+            String expectedStatus,
+            String newStatus
+    ) {
+        String sql = """
+            UPDATE DONHANG
+            SET TrangThaiDon = ?,
+                MaTK_NV = ?
+            WHERE MaDH = ?
+              AND UPPER(TrangThaiDon) = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newStatus);
+            ps.setLong(2, staffId);
+            ps.setLong(3, orderId);
+            ps.setString(4, expectedStatus);
 
             return ps.executeUpdate() > 0;
 
@@ -783,6 +845,43 @@ public class OrderDAO {
             ps.setString(1, newStatus);
             ps.setLong(2, staffId);
             ps.setLong(3, orderId);
+
+            int rows = ps.executeUpdate();
+
+            System.out.println("[DAO CANCEL] rows=" + rows);
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            System.out.println("[DAO CANCEL] SQL ERROR:");
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean updateOrderStatusStaffAndCancelReasonIfCurrent(
+            long orderId,
+            long staffId,
+            String expectedStatus,
+            String newStatus,
+            String cancelReason
+    ) {
+        String sql = """
+            UPDATE DONHANG
+            SET TrangThaiDon = ?,
+                MaTK_NV = ?
+            WHERE MaDH = ?
+              AND UPPER(TrangThaiDon) = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newStatus);
+            ps.setLong(2, staffId);
+            ps.setLong(3, orderId);
+            ps.setString(4, expectedStatus);
 
             int rows = ps.executeUpdate();
 

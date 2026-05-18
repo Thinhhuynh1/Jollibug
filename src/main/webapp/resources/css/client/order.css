@@ -355,6 +355,11 @@ body[data-page="orders"] {
     color: var(--color-success);
 }
 
+.status.received {
+    background: rgba(47, 158, 102, 0.18);
+    color: var(--color-success);
+}
+
 .status.cancel-requested {
     background: rgba(230, 0, 0, 0.1);
     color: var(--color-red-600);

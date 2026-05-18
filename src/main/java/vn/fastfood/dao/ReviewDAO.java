@@ -22,7 +22,7 @@ public class ReviewDAO {
             FROM DONHANG
             WHERE MaDH = ?
               AND MaTK_KH = ?
-              AND UPPER(TrangThaiDon) = 'DELIVERED'
+              AND UPPER(TrangThaiDon) = 'RECEIVED'
         """;
 
         try (Connection conn = DBConnection.getConnection();

@@ -118,7 +118,7 @@ function renderOrderItems(items, orderStatus) {
 
     itemBody.innerHTML = "";
 
-    const canReview = normalizeStatus(orderStatus) === "DELIVERED";
+    const canReview = normalizeStatus(orderStatus) === "RECEIVED";
 
     items.forEach(item => {
         const row = document.createElement("tr");
@@ -162,7 +162,7 @@ function renderOrderActions(order) {
         `;
     }
 
-    if (status === "SHIPPING") {
+    if (status === "DELIVERED") {
         buttons += `
             <button type="button" class="btn btn-primary" onclick="confirmReceived(${order.maDH})">
                 Đã nhận hàng
@@ -174,7 +174,7 @@ function renderOrderActions(order) {
         buttons += `<span class="order-note">Đang chờ nhân viên xử lý yêu cầu hủy</span>`;
     }
 
-    if (status === "CANCELLED" || status === "DELIVERED") {
+    if (status === "CANCELLED" || status === "RECEIVED") {
         buttons += `
             <button type="button" class="btn btn-outline reorder-btn" onclick="goToReorderCheckout(${order.maDH})">
                 Đặt lại
@@ -228,6 +228,7 @@ function displayStatus(status) {
         CONFIRMED: "Đã xác nhận",
         SHIPPING: "Đang giao",
         DELIVERED: "Đã giao",
+        RECEIVED: "Đã nhận hàng",
         CANCEL_REQUESTED: "Đang yêu cầu hủy",
         CANCELLED: "Đã hủy"
     };
@@ -563,6 +564,7 @@ function renderOrderTimeline(status) {
     if (!timeline) return;
 
     const currentStatus = normalizeStatus(status);
+    const timelineStatus = currentStatus === "RECEIVED" ? "DELIVERED" : currentStatus;
 
     let steps = [
         { key: "PENDING", label: "Đã đặt hàng" },
@@ -586,7 +588,7 @@ function renderOrderTimeline(status) {
         ];
     }
 
-    const currentIndex = steps.findIndex(step => step.key === currentStatus);
+    const currentIndex = steps.findIndex(step => step.key === timelineStatus);
 
     timeline.style.setProperty("--timeline-step-count", steps.length);
 
@@ -601,7 +603,7 @@ function renderOrderTimeline(status) {
             stateClass = "is-next";
         }
 
-        if (currentStatus === "CANCELLED" && step.key === "CANCELLED") {
+        if (timelineStatus === "CANCELLED" && step.key === "CANCELLED") {
             stateClass = "is-cancelled";
         }
 

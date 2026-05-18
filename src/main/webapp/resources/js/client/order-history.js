@@ -91,15 +91,15 @@ function renderOrdersByTab() {
         const status = normalizeStatus(order.trangThaiDon);
 
         if (currentTab === "active") {
-            return ["PENDING", "CONFIRMED", "SHIPPING", "CANCEL_REQUESTED"].includes(status);
+            return ["PENDING", "CONFIRMED", "SHIPPING", "DELIVERED", "CANCEL_REQUESTED"].includes(status);
         }
 
         if (currentTab === "history") {
-            return ["DELIVERED", "CANCELLED"].includes(status);
+            return ["RECEIVED", "CANCELLED"].includes(status);
         }
 
         if (currentTab === "review") {
-            return status === "DELIVERED" && hasPendingReviewItems(order.maDH);
+            return status === "RECEIVED" && hasPendingReviewItems(order.maDH);
         }
 
         return true;
@@ -232,17 +232,19 @@ function sortOrdersForCurrentTab(orders) {
 function getActiveOrderPriority(order) {
     const status = normalizeStatus(order.trangThaiDon);
 
-    // Ưu tiên cao nhất: đơn đang giao, tức khách cần xác nhận đã nhận hàng.
-    if (status === "SHIPPING") return 1;
+    // Ưu tiên cao nhất: nhân viên đã giao, khách cần xác nhận đã nhận hàng.
+    if (status === "DELIVERED") return 1;
+
+    if (status === "SHIPPING") return 2;
 
     // Sau đó là đơn đã xác nhận, đang chờ giao.
-    if (status === "CONFIRMED") return 2;
+    if (status === "CONFIRMED") return 3;
 
     // Sau đó là đơn mới, chờ xác nhận.
-    if (status === "PENDING") return 3;
+    if (status === "PENDING") return 4;
 
     // Cuối cùng là đơn đang yêu cầu hủy.
-    if (status === "CANCEL_REQUESTED") return 4;
+    if (status === "CANCEL_REQUESTED") return 5;
 
     return 99;
 }
@@ -346,7 +348,7 @@ function renderOrderAction(order) {
         `;
     }
 
-    if (status === "SHIPPING") {
+    if (status === "DELIVERED") {
         return `
             <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); confirmReceived(${order.maDH});">
                 Đã nhận hàng
@@ -358,7 +360,7 @@ function renderOrderAction(order) {
         return `<span class="order-note">Đang chờ xử lý hủy</span>`;
     }
 
-    if (currentTab === "review" && status === "DELIVERED") {
+    if (currentTab === "review" && status === "RECEIVED") {
         return `
             <a class="btn btn-outline" href="/orders/detail?orderId=${order.maDH}" onclick="event.stopPropagation();">
                 Đánh giá món
@@ -366,7 +368,7 @@ function renderOrderAction(order) {
         `;
     }
 
-    if (currentTab === "history" && (status === "DELIVERED" || status === "CANCELLED")) {
+    if (currentTab === "history" && (status === "RECEIVED" || status === "CANCELLED")) {
         return `
             <button type="button" class="btn btn-outline reorder-btn" onclick="event.stopPropagation(); goToReorderCheckout(${order.maDH});">
                 Đặt lại
@@ -599,6 +601,7 @@ function displayStatus(status) {
         CONFIRMED: "Đã xác nhận",
         SHIPPING: "Đang giao",
         DELIVERED: "Đã giao",
+        RECEIVED: "Đã nhận hàng",
         CANCEL_REQUESTED: "Yêu cầu hủy",
         CANCELLED: "Đã hủy"
     };

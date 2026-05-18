@@ -52,7 +52,7 @@
             <section class="orders-card">
                 <div class="orders-card__header">
                     <h2>Danh sách món ăn</h2>
-                    <span class="orders-card__hint">Có thể đánh giá từng món khi đơn đã giao</span>
+                    <span class="orders-card__hint">Có thể đánh giá từng món khi đơn đã nhận hàng</span>
                 </div>
 
                 <div class="orders-table-wrap">

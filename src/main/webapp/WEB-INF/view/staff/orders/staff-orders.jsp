@@ -51,6 +51,7 @@
                             <option value="CONFIRMED">Đã xác nhận</option>
                             <option value="SHIPPING">Đang giao</option>
                             <option value="DELIVERED">Đã giao</option>
+                            <option value="RECEIVED">Đã nhận hàng</option>
                             <option value="CANCEL_REQUESTED">Yêu cầu hủy</option>
                             <option value="CANCELLED">Đã hủy</option>
                         </select>
