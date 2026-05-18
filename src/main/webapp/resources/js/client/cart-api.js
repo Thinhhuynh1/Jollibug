@@ -24,7 +24,8 @@ async function loadCart() {
     if (message) message.textContent = "";
 
     try {
-        const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
+        // const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
+        const response = await fetch(CART_API_BASE);
 
         if (!response.ok) {
             throw new Error("Không thể tải giỏ hàng.");
@@ -122,6 +123,27 @@ function updateSummary(totalQuantity, totalAmount) {
     if (headerCartCountEl) {
         headerCartCountEl.textContent = totalQuantity;
     }
+
+    updateCheckoutButton(totalQuantity);
+}
+
+function updateCheckoutButton(totalQuantity) {
+    const checkoutButton = document.getElementById("checkout-button");
+
+    if (!checkoutButton) return;
+
+    if (Number(totalQuantity || 0) <= 0) {
+        checkoutButton.classList.add("is-disabled");
+        checkoutButton.setAttribute("aria-disabled", "true");
+        checkoutButton.setAttribute("href", "#");
+        checkoutButton.onclick = () => false;
+        return;
+    }
+
+    checkoutButton.classList.remove("is-disabled");
+    checkoutButton.setAttribute("aria-disabled", "false");
+    checkoutButton.setAttribute("href", "/checkout");
+    checkoutButton.onclick = null;
 }
 
 async function changeQuantity(maMon, delta) {
@@ -271,10 +293,10 @@ function closeDeleteModal() {
 }
 
 async function deleteCartItem(maMon) {
-    const customerId = getCustomerId();
+    // const customerId = getCustomerId();
 
     try {
-        const response = await fetch(`${CART_API_BASE}/items?customerId=${customerId}&maMon=${maMon}`, {
+        const response = await fetch(`${CART_API_BASE}/items?maMon=${maMon}`, {
             method: "DELETE"
         });
 

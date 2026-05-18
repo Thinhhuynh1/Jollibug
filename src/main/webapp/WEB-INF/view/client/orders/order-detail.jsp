@@ -52,7 +52,7 @@
             <section class="orders-card">
                 <div class="orders-card__header">
                     <h2>Danh sách món ăn</h2>
-                    <span class="orders-card__hint">Có thể đánh giá từng món khi đơn đã giao</span>
+                    <span class="orders-card__hint">Có thể đánh giá từng món khi đơn đã nhận hàng</span>
                 </div>
 
                 <div class="orders-table-wrap">
@@ -83,12 +83,13 @@
 
         <label>Chọn sao</label>
         <div id="reviewStarRating" class="review-star-rating" role="radiogroup" aria-label="Chọn số sao đánh giá">
-            <button type="button" class="review-star" data-rating="1" aria-label="1 sao">★</button>
-            <button type="button" class="review-star" data-rating="2" aria-label="2 sao">★</button>
-            <button type="button" class="review-star" data-rating="3" aria-label="3 sao">★</button>
-            <button type="button" class="review-star" data-rating="4" aria-label="4 sao">★</button>
-            <button type="button" class="review-star" data-rating="5" aria-label="5 sao">★</button>
+            <button type="button" class="review-star" data-rating="1" role="radio" aria-label="1 sao">★</button>
+            <button type="button" class="review-star" data-rating="2" role="radio" aria-label="2 sao">★</button>
+            <button type="button" class="review-star" data-rating="3" role="radio" aria-label="3 sao">★</button>
+            <button type="button" class="review-star" data-rating="4" role="radio" aria-label="4 sao">★</button>
+            <button type="button" class="review-star" data-rating="5" role="radio" aria-label="5 sao">★</button>
         </div>
+        <div id="reviewRatingLabel" class="review-rating-label" aria-live="polite">Rất hài lòng</div>
 
         <label for="reviewNoiDung">Nội dung đánh giá</label>
         <textarea id="reviewNoiDung" rows="4" placeholder="Nhập cảm nhận của bạn..."></textarea>

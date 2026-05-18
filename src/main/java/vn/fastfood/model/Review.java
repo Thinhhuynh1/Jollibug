@@ -10,6 +10,10 @@ public class Review {
     private int sao;
     private String noiDung;
     private Timestamp ngayDG;
+    private String tenMon;
+    private String imageUrl;
+    private String tenKhachHang;
+    private String emailKhachHang;
 
     public Review() {
     }
@@ -68,5 +72,37 @@ public class Review {
 
     public void setNgayDG(Timestamp ngayDG) {
         this.ngayDG = ngayDG;
+    }
+
+    public String getTenMon() {
+        return tenMon;
+    }
+
+    public void setTenMon(String tenMon) {
+        this.tenMon = tenMon;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getTenKhachHang() {
+        return tenKhachHang;
+    }
+
+    public void setTenKhachHang(String tenKhachHang) {
+        this.tenKhachHang = tenKhachHang;
+    }
+
+    public String getEmailKhachHang() {
+        return emailKhachHang;
+    }
+
+    public void setEmailKhachHang(String emailKhachHang) {
+        this.emailKhachHang = emailKhachHang;
     }
 }

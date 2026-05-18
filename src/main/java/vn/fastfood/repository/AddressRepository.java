@@ -1,5 +1,7 @@
 package vn.fastfood.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,4 +34,12 @@ public interface AddressRepository extends JpaRepository<DiaChi, Long> {
 
     @Query("SELECT d FROM DiaChi d WHERE d.user.maTK = :maTK ORDER BY d.maDC asc")
     DiaChi findFirstByUser_MaTKOrderByMaDCAsc(long maTK);
+
+    @Query(value = """
+            SELECT *
+            FROM DIACHI
+            WHERE MATK = ?1
+            ORDER BY ISDEFAULT DESC, MADC ASC
+            """, nativeQuery = true)
+    List<DiaChi> findByUserMaTKOrderByDefaultAddressDescMaDCAsc(long maTK);
 }

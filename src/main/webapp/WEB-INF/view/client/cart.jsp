@@ -30,28 +30,63 @@
       <div class="cart-shell">
         <section class="cart-column">
           <article class="cart-panel">
-            <div class="cart-item-list">
+            <div id="cartItems" class="cart-item-list">
+              <c:if test="${param.checkoutEmpty == 'true'}">
+                <div class="cart-empty">
+                  <h3>Giỏ hàng đang trống</h3>
+                  <p>Vui lòng chọn thêm món trước khi đặt hàng.</p>
+                  <a class="btn btn-primary" href="/menu">Xem thực đơn</a>
+                </div>
+              </c:if>
+
               <c:set var="tongSoLuong" value="0" />
               <c:set var="tongTien" value="0" />
               <c:forEach var="cartItem" items="${sessionScope.cart}">
                 <c:set var="tongSoLuong" value="${tongSoLuong + cartItem.soLuong}"/>
                 <c:set var="tongTien" value="${tongTien + cartItem.thanhTien}" />
-                <article class="cart-line">
+                <article class="cart-line"
+                        id="cart-line-${cartItem.maMon}"
+                        data-price="${cartItem.donGia}">
                   <div class="cart-line__thumb">
                     <img src="/images/${cartItem.imageUrl}"
-                         style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+                        alt="${cartItem.tenMon}"
+                        style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
                   </div>
+
                   <div class="cart-line__meta">
                     <h3 class="cart-line__name">${cartItem.tenMon}</h3>
+                    <p class="cart-line__unit">Mã món: ${cartItem.maMon}</p>
+
                     <div class="cart-line__controls">
-                      <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
-                      <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
-                        <div class="qty-stepper" aria-label="Chinh so luong">
-                          <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
-                          <span class="qty-stepper__value">${cartItem.soLuong}</span>
-                          <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
+                      <a class="cart-link-btn"
+                        href="#"
+                        data-action="remove"
+                        onclick="removeCartItem(event, ${cartItem.maMon})">
+                        Xóa
+                      </a>
+
+                      <div class="cart-line__purchase">
+                        <div class="qty-stepper" aria-label="Chỉnh số lượng">
+                          <button class="qty-stepper__btn"
+                                  type="button"
+                                  aria-label="Giảm số lượng"
+                                  onclick="changeQuantity(${cartItem.maMon}, -1)">
+                            -
+                          </button>
+
+                          <span class="qty-stepper__value" id="qty-${cartItem.maMon}">
+                            ${cartItem.soLuong}
+                          </span>
+
+                          <button class="qty-stepper__btn"
+                                  type="button"
+                                  aria-label="Tăng số lượng"
+                                  onclick="changeQuantity(${cartItem.maMon}, 1)">
+                            +
+                          </button>
                         </div>
-                        <strong class="cart-line__sum">
+
+                        <strong class="cart-line__sum" id="sum-${cartItem.maMon}">
                           <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> đ
                         </strong>
                       </div>
@@ -84,7 +119,14 @@
               </div>
             </div>
 
-            <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
+            <c:choose>
+              <c:when test="${tongSoLuong > 0}">
+                <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
+              </c:when>
+              <c:otherwise>
+                <a class="btn btn-primary btn-block is-disabled" id="checkout-button" href="#" aria-disabled="true" onclick="return false;">Đặt hàng</a>
+              </c:otherwise>
+            </c:choose>
           </article>
         </aside>
       </div>

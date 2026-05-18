@@ -22,7 +22,13 @@
       </head>
 
       <body class="checkout-page" data-page="checkout">
-        <jsp:include page="layout/header.jsp" />
+        <jsp:include page="../layout/header.jsp"/>
+
+        <c:if test="${not empty sessionScope.user}">
+          <input type="hidden" id="customerId" value="${sessionScope.user.maTK}" />
+        </c:if>
+
+        <input type="hidden" id="addressSelect" value="" />
 
         <main class="page-shell checkout-main">
           <div class="container">
@@ -85,14 +91,14 @@
                   <h3 class="section-subtitle">Payment Method</h3>
                   <div class="payment-options" role="radiogroup" aria-label="Payment method">
                     <label class="payment-option">
-                      <input type="radio" name="payment-method" value="cod" checked />
+                      <input type="radio" name="payment-method" value="COD" checked />
                       <div>
                         <strong>Cash on Delivery (COD)</strong>
                       </div>
                     </label>
 
                     <label class="payment-option">
-                      <input type="radio" name="payment-method" value="online" />
+                      <input type="radio" name="payment-method" value="EWALLET" />
                       <div>
                         <strong>Card / E-wallet</strong>
                       </div>
