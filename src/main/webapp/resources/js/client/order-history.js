@@ -325,27 +325,142 @@ async function reorderOrder(orderId) {
     }
 }
 
-async function requestCancelOrder(orderId) {
-    const customerId = getCurrentCustomerId();
+function requestCancelOrder(orderId) {
+    openClientCancelConfirmModal(orderId, async () => {
+        orderDetailCache.delete(orderId);
+        await loadOrders();
+    });
+}
 
-    if (!confirm("Bạn có chắc muốn hủy đơn hàng này không?")) {
+function openClientCancelConfirmModal(orderId, afterSuccessCallback) {
+    const oldModal = document.getElementById("clientCancelConfirmModal");
+    if (oldModal) oldModal.remove();
+
+    window.afterClientOrderCancelled = afterSuccessCallback || null;
+
+    const modal = document.createElement("div");
+    modal.id = "clientCancelConfirmModal";
+    modal.className = "client-cancel-modal-root";
+
+    modal.innerHTML = `
+        <div class="client-cancel-modal-box">
+            <div class="client-cancel-modal-header">
+                <h2>Xác nhận hủy đơn #${orderId}</h2>
+                <button type="button" class="client-cancel-close-btn" onclick="closeClientCancelConfirmModal()">×</button>
+            </div>
+
+            <p class="client-cancel-confirm-text">
+                Vui lòng chọn lý do hủy đơn trước khi xác nhận.
+            </p>
+
+            <div class="client-cancel-reason-list">
+                ${renderClientCancelReason("Tôi muốn thay đổi món", true)}
+                ${renderClientCancelReason("Tôi muốn thay đổi địa chỉ giao hàng", false)}
+                ${renderClientCancelReason("Thời gian giao hàng quá lâu", false)}
+                ${renderClientCancelReason("Tôi đặt nhầm đơn", false)}
+                ${renderClientCancelReason("Khác", false, true)}
+            </div>
+
+            <textarea
+                id="clientOtherCancelReason"
+                class="client-other-cancel-reason hidden"
+                placeholder="Nhập lý do hủy khác..."
+            ></textarea>
+
+            <div class="client-cancel-modal-actions">
+                <button type="button" class="client-cancel-danger-btn" onclick="confirmClientCancelOrder(${orderId})">
+                    Xác nhận hủy
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.querySelectorAll('input[name="clientCancelReason"]').forEach(input => {
+        input.addEventListener("change", toggleClientOtherCancelReason);
+    });
+}
+
+function renderClientCancelReason(label, checked, isOther) {
+    return `
+        <label class="client-cancel-reason-choice">
+            <input
+                type="radio"
+                name="clientCancelReason"
+                value="${escapeHtml(label)}"
+                ${checked ? "checked" : ""}
+                data-other="${isOther ? "true" : "false"}"
+            >
+            <span>${escapeHtml(label)}</span>
+        </label>
+    `;
+}
+
+function toggleClientOtherCancelReason() {
+    const selected = document.querySelector('input[name="clientCancelReason"]:checked');
+    const textarea = document.getElementById("clientOtherCancelReason");
+
+    if (!selected || !textarea) return;
+
+    if (selected.dataset.other === "true") {
+        textarea.classList.remove("hidden");
+        textarea.focus();
+    } else {
+        textarea.classList.add("hidden");
+        textarea.value = "";
+    }
+}
+
+function closeClientCancelConfirmModal() {
+    const modal = document.getElementById("clientCancelConfirmModal");
+    if (modal) modal.remove();
+}
+
+async function confirmClientCancelOrder(orderId) {
+    const selectedReason = document.querySelector('input[name="clientCancelReason"]:checked');
+    const otherReason = document.getElementById("clientOtherCancelReason");
+
+    if (!selectedReason) {
+        alert("Vui lòng chọn lý do hủy đơn.");
         return;
     }
 
+    let reason = selectedReason.value;
+
+    if (selectedReason.dataset.other === "true") {
+        reason = otherReason ? otherReason.value.trim() : "";
+    }
+
+    if (!reason) {
+        alert("Vui lòng nhập lý do hủy đơn.");
+        return;
+    }
+
+    await submitClientCancelOrder(orderId, reason);
+}
+
+async function submitClientCancelOrder(orderId, reason) {
+    const customerId = getCurrentCustomerId();
+    const params = new URLSearchParams();
+    params.append("customerId", customerId);
+    params.append("cancelReason", reason);
+
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/cancel?customerId=${customerId}`, {
+        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/cancel?${params.toString()}`, {
             method: "POST"
         });
 
         const data = await response.json();
-
         alert(data.message || "Đã xử lý yêu cầu hủy đơn.");
 
         if (response.ok) {
-            orderDetailCache.delete(orderId);
-            await loadOrders();
-        }
+            closeClientCancelConfirmModal();
 
+            if (typeof window.afterClientOrderCancelled === "function") {
+                window.afterClientOrderCancelled(orderId);
+            }
+        }
     } catch (error) {
         alert("Lỗi khi gửi yêu cầu hủy đơn.");
     }
@@ -411,6 +526,15 @@ function formatMoney(value) {
 function formatDate(value) {
     if (!value) return "-";
     return new Date(value).toLocaleString("vi-VN");
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
 function getFallbackFoodImage(maMon) {

@@ -54,6 +54,11 @@
               <!-- Dropdown gợi ý địa chỉ -->
               <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
             </label>
+
+            <label class="field-label">
+              <span>Ghi chú cho đơn hàng</span>
+              <textarea id="order-note" rows="3" placeholder="Ví dụ: ít cay, gọi trước khi giao..."></textarea>
+            </label>
           </form>
 
           <div style="text-align: end;">

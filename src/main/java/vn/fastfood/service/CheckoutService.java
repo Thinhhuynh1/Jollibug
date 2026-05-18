@@ -30,10 +30,8 @@ public class CheckoutService {
         long customerId = request.getCustomerId();
 
         /*
-         * Không bắt buộc địa chỉ phải tồn tại trong bảng DIACHI.
-         * Nếu khách chọn địa chỉ đã lưu và MaDC hợp lệ, dùng MaDC đó.
-         * Nếu MaDC không hợp lệ hoặc khách nhập địa chỉ mới, vẫn cho đặt hàng,
-         * thông tin giao hàng sẽ được lưu trong GhiChu.
+         * Địa chỉ giao hàng phải đến từ DIACHI/MaDC.
+         * GhiChu chỉ lưu ghi chú khách nhập, không lưu người nhận/SĐT/email/địa chỉ.
          */
         Long maDC = request.getMaDC();
 
@@ -91,7 +89,7 @@ public class CheckoutService {
                     discountAmount,
                     total,
                     maGG,
-                    request.getGhiChu()
+                    normalizeNote(request.getGhiChu())
             );
 
             boolean historyRecorded = orderDAO.insertOrderStatusHistory(
@@ -181,5 +179,13 @@ public class CheckoutService {
         }
 
         return checkoutItems;
+    }
+
+    private String normalizeNote(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+
+        return value.trim();
     }
 }

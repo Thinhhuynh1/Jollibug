@@ -49,9 +49,10 @@ public class OrderController {
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<Map<String, Object>> cancelOrder(
         @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
+        @RequestParam("customerId") long customerId,
+        @RequestParam(value = "cancelReason", required = false) String cancelReason
     ) {
-        boolean result = orderService.requestCancelOrder(orderId, customerId);
+        boolean result = orderService.requestCancelOrder(orderId, customerId, cancelReason);
         
         if (result) {
             return ResponseEntity.ok(

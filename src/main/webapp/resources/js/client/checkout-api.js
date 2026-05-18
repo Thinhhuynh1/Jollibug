@@ -224,12 +224,8 @@ async function submitCheckout() {
 }
 
 function buildCheckoutNote() {
-    const name = getValue("delivery-name");
-    const phone = getValue("delivery-phone");
-    const email = getValue("delivery-email");
-    const address = getValue("delivery-address");
-
-    return `Người nhận: ${name}; SĐT: ${phone}; Email: ${email}; Địa chỉ nhập: ${address}`;
+    const note = getValue("order-note").trim();
+    return note || null;
 }
 
 function showCheckoutMessage(message) {

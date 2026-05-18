@@ -193,8 +193,8 @@ public class CheckoutDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, new String[]{"MADH"})) {
 
-            String phone = extractBetween(ghiChu, "SĐT:", ";");
-            String address = extractAfter(ghiChu, "Địa chỉ nhập:");
+            DeliverySnapshot delivery = getDeliverySnapshot(conn, customerId, maDC);
+            String note = normalizeNote(ghiChu);
 
             ps.setLong(1, customerId);
             ps.setLong(2, customerId);
@@ -211,12 +211,12 @@ public class CheckoutDAO {
             ps.setBigDecimal(7, tienGiamGia);
             ps.setBigDecimal(8, thanhTien);
 
-            ps.setString(9, phone);
-            ps.setString(10, phone);
-            ps.setString(11, address);
-            ps.setString(12, address);
-            ps.setString(13, ghiChu);
-            ps.setString(14, ghiChu);
+            ps.setString(9, delivery.phone());
+            ps.setString(10, delivery.phone());
+            ps.setString(11, delivery.address());
+            ps.setString(12, delivery.address());
+            ps.setString(13, note);
+            ps.setString(14, note);
 
             if (maGG == null) {
                 ps.setNull(15, Types.NUMERIC);
@@ -351,39 +351,54 @@ public class CheckoutDAO {
         return false;
     }
 
-    private String extractBetween(String source, String startToken, String endToken) {
-        if (source == null || startToken == null || endToken == null) {
-            return "";
+    private DeliverySnapshot getDeliverySnapshot(Connection conn, long customerId, Long maDC) throws SQLException {
+        if (maDC == null || maDC <= 0) {
+            return new DeliverySnapshot("", "");
         }
 
-        int startIndex = source.indexOf(startToken);
+        String sql = """
+            SELECT
+                SDTNguoiNhan,
+                TRIM(
+                    NVL(DiaChiCuThe, '') ||
+                    CASE WHEN PhuongXa IS NOT NULL THEN ', ' || PhuongXa ELSE '' END ||
+                    CASE WHEN QuanHuyen IS NOT NULL THEN ', ' || QuanHuyen ELSE '' END ||
+                    CASE WHEN TinhThanh IS NOT NULL THEN ', ' || TinhThanh ELSE '' END
+                ) AS DiaChiGiaoHang
+            FROM DIACHI
+            WHERE MaDC = ?
+              AND MaTK = ?
+        """;
 
-        if (startIndex < 0) {
-            return "";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, maDC);
+            ps.setLong(2, customerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new DeliverySnapshot(
+                            defaultString(rs.getString("SDTNguoiNhan")),
+                            defaultString(rs.getString("DiaChiGiaoHang"))
+                    );
+                }
+            }
         }
 
-        startIndex += startToken.length();
-
-        int endIndex = source.indexOf(endToken, startIndex);
-
-        if (endIndex < 0) {
-            return source.substring(startIndex).trim();
-        }
-
-        return source.substring(startIndex, endIndex).trim();
+        return new DeliverySnapshot("", "");
     }
 
-    private String extractAfter(String source, String token) {
-        if (source == null || token == null) {
-            return "";
+    private String normalizeNote(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
         }
 
-        int index = source.indexOf(token);
+        return value.trim();
+    }
 
-        if (index < 0) {
-            return "";
-        }
+    private String defaultString(String value) {
+        return value == null ? "" : value.trim();
+    }
 
-        return source.substring(index + token.length()).trim();
+    private record DeliverySnapshot(String phone, String address) {
     }
 }

@@ -707,28 +707,33 @@ body[data-page="orders"] {
 }
 
 .order-timeline {
+    --timeline-step-count: 4;
+    --timeline-dot-size: 1.15rem;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--timeline-step-count), minmax(0, 1fr));
     gap: 0;
     align-items: center;
     position: relative;
-    min-height: 3rem;
-    padding: 0.5rem 0.25rem;
+    min-height: 2.5rem;
+    padding: 0.55rem 0.5rem;
     overflow: visible;
 }
 
 .timeline-step {
     position: relative;
     display: grid;
-    place-items: center;
+    grid-template-rows: var(--timeline-dot-size);
+    justify-items: center;
+    align-items: center;
     min-width: 0;
     overflow: visible;
+    text-align: center;
 }
 
 .timeline-step::before {
     content: "";
     position: absolute;
-    top: 50%;
+    top: calc(var(--timeline-dot-size) / 2);
     left: -50%;
     width: 100%;
     height: 4px;
@@ -744,12 +749,18 @@ body[data-page="orders"] {
 .timeline-step__dot {
     position: relative;
     z-index: 1;
-    width: 1.05rem;
-    height: 1.05rem;
+    display: inline-grid;
+    place-items: center;
+    width: var(--timeline-dot-size);
+    height: var(--timeline-dot-size);
     border: 2px solid rgba(26, 26, 26, 0.12);
     border-radius: 999px;
     background: #ffffff;
     box-shadow: 0 0 0 6px #ffffff;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 900;
+    line-height: 1;
 }
 
 .timeline-step::after {
@@ -779,15 +790,18 @@ body[data-page="orders"] {
     transform: translate(-50%, 0);
 }
 
-.timeline-step.is-complete::before,
-.timeline-step.is-cancelled::before {
+.timeline-step.is-complete::before {
     background: rgba(47, 158, 102, 0.55);
 }
 
 .timeline-step.is-active::before {
-    background: linear-gradient(90deg, rgba(230, 0, 0, 0.18), rgba(230, 0, 0, 0.72), rgba(230, 0, 0, 0.18));
-    background-size: 200% 100%;
-    animation: orderTimelineFlow 1.35s linear infinite;
+    background: rgba(47, 158, 102, 0.55);
+}
+
+.timeline-step.is-next::before {
+    background: linear-gradient(90deg, rgba(230, 0, 0, 0.18), rgba(230, 0, 0, 0.78), rgba(230, 0, 0, 0.18));
+    background-size: 220% 100%;
+    animation: orderTimelineFlow 1.1s linear infinite;
 }
 
 .timeline-step.is-complete .timeline-step__dot {
@@ -796,13 +810,45 @@ body[data-page="orders"] {
 }
 
 .timeline-step.is-active .timeline-step__dot {
+    border-color: #2f9e66;
+    background: #2f9e66;
+    box-shadow: 0 0 0 6px rgba(47, 158, 102, 0.1);
+}
+
+.timeline-step.is-next .timeline-step__dot {
     border-color: #e60000;
     background: #e60000;
     box-shadow: 0 0 0 6px rgba(230, 0, 0, 0.08);
+    animation: orderTimelinePulse 1.1s ease-in-out infinite;
+}
+
+@keyframes orderTimelineFlow {
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: -100% 0;
+    }
+}
+
+@keyframes orderTimelinePulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 6px rgba(230, 0, 0, 0.08);
+    }
+
+    50% {
+        box-shadow: 0 0 0 10px rgba(230, 0, 0, 0.14);
+    }
 }
 
 .timeline-step.is-cancelled {
     color: #c93a37;
+}
+
+.timeline-step.is-cancelled::before {
+    background: rgba(201, 58, 55, 0.48);
 }
 
 .timeline-step.is-cancelled .timeline-step__dot {
@@ -828,14 +874,131 @@ body[data-page="orders"] {
     line-height: 1.4;
 }
 
-@keyframes orderTimelineFlow {
-    from {
-        background-position: 100% 0;
-    }
+.client-cancel-modal-root {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(24, 12, 4, 0.28);
+    backdrop-filter: blur(2px);
+}
 
-    to {
-        background-position: -100% 0;
-    }
+.client-cancel-modal-box {
+    position: relative;
+    width: min(100%, 520px);
+    max-height: calc(100vh - 2rem);
+    overflow: auto;
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid rgba(111, 82, 55, 0.1);
+    border-radius: 24px;
+    background: #fffefb;
+    box-shadow: 0 24px 60px rgba(24, 12, 4, 0.18);
+}
+
+.client-cancel-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(111, 82, 55, 0.08);
+}
+
+.client-cancel-modal-header h2 {
+    margin: 0;
+    padding-right: 2.75rem;
+    color: #211a16;
+    font-size: 1.35rem;
+    font-weight: 900;
+}
+
+.client-cancel-close-btn {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    width: 2.75rem;
+    min-height: 2.75rem;
+    border: 1px solid rgba(111, 82, 55, 0.12);
+    border-radius: 999px;
+    background: #fffaf8;
+    color: #211a16;
+    cursor: pointer;
+    font-size: 1.75rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.client-cancel-confirm-text {
+    margin: 0;
+    color: #3b2c22;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+.client-cancel-reason-list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.client-cancel-reason-choice {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3.15rem;
+    padding: 0.8rem 0.95rem;
+    border: 1px solid rgba(111, 82, 55, 0.14);
+    border-radius: 14px;
+    background: #fffaf8;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+.client-cancel-reason-choice:hover {
+    border-color: #e60000;
+    background: #fff3f1;
+}
+
+.client-cancel-reason-choice input {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #e60000;
+}
+
+.client-cancel-reason-choice:has(input:checked) {
+    border-color: #e60000;
+    background: rgba(230, 0, 0, 0.08);
+    color: #c40000;
+}
+
+.client-other-cancel-reason {
+    width: 100%;
+    min-height: 5.25rem;
+    border: 1px solid rgba(111, 82, 55, 0.14);
+    border-radius: 14px;
+    padding: 0.85rem 0.95rem;
+    resize: vertical;
+    font: inherit;
+}
+
+.client-cancel-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.7rem;
+}
+
+.client-cancel-danger-btn {
+    min-height: 2.85rem;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.75rem 1.1rem;
+    background: #c40000;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 900;
 }
 
 @media (max-width: 760px) {
@@ -847,21 +1010,31 @@ body[data-page="orders"] {
     }
 
     .timeline-step {
+        grid-template-columns: var(--timeline-dot-size) minmax(0, 1fr);
+        grid-template-rows: auto;
         justify-items: start;
-        min-height: 1.2rem;
+        align-items: center;
+        column-gap: 0.85rem;
+        min-height: 2rem;
+        text-align: left;
     }
 
     .timeline-step::before {
-        top: -0.85rem;
-        left: 0.52rem;
+        top: -0.95rem;
+        left: calc(var(--timeline-dot-size) / 2);
         width: 4px;
-        height: 1.25rem;
+        height: 1.45rem;
         transform: none;
+    }
+
+    .timeline-step__dot {
+        grid-column: 1;
+        grid-row: 1;
     }
 
     .timeline-step::after {
         bottom: auto;
-        left: 1.55rem;
+        left: calc(var(--timeline-dot-size) + 0.85rem);
         top: 50%;
         transform: translate(0.2rem, -50%);
     }

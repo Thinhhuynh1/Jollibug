@@ -24,6 +24,10 @@ public class OrderService {
     }
 
     public boolean requestCancelOrder(long orderId, long customerId) {
+        return requestCancelOrder(orderId, customerId, null);
+    }
+
+    public boolean requestCancelOrder(long orderId, long customerId, String cancelReason) {
         Order dh = orderDAO.getOrderById(orderId, customerId);
         if (dh == null) {
             System.out.println("Không tìm thấy đơn hàng hoặc đơn không thuộc khách hàng này.");
@@ -31,12 +35,14 @@ public class OrderService {
         }
 
         String status = normalizeStatus(dh.getTrangThaiDon());
+        String reason = normalizeReason(cancelReason);
+
         if ("PENDING".equals(status)) {
-            return updateCustomerStatus(orderId, customerId, status, "CANCELLED", null);
+            return updateCustomerStatus(orderId, customerId, status, "CANCELLED", reason);
         }
 
         if ("CONFIRMED".equals(status)) {
-            return updateCustomerStatus(orderId, customerId, status, "CANCEL_REQUESTED", null);
+            return updateCustomerStatus(orderId, customerId, status, "CANCEL_REQUESTED", reason);
         }
         
         System.out.println("Đơn hàng ở trạng thái " + status + " nên không thể hủy.");
@@ -86,6 +92,14 @@ public class OrderService {
         if (status == null)
             return "";
         return status.trim().toUpperCase();
+    }
+
+    private String normalizeReason(String reason) {
+        if (reason == null || reason.trim().isEmpty()) {
+            return "Khách hàng không cung cấp lý do cụ thể";
+        }
+
+        return reason.trim();
     }
 
     public List<Order> getOrdersForStaff(String status, String keyword, String fromDate, String toDate) {
