@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ReviewDAO {
 
@@ -167,6 +168,101 @@ public class ReviewDAO {
         }
 
         return reviews;
+    }
+
+    public List<Review> getReviewsForStaff(String rating, String keyword, String fromDate, String toDate) {
+        List<Review> reviews = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+            SELECT
+                dg.MaDG,
+                dg.MaTK_KH,
+                dg.MaMon,
+                dg.MaDH,
+                dg.Sao,
+                dg.NoiDung,
+                dg.NgayDG,
+                u.HoTen AS TenKhachHang,
+                u.Email AS EmailKhachHang
+            FROM DANHGIA dg
+            LEFT JOIN USERS u ON dg.MaTK_KH = u.MaTK
+            WHERE 1 = 1
+        """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (rating != null && !rating.trim().isEmpty()) {
+            sql.append(" AND dg.Sao = ? ");
+            params.add(Integer.parseInt(rating.trim()));
+        }
+
+        if (fromDate != null && !fromDate.trim().isEmpty()) {
+            sql.append(" AND TRUNC(dg.NgayDG) >= TO_DATE(?, 'YYYY-MM-DD') ");
+            params.add(fromDate.trim());
+        }
+
+        if (toDate != null && !toDate.trim().isEmpty()) {
+            sql.append(" AND TRUNC(dg.NgayDG) <= TO_DATE(?, 'YYYY-MM-DD') ");
+            params.add(toDate.trim());
+        }
+
+        sql.append(" ORDER BY dg.NgayDG DESC, dg.MaDG DESC ");
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            setParameters(ps, params);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Review review = new Review();
+
+                    review.setMaDG(rs.getLong("MaDG"));
+                    review.setMaTKKH(rs.getLong("MaTK_KH"));
+                    review.setMaMon(rs.getLong("MaMon"));
+                    review.setMaDH(rs.getLong("MaDH"));
+                    review.setSao(rs.getInt("Sao"));
+                    review.setNoiDung(readClob(rs.getClob("NoiDung")));
+                    review.setNgayDG(rs.getTimestamp("NgayDG"));
+                    review.setTenKhachHang(rs.getString("TenKhachHang"));
+                    review.setEmailKhachHang(rs.getString("EmailKhachHang"));
+                    enrichReviewFoodInfo(conn, review);
+
+                    if (matchesStaffReviewKeyword(review, keyword)) {
+                        reviews.add(review);
+                    }
+                }
+            }
+
+        } catch (SQLException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
+    }
+
+    private boolean matchesStaffReviewKeyword(Review review, String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return true;
+        }
+
+        String normalizedKeyword = keyword.trim().toLowerCase(Locale.ROOT);
+
+        return contains(review.getTenMon(), normalizedKeyword)
+                || contains(review.getTenKhachHang(), normalizedKeyword)
+                || contains(review.getEmailKhachHang(), normalizedKeyword)
+                || contains(review.getNoiDung(), normalizedKeyword)
+                || String.valueOf(review.getMaDH()).contains(normalizedKeyword)
+                || String.valueOf(review.getMaTKKH()).contains(normalizedKeyword);
+    }
+
+    private boolean contains(String value, String keyword) {
+        return value != null && value.toLowerCase(Locale.ROOT).contains(keyword);
+    }
+
+    private void setParameters(PreparedStatement ps, List<Object> params) throws SQLException {
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
     }
 
     private void enrichReviewFoodInfo(Connection conn, Review review) {

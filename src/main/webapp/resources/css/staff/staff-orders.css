@@ -14,6 +14,33 @@ body[data-admin-page="orders"] .staff-orders-board__header .eyebrow {
     background: rgba(230, 0, 0, 0.1);
 }
 
+body[data-admin-page="orders"] .staff-orders-tabs {
+    display: inline-flex;
+    width: fit-content;
+    gap: 0.4rem;
+    padding: 0.35rem;
+    border: 1px solid rgba(111, 82, 55, 0.1);
+    border-radius: 999px;
+    background: #fffaf5;
+}
+
+body[data-admin-page="orders"] .staff-orders-tab {
+    min-height: 2.65rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #5f544d;
+    cursor: pointer;
+    padding: 0 1.05rem;
+    font-weight: 900;
+}
+
+body[data-admin-page="orders"] .staff-orders-tab.is-active {
+    background: var(--color-red-500);
+    color: #ffffff;
+    box-shadow: 0 10px 20px rgba(230, 0, 0, 0.14);
+}
+
 body[data-admin-page="orders"] .filter-card,
 body[data-admin-page="orders"] .table-card {
     border: 1px solid rgba(111, 82, 55, 0.08);
@@ -30,6 +57,146 @@ body[data-admin-page="orders"] .table-card {
     display: grid;
     gap: var(--space-4);
     padding: 1.1rem;
+}
+
+body[data-admin-page="orders"] .staff-review-panel {
+    display: grid;
+    gap: 1rem;
+}
+
+body[data-admin-page="orders"] .staff-review-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+body[data-admin-page="orders"] .staff-review-card {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem;
+    border: 1px solid rgba(111, 82, 55, 0.1);
+    border-left-width: 4px;
+    border-radius: 18px;
+    background: #fffefb;
+}
+
+body[data-admin-page="orders"] .staff-review-card.is-low {
+    border-left-color: #c93a37;
+}
+
+body[data-admin-page="orders"] .staff-review-card.is-mid {
+    border-left-color: #d97706;
+}
+
+body[data-admin-page="orders"] .staff-review-card.is-high {
+    border-left-color: #2f9e66;
+}
+
+body[data-admin-page="orders"] .staff-review-card__media img,
+body[data-admin-page="orders"] .staff-review-card__placeholder {
+    width: 88px;
+    height: 88px;
+    border-radius: 14px;
+}
+
+body[data-admin-page="orders"] .staff-review-card__media img {
+    display: block;
+    object-fit: cover;
+    background: #f5eee9;
+}
+
+body[data-admin-page="orders"] .staff-review-card__placeholder {
+    display: grid;
+    place-items: center;
+    background: #fff4ee;
+    color: #8b6f63;
+    font-size: 0.76rem;
+    font-weight: 900;
+}
+
+body[data-admin-page="orders"] .staff-review-card__content {
+    min-width: 0;
+    display: grid;
+    gap: 0.55rem;
+}
+
+body[data-admin-page="orders"] .staff-review-card__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+body[data-admin-page="orders"] .staff-review-card__top h3 {
+    margin: 0 0 0.2rem;
+    color: #211a16;
+    font-size: 1.03rem;
+    font-weight: 900;
+}
+
+body[data-admin-page="orders"] .staff-review-card__top p,
+body[data-admin-page="orders"] .staff-review-date {
+    margin: 0;
+    color: var(--color-ink-500);
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+body[data-admin-page="orders"] .staff-review-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+body[data-admin-page="orders"] .staff-review-stars {
+    display: inline-flex;
+    gap: 0.1rem;
+    color: #d7c7ba;
+    font-size: 1.18rem;
+    line-height: 1;
+}
+
+body[data-admin-page="orders"] .staff-review-stars span.is-active {
+    color: #f4b400;
+}
+
+body[data-admin-page="orders"] .staff-review-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.85rem;
+    border-radius: 999px;
+    padding: 0.3rem 0.62rem;
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+body[data-admin-page="orders"] .staff-review-badge.is-low {
+    background: rgba(201, 58, 55, 0.13);
+    color: #b12f2d;
+}
+
+body[data-admin-page="orders"] .staff-review-badge.is-mid {
+    background: rgba(217, 119, 6, 0.14);
+    color: #a15c05;
+}
+
+body[data-admin-page="orders"] .staff-review-badge.is-high {
+    background: rgba(47, 158, 102, 0.15);
+    color: #2f8a59;
+}
+
+body[data-admin-page="orders"] .staff-review-content {
+    margin: 0;
+    color: #3b2c22;
+    font-weight: 700;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+body[data-admin-page="orders"] .staff-review-actions {
+    display: flex;
+    justify-content: flex-end;
 }
 
 body[data-admin-page="orders"] .table-card__header {
@@ -476,6 +643,17 @@ body[data-admin-page="orders"] .empty-cell {
     body[data-admin-page="orders"] .staff-orders-board__header,
     body[data-admin-page="orders"] .table-card__header {
         flex-direction: column;
+    }
+
+    body[data-admin-page="orders"] .staff-orders-tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        border-radius: 18px;
+    }
+
+    body[data-admin-page="orders"] .staff-review-card {
+        grid-template-columns: 1fr;
     }
 
     body[data-admin-page="orders"] .filter-grid,

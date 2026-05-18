@@ -12,6 +12,8 @@ public class Review {
     private Timestamp ngayDG;
     private String tenMon;
     private String imageUrl;
+    private String tenKhachHang;
+    private String emailKhachHang;
 
     public Review() {
     }
@@ -86,5 +88,21 @@ public class Review {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getTenKhachHang() {
+        return tenKhachHang;
+    }
+
+    public void setTenKhachHang(String tenKhachHang) {
+        this.tenKhachHang = tenKhachHang;
+    }
+
+    public String getEmailKhachHang() {
+        return emailKhachHang;
+    }
+
+    public void setEmailKhachHang(String emailKhachHang) {
+        this.emailKhachHang = emailKhachHang;
     }
 }

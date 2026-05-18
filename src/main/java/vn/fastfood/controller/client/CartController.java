@@ -11,6 +11,8 @@ import vn.fastfood.entity.User;
 import vn.fastfood.repository.UserRepository;
 import vn.fastfood.service.OrderService;
 
+import java.util.List;
+
 @Controller
 public class CartController {
     // cart, checkout, orders.
@@ -52,6 +54,10 @@ public class CartController {
             }
         }
 
+        if (isCartEmpty(session)) {
+            return "redirect:/cart?checkoutEmpty=true";
+        }
+
         model.addAttribute("checkoutUser", user);
 
         System.out.println("[CHECKOUT PAGE] userId=" + user.getMaTK()
@@ -86,5 +92,25 @@ public class CartController {
         }
 
         return null;
+    }
+
+    private boolean isCartEmpty(HttpSession session) {
+        if (session == null) {
+            return true;
+        }
+
+        Object cartObj = session.getAttribute("cart");
+
+        if (!(cartObj instanceof List<?> cart)) {
+            return true;
+        }
+
+        return cart.stream().noneMatch(item -> {
+            if (item instanceof vn.fastfood.model.CartItem cartItem) {
+                return cartItem.getSoLuong() > 0;
+            }
+
+            return false;
+        });
     }
 }

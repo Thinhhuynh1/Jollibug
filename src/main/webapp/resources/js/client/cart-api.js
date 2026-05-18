@@ -123,6 +123,27 @@ function updateSummary(totalQuantity, totalAmount) {
     if (headerCartCountEl) {
         headerCartCountEl.textContent = totalQuantity;
     }
+
+    updateCheckoutButton(totalQuantity);
+}
+
+function updateCheckoutButton(totalQuantity) {
+    const checkoutButton = document.getElementById("checkout-button");
+
+    if (!checkoutButton) return;
+
+    if (Number(totalQuantity || 0) <= 0) {
+        checkoutButton.classList.add("is-disabled");
+        checkoutButton.setAttribute("aria-disabled", "true");
+        checkoutButton.setAttribute("href", "#");
+        checkoutButton.onclick = () => false;
+        return;
+    }
+
+    checkoutButton.classList.remove("is-disabled");
+    checkoutButton.setAttribute("aria-disabled", "false");
+    checkoutButton.setAttribute("href", "/checkout");
+    checkoutButton.onclick = null;
 }
 
 async function changeQuantity(maMon, delta) {

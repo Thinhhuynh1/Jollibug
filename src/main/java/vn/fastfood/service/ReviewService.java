@@ -40,4 +40,8 @@ public class ReviewService {
     public List<Review> getReviewsByCustomerId(long customerId) {
         return reviewDAO.getReviewsByCustomerId(customerId);
     }
+
+    public List<Review> getReviewsForStaff(String rating, String keyword, String fromDate, String toDate) {
+        return reviewDAO.getReviewsForStaff(rating, keyword, fromDate, toDate);
+    }
 }
