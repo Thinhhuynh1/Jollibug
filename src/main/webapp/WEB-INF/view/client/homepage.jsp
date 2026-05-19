@@ -122,7 +122,7 @@
                 <div class="hp-prod-card__footer">
                   <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
                   <c:if test="${not empty sessionScope.user}">
-                    <form method="post" action="/addCart" >
+                    <form method="post" data-add-cart-form data-add-cart-api="/api/cart/add">
                       <input type="hidden" name="productID" value="${monAn.maMon}">
                       <button class="hp-prod-card__btn"  type="submit">+ Thêm</button>
                     </form>
@@ -200,6 +200,7 @@
       });
     });
   </script> -->
+  <script src="/js/client/main.js"></script>
 
 </body>
 </html>

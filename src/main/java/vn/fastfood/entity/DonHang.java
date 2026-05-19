@@ -43,7 +43,7 @@ public class DonHang {
     @Column(name = "TongTien")
     private Long tongTien;
 
-    // PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED
+    // PENDING, CONFIRMED, SHIPPING, DELIVERED, RECEIVED, CANCELLED
     @Column(name = "TrangThai")
     private String trangThai;
 

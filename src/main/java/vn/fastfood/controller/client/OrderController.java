@@ -1,5 +1,7 @@
 package vn.fastfood.controller.client;
 
+import jakarta.servlet.http.HttpSession;
+import vn.fastfood.dto.ReorderResponse;
 import vn.fastfood.dto.OrderDetailResponse;
 import vn.fastfood.dto.OrderStatusHistoryResponse;
 import vn.fastfood.model.OrderItem;
@@ -49,9 +51,10 @@ public class OrderController {
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<Map<String, Object>> cancelOrder(
         @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
+        @RequestParam("customerId") long customerId,
+        @RequestParam(value = "cancelReason", required = false) String cancelReason
     ) {
-        boolean result = orderService.requestCancelOrder(orderId, customerId);
+        boolean result = orderService.requestCancelOrder(orderId, customerId, cancelReason);
         
         if (result) {
             return ResponseEntity.ok(
@@ -113,27 +116,18 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/reorder")
-    public ResponseEntity<Map<String, Object>> reorder(
+    public ResponseEntity<ReorderResponse> reorder(
         @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
+        @RequestParam("customerId") long customerId,
+        HttpSession session
     ) {
-        boolean result = orderService.reorder(orderId, customerId);
+        ReorderResponse response = orderService.prepareReorderCheckout(orderId, customerId, session);
 
-        if (result) {
-            return ResponseEntity.ok(
-                Map.of(
-                    "success", true,
-                    "message", "\u0110\u00e3 th\u00eam l\u1ea1i c\u00e1c m\u00f3n trong \u0111\u01a1n v\u00e0o gi\u1ecf h\u00e0ng."
-                )
-            );
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
         }
 
-        return ResponseEntity.badRequest().body(
-            Map.of(
-                "success", false,
-                "message", "Kh\u00f4ng th\u1ec3 \u0111\u1eb7t l\u1ea1i \u0111\u01a1n h\u00e0ng n\u00e0y."
-            )
-        );
+        return ResponseEntity.badRequest().body(response);
     }
 
     @GetMapping("/{orderId}/can-review")

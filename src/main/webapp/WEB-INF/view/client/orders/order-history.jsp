@@ -44,6 +44,9 @@
                 <button class="order-tab" type="button" data-tab="review" onclick="switchOrderTab('review')">
                     Đánh giá
                 </button>
+                <button class="order-tab" type="button" data-tab="reviewed" onclick="switchOrderTab('reviewed')">
+                    Đã đánh giá
+                </button>
             </div>
 
             <div id="message" class="message" role="status" aria-live="polite"></div>

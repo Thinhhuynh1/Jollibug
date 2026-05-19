@@ -1,6 +1,7 @@
 package vn.fastfood.controller.staff;
 
-import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -10,11 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import vn.fastfood.entity.ChiTietHoTro;
+import vn.fastfood.entity.DiaChi;
 import vn.fastfood.entity.User;
 import vn.fastfood.entity.YeuCauHoTro;
 import vn.fastfood.repository.ChiTietHoTroRepository;
 import vn.fastfood.repository.UserRepository;
 import vn.fastfood.repository.YeuCauHoTroRepository;
+import vn.fastfood.model.Order;
+import vn.fastfood.service.OrderService;
 
 @Controller
 public class StaffController {
@@ -22,6 +26,7 @@ public class StaffController {
     private final YeuCauHoTroRepository yeuCauRepo;
     private final ChiTietHoTroRepository chiTietRepo;
     private final UserRepository userRepository;
+    private final OrderService orderService = new OrderService();
 
     public StaffController(YeuCauHoTroRepository yeuCauRepo,
             ChiTietHoTroRepository chiTietRepo,
@@ -109,13 +114,100 @@ public class StaffController {
         return "redirect:/staff/support?tab=review";
     }
 
+    // -------------------------------------------------------------------
+    // Qly khach hang
+    // -------------------------------------------------------------------
     @GetMapping("/staff/clients")
-    public String getClientsPage() {
+    public String getClientsPage(Model model) {
+        List<User> clients = userRepository.findByVaiTro_TenVT("CLIENT");
+        model.addAttribute("clients", clients);
         return "/staff/clients/show";
     }
 
     @GetMapping("/staff/clients/detail")
-    public String getClientDetailPage() {
+    public String getClientDetailPage(@RequestParam("clientId") long clientId, Model model) {
+        User client = userRepository.findByMaTK(clientId);
+        if (client == null) {
+            return "redirect:/staff/clients";
+        }
+
+        List<Order> orders = orderService.getOrdersByCustomerId(clientId);
+        DiaChi defaultAddress = getDefaultAddress(client.getDiaChi());
+
+        int totalOrders = orders.size();
+        int completedOrders = 0;
+        BigDecimal totalSpent = BigDecimal.ZERO;
+
+        for (Order order : orders) {
+            if (order.getThanhTien() != null) {
+                totalSpent = totalSpent.add(order.getThanhTien());
+            }
+
+            String status = order.getTrangThaiDon();
+            if (status != null && "DELIVERED".equalsIgnoreCase(status.trim())) {
+                completedOrders++;
+            }
+        }
+
+        model.addAttribute("client", client);
+        model.addAttribute("defaultAddress", defaultAddress);
+        model.addAttribute("recentOrders", orders);
+        model.addAttribute("totalOrders", totalOrders);
+        model.addAttribute("completedOrders", completedOrders);
+        model.addAttribute("totalSpent", totalSpent);
+        model.addAttribute("paymentSummary", buildPaymentSummary(orders));
+
         return "/staff/clients/detail";
+    }
+
+    private DiaChi getDefaultAddress(List<DiaChi> addresses) {
+        if (addresses == null || addresses.isEmpty()) {
+            return null;
+        }
+
+        for (DiaChi address : addresses) {
+            if (address != null && address.isDefaultAddress()) {
+                return address;
+            }
+        }
+
+        return addresses.get(0);
+    }
+
+    private List<String> buildPaymentSummary(List<Order> orders) {
+        List<String> methods = new ArrayList<>();
+
+        for (Order order : orders) {
+            String method = order.getTenPT();
+            if (method == null || method.trim().isEmpty()) {
+                method = mapPaymentMethod(order.getMaPT());
+            }
+
+            if (method != null && !method.isBlank() && !methods.contains(method)) {
+                methods.add(method);
+            }
+        }
+
+        return methods;
+    }
+
+    private String mapPaymentMethod(String maPT) {
+        if (maPT == null) {
+            return null;
+        }
+
+        String mapPT = maPT.trim().toUpperCase();
+        switch (mapPT) {
+            case "COD":
+                return "Thanh toán khi nhận hàng";
+            case "BANK":
+                return "Chuyển khoản ngân hàng";
+            case "EWALLET":
+                return "Ví điện tử";
+            case "CREDIT_CARD":
+                return "Thẻ tín dụng / Ghi nợ";
+            default:
+                return maPT;
+        }
     }
 }

@@ -1,9 +1,17 @@
 package vn.fastfood.controller.client;
 
+import org.springframework.http.ResponseEntity;
+
+import jakarta.servlet.http.HttpSession;
+import vn.fastfood.dto.CartUpdateRequest;
+import vn.fastfood.model.CartItem;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,25 +21,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpSession;
-import vn.fastfood.dto.CartUpdateRequest;
-import vn.fastfood.model.CartItem;
 import vn.fastfood.service.CartService;
 import vn.fastfood.service.CartService.CartAddResult;
 
 @RestController
 @RequestMapping("/api/cart")
 public class CartApiController {
+
+        @GetMapping
+        public ResponseEntity<List<CartItem>> getCart(HttpSession session) {
+                return ResponseEntity.ok(getSessionCart(session));
+        }
+
         private final CartService cartService;
 
         public CartApiController(CartService cartService) {
                 this.cartService = cartService;
-        }
-
-        @GetMapping
-        public ResponseEntity<List<CartItem>> getCart(
-                        @RequestParam("customerId") long customerId) {
-                return ResponseEntity.ok(cartService.getCartItems(customerId));
         }
 
         @PostMapping("/add")
@@ -56,41 +61,80 @@ public class CartApiController {
 
         @PutMapping("/items")
         public ResponseEntity<Map<String, Object>> updateCartItem(
-                        @RequestBody CartUpdateRequest request) {
-                boolean result = cartService.updateQuantity(
-                                request.getCustomerId(),
-                                request.getMaMon(),
-                                request.getSoLuong());
-
-                if (result) {
-                        return ResponseEntity.ok(
-                                        Map.of(
-                                                        "success", true,
-                                                        "message", "Cap nhat so luong trong gio hang thanh cong."));
+                        @RequestBody CartUpdateRequest request,
+                        HttpSession session) {
+                if (request == null || request.getSoLuong() < 1) {
+                        return ResponseEntity.badRequest().body(Map.of(
+                                        "success", false,
+                                        "message", "Dữ liệu cập nhật giỏ hàng không hợp lệ."));
                 }
 
-                return ResponseEntity.badRequest().body(
-                                Map.of(
-                                                "success", false,
-                                                "message", "Khong the cap nhat so luong trong gio hang."));
+                List<CartItem> cart = getSessionCart(session);
+
+                for (CartItem item : cart) {
+                        if (item.getMaMon() == request.getMaMon()) {
+                                int newQuantity = request.getSoLuong();
+
+                                item.setSoLuong(newQuantity);
+
+                                BigDecimal donGia = item.getDonGia() == null ? BigDecimal.ZERO : item.getDonGia();
+                                item.setThanhTien(donGia.multiply(BigDecimal.valueOf(newQuantity)));
+
+                                session.setAttribute("cart", cart);
+
+                                return ResponseEntity.ok(Map.of(
+                                                "success", true,
+                                                "message", "Cập nhật số lượng trong giỏ hàng thành công."));
+                        }
+                }
+
+                return ResponseEntity.badRequest().body(Map.of(
+                                "success", false,
+                                "message", "Không tìm thấy món trong giỏ hàng."));
         }
 
         @DeleteMapping("/items")
         public ResponseEntity<Map<String, Object>> removeCartItem(
-                        @RequestParam("customerId") long customerId,
-                        @RequestParam("maMon") long maMon) {
-                boolean result = cartService.removeItem(customerId, maMon);
+                        @RequestParam("maMon") long maMon,
+                        HttpSession session) {
+                List<CartItem> cart = getSessionCart(session);
+                boolean removed = false;
 
-                if (result) {
-                        return ResponseEntity.ok(
-                                        Map.of(
-                                                        "success", true,
-                                                        "message", "Xoa mon khoi gio hang thanh cong."));
+                Iterator<CartItem> iterator = cart.iterator();
+
+                while (iterator.hasNext()) {
+                        CartItem item = iterator.next();
+
+                        if (item.getMaMon() == maMon) {
+                                iterator.remove();
+                                removed = true;
+                                break;
+                        }
                 }
 
-                return ResponseEntity.badRequest().body(
-                                Map.of(
-                                                "success", false,
-                                                "message", "Khong the xoa mon khoi gio hang."));
+                session.setAttribute("cart", cart);
+
+                if (!removed) {
+                        return ResponseEntity.badRequest().body(Map.of(
+                                        "success", false,
+                                        "message", "Không tìm thấy món trong giỏ hàng."));
+                }
+
+                return ResponseEntity.ok(Map.of(
+                                "success", true,
+                                "message", "Xóa món khỏi giỏ hàng thành công."));
+        }
+
+        @SuppressWarnings("unchecked")
+        private List<CartItem> getSessionCart(HttpSession session) {
+                Object cartObj = session.getAttribute("cart");
+
+                if (cartObj instanceof List<?>) {
+                        return (List<CartItem>) cartObj;
+                }
+
+                List<CartItem> cart = new ArrayList<>();
+                session.setAttribute("cart", cart);
+                return cart;
         }
 }

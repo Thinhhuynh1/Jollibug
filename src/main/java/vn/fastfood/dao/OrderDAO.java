@@ -4,6 +4,7 @@ import vn.fastfood.config.DBConnection;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
 import vn.fastfood.model.OrderStatusHistory;
+import vn.fastfood.model.ReorderCartItemCandidate;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -46,12 +47,43 @@ public class OrderDAO {
 
     public Order getOrderById(long orderId, long customerId) {
         String sql = """
-            SELECT MaDH, MaTK_KH, MaTK_NV, NgayDat, MaDC,
-                   TongTienMon, TienGiamGia, ThanhTien,
-                   TrangThaiDon, MaGG, GhiChu
-            FROM DONHANG
-            WHERE MaDH = ?
-              AND MaTK_KH = ?
+            SELECT
+                dh.MaDH,
+                dh.MaTK_KH,
+                dh.MaTK_NV,
+                dh.NgayDat,
+                dh.MaDC,
+                dh.TongTienMon,
+                dh.TienGiamGia,
+                dh.ThanhTien,
+                dh.TrangThaiDon,
+                dh.MaGG,
+                dh.GhiChu,
+
+                u.HoTen AS TenKhachHang,
+                u.SDT AS SDTKhachHang,
+                u.Email AS EmailKhachHang,
+
+                dc.TenNguoiNhan AS TenNguoiNhan,
+                dc.SDTNguoiNhan AS SDTNguoiNhan,
+                TRIM(
+                    NVL(dc.DiaChiCuThe, '') ||
+                    CASE WHEN dc.PhuongXa IS NOT NULL THEN ', ' || dc.PhuongXa ELSE '' END ||
+                    CASE WHEN dc.QuanHuyen IS NOT NULL THEN ', ' || dc.QuanHuyen ELSE '' END ||
+                    CASE WHEN dc.TinhThanh IS NOT NULL THEN ', ' || dc.TinhThanh ELSE '' END
+                ) AS DiaChiGiaoHang,
+
+                tt.MaPT AS MaPT,
+                pt.TenPT AS TenPT,
+                tt.TrangThaiTT AS TrangThaiTT
+
+            FROM DONHANG dh
+            LEFT JOIN USERS u ON dh.MaTK_KH = u.MaTK
+            LEFT JOIN DIACHI dc ON dh.MaDC = dc.MaDC
+            LEFT JOIN THANHTOAN tt ON dh.MaDH = tt.MaDH
+            LEFT JOIN PHUONGTHUCTT pt ON tt.MaPT = pt.MaPT
+            WHERE dh.MaDH = ?
+              AND dh.MaTK_KH = ?
         """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -62,7 +94,7 @@ public class OrderDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapResultSetToOrder(rs);
+                    return mapStaffOrderDetailResultSetToOrder(rs);
                 }
             }
 
@@ -169,7 +201,7 @@ public class OrderDAO {
                 tt.TrangThaiTT AS TrangThaiTT
 
             FROM DONHANG dh
-            LEFT JOIN USERS u ON dh.MaTK_KH = u.MaTK
+            LEFT JOIN NGUOIDUNG u ON dh.MaTK_KH = u.MaTK
             LEFT JOIN DIACHI dc ON dh.MaDC = dc.MaDC
             LEFT JOIN THANHTOAN tt ON dh.MaDH = tt.MaDH
             LEFT JOIN PHUONGTHUCTT pt ON tt.MaPT = pt.MaPT
@@ -228,7 +260,166 @@ public class OrderDAO {
             e.printStackTrace();
         }
 
+        enrichOrderItems(orderId, items);
+
         return items;
+    }
+
+    private void enrichOrderItems(long orderId, List<OrderItem> items) {
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
+        try (Connection conn = DBConnection.getConnection()) {
+            for (OrderItem item : items) {
+                enrichOrderItemImage(conn, item);
+                enrichOrderItemReviewStatus(conn, orderId, item);
+            }
+        } catch (SQLException e) {
+            System.out.println("[ORDER ITEMS] Could not enrich order items. Returning base order item data.");
+            e.printStackTrace();
+        }
+    }
+
+    private void enrichOrderItemImage(Connection conn, OrderItem item) {
+        String sql = """
+            SELECT image_url
+            FROM MONAN
+            WHERE MaMon = ?
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, item.getMaMon());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    item.setImageUrl(rs.getString("image_url"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("[ORDER ITEMS] Could not load image for maMon=" + item.getMaMon());
+        }
+    }
+
+    private void enrichOrderItemReviewStatus(Connection conn, long orderId, OrderItem item) {
+        String sql = """
+            SELECT COUNT(*)
+            FROM DANHGIA dg
+            JOIN DONHANG dh
+              ON dg.MaDH = dh.MaDH
+             AND dg.MaTK_KH = dh.MaTK_KH
+            WHERE dg.MaDH = ?
+              AND dg.MaMon = ?
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            ps.setLong(2, item.getMaMon());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    item.setReviewed(rs.getInt(1) > 0);
+                }
+            }
+        } catch (SQLException e) {
+            item.setReviewed(false);
+            System.out.println("[ORDER ITEMS] Could not load review status for maMon=" + item.getMaMon());
+        }
+    }
+
+    public List<ReorderCartItemCandidate> getReorderCartItemCandidates(long orderId) {
+        List<ReorderCartItemCandidate> items = new ArrayList<>();
+
+        String orderItemsSql = """
+            SELECT MaMon, TenMon, SoLuong
+            FROM CHITIETDH
+            WHERE MaDH = ?
+            ORDER BY MaMon
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(orderItemsSql)) {
+
+            ps.setLong(1, orderId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ReorderCartItemCandidate item = new ReorderCartItemCandidate();
+
+                    item.setMaMon(rs.getLong("MaMon"));
+                    item.setOrderTenMon(rs.getString("TenMon"));
+                    item.setRequestedQuantity(rs.getInt("SoLuong"));
+
+                    enrichReorderProduct(conn, item);
+
+                    items.add(item);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return items;
+    }
+
+    private void enrichReorderProduct(Connection conn, ReorderCartItemCandidate item) {
+        String[] sqlCandidates = {
+                """
+                    SELECT TenMon, Gia, image_url, IsAvailable, SoLuongTon AS StockQuantity
+                    FROM MONAN
+                    WHERE MaMon = ?
+                """,
+                """
+                    SELECT TenMon, Gia, image_url, IsAvailable, SLuongTon AS StockQuantity
+                    FROM MONAN
+                    WHERE MaMon = ?
+                """,
+                """
+                    SELECT TenMon, Gia, IsAvailable
+                    FROM MONAN
+                    WHERE MaMon = ?
+                """
+        };
+
+        for (String sql : sqlCandidates) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, item.getMaMon());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        item.setProductExists(false);
+                        return;
+                    }
+
+                    item.setProductExists(true);
+                    item.setCurrentTenMon(rs.getString("TenMon"));
+                    item.setCurrentPrice(rs.getBigDecimal("Gia"));
+
+                    try {
+                        item.setImageUrl(rs.getString("image_url"));
+                    } catch (SQLException ignored) {
+                        item.setImageUrl(null);
+                    }
+
+                    int isAvailable = rs.getInt("IsAvailable");
+                    item.setAvailable(!rs.wasNull() && isAvailable == 1);
+
+                    try {
+                        long stock = rs.getLong("StockQuantity");
+                        item.setAvailableQuantity(rs.wasNull() ? Long.MAX_VALUE : stock);
+                    } catch (SQLException ignored) {
+                        item.setAvailableQuantity(Long.MAX_VALUE);
+                    }
+
+                    return;
+                }
+            } catch (SQLException ignored) {
+                // Try the next schema variant.
+            }
+        }
+
+        item.setProductExists(false);
     }
 
     public boolean insertOrderStatusHistory(
@@ -398,6 +589,37 @@ public class OrderDAO {
         return false;
     }
 
+    public boolean updateCustomerOrderStatusIfCurrent(
+            long orderId,
+            long customerId,
+            String expectedStatus,
+            String newStatus
+    ) {
+        String sql = """
+            UPDATE DONHANG
+            SET TrangThaiDon = ?
+            WHERE MaDH = ?
+              AND MaTK_KH = ?
+              AND UPPER(TrangThaiDon) = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newStatus);
+            ps.setLong(2, orderId);
+            ps.setLong(3, customerId);
+            ps.setString(4, expectedStatus);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public boolean updateOrderStatusAndStaff(long orderId, long staffId, String newStatus) {
         String sql = """
             UPDATE DONHANG
@@ -412,6 +634,37 @@ public class OrderDAO {
             ps.setString(1, newStatus);
             ps.setLong(2, staffId);
             ps.setLong(3, orderId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean updateOrderStatusAndStaffIfCurrent(
+            long orderId,
+            long staffId,
+            String expectedStatus,
+            String newStatus
+    ) {
+        String sql = """
+            UPDATE DONHANG
+            SET TrangThaiDon = ?,
+                MaTK_NV = ?
+            WHERE MaDH = ?
+              AND UPPER(TrangThaiDon) = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newStatus);
+            ps.setLong(2, staffId);
+            ps.setLong(3, orderId);
+            ps.setString(4, expectedStatus);
 
             return ps.executeUpdate() > 0;
 
@@ -582,27 +835,53 @@ public class OrderDAO {
         String sql = """
             UPDATE DONHANG
             SET TrangThaiDon = ?,
-                MaTK_NV = ?,
-                GhiChu = CASE
-                    WHEN GhiChu IS NULL OR DBMS_LOB.GETLENGTH(GhiChu) = 0 THEN TO_CLOB(?)
-                    ELSE GhiChu || TO_CLOB(CHR(10) || ?)
-                END
+                MaTK_NV = ?
             WHERE MaDH = ?
         """;
-
-        String reasonText = "[Hủy đơn] Lý do: "
-                + (cancelReason == null || cancelReason.trim().isEmpty()
-                ? "Không có lý do cụ thể"
-                : cancelReason.trim());
 
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, newStatus);
             ps.setLong(2, staffId);
-            ps.setString(3, reasonText);
-            ps.setString(4, reasonText);
-            ps.setLong(5, orderId);
+            ps.setLong(3, orderId);
+
+            int rows = ps.executeUpdate();
+
+            System.out.println("[DAO CANCEL] rows=" + rows);
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            System.out.println("[DAO CANCEL] SQL ERROR:");
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean updateOrderStatusStaffAndCancelReasonIfCurrent(
+            long orderId,
+            long staffId,
+            String expectedStatus,
+            String newStatus,
+            String cancelReason
+    ) {
+        String sql = """
+            UPDATE DONHANG
+            SET TrangThaiDon = ?,
+                MaTK_NV = ?
+            WHERE MaDH = ?
+              AND UPPER(TrangThaiDon) = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newStatus);
+            ps.setLong(2, staffId);
+            ps.setLong(3, orderId);
+            ps.setString(4, expectedStatus);
 
             int rows = ps.executeUpdate();
 

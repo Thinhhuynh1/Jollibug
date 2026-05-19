@@ -21,8 +21,9 @@
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="1">
-    <input type="hidden" id="orderId">
+    <input type="hidden" id="customerId" value="${param.customerId}">
+    <input type="hidden" id="orderId" value="${param.orderId}">
+    <input type="hidden" id="maPT" value="${param.maPT}">
     <div class="container">
       <div class="page-intro">
         <h1 class="section-title">Thanh toán đơn hàng</h1>
@@ -36,27 +37,27 @@
             <h3 class="section-subtitle">Phương thức đã chọn</h3>
             <div class="payment-options" role="radiogroup" aria-label="Payment method">
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="cod" checked />
+                <input type="radio" name="payment-method" value="COD" checked disabled />
                 <div>
                   <strong>Thanh toán khi nhận hàng (COD)</strong>
                 </div>
               </label>
                 <label class="payment-option">
-                <input type="radio" name="payment-method" value="credit-card" />
+                <input type="radio" name="payment-method" value="CREDIT_CARD" disabled />
                 <div>
                   <strong>Thẻ tín dụng / Ghi nợ</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="banking" />
+                <input type="radio" name="payment-method" value="BANK" disabled />
                 <div>
                   <strong>Chuyển khoản (Internet Banking)</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="ewallet" />
+                <input type="radio" name="payment-method" value="EWALLET" disabled />
                 <div>
                   <strong>Ví điện tử (Momo, ZaloPay, VNPAY)</strong>
                 </div>
@@ -112,8 +113,8 @@
           <!-- <button class="btn btn-primary btn-block" type="button" id="btn-place-order">Thanh toán</button> -->
           <div id="paymentMessage" class="payment-message"></div>
 
-          <button class="btn btn-primary btn-block" type="button" id="confirmPaymentBtn">
-            Xác nhận thanh toán
+          <button class="btn btn-primary btn-block" type="button" id="confirmPaymentBtn" disabled>
+            Đang xử lý thanh toán...
           </button>
         </section>
         <section class="checkout-card">

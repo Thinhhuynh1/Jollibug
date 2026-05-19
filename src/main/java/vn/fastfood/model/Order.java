@@ -118,6 +118,22 @@ public class Order {
         this.ghiChu = ghiChu;
     }
 
+    public String getNote() {
+        return ghiChu;
+    }
+
+    public void setNote(String note) {
+        this.ghiChu = note;
+    }
+
+    public String getOrderNote() {
+        return ghiChu;
+    }
+
+    public void setOrderNote(String orderNote) {
+        this.ghiChu = orderNote;
+    }
+
     public String getTenKhachHang() {
         return tenKhachHang;
     }

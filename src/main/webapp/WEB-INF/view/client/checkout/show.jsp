@@ -21,8 +21,8 @@
   <jsp:include page="../layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="1">
-    <input type="hidden" id="addressSelect" value="1">
+    <input type="hidden" id="customerId" value="${checkoutUser.maTK}" />
+    <input type="hidden" id="addressSelect" value="" />
 
     <div class="container">
       <div class="page-intro">
@@ -54,60 +54,46 @@
               <!-- Dropdown gợi ý địa chỉ -->
               <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
             </label>
+
+            <label class="field-label">
+              <span>Ghi chú cho đơn hàng</span>
+              <textarea id="order-note" rows="3" placeholder="Ví dụ: ít cay, gọi trước khi giao..."></textarea>
+            </label>
           </form>
 
           <div style="text-align: end;">
-            <a class="btn btn-outline" href="/checkout/changeAddress" >
+            <a class="btn btn-outline" href="${pageContext.request.contextPath}/checkout/change-address" >
               Đổi địa chỉ
             </a>
           </div>
-
-          <!-- <section>
-            <h3 class="section-subtitle">Phương thức thanh toán</h3>
-            <div class="payment-options" role="radiogroup" aria-label="Payment method">
-              <label class="payment-option">
-                <input type="radio" name="payment-method" value="cod" checked />
-                <div>
-                  <strong>Thanh toán khi nhận hàng (COD)</strong>
-                </div>
-              </label>
-
-              <label class="payment-option">
-                <input type="radio" name="payment-method" value="online" />
-                <div>
-                  <strong>Thanh toán bằng ATM/ Ví điện tử</strong>
-                </div>
-              </label>
-            </div>
-          </section> -->
 
           <section class="payment-method-section">
             <h3 class="section-subtitle">Phương thức thanh toán</h3>
 
             <div class="payment-options" role="radiogroup" aria-label="Payment method">
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="COD" checked />
+                <input type="radio" name="payment-method" value="COD" checked>
                 <div>
                   <strong>Thanh toán khi nhận hàng (COD)</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="CREDIT_CARD" />
+                <input type="radio" name="payment-method" value="CREDIT_CARD">
                 <div>
                   <strong>Thẻ tín dụng / Ghi nợ</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="BANK" />
+                <input type="radio" name="payment-method" value="BANK">
                 <div>
                   <strong>Chuyển khoản ngân hàng</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="EWALLET" />
+                <input type="radio" name="payment-method" value="EWALLET">
                 <div>
                   <strong>Ví điện tử</strong>
                 </div>
@@ -115,9 +101,21 @@
             </div>
           </section>
 
+          <c:if test="${not empty reorderMessage}">
+            <div class="checkout-message">${reorderMessage}</div>
+          </c:if>
+
+          <c:if test="${not empty reorderSkippedItems}">
+            <div class="checkout-message">
+              <c:forEach var="skippedItem" items="${reorderSkippedItems}">
+                <div>${skippedItem}</div>
+              </c:forEach>
+            </div>
+          </c:if>
+
           <div id="checkoutMessage" class="checkout-message"></div>
 
-          <button class="btn btn-primary btn-block" type="button" id="btn-place-order">
+          <button type="button" id="checkoutButton" class="btn btn-primary btn-block">
             Thanh toán
           </button>
         </section>
@@ -252,7 +250,7 @@
   <jsp:include page="../layout/footer.jsp" />
 
   <script src="/js/client/main.js"></script>
-  <script src="${pageContext.request.contextPath}/resources/js/client/checkout-api.js"></script>
+  <script src="${pageContext.request.contextPath}/resources/js/client/checkout-api.js" defer></script>
 </body>
 </html>
 
