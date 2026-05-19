@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -51,9 +51,16 @@
                           <span class="qty-stepper__value">${cartItem.soLuong}</span>
                           <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
                         </div>
-                        <strong class="cart-line__sum">
-                          <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> đ
-                        </strong>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                          <c:if test="${cartItem.donGia < cartItem.donGiaGoc}">
+                            <span style="text-decoration: line-through; color: #999; font-size: 0.85em; font-weight: 500;">
+                              <fmt:formatNumber type="number" value="${cartItem.donGiaGoc * cartItem.soLuong}" /> đ
+                            </span>
+                          </c:if>
+                          <strong class="cart-line__sum">
+                            <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> đ
+                          </strong>
+                        </div>
                       </div>
                     </div>
                   </div>

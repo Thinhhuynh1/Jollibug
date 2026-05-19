@@ -14,21 +14,21 @@ public class CheckoutDAO {
         List<CheckoutCartItem> items = new ArrayList<>();
 
         String sql = """
-            SELECT m.MaMon,
-                   m.TenMon,
-                   ct.SLuong,
-                   m.Gia AS DonGia,
-                   (ct.SLuong * m.Gia) AS ThanhTien
-            FROM GIOHANG gh
-            JOIN CHITIETGH ct ON gh.MaGH = ct.MaGH
-            JOIN MONAN m ON ct.MaMon = m.MaMon
-            WHERE gh.MaTK = ?
-              AND m.IsAvailable = 1
-            ORDER BY ct.added_at DESC
-        """;
+                    SELECT m.MaMon,
+                           m.TenMon,
+                           ct.SLuong,
+                           m.Gia AS DonGia,
+                           (ct.SLuong * m.Gia) AS ThanhTien
+                    FROM GIOHANG gh
+                    JOIN CHITIETGH ct ON gh.MaGH = ct.MaGH
+                    JOIN MONAN m ON ct.MaMon = m.MaMon
+                    WHERE gh.MaTK = ?
+                      AND m.IsAvailable = 1
+                    ORDER BY ct.added_at DESC
+                """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, customerId);
 
@@ -59,14 +59,14 @@ public class CheckoutDAO {
         }
 
         String sql = """
-            SELECT MaGG
-            FROM MAGIAMGIA
-            WHERE UPPER(MaCode) = UPPER(?)
-              AND CURRENT_TIMESTAMP BETWEEN NgayBatDau AND NgayKetThuc
-        """;
+                    SELECT MaGG
+                    FROM MAGIAMGIA
+                    WHERE UPPER(MaCode) = UPPER(?)
+                      AND CURRENT_TIMESTAMP BETWEEN NgayBatDau AND NgayKetThuc
+                """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, discountCode.trim());
 
@@ -89,14 +89,14 @@ public class CheckoutDAO {
         }
 
         String sql = """
-            SELECT LoaiGiam, MucGiam, DieuKien
-            FROM MAGIAMGIA
-            WHERE UPPER(MaCode) = UPPER(?)
-              AND CURRENT_TIMESTAMP BETWEEN NgayBatDau AND NgayKetThuc
-        """;
+                    SELECT LoaiGiam, MucGiam, DieuKien
+                    FROM MAGIAMGIA
+                    WHERE UPPER(MaCode) = UPPER(?)
+                      AND CURRENT_TIMESTAMP BETWEEN NgayBatDau AND NgayKetThuc
+                """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, discountCode.trim());
 
@@ -138,20 +138,19 @@ public class CheckoutDAO {
             BigDecimal tienGiamGia,
             BigDecimal thanhTien,
             Long maGG,
-            String ghiChu
-    ) throws SQLException {
+            String ghiChu) throws SQLException {
 
         String sql = """
-            INSERT INTO DONHANG (
-                MaTK_KH, MaTK_NV, NgayDat, MaDC,
-                TongTienMon, TienGiamGia, ThanhTien,
-                TrangThaiDon, MaGG, GhiChu
-            )
-            VALUES (?, NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, 'PENDING', ?, ?)
-        """;
+                    INSERT INTO DONHANG (
+                        MaTK_KH, MaTK_NV, NgayDat, MaDC,
+                        TongTienMon, TienGiamGia, ThanhTien,
+                        TrangThaiDon, MaGG, GhiChu
+                    )
+                    VALUES (?, NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, 'PENDING', ?, ?)
+                """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, new String[]{"MaDH"})) {
+                PreparedStatement ps = conn.prepareStatement(sql, new String[] { "MaDH" })) {
 
             ps.setLong(1, customerId);
 
@@ -187,14 +186,14 @@ public class CheckoutDAO {
 
     public void createOrderItem(long orderId, CheckoutCartItem item) throws SQLException {
         String sql = """
-            INSERT INTO CHITIETDH (
-                MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien
-            )
-            VALUES (?, ?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO CHITIETDH (
+                        MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, orderId);
             ps.setLong(2, item.getMaMon());
@@ -209,16 +208,16 @@ public class CheckoutDAO {
 
     public void createPayment(long orderId, String maPT, BigDecimal amount) throws SQLException {
         String sql = """
-            INSERT INTO THANHTOAN (
-                MaDH, MaPT, NgayTT, SoTien, TrangThaiTT
-            )
-            VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
-        """;
+                    INSERT INTO THANHTOAN (
+                        MaDH, MaPT, NgayTT, SoTien, TrangThaiTT
+                    )
+                    VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
+                """;
 
         String paymentStatus = "Pending";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, orderId);
             ps.setString(2, maPT);
@@ -235,14 +234,14 @@ public class CheckoutDAO {
         }
 
         String sql = """
-            SELECT COUNT(*)
-            FROM DIACHI
-            WHERE MaDC = ?
-              AND MaTK = ?
-        """;
+                    SELECT COUNT(*)
+                    FROM DIACHI
+                    WHERE MaDC = ?
+                      AND MaTK = ?
+                """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, maDC);
             ps.setLong(2, customerId);
@@ -266,13 +265,13 @@ public class CheckoutDAO {
         }
 
         String sql = """
-            SELECT COUNT(*)
-            FROM PHUONGTHUCTT
-            WHERE MaPT = ?
-        """;
+                    SELECT COUNT(*)
+                    FROM PHUONGTHUCTT
+                    WHERE MaPT = ?
+                """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, maPT.trim().toUpperCase());
 

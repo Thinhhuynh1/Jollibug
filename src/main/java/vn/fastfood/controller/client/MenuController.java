@@ -64,7 +64,11 @@ public class MenuController {
     @GetMapping("/product")
     public String getProductDetail(Model model,
             @RequestParam("productID") Long productID) {
-        model.addAttribute("monAn", this.monAnRepository.findProduct(productID));
+        MonAn monAn = this.monAnRepository.findProduct(productID);
+        if (monAn != null) {
+            this.promotionService.applyPromotions(java.util.List.of(monAn));
+        }
+        model.addAttribute("monAn", monAn);
         return "client/product";
     }
 
@@ -80,6 +84,9 @@ public class MenuController {
             return "redirect:/menu";
         }
 
+        // Áp dụng khuyến mãi để lấy giá sau giảm
+        this.promotionService.applyPromotions(java.util.List.of(monAn));
+
         @SuppressWarnings("unchecked")
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         if (cart == null) {
@@ -94,12 +101,15 @@ public class MenuController {
             }
         }
 
-        BigDecimal gia = BigDecimal.valueOf(monAn.getGia());
+        // Dùng giá giảm nếu có khuyến mãi, ngược lại dùng giá gốc
+        BigDecimal gia = BigDecimal.valueOf(monAn.getGiaGiam());
+        BigDecimal giaGoc = BigDecimal.valueOf(monAn.getGia());
         if (cartItem != null) {
             int soLuong = cartItem.getSoLuong() + quantity;
             cartItem.setSoLuong(soLuong);
             cartItem.setDonGia(gia);
             cartItem.setThanhTien(gia.multiply(BigDecimal.valueOf(soLuong)));
+            cartItem.setDonGiaGoc(giaGoc);
         } else {
             CartItem item = new CartItem();
             item.setMaMon(monAn.getMaMon());
@@ -108,6 +118,7 @@ public class MenuController {
             item.setDonGia(gia);
             item.setThanhTien(gia.multiply(BigDecimal.valueOf(quantity)));
             item.setImageUrl(monAn.getImg());
+            item.setDonGiaGoc(giaGoc);
             cart.add(item);
         }
 

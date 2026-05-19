@@ -108,25 +108,41 @@
           <c:forEach var="monAn" items="${listMonAn}" end="5">
             <article class="hp-prod-card reveal-up">
               <div class="hp-prod-card__img">
-              <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
-            </div>
+                <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
+                <c:if test="${monAn.hasGiamGia}">
+                  <span class="hp-prod-card__badge">-${monAn.phanTramGiam}%</span>
+                </c:if>
+              </div>
               <div class="hp-prod-card__body">
                 <div class="hp-prod-card__meta">
                   <span>${monAn.danhMuc.tenDM}</span>
                   <span class="stars">★ 4.9</span>
                 </div>
-                <div class="hp-prod-card__name">${monAn.tenMon}</div>
+                <div class="hp-prod-card__name">
+                  <div>${monAn.tenMon}</div>
+                  <div class="hp-prod-card__price-container">
+                    <c:choose>
+                      <c:when test="${monAn.hasGiamGia}">
+                        <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.giaGiam}" type="number" />đ</span>
+                        <span class="hp-prod-card__old-price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                      </c:when>
+                      <c:otherwise>
+                        <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+                </div>
                 <div class="hp-prod-card__desc">
                   ${monAn.moTa}
                 </div>
                 <div class="hp-prod-card__footer">
-                  <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                  <a class="hp-prod-card__btn" href="/product?productID=${monAn.maMon}">Xem chi tiết</a>
                   <c:if test="${not empty sessionScope.user}">
                     <form method="post" action="/addCart" >
                       <input type="hidden" name="productID" value="${monAn.maMon}">
                       <button class="hp-prod-card__btn"  type="submit">+ Thêm</button>
                     </form>
-                  </c:if >
+                  </c:if>
                 </div>
               </div>
             </article>
