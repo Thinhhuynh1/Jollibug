@@ -66,7 +66,7 @@
               <div class="cluster">
                 <a class="btn btn-outline" href="/menu">Quay lại</a>
                 <c:if test="${not empty sessionScope.user}">
-                  <form method="post" action="/addCart" >
+                  <form method="post"  data-add-cart-form data-add-cart-api="/api/cart/add">
                     <input type="hidden" name="productID" value="${monAn.maMon}">
                     <button class="btn btn-primary" type="submit">+ Thêm</button>
                   </form>
@@ -85,6 +85,7 @@
   <jsp:include page="layout/footer.jsp"/>
 
   </body>
+  <script src="/js/client/main.js"></script>
 </html>
 
 

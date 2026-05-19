@@ -56,7 +56,12 @@ async function loadCart() {
             totalQuantity += soLuong;
             totalAmount += thanhTien;
 
-            const imageUrl = item.imageUrl || "https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg";
+            let imageUrl = item.imageUrl || "";
+            if (!imageUrl) {
+                imageUrl = "https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg";
+            } else if (!/^https?:\/\//i.test(imageUrl) && !imageUrl.startsWith("/")) {
+                imageUrl = `/resources/images/${imageUrl}`;
+            }
 
             const line = document.createElement("article");
             line.className = "cart-line";

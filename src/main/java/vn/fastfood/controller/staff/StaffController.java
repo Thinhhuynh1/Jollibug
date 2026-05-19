@@ -2,7 +2,6 @@ package vn.fastfood.controller.staff;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -30,8 +29,8 @@ public class StaffController {
     private final OrderService orderService = new OrderService();
 
     public StaffController(YeuCauHoTroRepository yeuCauRepo,
-                           ChiTietHoTroRepository chiTietRepo,
-                           UserRepository userRepository) {
+            ChiTietHoTroRepository chiTietRepo,
+            UserRepository userRepository) {
         this.yeuCauRepo = yeuCauRepo;
         this.chiTietRepo = chiTietRepo;
         this.userRepository = userRepository;
@@ -39,7 +38,7 @@ public class StaffController {
 
     @GetMapping("/staff")
     public String getOrders() {
-        return "redirect:/staff/orders/confirmed";
+        return "redirect:/staff/orders";
     }
 
     @GetMapping("/staff/orders/confirmed")
@@ -55,13 +54,19 @@ public class StaffController {
     }
 
     @GetMapping("/staff/orders/detail")
-    public String getOrderDetailPage() { return "/staff/orders/detail"; }
+    public String getOrderDetailPage() {
+        return "/staff/orders/detail";
+    }
 
     @GetMapping("/staff/orders/update-status")
-    public String getOrderUpdateStatusPage() { return "/staff/orders/update-status"; }
+    public String getOrderUpdateStatusPage() {
+        return "/staff/orders/update-status";
+    }
 
     @GetMapping("/staff/orders/confirm")
-    public String getOrderConfirmPage() { return "/staff/orders/confirm"; }
+    public String getOrderConfirmPage() {
+        return "/staff/orders/confirm";
+    }
 
     // ----------------------------------------------------------------
     // SUPPORT PAGE
@@ -109,9 +114,9 @@ public class StaffController {
         return "redirect:/staff/support?tab=review";
     }
 
-    //-------------------------------------------------------------------
-    //Qly khach hang 
-    //-------------------------------------------------------------------
+    // -------------------------------------------------------------------
+    // Qly khach hang
+    // -------------------------------------------------------------------
     @GetMapping("/staff/clients")
     public String getClientsPage(Model model) {
         List<User> clients = userRepository.findByVaiTro_TenVT("CLIENT");
