@@ -22,7 +22,7 @@ public class MaGiamGia {
     @Column(name = "MaGG")
     private Long maGG;
 
-    @Column(name = "MA_CODE", length = 50, nullable = false)
+    @Column(name = "MACODE", length = 50, nullable = false)
     private String tenMa;
 
     @Column(name = "LoaiGiam", length = 20)
@@ -63,19 +63,22 @@ public class MaGiamGia {
 
     @Transient
     public String getNgayBatDauValue() {
-        if (ngayBatDau == null) return "";
+        if (ngayBatDau == null)
+            return "";
         return ngayBatDau.toLocalDate().toString();
     }
 
     @Transient
     public String getNgayKetThucValue() {
-        if (ngayKetThuc == null) return "";
+        if (ngayKetThuc == null)
+            return "";
         return ngayKetThuc.toLocalDate().toString();
     }
 
     @Transient
     public String getDiscountDisplay() {
-        if (mucGiam == null) return "0";
+        if (mucGiam == null)
+            return "0";
         if ("PERCENTAGE".equals(loaiGiam)) {
             if (mucGiam % 1 == 0) {
                 return String.format("%d%%", mucGiam.longValue());

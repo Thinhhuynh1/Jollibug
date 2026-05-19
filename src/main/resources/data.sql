@@ -108,34 +108,34 @@ COMMIT;
 -- ===================================================================
 -- MÃ GIẢM GIÁ (COUPONS)
 -- ===================================================================
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('WELCOME10', 'PERCENTAGE', 10, 100, N'Giảm 10% cho khách hàng mới',
     TIMESTAMP '2026-01-01 00:00:00', TIMESTAMP '2026-12-31 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('SAVE20K', 'AMOUNT', 20000, 50, N'Giảm thẳng 20.000đ cho đơn từ 100.000đ',
     TIMESTAMP '2026-05-01 00:00:00', TIMESTAMP '2026-05-31 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('SUMMER15', 'PERCENTAGE', 15, 200, N'Khuyến mãi hè - giảm 15%',
     TIMESTAMP '2026-05-15 00:00:00', TIMESTAMP '2026-08-31 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('FLASH50K', 'AMOUNT', 50000, 20, N'Flash sale - giảm 50.000đ, số lượng có hạn',
     TIMESTAMP '2026-05-19 00:00:00', TIMESTAMP '2026-05-19 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('BIRTHDAY25', 'PERCENTAGE', 25, 30, N'Ưu đãi sinh nhật - giảm 25%',
     TIMESTAMP '2026-05-01 00:00:00', TIMESTAMP '2026-05-31 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('LOYAL30K', 'AMOUNT', 30000, 80, N'Khách hàng thân thiết - giảm 30.000đ',
     TIMESTAMP '2026-04-01 00:00:00', TIMESTAMP '2026-06-30 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('NEWYEAR20', 'PERCENTAGE', 20, 500, N'Mừng năm mới - giảm 20%',
     TIMESTAMP '2026-01-01 00:00:00', TIMESTAMP '2026-01-15 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('COMBO10K', 'AMOUNT', 10000, 0, N'Combo đặc biệt - đã hết lượt dùng',
     TIMESTAMP '2026-03-01 00:00:00', TIMESTAMP '2026-03-31 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('VIP5', 'PERCENTAGE', 5, 1000, N'Giảm 5% cho thành viên VIP',
     TIMESTAMP '2026-01-01 00:00:00', TIMESTAMP '2026-12-31 23:59:59');
-INSERT INTO MAGIAMGIA (MA_CODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('WEEKEND30', 'PERCENTAGE', 30, 100, N'Sale cuối tuần - giảm 30%',
     TIMESTAMP '2026-05-17 00:00:00', TIMESTAMP '2026-05-18 23:59:59');
 COMMIT;
