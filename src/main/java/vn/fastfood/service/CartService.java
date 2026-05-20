@@ -2,6 +2,7 @@ package vn.fastfood.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import vn.fastfood.dao.CartDAO;
 import vn.fastfood.entity.MonAn;
 import vn.fastfood.model.CartItem;
@@ -17,9 +18,11 @@ import jakarta.servlet.http.HttpSession;
 public class CartService {
     private final CartDAO cartDAO = new CartDAO();
     private final MonAnRepository monAnRepository;
+    private final PromotionService promotionService;
 
-    public CartService(MonAnRepository monAnRepository) {
+    public CartService(MonAnRepository monAnRepository, PromotionService promotionService) {
         this.monAnRepository = monAnRepository;
+        this.promotionService = promotionService;
     }
 
     public List<CartItem> getCartItems(long customerId) {
@@ -32,6 +35,9 @@ public class CartService {
             return new CartAddResult(false, "San pham khong ton tai.", 0);
         }
 
+        // Áp dụng chương trình khuyến mãi để tính giá giảm
+        promotionService.applyPromotions(Collections.singletonList(monAn));
+
         @SuppressWarnings("unchecked")
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         if (cart == null) {
@@ -39,20 +45,23 @@ public class CartService {
         }
 
         CartItem cartItem = findCartItem(cart, monAn.getMaMon());
-        BigDecimal gia = BigDecimal.valueOf(monAn.getGia());
+        BigDecimal giaGoc = BigDecimal.valueOf(monAn.getGia());
+        BigDecimal giaGiam = BigDecimal.valueOf(monAn.getGiaGiam());
 
         if (cartItem != null) {
             int soLuong = cartItem.getSoLuong() + 1;
             cartItem.setSoLuong(soLuong);
-            cartItem.setDonGia(gia);
-            cartItem.setThanhTien(gia.multiply(BigDecimal.valueOf(soLuong)));
+            cartItem.setDonGia(giaGiam);
+            cartItem.setDonGiaGoc(giaGoc);
+            cartItem.setThanhTien(giaGiam.multiply(BigDecimal.valueOf(soLuong)));
         } else {
             CartItem item = new CartItem();
             item.setMaMon(monAn.getMaMon());
             item.setTenMon(monAn.getTenMon());
             item.setSoLuong(1);
-            item.setDonGia(gia);
-            item.setThanhTien(gia);
+            item.setDonGia(giaGiam);
+            item.setDonGiaGoc(giaGoc);
+            item.setThanhTien(giaGiam);
             item.setImageUrl(monAn.getImg());
             cart.add(item);
         }
