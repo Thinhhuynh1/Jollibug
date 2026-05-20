@@ -1,17 +1,10 @@
 const STAFF_API_BASE = "/api/staff/orders";
-let currentStaffOrdersTab = "orders";
 
 document.addEventListener("DOMContentLoaded", () => {
-    updateStaffOrdersTabView();
     loadStaffOrders();
 });
 
 async function loadStaffOrders() {
-    if (currentStaffOrdersTab === "reviews") {
-        await loadStaffReviews();
-        return;
-    }
-
     const status = document.getElementById("statusFilter").value;
     const keyword = document.getElementById("keywordFilter").value;
     const fromDate = document.getElementById("fromDateFilter").value;
@@ -102,196 +95,6 @@ function renderUpdateButton(order) {
     `;
 }
 
-function switchStaffOrdersTab(tab) {
-    currentStaffOrdersTab = tab === "reviews" ? "reviews" : "orders";
-    updateStaffOrdersTabView();
-    loadStaffOrders();
-}
-
-function updateStaffOrdersTabView() {
-    const isReviewTab = currentStaffOrdersTab === "reviews";
-    const ordersTabButton = document.getElementById("ordersTabButton");
-    const reviewsTabButton = document.getElementById("reviewsTabButton");
-    const orderPanel = document.getElementById("staffOrderPanel");
-    const reviewPanel = document.getElementById("staffReviewPanel");
-    const tableTitle = document.getElementById("staffTableTitle");
-    const statusFilterLabel = document.getElementById("statusFilterLabel");
-    const keywordFilter = document.getElementById("keywordFilter");
-
-    if (ordersTabButton) ordersTabButton.classList.toggle("is-active", !isReviewTab);
-    if (reviewsTabButton) reviewsTabButton.classList.toggle("is-active", isReviewTab);
-    if (orderPanel) orderPanel.classList.toggle("hidden", isReviewTab);
-    if (reviewPanel) reviewPanel.classList.toggle("hidden", !isReviewTab);
-    if (tableTitle) tableTitle.textContent = isReviewTab ? "Đánh giá khách hàng" : "Danh sách đơn";
-    if (statusFilterLabel) statusFilterLabel.textContent = isReviewTab ? "Số sao" : "Trạng thái";
-    if (keywordFilter) {
-        keywordFilter.placeholder = isReviewTab
-            ? "Mã đơn, tên khách, tên món, nội dung..."
-            : "Mã đơn, mã khách, ghi chú...";
-    }
-
-    renderPrimaryFilterOptions();
-}
-
-function renderPrimaryFilterOptions() {
-    const statusFilter = document.getElementById("statusFilter");
-    if (!statusFilter) return;
-
-    const options = currentStaffOrdersTab === "reviews"
-        ? [
-            ["", "Tất cả"],
-            ["1", "1 sao"],
-            ["2", "2 sao"],
-            ["3", "3 sao"],
-            ["4", "4 sao"],
-            ["5", "5 sao"]
-        ]
-        : [
-            ["", "Tất cả"],
-            ["PENDING", "Chờ xác nhận"],
-            ["CONFIRMED", "Đã xác nhận"],
-            ["SHIPPING", "Đang giao"],
-            ["DELIVERED", "Đã giao"],
-            ["RECEIVED", "Đã nhận hàng"],
-            ["CANCEL_REQUESTED", "Yêu cầu hủy"],
-            ["CANCELLED", "Đã hủy"]
-        ];
-
-    statusFilter.innerHTML = options
-        .map(([value, label]) => `<option value="${value}">${label}</option>`)
-        .join("");
-}
-
-async function loadStaffReviews() {
-    const rating = document.getElementById("statusFilter").value;
-    const keyword = document.getElementById("keywordFilter").value;
-    const fromDate = document.getElementById("fromDateFilter").value;
-    const toDate = document.getElementById("toDateFilter").value;
-    const message = document.getElementById("message");
-    const reviewList = document.getElementById("staffReviewList");
-
-    if (!reviewList) return;
-
-    if (message) message.textContent = "";
-    reviewList.innerHTML = "";
-
-    const params = new URLSearchParams();
-    if (rating) params.append("rating", rating);
-    if (keyword) params.append("keyword", keyword);
-    if (fromDate) params.append("fromDate", fromDate);
-    if (toDate) params.append("toDate", toDate);
-
-    try {
-        const url = params.toString()
-            ? `${STAFF_API_BASE}/reviews?${params.toString()}`
-            : `${STAFF_API_BASE}/reviews`;
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error("Không thể tải danh sách đánh giá.");
-        }
-
-        const reviews = await response.json();
-
-        if (!reviews.length) {
-            reviewList.innerHTML = `<p class="empty-cell">Không có đánh giá phù hợp.</p>`;
-            return;
-        }
-
-        reviewList.innerHTML = reviews.map(renderStaffReviewCard).join("");
-
-    } catch (error) {
-        if (message) message.textContent = error.message;
-    }
-}
-
-function renderStaffReviewCard(review) {
-    const imageSrc = normalizeStaffReviewImage(review.imageUrl);
-    const attentionClass = getReviewAttentionClass(review.sao);
-
-    return `
-        <article class="staff-review-card ${attentionClass}">
-            <div class="staff-review-card__media">
-                ${
-                    imageSrc
-                    ? `<img src="${imageSrc}" alt="${escapeHtml(review.tenMon || "Món ăn")}" loading="lazy">`
-                    : `<div class="staff-review-card__placeholder">No image</div>`
-                }
-            </div>
-
-            <div class="staff-review-card__content">
-                <div class="staff-review-card__top">
-                    <div>
-                        <h3>${escapeHtml(review.tenMon || `Món #${review.maMon}`)}</h3>
-                        <p>
-                            Khách: <strong>${escapeHtml(review.tenKhachHang || `#${review.maTKKH}`)}</strong>
-                            · Đơn #${review.maDH}
-                        </p>
-                    </div>
-                    <span class="staff-review-date">${formatDate(review.ngayDG)}</span>
-                </div>
-
-                <div class="staff-review-meta">
-                    <span class="staff-review-stars">${renderReviewStars(review.sao)}</span>
-                    <span class="staff-review-badge ${attentionClass}">${displayReviewLevel(review.sao)}</span>
-                </div>
-
-                <p class="staff-review-content">${formatMultilineText(review.noiDung || "")}</p>
-            </div>
-
-            <div class="staff-review-actions">
-                <a class="secondary-btn" href="/staff/order-detail?orderId=${review.maDH}">Xem đơn</a>
-            </div>
-        </article>
-    `;
-}
-
-function renderReviewStars(value) {
-    const rating = Math.min(Math.max(Number(value || 0), 0), 5);
-    let html = "";
-
-    for (let index = 1; index <= 5; index++) {
-        html += `<span class="${index <= rating ? "is-active" : ""}">★</span>`;
-    }
-
-    return html;
-}
-
-function displayReviewLevel(value) {
-    const rating = Number(value || 0);
-    if (rating <= 2) return "Cần chú ý";
-    if (rating === 3) return "Trung bình";
-    return "Tích cực";
-}
-
-function getReviewAttentionClass(value) {
-    const rating = Number(value || 0);
-    if (rating <= 2) return "is-low";
-    if (rating === 3) return "is-mid";
-    return "is-high";
-}
-
-function normalizeStaffReviewImage(imageUrl) {
-    const value = String(imageUrl || "").trim();
-    if (!value) return "";
-    if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("/")) return value;
-    return `/images/${value}`;
-}
-
-function formatMultilineText(value) {
-    return escapeHtml(value).replace(/\n/g, "<br>");
-}
-
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
 function closeStatusModal() {
     const modal = document.getElementById("statusModal");
     if (modal) {
@@ -359,7 +162,6 @@ function displayStatus(status) {
         CONFIRMED: "Đã xác nhận",
         SHIPPING: "Đang giao",
         DELIVERED: "Đã giao",
-        RECEIVED: "Đã nhận hàng",
         CANCEL_REQUESTED: "Yêu cầu hủy",
         CANCELLED: "Đã hủy"
     };

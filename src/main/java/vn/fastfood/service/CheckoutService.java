@@ -1,6 +1,5 @@
 package vn.fastfood.service;
 
-import jakarta.servlet.http.HttpSession;
 import vn.fastfood.dao.CheckoutDAO;
 import vn.fastfood.dao.OrderDAO;
 import vn.fastfood.dto.CheckoutRequest;
@@ -8,15 +7,19 @@ import vn.fastfood.dto.CheckoutResponse;
 import vn.fastfood.model.CartItem;
 import vn.fastfood.model.CheckoutCartItem;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class CheckoutService {
-
     private final CheckoutDAO checkoutDAO = new CheckoutDAO();
     private final OrderDAO orderDAO = new OrderDAO();
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{9,15}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
 
     public CheckoutResponse checkout(CheckoutRequest request, HttpSession session) {
         if (request == null) {
@@ -29,13 +32,11 @@ public class CheckoutService {
 
         long customerId = request.getCustomerId();
 
-        if (customerId <= 0) {
-            return new CheckoutResponse(false, "Thông tin khách hàng không hợp lệ. Vui lòng đăng nhập lại.", null, null, null, null);
-        }
-
         /*
-         * Địa chỉ giao hàng phải đến từ DIACHI/MaDC.
-         * GhiChu chỉ lưu ghi chú khách nhập, không lưu người nhận/SĐT/email/địa chỉ.
+         * Không bắt buộc địa chỉ phải tồn tại trong bảng DIACHI.
+         * Nếu khách chọn địa chỉ đã lưu và MaDC hợp lệ, dùng MaDC đó.
+         * Nếu MaDC không hợp lệ hoặc khách nhập địa chỉ mới, vẫn cho đặt hàng,
+         * thông tin giao hàng sẽ được lưu trong GhiChu.
          */
         Long maDC = request.getMaDC();
 
@@ -43,7 +44,7 @@ public class CheckoutService {
             maDC = null;
         }
 
-        if (maDC == null) {
+        if (maDC == null || maDC <= 0) {
             return new CheckoutResponse(false, "Vui lòng chọn địa chỉ giao hàng.", null, null, null, null);
         }
 
@@ -52,7 +53,6 @@ public class CheckoutService {
         }
 
         String maPT = request.getMaPT();
-
         if (maPT == null || maPT.trim().isEmpty()) {
             return new CheckoutResponse(false, "Vui lòng chọn phương thức thanh toán.", null, null, null, null);
         }
@@ -70,25 +70,18 @@ public class CheckoutService {
         }
 
         BigDecimal subtotal = BigDecimal.ZERO;
-
         for (CheckoutCartItem item : items) {
-            if (item.getThanhTien() != null) {
-                subtotal = subtotal.add(item.getThanhTien());
-            }
+            subtotal = subtotal.add(item.getThanhTien());
         }
 
         BigDecimal discountAmount = checkoutDAO.calculateDiscount(request.getDiscountCode(), subtotal);
-
-        if (discountAmount == null) {
-            discountAmount = BigDecimal.ZERO;
-        }
-
         if (discountAmount.compareTo(subtotal) > 0) {
             discountAmount = subtotal;
         }
 
         BigDecimal total = subtotal.subtract(discountAmount);
         Long maGG = checkoutDAO.findDiscountIdByCode(request.getDiscountCode());
+        String orderNote = buildOrderNote(request);
 
         try {
             long orderId = checkoutDAO.createOrder(
@@ -98,7 +91,7 @@ public class CheckoutService {
                     discountAmount,
                     total,
                     maGG,
-                    normalizeNote(request.getGhiChu())
+                    orderNote
             );
 
             boolean historyRecorded = orderDAO.insertOrderStatusHistory(
@@ -151,16 +144,19 @@ public class CheckoutService {
             return new ArrayList<>();
         }
 
-        if (!(cartObj instanceof List<?> rawCart)) {
+        if (!(cartObj instanceof List<?>)) {
             return new ArrayList<>();
         }
 
+        List<?> rawCart = (List<?>) cartObj;
         List<CheckoutCartItem> checkoutItems = new ArrayList<>();
 
         for (Object obj : rawCart) {
-            if (!(obj instanceof CartItem cartItem)) {
+            if (!(obj instanceof CartItem)) {
                 continue;
             }
+
+            CartItem cartItem = (CartItem) obj;
 
             if (cartItem.getSoLuong() <= 0) {
                 continue;
@@ -177,9 +173,7 @@ public class CheckoutService {
             item.setSoLuong(cartItem.getSoLuong());
             item.setDonGia(cartItem.getDonGia());
 
-            BigDecimal thanhTien = cartItem.getDonGia()
-                    .multiply(BigDecimal.valueOf(cartItem.getSoLuong()));
-
+            BigDecimal thanhTien = cartItem.getDonGia().multiply(BigDecimal.valueOf(cartItem.getSoLuong()));
             item.setThanhTien(thanhTien);
 
             checkoutItems.add(item);
@@ -188,11 +182,45 @@ public class CheckoutService {
         return checkoutItems;
     }
 
-    private String normalizeNote(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return null;
+    private String buildOrderNote(CheckoutRequest request) {
+        List<String> parts = new ArrayList<>();
+
+        if (hasText(request.getGhiChu())) {
+            parts.add(request.getGhiChu().trim());
         }
 
-        return value.trim();
+        if (hasText(request.getDeliveryName())) {
+            parts.add("Người nhận: " + request.getDeliveryName().trim());
+        }
+
+        if (hasText(request.getDeliveryPhone())) {
+            String phone = request.getDeliveryPhone().trim();
+
+            if (!PHONE_PATTERN.matcher(phone).matches()) {
+                throw new IllegalArgumentException("Số điện thoại nhận hàng không hợp lệ.");
+            }
+
+            parts.add("SĐT: " + phone);
+        }
+
+        if (hasText(request.getEmail())) {
+            String email = request.getEmail().trim();
+
+            if (!EMAIL_PATTERN.matcher(email).matches()) {
+                throw new IllegalArgumentException("Email không hợp lệ.");
+            }
+
+            parts.add("Email: " + email);
+        }
+
+        if (hasText(request.getDeliveryAddress())) {
+            parts.add("Địa chỉ nhập: " + request.getDeliveryAddress().trim());
+        }
+
+        return String.join("; ", parts);
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

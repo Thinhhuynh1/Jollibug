@@ -54,6 +54,7 @@ public class CouponService {
         }
 
         switch (type.trim().toUpperCase()) {
+            case "PERCENT":
             case "PERCENTAGE":
                 discount = subtotal * (amount / 100.0);
                 break;

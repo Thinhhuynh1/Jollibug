@@ -2,6 +2,8 @@ package vn.fastfood.model;
 
 import java.sql.Timestamp;
 
+import vn.fastfood.entity.User;
+
 public class Review {
     private long maDG;
     private long maTKKH;
@@ -10,10 +12,7 @@ public class Review {
     private int sao;
     private String noiDung;
     private Timestamp ngayDG;
-    private String tenMon;
-    private String imageUrl;
-    private String tenKhachHang;
-    private String emailKhachHang;
+    private User khachHang;
 
     public Review() {
     }
@@ -74,35 +73,11 @@ public class Review {
         this.ngayDG = ngayDG;
     }
 
-    public String getTenMon() {
-        return tenMon;
+    public User getKhachHang() {
+        return khachHang;
     }
 
-    public void setTenMon(String tenMon) {
-        this.tenMon = tenMon;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public String getTenKhachHang() {
-        return tenKhachHang;
-    }
-
-    public void setTenKhachHang(String tenKhachHang) {
-        this.tenKhachHang = tenKhachHang;
-    }
-
-    public String getEmailKhachHang() {
-        return emailKhachHang;
-    }
-
-    public void setEmailKhachHang(String emailKhachHang) {
-        this.emailKhachHang = emailKhachHang;
+    public void setKhachHang(User khachHang) {
+        this.khachHang = khachHang;
     }
 }

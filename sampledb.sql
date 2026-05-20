@@ -78,7 +78,6 @@ CREATE TABLE DONHANG (
             'CONFIRMED',
             'SHIPPING',
             'DELIVERED',
-            'RECEIVED',
             'CANCEL_REQUESTED',
             'CANCELLED'
         )
@@ -250,7 +249,7 @@ VALUES (3, 2, 'Gà Rán Giòn Cay', 2, 39000, 78000);
 INSERT INTO THANHTOAN (MaDH, MaPT, NgayTT, SoTien, TrangThaiTT)
 VALUES (3, 'COD', CURRENT_TIMESTAMP, 123000, 'Pending');
 
--- 10. Đơn hàng test 4: RECEIVED để test đánh giá
+-- 10. Đơn hàng test 4: DELIVERED để test đánh giá
 INSERT INTO DONHANG (
     MaTK_KH, MaTK_NV, NgayDat, MaDC,
     TongTienMon, TienGiamGia, ThanhTien,
@@ -259,7 +258,7 @@ INSERT INTO DONHANG (
 VALUES (
     1, 2, CURRENT_TIMESTAMP, 1,
     45000, 0, 45000,
-    'RECEIVED', NULL, 'Đơn test trạng thái RECEIVED'
+    'DELIVERED', NULL, 'Đơn test trạng thái DELIVERED'
 );
 
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien)
@@ -416,7 +415,7 @@ VALUES (
     78000
 );
 
--- Đơn 4: RECEIVED - dùng để test đánh giá
+-- Đơn 4: DELIVERED - dùng để test đánh giá
 INSERT INTO DONHANG (
     MaTK_KH,
     MaTK_NV,
@@ -437,9 +436,9 @@ VALUES (
     45000,
     0,
     45000,
-    'RECEIVED',
+    'DELIVERED',
     NULL,
-    'Đơn test RECEIVED - khách được đánh giá món ăn'
+    'Đơn test DELIVERED - khách được đánh giá món ăn'
 );
 
 INSERT INTO CHITIETDH (
@@ -502,7 +501,7 @@ VALUES (
     59000
 );
 
--- Đơn 6: RECEIVED nhiều món - dùng để test đánh giá từng món
+-- Đơn 6: DELIVERED nhiều món - dùng để test đánh giá từng món
 INSERT INTO DONHANG (
     MaTK_KH,
     MaTK_NV,
@@ -523,9 +522,9 @@ VALUES (
     143000,
     10000,
     133000,
-    'RECEIVED',
+    'DELIVERED',
     NULL,
-    'Đơn test RECEIVED nhiều món - test đánh giá từng món'
+    'Đơn test DELIVERED nhiều món - test đánh giá từng món'
 );
 
 INSERT INTO CHITIETDH (
@@ -1212,7 +1211,6 @@ CREATE TABLE LICHSUTRANGTHAIDH (
             'CONFIRMED',
             'SHIPPING',
             'DELIVERED',
-            'RECEIVED',
             'CANCEL_REQUESTED',
             'CANCELLED'
         )
