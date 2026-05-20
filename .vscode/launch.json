@@ -2,6 +2,20 @@
   "configurations": [
     {
       "type": "java",
+      "name": "FastFoodApplication",
+      "request": "launch",
+      "mainClass": "FastFoodApplication",
+      "projectName": "fast-food"
+    },
+    {
+      "type": "java",
+      "name": "FastFoodApplication",
+      "request": "launch",
+      "mainClass": "vn.fastfood.FastFoodApplication",
+      "projectName": "fast-food"
+    },
+    {
+      "type": "java",
       "name": "Spring Boot-FastFoodApplication<fast-food>",
       "request": "launch",
       "cwd": "${workspaceFolder}",

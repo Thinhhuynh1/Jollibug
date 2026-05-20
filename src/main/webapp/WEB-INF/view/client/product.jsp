@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
@@ -195,7 +195,7 @@
               <div class="cluster">
                 <a class="btn btn-outline" href="/menu">← Quay lại thực đơn</a>
                 <c:if test="${not empty sessionScope.user}">
-                  <form method="post" action="/addCart">
+                  <form method="post"  data-add-cart-form data-add-cart-api="/api/cart/add">
                     <input type="hidden" name="productID" value="${monAn.maMon}">
                     <button class="btn btn-primary" type="submit">🛒 Thêm vào giỏ</button>
                   </form>
@@ -216,5 +216,6 @@
   <!-- SHARED FOOTER -->
   <jsp:include page="layout/footer.jsp"/>
 
-</body>
+  </body>
+  <script src="/js/client/main.js"></script>
 </html>
