@@ -20,10 +20,10 @@
         <header class="site-header" id="site-header">
           <div class="container site-header__inner">
             <a class="brand" href="${homeUrl}" aria-label="Jollibug home">
-              <span class="brand__mark">JB</span>
+              <span class="brand__mark"><img src="/images/jollibug.png" alt="JB Logo"></span>
               <span class="brand__copy">
                 <span class="brand__title">Jollibug</span>
-                <span class="brand__tag">Premium fast-food ordering</span>
+                <span class="brand__tag">Dịch vụ đặt thức ăn tiện lợi</span>
               </span>
             </a>
 

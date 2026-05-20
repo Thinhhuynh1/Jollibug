@@ -1,7 +1,6 @@
 const CLIENT_ORDER_API = "/api/orders";
 
 let allOrders = [];
-let allReviews = [];
 let currentTab = "active";
 const orderDetailCache = new Map();
 
@@ -35,7 +34,6 @@ async function loadOrders() {
         allOrders = Array.isArray(orders) ? orders : [];
 
         await preloadOrderSummaries(allOrders);
-        await loadCustomerReviews(customerId);
         renderOrdersByTab();
 
     } catch (error) {
@@ -81,25 +79,19 @@ function renderOrdersByTab() {
 
     if (!list) return;
 
-    if (currentTab === "reviewed") {
-        updateSectionTitle(title);
-        renderReviewedList(list);
-        return;
-    }
-
     let filteredOrders = allOrders.filter(order => {
         const status = normalizeStatus(order.trangThaiDon);
 
         if (currentTab === "active") {
-            return ["PENDING", "CONFIRMED", "SHIPPING", "DELIVERED", "CANCEL_REQUESTED"].includes(status);
+            return ["PENDING", "CONFIRMED", "SHIPPING", "CANCEL_REQUESTED"].includes(status);
         }
 
         if (currentTab === "history") {
-            return ["RECEIVED", "CANCELLED"].includes(status);
+            return ["DELIVERED", "CANCELLED"].includes(status);
         }
 
         if (currentTab === "review") {
-            return status === "RECEIVED" && hasPendingReviewItems(order.maDH);
+            return status === "DELIVERED";
         }
 
         return true;
@@ -125,11 +117,6 @@ function renderOrdersByTab() {
 function updateSectionTitle(title) {
     if (!title) return;
 
-    if (currentTab === "reviewed") {
-        title.textContent = "Đã đánh giá";
-        return;
-    }
-
     if (currentTab === "active") {
         title.textContent = "Đơn đang đến";
         return;
@@ -144,68 +131,9 @@ function updateSectionTitle(title) {
 }
 
 function getEmptyMessage() {
-    if (currentTab === "reviewed") return "Bạn chưa gửi đánh giá nào. Các đánh giá đã gửi sẽ xuất hiện tại đây.";
     if (currentTab === "active") return "Bạn chưa có đơn nào đang xử lý.";
     if (currentTab === "history") return "Bạn chưa có đơn hàng trong lịch sử.";
     return "Bạn chưa có đơn nào có thể đánh giá.";
-}
-
-function hasPendingReviewItems(orderId) {
-    const items = orderDetailCache.get(orderId) || [];
-    return items.some(item => !item.reviewed);
-}
-
-function renderReviewedList(list) {
-    if (!allReviews.length) {
-        list.innerHTML = `<p class="empty-cell">${getEmptyMessage()}</p>`;
-        return;
-    }
-
-    list.innerHTML = "";
-
-    allReviews.forEach(review => {
-        const card = document.createElement("article");
-        card.className = "customer-review-card";
-
-        const imageSrc = normalizeFoodImage(review.imageUrl || review.hinhAnh || "");
-        const orderCode = review.maDH ? `#${review.maDH}` : "-";
-
-        card.innerHTML = `
-            <div class="customer-review-card__media">
-                ${
-                    imageSrc
-                    ? `<img src="${imageSrc}" alt="${escapeHtml(review.tenMon || "Món ăn")}" loading="lazy">`
-                    : `<div class="customer-review-card__placeholder">No image</div>`
-                }
-            </div>
-            <div class="customer-review-card__body">
-                <div class="customer-review-card__top">
-                    <div>
-                        <h3>${escapeHtml(review.tenMon || `Món #${review.maMon}`)}</h3>
-                        <p>Mã đơn hàng: <strong>${escapeHtml(orderCode)}</strong></p>
-                    </div>
-                    <span class="customer-review-date">${formatDate(review.ngayDG)}</span>
-                </div>
-                <div class="customer-review-stars" aria-label="${Number(review.sao || 0)} sao">
-                    ${renderStars(review.sao)}
-                </div>
-                <p class="customer-review-content">${formatMultilineText(review.noiDung || "")}</p>
-            </div>
-        `;
-
-        list.appendChild(card);
-    });
-}
-
-function renderStars(value) {
-    const rating = Math.min(Math.max(Number(value || 0), 0), 5);
-    let html = "";
-
-    for (let index = 1; index <= 5; index++) {
-        html += `<span class="${index <= rating ? "is-active" : ""}">★</span>`;
-    }
-
-    return html;
 }
 
 function sortOrdersForCurrentTab(orders) {
@@ -232,19 +160,17 @@ function sortOrdersForCurrentTab(orders) {
 function getActiveOrderPriority(order) {
     const status = normalizeStatus(order.trangThaiDon);
 
-    // Ưu tiên cao nhất: nhân viên đã giao, khách cần xác nhận đã nhận hàng.
-    if (status === "DELIVERED") return 1;
-
-    if (status === "SHIPPING") return 2;
+    // Ưu tiên cao nhất: đơn đang giao, tức khách cần xác nhận đã nhận hàng.
+    if (status === "SHIPPING") return 1;
 
     // Sau đó là đơn đã xác nhận, đang chờ giao.
-    if (status === "CONFIRMED") return 3;
+    if (status === "CONFIRMED") return 2;
 
     // Sau đó là đơn mới, chờ xác nhận.
-    if (status === "PENDING") return 4;
+    if (status === "PENDING") return 3;
 
     // Cuối cùng là đơn đang yêu cầu hủy.
-    if (status === "CANCEL_REQUESTED") return 5;
+    if (status === "CANCEL_REQUESTED") return 4;
 
     return 99;
 }
@@ -323,7 +249,7 @@ function createOrderCard(order) {
 }
 
 function renderOrderItemPreview(item) {
-    const imageSrc = normalizeFoodImage(item.hinhAnh || item.imageUrl || "") || getFallbackFoodImage(item.maMon);
+    const imageSrc = item.hinhAnh || item.imageUrl || getFallbackFoodImage(item.maMon);
 
     return `
         <div class="customer-order-item">
@@ -348,7 +274,7 @@ function renderOrderAction(order) {
         `;
     }
 
-    if (status === "DELIVERED") {
+    if (status === "SHIPPING") {
         return `
             <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); confirmReceived(${order.maDH});">
                 Đã nhận hàng
@@ -360,7 +286,7 @@ function renderOrderAction(order) {
         return `<span class="order-note">Đang chờ xử lý hủy</span>`;
     }
 
-    if (currentTab === "review" && status === "RECEIVED") {
+    if (currentTab === "review" && status === "DELIVERED") {
         return `
             <a class="btn btn-outline" href="/orders/detail?orderId=${order.maDH}" onclick="event.stopPropagation();">
                 Đánh giá món
@@ -368,9 +294,9 @@ function renderOrderAction(order) {
         `;
     }
 
-    if (currentTab === "history" && (status === "RECEIVED" || status === "CANCELLED")) {
+    if (currentTab === "history" && status === "DELIVERED") {
         return `
-            <button type="button" class="btn btn-outline reorder-btn" onclick="event.stopPropagation(); goToReorderCheckout(${order.maDH});">
+            <button type="button" class="btn btn-outline reorder-btn" onclick="event.stopPropagation(); reorderOrder(${order.maDH});">
                 Đặt lại
             </button>
         `;
@@ -379,27 +305,7 @@ function renderOrderAction(order) {
     return "";
 }
 
-async function loadCustomerReviews(customerId) {
-    try {
-        let response = await fetch(`${CLIENT_ORDER_API}/my-reviews`);
-
-        if (!response.ok) {
-            response = await fetch(`${CLIENT_ORDER_API}/reviews?customerId=${customerId}`);
-        }
-
-        if (!response.ok) {
-            allReviews = [];
-            return;
-        }
-
-        const reviews = await response.json();
-        allReviews = Array.isArray(reviews) ? reviews : [];
-    } catch (error) {
-        allReviews = [];
-    }
-}
-
-async function legacyReorderOrder(orderId) {
+async function reorderOrder(orderId) {
     const customerId = getCurrentCustomerId();
 
     try {
@@ -419,142 +325,27 @@ async function legacyReorderOrder(orderId) {
     }
 }
 
-function requestCancelOrder(orderId) {
-    openClientCancelConfirmModal(orderId, async () => {
-        orderDetailCache.delete(orderId);
-        await loadOrders();
-    });
-}
-
-function openClientCancelConfirmModal(orderId, afterSuccessCallback) {
-    const oldModal = document.getElementById("clientCancelConfirmModal");
-    if (oldModal) oldModal.remove();
-
-    window.afterClientOrderCancelled = afterSuccessCallback || null;
-
-    const modal = document.createElement("div");
-    modal.id = "clientCancelConfirmModal";
-    modal.className = "client-cancel-modal-root";
-
-    modal.innerHTML = `
-        <div class="client-cancel-modal-box">
-            <div class="client-cancel-modal-header">
-                <h2>Xác nhận hủy đơn #${orderId}</h2>
-                <button type="button" class="client-cancel-close-btn" onclick="closeClientCancelConfirmModal()">×</button>
-            </div>
-
-            <p class="client-cancel-confirm-text">
-                Vui lòng chọn lý do hủy đơn trước khi xác nhận.
-            </p>
-
-            <div class="client-cancel-reason-list">
-                ${renderClientCancelReason("Tôi muốn thay đổi món", true)}
-                ${renderClientCancelReason("Tôi muốn thay đổi địa chỉ giao hàng", false)}
-                ${renderClientCancelReason("Thời gian giao hàng quá lâu", false)}
-                ${renderClientCancelReason("Tôi đặt nhầm đơn", false)}
-                ${renderClientCancelReason("Khác", false, true)}
-            </div>
-
-            <textarea
-                id="clientOtherCancelReason"
-                class="client-other-cancel-reason hidden"
-                placeholder="Nhập lý do hủy khác..."
-            ></textarea>
-
-            <div class="client-cancel-modal-actions">
-                <button type="button" class="client-cancel-danger-btn" onclick="confirmClientCancelOrder(${orderId})">
-                    Xác nhận hủy
-                </button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    document.querySelectorAll('input[name="clientCancelReason"]').forEach(input => {
-        input.addEventListener("change", toggleClientOtherCancelReason);
-    });
-}
-
-function renderClientCancelReason(label, checked, isOther) {
-    return `
-        <label class="client-cancel-reason-choice">
-            <input
-                type="radio"
-                name="clientCancelReason"
-                value="${escapeHtml(label)}"
-                ${checked ? "checked" : ""}
-                data-other="${isOther ? "true" : "false"}"
-            >
-            <span>${escapeHtml(label)}</span>
-        </label>
-    `;
-}
-
-function toggleClientOtherCancelReason() {
-    const selected = document.querySelector('input[name="clientCancelReason"]:checked');
-    const textarea = document.getElementById("clientOtherCancelReason");
-
-    if (!selected || !textarea) return;
-
-    if (selected.dataset.other === "true") {
-        textarea.classList.remove("hidden");
-        textarea.focus();
-    } else {
-        textarea.classList.add("hidden");
-        textarea.value = "";
-    }
-}
-
-function closeClientCancelConfirmModal() {
-    const modal = document.getElementById("clientCancelConfirmModal");
-    if (modal) modal.remove();
-}
-
-async function confirmClientCancelOrder(orderId) {
-    const selectedReason = document.querySelector('input[name="clientCancelReason"]:checked');
-    const otherReason = document.getElementById("clientOtherCancelReason");
-
-    if (!selectedReason) {
-        alert("Vui lòng chọn lý do hủy đơn.");
-        return;
-    }
-
-    let reason = selectedReason.value;
-
-    if (selectedReason.dataset.other === "true") {
-        reason = otherReason ? otherReason.value.trim() : "";
-    }
-
-    if (!reason) {
-        alert("Vui lòng nhập lý do hủy đơn.");
-        return;
-    }
-
-    await submitClientCancelOrder(orderId, reason);
-}
-
-async function submitClientCancelOrder(orderId, reason) {
+async function requestCancelOrder(orderId) {
     const customerId = getCurrentCustomerId();
-    const params = new URLSearchParams();
-    params.append("customerId", customerId);
-    params.append("cancelReason", reason);
+
+    if (!confirm("Bạn có chắc muốn hủy đơn hàng này không?")) {
+        return;
+    }
 
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/cancel?${params.toString()}`, {
+        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/cancel?customerId=${customerId}`, {
             method: "POST"
         });
 
         const data = await response.json();
+
         alert(data.message || "Đã xử lý yêu cầu hủy đơn.");
 
         if (response.ok) {
-            closeClientCancelConfirmModal();
-
-            if (typeof window.afterClientOrderCancelled === "function") {
-                window.afterClientOrderCancelled(orderId);
-            }
+            orderDetailCache.delete(orderId);
+            await loadOrders();
         }
+
     } catch (error) {
         alert("Lỗi khi gửi yêu cầu hủy đơn.");
     }
@@ -601,7 +392,6 @@ function displayStatus(status) {
         CONFIRMED: "Đã xác nhận",
         SHIPPING: "Đang giao",
         DELIVERED: "Đã giao",
-        RECEIVED: "Đã nhận hàng",
         CANCEL_REQUESTED: "Yêu cầu hủy",
         CANCELLED: "Đã hủy"
     };
@@ -623,15 +413,6 @@ function formatDate(value) {
     return new Date(value).toLocaleString("vi-VN");
 }
 
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
 function getFallbackFoodImage(maMon) {
     const images = [
         "https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg",
@@ -642,51 +423,4 @@ function getFallbackFoodImage(maMon) {
 
     const index = Math.abs(Number(maMon || 0)) % images.length;
     return images[index];
-}
-
-function normalizeFoodImage(imageUrl) {
-    const value = String(imageUrl || "").trim();
-
-    if (!value) {
-        return "";
-    }
-
-    if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("/")) {
-        return value;
-    }
-
-    return `/images/${value}`;
-}
-
-function formatMultilineText(value) {
-    return escapeHtml(value).replace(/\n/g, "<br>");
-}
-
-async function reorderOrder(orderId) {
-    const customerId = getCurrentCustomerId();
-
-    try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/reorder?customerId=${customerId}`, {
-            method: "POST"
-        });
-
-        const data = await response.json();
-        const skippedItems = Array.isArray(data.skippedItems) ? data.skippedItems : [];
-        const detailMessage = skippedItems.length ? "\n\n" + skippedItems.join("\n") : "";
-
-        if (!response.ok || !data.success) {
-            alert((data.message || "Không thể đặt lại đơn hàng này.") + detailMessage);
-            return;
-        }
-
-        alert((data.message || "Đã tạo lại giỏ hàng từ đơn cũ.") + detailMessage);
-        window.location.href = "/checkout";
-
-    } catch (error) {
-        alert("Lỗi khi đặt lại đơn hàng.");
-    }
-}
-
-function goToReorderCheckout(orderId) {
-    window.location.href = `/checkout?reorderOrderId=${encodeURIComponent(orderId)}`;
 }

@@ -30,15 +30,7 @@
       <div class="cart-shell">
         <section class="cart-column">
           <article class="cart-panel">
-            <div id="cartItems" class="cart-item-list">
-              <c:if test="${param.checkoutEmpty == 'true'}">
-                <div class="cart-empty">
-                  <h3>Giỏ hàng đang trống</h3>
-                  <p>Vui lòng chọn thêm món trước khi đặt hàng.</p>
-                  <a class="btn btn-primary" href="/menu">Xem thực đơn</a>
-                </div>
-              </c:if>
-
+            <div class="cart-item-list">
               <c:set var="tongSoLuong" value="0" />
               <c:set var="tongTien" value="0" />
               <c:forEach var="cartItem" items="${sessionScope.cart}">
@@ -119,14 +111,7 @@
               </div>
             </div>
 
-            <c:choose>
-              <c:when test="${tongSoLuong > 0}">
-                <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
-              </c:when>
-              <c:otherwise>
-                <a class="btn btn-primary btn-block is-disabled" id="checkout-button" href="#" aria-disabled="true" onclick="return false;">Đặt hàng</a>
-              </c:otherwise>
-            </c:choose>
+            <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
           </article>
         </aside>
       </div>

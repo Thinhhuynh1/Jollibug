@@ -12,12 +12,6 @@ import vn.fastfood.entity.DiaChi;
 @Repository
 public interface AddressRepository extends JpaRepository<DiaChi, Long> {
 
-        //     @Query("""
-        //                 select count(ma)
-        //                 from  MonAn ma
-        //                 where ma.danhMuc.maDM = :categoryID
-        //                 """)
-        // long countMonAn(@Param("categoryID") long categoryID);\
     @Query("""
             select count(1)
             from DiaChi dc

@@ -21,8 +21,17 @@
   <jsp:include page="../layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="${checkoutUser.maTK}" />
-    <input type="hidden" id="addressSelect" value="" />
+    <input type="hidden" id="customerId" value="${sessionScope.userId}">
+    <input type="hidden" id="addressSelect" value="${defaultAddress != null ? defaultAddress.maDC : ''}">
+    <input type="hidden" id="currentUserName" value="${currentUser != null ? currentUser.hoTen : ''}">
+    <input type="hidden" id="currentUserPhone" value="${currentUser != null ? currentUser.sdt : ''}">
+    <input type="hidden" id="currentUserEmail" value="${currentUser != null ? currentUser.email : ''}">
+    <input type="hidden" id="defaultAddressName" value="${defaultAddress != null ? defaultAddress.tenNguoiNhan : ''}">
+    <input type="hidden" id="defaultAddressPhone" value="${defaultAddress != null ? defaultAddress.sdtNguoiNhan : ''}">
+    <input type="hidden" id="defaultAddressLine" value="${defaultAddress != null ? defaultAddress.diaChiCuThe : ''}">
+    <input type="hidden" id="defaultWard" value="${defaultAddress != null ? defaultAddress.phuongXa : ''}">
+    <input type="hidden" id="defaultDistrict" value="${defaultAddress != null ? defaultAddress.quanHuyen : ''}">
+    <input type="hidden" id="defaultProvince" value="${defaultAddress != null ? defaultAddress.tinhThanh : ''}">
 
     <div class="container">
       <div class="page-intro">
@@ -53,11 +62,6 @@
               <input type="text" id="delivery-address" autocomplete="off" required />
               <!-- Dropdown gợi ý địa chỉ -->
               <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
-            </label>
-
-            <label class="field-label">
-              <span>Ghi chú cho đơn hàng</span>
-              <textarea id="order-note" rows="3" placeholder="Ví dụ: ít cay, gọi trước khi giao..."></textarea>
             </label>
           </form>
 
@@ -100,18 +104,6 @@
               </label>
             </div>
           </section>
-
-          <c:if test="${not empty reorderMessage}">
-            <div class="checkout-message">${reorderMessage}</div>
-          </c:if>
-
-          <c:if test="${not empty reorderSkippedItems}">
-            <div class="checkout-message">
-              <c:forEach var="skippedItem" items="${reorderSkippedItems}">
-                <div>${skippedItem}</div>
-              </c:forEach>
-            </div>
-          </c:if>
 
           <div id="checkoutMessage" class="checkout-message"></div>
 

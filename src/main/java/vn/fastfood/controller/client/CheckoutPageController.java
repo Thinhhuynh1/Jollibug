@@ -40,6 +40,7 @@ public class CheckoutPageController {
 
         model.addAttribute("addresses", addresses);
         model.addAttribute("checkoutUser", user);
+        model.addAttribute("currentUser", user);
 
         return "client/checkout/changeAddress";
     }
