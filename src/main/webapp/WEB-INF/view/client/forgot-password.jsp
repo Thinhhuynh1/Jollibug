@@ -1,65 +1,67 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Forgot Password</title>
-  <meta name="description" content="Reset your Jollibug password - enter your email to receive a recovery link." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="client/css/profile.css">
+﻿<%@page contentType="text/html" pageEncoding="UTF-8" %>
+  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+      <!DOCTYPE html>
+      <html lang="en">
 
-  
-</head>
-<body data-page="profile">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Jollibug | Sign In</title>
+        <meta name="description"
+          content="Sign in to your Jollibug account to access saved addresses, order history, and faster reordering." />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
+          rel="stylesheet" />
+        <link rel="stylesheet" href="/webapp/resources/shared/css/global.css" />
+        <link rel="stylesheet" href="/webapp/resources/shared/css/components.css" />
+        <link rel="stylesheet" href="css/global.css" />
+        <link rel="stylesheet" href="css/components.css" />
+        <link rel="stylesheet" href="css/admin.css" />
+      </head>
 
-  <jsp:include page="layout/header.jsp" />
+      <body data-page="login">
 
-  <main class="profile-page">
-    <div class="container">
-      <div class="profile-layout">
-        <aside class="profile-sidebar">
-          <div class="profile-sidebar__avatar">U</div>
-          <div class="profile-sidebar__greeting">Xin chào,</div>
-          <div class="profile-sidebar__name">User Demo!</div>
-          <a class="profile-sidebar__logout" href="/logout">Đăng xuất</a>
+        <!-- SHARED HEADER -->
+        <jsp:include page="layout/header.jsp" />
 
-          <nav class="profile-nav" aria-label="Profile navigation">
-            <a href="/orders">Đơn hàng</a>
-            <a href="/address">Địa chỉ của bạn</a>
-            <a class="is-active" href="/profile">Chi tiết tài khoản</a>
-            <a href="/forgot-password">Đặt lại mật khẩu</a>
-          </nav>
-        </aside>
-
-        <section class="profile-content">
-          <div class="auth-panel__content">
-              <div class="page-intro" style="margin-bottom:0;">
-                <span class="eyebrow">Forgot Password</span>
-                <h2 class="section-title">Đặt lại mật khẩu</h2>
-              </div>
-              <!-- Future Spring MVC: action="/forgot-password" method="post" -->
-              <form class="floating-grid" data-demo-form
-                    data-success-message="Reset link sent in demo mode."
-                    id="forgot-form" novalidate>
-                <div class="floating-field">
-                  <input id="forgot-email" name="email" type="email" placeholder=" " required />
-                  <label for="forgot-email">Email address</label>
+        <main class="page-shell">
+          <section class="section">
+            <div class="container" style="width: min(700px, calc(100% - 1.5rem * 2));">
+              <article class="auth-panel reveal-up">
+                <div class="auth-panel__content">
+                  <div class="page-intro" style="margin-bottom:0;">
+                    <h2 class="section-title">Quên mật khẩu</h2>
+                  </div>
+                  <c:if test="${not empty error}">
+                    <div
+                      style="background-color: #fbfbfb; border: 1px solid #ffebed; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 15px; margin-top: 15px;">
+                      ${error}
+                    </div>
+                  </c:if>
+                  <form class="floating-grid" method="POST">
+                    <div class="floating-field">
+                      <input id="forgot-email" name="email" type="email" placeholder=" " required />
+                      <label for="forgot-email">Địa chỉ email</label>
+                    </div>
+                    <button class="btn btn-primary btn-block" type="submit">Xác nhận</button>
+                  </form>
+                  <div class="card-actions">
+                    <a href="/register">Bạn chưa có tài khoản? Đăng ký</a>
+                    <a href="/login">Bạn đã có tài khoản? Đăng nhập</a>
+                  </div>
                 </div>
-                <button class="btn btn-primary btn-block" type="submit">Xác nhận</button>
-              </form>
+              </article>
+
 
             </div>
-        </section>
-      </div>
-    </div>
-  </main>
+          </section>
+        </main>
 
-</body>
-</html>
+        <!-- SHARED FOOTER -->
+        <jsp:include page="layout/footer.jsp" />
+
+      </body>
+
+      </html>

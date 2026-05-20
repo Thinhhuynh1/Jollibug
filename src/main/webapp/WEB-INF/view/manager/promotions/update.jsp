@@ -1,0 +1,136 @@
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jollibug | Cập nhật khuyến mãi</title>
+<meta name="description" content="Jollibug Manager - cập nhật khuyến mãi." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="<c:url value='/css/global.css'/>" />
+<link rel="stylesheet" href="<c:url value='/css/components.css'/>" />
+<link rel="stylesheet" href="<c:url value='/css/admin.css'/>" />
+<link rel="stylesheet" href="<c:url value='/css/client/profile.css'/>" />
+</head>
+<body data-admin-role="manager" data-admin-page="promotions">
+<div class="admin-shell admin-body" data-admin-table-root>
+<jsp:include page="../layout/sidebar.jsp" />
+<main class="admin-main">
+<jsp:include page="../layout/topbar.jsp" />
+<div style="max-width:52rem; margin:0 auto; width:100%;">
+<section class="profile-content">
+<section class="profile-section">
+<h1 class="profile-title">Cập nhật khuyến mãi</h1>
+
+<form action="<c:url value='/manager/promotions/update'/>" method="post" class="profile-form">
+<input type="hidden" name="promotionID" value="${promotion.maCT}" />
+<div class="profile-grid">
+<label class="profile-field">
+<span>Tên chương trình</span>
+<input type="text" name="tenCT" value="${promotion.tenCT}" required />
+</label>
+
+<label class="profile-field">
+<span>Mức giảm (%)</span>
+<input type="number" step="0.1" min="0" max="100" name="phanTramGiam" value="${promotion.phanTramGiam}" required />
+</label>
+
+<label class="profile-field">
+<span>Ngày bắt đầu</span>
+<input type="date" name="startDate" value="${promotion.ngayBatDauValue}" required />
+</label>
+
+<label class="profile-field">
+<span>Ngày kết thúc</span>
+<input type="date" name="endDate" value="${promotion.ngayKetThucValue}" required />
+</label>
+</div>
+
+<div class="promo-apply-panel">
+    <div class="promo-apply-header">
+        <span>Phạm vi áp dụng</span>
+        <small>Chọn mức áp dụng phù hợp nhất cho chương trình giảm giá</small>
+    </div>
+    <div class="promo-apply-options">
+        <label class="promo-option-card<c:if test='${promotion.phamViApDung == null || promotion.phamViApDung == "ALL"}'> active</c:if>">
+            <input type="radio" name="phamViApDung" value="ALL" <c:if test="${promotion.phamViApDung == null || promotion.phamViApDung == 'ALL'}">checked</c:if> />
+            <div>
+                <strong>Tất cả món</strong>
+                <small>Áp dụng giảm giá cho toàn bộ thực đơn.</small>
+            </div>
+        </label>
+
+        <label class="promo-option-card<c:if test='${promotion.phamViApDung == "CATEGORY"}'> active</c:if>">
+            <input type="radio" name="phamViApDung" value="CATEGORY" <c:if test="${promotion.phamViApDung == 'CATEGORY'}">checked</c:if> />
+            <div>
+                <strong>Theo danh mục</strong>
+                <small>Chỉ áp dụng cho một danh mục món ăn cụ thể.</small>
+            </div>
+        </label>
+
+        <label class="promo-option-card<c:if test='${promotion.phamViApDung == "ITEM"}'> active</c:if>">
+            <input type="radio" name="phamViApDung" value="ITEM" <c:if test="${promotion.phamViApDung == 'ITEM'}">checked</c:if> />
+            <div>
+                <strong>Chọn món</strong>
+                <small>Lựa chọn riêng từng món để áp dụng khuyến mãi.</small>
+            </div>
+        </label>
+    </div>
+
+    <div id="apply-category" class="promo-apply-details<c:if test='${promotion.phamViApDung == "CATEGORY"}'> active</c:if>">
+        <label class="promo-detail-label">Danh mục áp dụng</label>
+        <div class="promo-category-select">
+            <select name="maDM">
+                <option value="">-- Chọn danh mục --</option>
+                <c:forEach items="${danhMucList}" var="category">
+                    <option value="${category.maDM}" <c:if test="${promotion.maDM == category.maDM}">selected</c:if>>${category.tenDM}</option>
+                </c:forEach>
+            </select>
+        </div>
+    </div>
+
+    <div id="apply-items" class="promo-apply-details<c:if test='${promotion.phamViApDung == "ITEM"}'> active</c:if>">
+        <label class="promo-detail-label">Chọn món áp dụng</label>
+        <div class="promo-items-list">
+            <c:forEach items="${monAnList}" var="monAn">
+                <label class="promo-item-card">
+                    <input type="checkbox" name="selectedMonAnIds" value="${monAn.maMon}" <c:if test="${selectedMonAnIds.contains(monAn.maMon)}">checked</c:if> />
+                    <span>${monAn.tenMon}</span>
+                </label>
+            </c:forEach>
+        </div>
+    </div>
+</div>
+
+<div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
+<a href="<c:url value='/manager/promotions/detail'/>?promotionID=${promotion.maCT}" class="btn btn-ghost">Hủy</a>
+<button type="submit" class="profile-submit" style="max-width:180px;">Lưu thay đổi</button>
+</div>
+</form>
+</section>
+</section>
+</div>
+</main>
+</div>
+<script>
+const applyTypeRadios = document.querySelectorAll('input[name="phamViApDung"]');
+const optionCards = document.querySelectorAll('.promo-option-card');
+const categorySection = document.getElementById('apply-category');
+const itemsSection = document.getElementById('apply-items');
+function updateApplySections() {
+  const selected = document.querySelector('input[name="phamViApDung"]:checked');
+  optionCards.forEach(card => {
+    const radio = card.querySelector('input[type="radio"]');
+    card.classList.toggle('active', radio === selected);
+  });
+  categorySection.classList.toggle('active', selected.value === 'CATEGORY');
+  itemsSection.classList.toggle('active', selected.value === 'ITEM');
+}
+applyTypeRadios.forEach(radio => radio.addEventListener('change', updateApplySections));
+updateApplySections();
+</script>
+</body>
+</html>

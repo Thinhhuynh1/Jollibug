@@ -15,59 +15,102 @@
 
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/client/cart-api.css" />
 </head>
 <body class="cart-page" data-page="cart">
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell section-tight">
+    <input type="hidden" id="customerId" value="1">
     <div class="container">
       <div class="page-intro">
-        <span class="eyebrow">Cart</span>
-        <h1 class="page-title">My Cart</h1>
-        <p class="lead">Review your selected meals before placing the order.</p>
+        <h1 class="page-title">Giỏ hàng của tôi</h1>
       </div>
 
       <div class="cart-shell">
         <section class="cart-column">
           <article class="cart-panel">
-            <h2 class="cart-panel__title">My Cart</h2>
-            <div class="cart-item-list" id="cart-item-list" aria-live="polite"></div>
-            <div class="empty-state hidden" id="cart-empty-state">
-              <h3>Your cart is empty</h3>
-              <p class="muted">Add delicious items from the menu to continue.</p>
-              <a class="btn btn-primary" href="/menu">Browse Menu</a>
+            <div class="cart-item-list">
+              <c:set var="tongSoLuong" value="0" />
+              <c:set var="tongTien" value="0" />
+              <c:forEach var="cartItem" items="${sessionScope.cart}">
+                <c:set var="tongSoLuong" value="${tongSoLuong + cartItem.soLuong}"/>
+                <c:set var="tongTien" value="${tongTien + cartItem.thanhTien}" />
+                <article class="cart-line">
+                  <div class="cart-line__thumb">
+                    <img src="/images/${cartItem.imageUrl}"
+                         style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+                  </div>
+                  <div class="cart-line__meta">
+                    <h3 class="cart-line__name">${cartItem.tenMon}</h3>
+                    <div class="cart-line__controls">
+                      <a class="cart-link-btn" href="#" data-action="remove">Xoa</a>
+                      <div style="margin-left:auto;display:inline-flex;align-items:center;gap:0.6rem;">
+                        <div class="qty-stepper" aria-label="Chinh so luong">
+                          <button class="qty-stepper__btn" type="button" aria-label="Giam so luong">-</button>
+                          <span class="qty-stepper__value">${cartItem.soLuong}</span>
+                          <button class="qty-stepper__btn" type="button" aria-label="Tang so luong">+</button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                          <c:if test="${cartItem.donGia < cartItem.donGiaGoc}">
+                            <span style="text-decoration: line-through; color: #999; font-size: 0.85em; font-weight: 500;">
+                              <fmt:formatNumber type="number" value="${cartItem.donGiaGoc * cartItem.soLuong}" /> đ
+                            </span>
+                          </c:if>
+                          <strong class="cart-line__sum">
+                            <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> đ
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </c:forEach>
             </div>
+
+            <div id="cartMessage" class="cart-message"></div>
           </article>
         </section>
 
         <aside class="summary-column">
           <article class="summary-panel">
-            <h2 class="summary-panel__title">Order Summary</h2>
-            <p class="summary-count" id="summary-item-count">0 ITEMS</p>
-
-            <div class="voucher-inline">
-              <p class="section-subtitle">Have a promo code?</p>
-              <div class="voucher-inline__row">
-                <input id="voucher-code" type="text" placeholder="Enter promo code" />
-                <button class="btn btn-outline voucher-inline__apply" id="voucher-apply" type="button">Apply</button>
-              </div>
-              <p class="summary-note" id="voucher-note"></p>
+            <div style="display:flex; align-items:center; width:100%;">
+              <h2 class="summary-panel__title">Tổng sản phẩm </h2>
+              
+              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">${tongSoLuong} MÓN</h2>
             </div>
+
+
 
             <div class="summary-lines">
-              <div class="summary-line"><span>Subtotal</span><strong id="summary-subtotal">0 VND</strong></div>
-              <div class="summary-line summary-line--strong"><span>Total</span><strong id="summary-total">0 VND</strong></div>
+              <div class="summary-line summary-line--strong">
+                <span>Tổng tiền</span>
+                <strong id="summary-total">
+                  <fmt:formatNumber type="number" value="${tongTien}"/> đ
+                </strong>
+              </div>
             </div>
 
-            <button class="btn btn-primary btn-block" type="button" id="checkout-button">Checkout</button>
+            <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
           </article>
         </aside>
       </div>
     </div>
   </main>
 
-  <script src="js/client/nav.js" defer></script>
-  <script src="js/client/cart.js" defer></script>
+  <div class="delete-confirm-modal" id="deleteConfirmModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" aria-hidden="true">
+    <div class="delete-confirm-card" role="document">
+      <h2 id="deleteModalTitle">Xóa món khỏi giỏ hàng?</h2>
+      <p id="deleteModalMessage">Bạn có chắc muốn xóa món này khỏi giỏ hàng không?</p>
+      <div class="delete-confirm-actions">
+        <button class="btn btn-ghost" type="button" id="cancelDeleteBtn">Hủy</button>
+        <button class="btn btn-primary delete-confirm-btn" type="button" id="confirmDeleteBtn">Xóa món</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARED FOOTER -->
+  <jsp:include page="layout/footer.jsp" />
+<script src="${pageContext.request.contextPath}/resources/js/client/cart-api.js"></script>
 </body>
 </html>
-

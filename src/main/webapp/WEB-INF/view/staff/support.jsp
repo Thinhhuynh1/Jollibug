@@ -1,246 +1,462 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Staff - Customer Support</title>
-  <meta name="description" content="Jollibug Staff portal - receive support tickets, chat with customers, and view their purchase history." />
+  <title>Jollibug | Staff - Chăm sóc khách hàng</title>
+  <meta name="description" content="Jollibug Staff portal - chat hỗ trợ, xử lý khiếu nại và phản hồi đánh giá." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/admin.css" />
-  <link rel="stylesheet" href="css/staff.css" />
+  <link rel="stylesheet" href="<c:url value='/css/global.css'/>" />
+  <link rel="stylesheet" href="<c:url value='/css/components.css'/>" />
+  <link rel="stylesheet" href="<c:url value='/css/admin.css'/>" />
+  <link rel="stylesheet" href="<c:url value='/css/staff.css?v=2'/>" />
 </head>
 
-<!--
-  data-admin-role="staff"    -> Spring Security path guard
-  data-admin-page="support"  -> read by support.js
--->
 <body data-admin-role="staff" data-admin-page="support">
 
-  <div class="admin-shell admin-body" data-staff-support-root>
+  <div class="admin-shell admin-body" data-admin-table-root>
 
-    <!-- SECTION -->
-    <aside class="admin-sidebar">
-      <div class="admin-sidebar__inner">
-        <div class="admin-brand">
-          <div class="brand">
-            <span class="brand__mark">JB</span>
-            <span class="brand__copy">
-              <span class="brand__title">Jollibug Staff</span>
-              <span class="brand__tag">Operations Portal</span>
-            </span>
-          </div>
-          <span class="admin-role">Staff</span>
-          <p>Order fulfilment and customer support</p>
-        </div>
+    <jsp:include page="layout/sidebar.jsp" />
 
-        <nav class="admin-nav">
-          <span class="admin-nav__section">Workspace</span>
-          <a href="/orders">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-              <rect x="9" y="3" width="6" height="4" rx="1"/>
-              <path d="M9 12h6M9 16h4"/>
-            </svg>
-            Order Management
-          </a>
-          <a class="is-active" href="/support">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            Customer Support
-          </a>
-          <span class="admin-nav__section">Quick links</span>
-          <a href="client-home.html">Back to site</a>
-        </nav>
-      </div>
-    </aside>
-
-    <!-- SECTION -->
     <main class="admin-main">
 
-      <!-- Topbar -->
-      <div class="admin-topbar">
-        <div class="admin-topbar__copy">
-          <strong>Jollibug Customer Support</strong>
-          <span class="muted">Handle complaints, assist customers, and view purchase history.</span>
-        </div>
-        <div class="admin-topbar__user">
-          <span class="admin-role">Staff</span>
-          <div class="admin-avatar" id="topbar-user-initials" aria-hidden="true">ST</div>
-          <div class="stack" style="gap:0.15rem;">
-            <strong id="topbar-user-name">Staff Member</strong>
-            <span class="muted" id="topbar-user-role">Staff · Support</span>
-          </div>
-          <button class="btn btn-outline" type="button" id="btn-logout">Logout</button>
-        </div>
-      </div>
+      <jsp:include page="layout/topbar.jsp" />
 
-      <!-- SECTION -->
-      <div class="page-intro" style="margin-bottom:var(--space-5);">
-        <span class="eyebrow">Staff View</span>
-        <h1 class="section-title">Customer Care Center</h1>
-        <p class="lead">Select a support ticket to view the conversation thread and customer profile.</p>
-      </div>
+      <c:set var="supportTab" value="${empty param.tab ? 'chat' : param.tab}" />
 
-      <!-- SECTION -->
-      <div class="support-shell">
-
-        <!-- LEFT: Ticket List -->
-        <div class="ticket-list-panel">
-          <div class="ticket-list-panel__header">
-            <strong>Support Tickets</strong>
-            <span class="status-badge" data-status="pending" id="open-ticket-count">0 open</span>
+      <section class="admin-panel">
+        <div class="panel-header">
+          <div class="header-content">
+            <div class="header-title-group">
+              <h1 class="section-title">Chăm sóc khách hàng</h1>
+              <p class="section-subtitle">Quản lý đánh giá từ khách hàng</p>
+            </div>
           </div>
-          <label class="table-search" style="margin:0.75rem 1rem;">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="7"></circle>
-              <path d="m20 20-3.5-3.5"></path>
-            </svg>
-            <input id="ticket-search" type="search" placeholder="Search tickets..." />
-          </label>
-          <div class="cluster" style="padding:0 1rem 0.75rem; gap: var(--space-2);">
-            <button class="order-filter-pill is-active" type="button" data-ticket-filter="all" id="tf-all">All</button>
-            <button class="order-filter-pill" type="button" data-ticket-filter="open" id="tf-open">Open</button>
-            <button class="order-filter-pill" type="button" data-ticket-filter="resolved" id="tf-resolved">Resolved</button>
-          </div>
-          <div class="ticket-list" id="ticket-list" role="listbox" aria-label="Support tickets">
-            <!-- Populated by support.js -->
+          <div class="panel-controls support-toolbar">
+            <div class="tab-buttons">
+              <a href="<c:url value='/staff/support?tab=chat'/>" class="tab-btn tab-btn--outline<c:if test='${supportTab == "chat"}'> is-active</c:if>" role="tab" aria-selected="${supportTab == 'chat'}" aria-controls="tab-chat">
+                Chat
+              </a>
+              <a href="<c:url value='/staff/support?tab=review'/>" class="tab-btn tab-btn--solid<c:if test='${supportTab == "review"}'> is-active</c:if>" role="tab" aria-selected="${supportTab == 'review'}" aria-controls="tab-review">
+                Đánh giá
+              </a>
+            </div>
           </div>
         </div>
 
-        <!-- RIGHT: Chat Workspace -->
-        <div class="chat-workspace" id="chat-workspace">
-
-          <!-- Chat Panel -->
-          <div class="chat-panel" id="chat-panel">
-            <!-- Header filled by JS -->
-            <div class="chat-panel__header" id="chat-header">
-              <div class="chat-panel__avatar" id="chat-cust-avatar" aria-hidden="true">?</div>
-              <div class="chat-panel__meta">
-                <strong id="chat-cust-name">Select a ticket</strong>
-                <span id="chat-cust-issue">-</span>
+        <div id="tab-chat" class="support-tab-panel<c:if test='${supportTab == "chat"}'> is-active</c:if>" <c:if test='${supportTab != "chat"}'>hidden</c:if>>
+          <div class="support-shell">
+            <aside class="ticket-list-panel">
+              <div class="ticket-list-panel__header">
+                <strong>Hội thoại đang mở</strong>
+                <span class="status-badge" data-status="active">${onlineCount} online</span>
               </div>
-              <span class="status-badge" id="chat-ticket-status" data-status="open" style="margin-left:auto;">open</span>
-            </div>
-
-            <!-- Quick replies -->
-            <div class="quick-replies" id="quick-replies-bar">
-              <button class="quick-reply-chip" type="button" data-reply="Thank you for contacting us!">ðŸ‘‹ Greet</button>
-              <button class="quick-reply-chip" type="button" data-reply="I'm looking into this for you right now.">ðŸ” Investigating</button>
-              <button class="quick-reply-chip" type="button" data-reply="Your refund has been processed.">ðŸ’° Refund</button>
-              <button class="quick-reply-chip" type="button" data-reply="Is there anything else I can help you with?">-œ… Closing</button>
-            </div>
-
-            <!-- Messages -->
-            <div class="chat-messages" id="chat-messages">
-              <div class="chat-empty">
-                <div class="chat-empty__icon">ðŸ’¬</div>
-                <p>Select a ticket to start supporting</p>
+              <div class="ticket-list">
+                <c:choose>
+                  <c:when test="${empty tickets}">
+                    <p style="padding:1rem;color:var(--color-text-muted)">Chưa có hội thoại nào.</p>
+                  </c:when>
+                  <c:otherwise>
+                    <c:forEach var="ticket" items="${tickets}">
+                      <a href="<c:url value='/staff/support?maYC=${ticket.maYC}'/>" style="text-decoration:none;color:inherit">
+                        <article class="ticket-item<c:if test='${ticket.maYC == activeConvId}'> is-active</c:if>">
+                          <div class="ticket-item__header">
+                            <span class="ticket-item__name"><c:out value="${ticket.khachHang.hoTen}"/></span>
+                            <span class="ticket-item__time">${ticket.createdAtDisplay}</span>
+                          </div>
+                          <p class="ticket-item__preview"><c:out value="${ticket.tieuDe}"/></p>
+                          <span class="status-badge" style="font-size:.7rem;margin-top:.25rem;display:inline-block"
+                                data-status="${ticket.trangThai == 'Pending' ? 'pending' : ticket.trangThai == 'Processing' ? 'active' : 'done'}">
+                            <c:out value="${ticket.trangThai}"/>
+                          </span>
+                        </article>
+                      </a>
+                    </c:forEach>
+                  </c:otherwise>
+                </c:choose>
               </div>
-            </div>
+            </aside>
 
-            <!-- Input bar -->
-            <div class="chat-input-bar">
-              <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" />
-              <button class="chat-send-btn" type="button" id="chat-send-btn" aria-label="Send message">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <line x1="22" y1="2" x2="11" y2="13"/>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-              </button>
-            </div>
+            <section class="chat-workspace">
+              <article class="chat-panel"
+                       data-chat-root
+                       data-chat-variant="staff"
+                       data-chat-vaitrogui="NhanVien"
+                       data-chat-ma-tk-gui="${sessionScope.user.maTK}"
+                       data-chat-ten="${sessionScope.user.hoTen}"
+                       data-chat-mayc="${activeConvId}">
+                <header class="chat-panel__header">
+                  <div class="chat-panel__avatar">
+                    <c:choose>
+                      <c:when test="${not empty activeClientName}">
+                        ${fn:substring(activeClientName, 0, 2)}
+                      </c:when>
+                      <c:otherwise>--</c:otherwise>
+                    </c:choose>
+                  </div>
+                  <div class="chat-panel__meta">
+                    <strong><c:out value="${not empty activeClientName ? activeClientName : 'Chọn hội thoại'}"/></strong>
+                    <c:choose>
+                      <c:when test="${not empty activeYC}">
+                        <span>Yêu cầu #${activeYC.maYC} – <c:out value="${activeYC.trangThai}"/></span>
+                      </c:when>
+                      <c:otherwise><span>Đang hoạt động</span></c:otherwise>
+                    </c:choose>
+                  </div>
+                  <c:if test="${not empty activeYC and activeYC.trangThai != 'Done'}">
+                    <a href="/api/chat/close?maYC=${activeYC.maYC}"
+                       class="btn btn-ghost" style="margin-left:auto;font-size:.8rem"
+                       onclick="return confirm('Đánh dấu hoàn thành yêu cầu này?')">✓ Hoàn thành</a>
+                  </c:if>
+                </header>
+
+                <div class="chat-messages" data-chat-messages>
+                  <c:forEach var="msg" items="${chatHistory}">
+                    <c:choose>
+                      <c:when test="${msg.vaiTroGui == 'Khach'}">
+                        <div class="chat-bubble chat-bubble--client">
+                          <div class="chat-bubble__avatar">
+                            ${fn:substring(activeClientName, 0, 2)}
+                          </div>
+                          <div class="chat-bubble__body">
+                            <div class="chat-bubble__text"><c:out value="${msg.noiDung}"/></div>
+                            <span class="chat-bubble__time">${msg.timeDisplay}</span>
+                          </div>
+                        </div>
+                      </c:when>
+                      <c:otherwise>
+                        <div class="chat-bubble chat-bubble--staff">
+                          <div class="chat-bubble__avatar">NV</div>
+                          <div class="chat-bubble__body">
+                            <div class="chat-bubble__text"><c:out value="${msg.noiDung}"/></div>
+                            <span class="chat-bubble__time">${msg.timeDisplay}</span>
+                          </div>
+                        </div>
+                      </c:otherwise>
+                    </c:choose>
+                  </c:forEach>
+                  <c:if test="${empty chatHistory and not empty activeConvId}">
+                    <p style="padding:1rem;color:var(--color-text-muted);text-align:center">Chưa có tin nhắn nào.</p>
+                  </c:if>
+                </div>
+
+                <form class="chat-input-bar" data-chat-form>
+                  <input id="chat-input" data-chat-input name="message" type="text"
+                         placeholder="Nhập phản hồi cho khách hàng..."
+                         <c:if test="${empty activeConvId or activeYC.trangThai == 'Done'}">disabled</c:if>/>
+                  <button class="chat-send-btn" type="submit" aria-label="Gửi tin nhắn"
+                          <c:if test="${empty activeConvId or activeYC.trangThai == 'Done'}">disabled</c:if>>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="m22 2-7 20-4-9-9-4z" />
+                      <path d="M22 2 11 13" />
+                    </svg>
+                  </button>
+                </form>
+              </article>
+            </section>
           </div>
+        </div>
 
-          <!-- Customer Profile Panel -->
-          <div class="customer-profile-panel" id="customer-profile">
-            <div class="customer-profile-panel__hero">
-              <div class="customer-avatar--lg" id="profile-avatar" aria-hidden="true">?</div>
-              <h3 id="profile-name" style="font-size:1.1rem; margin-bottom:0.25rem;">Select a ticket</h3>
-              <span class="muted" id="profile-email">-</span>
-            </div>
-            <div class="customer-profile-panel__body">
-
-              <!-- Stats row -->
-              <div class="profile-stat-row">
-                <div class="profile-stat">
-                  <strong id="profile-orders">0</strong>
-                  <span>Total Orders</span>
+        <div id="tab-review" class="support-tab-panel<c:if test='${supportTab == "review"}'> is-active</c:if>" <c:if test='${supportTab != "review"}'>hidden</c:if>>
+          <div class="review-panel">
+            <!-- Review 1: Low Score (2 stars) -->
+            <article class="review-card review-card--low-score">
+              <div class="review-header-row">
+                <div class="review-header-left">
+                  <h3 class="review-id">#DG001</h3>
+                  <div class="customer-info">
+                    <p class="customer-name">Lê Hoàng Phúc</p>
+                    <p class="customer-phone">0912 345 678</p>
+                  </div>
                 </div>
-                <div class="profile-stat">
-                  <strong id="profile-spent">$0</strong>
-                  <span>Total Spent</span>
+                <div class="review-timestamp">28/05/2024 14:35</div>
+              </div>
+
+              <div class="review-stars">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star empty">★</span>
+                <span class="star empty">★</span>
+                <span class="star empty">★</span>
+                <span class="rating-badge">2/5 Tệ</span>
+              </div>
+
+              <div class="review-metadata">
+                <p><strong>Món:</strong> Cơm tấm sườn nướng</p>
+              </div>
+
+              <div class="review-text-box">
+                <p>Giao hàng muộn hơn dự kiến 30 phút. Cơm bị lạnh, sườn cũng không còn mềm như vừa nướng xong. Rất không hài lòng với chất lượng lần này.</p>
+              </div>
+
+              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
+                <input type="hidden" name="maDG" value="1">
+                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
+                <div class="form-footer">
+                  <span class="char-count"><span class="current">0</span>/500</span>
+                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
                 </div>
-              </div>
+              </form>
+            </article>
 
-              <!-- Purchase history table -->
-              <div>
-                <strong style="font-size:0.88rem; display:block; margin-bottom:0.65rem;">
-                  Purchase History
-                </strong>
-                <div style="overflow-x:auto; border-radius:var(--radius-md); border:1px solid rgba(111,82,55,0.08);">
-                  <table class="history-table">
-                    <thead>
-                      <tr>
-                        <th>Order</th>
-                        <th>Date</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody id="profile-history-body">
-                      <tr>
-                        <td colspan="4" style="text-align:center; color:var(--color-ink-500); padding:1rem;">
-                          No history available
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+            <!-- Review 2: Medium Score (3 stars) -->
+            <article class="review-card review-card--medium-score">
+              <div class="review-header-row">
+                <div class="review-header-left">
+                  <h3 class="review-id">#DG002</h3>
+                  <div class="customer-info">
+                    <p class="customer-name">Trần Thu Hà</p>
+                    <p class="customer-phone">0987 654 321</p>
+                  </div>
                 </div>
+                <div class="review-timestamp">27/05/2024 18:20</div>
               </div>
 
-              <!-- Ticket notes -->
-              <div class="stack">
-                <strong style="font-size:0.88rem;">Ticket Notes</strong>
-                <textarea id="ticket-notes"
-                          placeholder="Add internal notes about this ticket..."
-                          style="min-height:6rem; font-size:0.88rem;"></textarea>
+              <div class="review-stars">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star empty">★</span>
+                <span class="star empty">★</span>
+                <span class="rating-badge">3/5 Trung bình</span>
               </div>
 
-              <div class="cluster">
-                <button class="btn btn-primary" type="button" id="btn-resolve-ticket" style="flex:1;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" aria-hidden="true">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  Mark Resolved
-                </button>
-                <button class="btn btn-outline" type="button" id="btn-save-notes">
-                  Save Notes
-                </button>
+              <div class="review-metadata">
+                <p><strong>Món:</strong> Gà rán combo 5 miếng</p>
               </div>
 
-            </div>
+              <div class="review-text-box">
+                <p>Gà rán tươi, giòn ngon. Nhưng phần mì ốc quên trong combo bị mềm và ẩm, không còn độ giòn. Tuy nhiên vẫn có thể ăn được.</p>
+              </div>
+
+              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
+                <input type="hidden" name="maDG" value="2">
+                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
+                <div class="form-footer">
+                  <span class="char-count"><span class="current">0</span>/500</span>
+                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
+                </div>
+              </form>
+            </article>
+
+            <!-- Review 3: Low Score (1 star) -->
+            <article class="review-card review-card--low-score">
+              <div class="review-header-row">
+                <div class="review-header-left">
+                  <h3 class="review-id">#DG003</h3>
+                  <div class="customer-info">
+                    <p class="customer-name">Nguyễn Văn A</p>
+                    <p class="customer-phone">0901 234 567</p>
+                  </div>
+                </div>
+                <div class="review-timestamp">26/05/2024 12:15</div>
+              </div>
+
+              <div class="review-stars">
+                <span class="star filled">★</span>
+                <span class="star empty">★</span>
+                <span class="star empty">★</span>
+                <span class="star empty">★</span>
+                <span class="star empty">★</span>
+                <span class="rating-badge">1/5 Rất tệ</span>
+              </div>
+
+              <div class="review-metadata">
+                <p><strong>Món:</strong> Bánh mì thịt lợn</p>
+              </div>
+
+              <div class="review-text-box">
+                <p>Nhận được bánh mì sai người. Hỗ trợ khách hàng rất chậm. Đã chờ đợi 2 ngày không ai xử lý. Sẽ không quay lại Jollibug nữa.</p>
+              </div>
+
+              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
+                <input type="hidden" name="maDG" value="3">
+                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
+                <div class="form-footer">
+                  <span class="char-count"><span class="current">0</span>/500</span>
+                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
+                </div>
+              </form>
+            </article>
+
+            <!-- Review 4: High Score (4 stars) -->
+            <article class="review-card">
+              <div class="review-header-row">
+                <div class="review-header-left">
+                  <h3 class="review-id">#DG004</h3>
+                  <div class="customer-info">
+                    <p class="customer-name">Phạm Minh Đức</p>
+                    <p class="customer-phone">0945 678 901</p>
+                  </div>
+                </div>
+                <div class="review-timestamp">25/05/2024 19:45</div>
+              </div>
+
+              <div class="review-stars">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star empty">★</span>
+                <span class="rating-badge">4/5 Tốt</span>
+              </div>
+
+              <div class="review-metadata">
+                <p><strong>Món:</strong> Khoai tây chiên vàng ơi là vàng</p>
+              </div>
+
+              <div class="review-text-box">
+                <p>Khoai tây rất ngon, giòn vàng ươm. Giao hàng nhanh chóng. Chỉ tiếc hơi ít muối một chút, nhưng vẫn rất hài lòng.</p>
+              </div>
+
+              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
+                <input type="hidden" name="maDG" value="4">
+                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
+                <div class="form-footer">
+                  <span class="char-count"><span class="current">0</span>/500</span>
+                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
+                </div>
+              </form>
+            </article>
+
+            <!-- Review 5: Perfect Score (5 stars) -->
+            <article class="review-card">
+              <div class="review-header-row">
+                <div class="review-header-left">
+                  <h3 class="review-id">#DG005</h3>
+                  <div class="customer-info">
+                    <p class="customer-name">Dương Thu Trang</p>
+                    <p class="customer-phone">0938 765 432</p>
+                  </div>
+                </div>
+                <div class="review-timestamp">24/05/2024 11:30</div>
+              </div>
+
+              <div class="review-stars">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="rating-badge">5/5 Xuất sắc</span>
+              </div>
+
+              <div class="review-metadata">
+                <p><strong>Món:</strong> Burger gà sốt phô mai</p>
+              </div>
+
+              <div class="review-text-box">
+                <p>Tuyệt vời! Burger rất ngon, thịt gà mềm, phô mai tan chảy. Giao hàng lại vô cùng nhanh. Sẽ tiếp tục đặt hàng từ Jollibug!</p>
+              </div>
+
+              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
+                <input type="hidden" name="maDG" value="5">
+                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
+                <div class="form-footer">
+                  <span class="char-count"><span class="current">0</span>/500</span>
+                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
+                </div>
+              </form>
+            </article>
+
+            <!-- Review 6: Low Score (2 stars) -->
+            <article class="review-card review-card--low-score">
+              <div class="review-header-row">
+                <div class="review-header-left">
+                  <h3 class="review-id">#DG006</h3>
+                  <div class="customer-info">
+                    <p class="customer-name">Võ Quang Huy</p>
+                    <p class="customer-phone">0912 348 765</p>
+                  </div>
+                </div>
+                <div class="review-timestamp">23/05/2024 15:50</div>
+              </div>
+
+              <div class="review-stars">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star empty">★</span>
+                <span class="star empty">★</span>
+                <span class="star empty">★</span>
+                <span class="rating-badge">2/5 Tệ</span>
+              </div>
+
+              <div class="review-metadata">
+                <p><strong>Món:</strong> Trà sữa trân châu đen</p>
+              </div>
+
+              <div class="review-text-box">
+                <p>Trà sữa bị lạnh quá, không còn vị trà. Trân châu cũng cứng chứ không mềm. Mong Jollibug cải thiện chất lượng nước uống.</p>
+              </div>
+
+              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
+                <input type="hidden" name="maDG" value="6">
+                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
+                <div class="form-footer">
+                  <span class="char-count"><span class="current">0</span>/500</span>
+                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
+                </div>
+              </form>
+            </article>
+
+            <!-- Review 7: Good Score (4 stars) -->
+            <article class="review-card">
+              <div class="review-header-row">
+                <div class="review-header-left">
+                  <h3 class="review-id">#DG007</h3>
+                  <div class="customer-info">
+                    <p class="customer-name">Bùi Kim Anh</p>
+                    <p class="customer-phone">0923 456 789</p>
+                  </div>
+                </div>
+                <div class="review-timestamp">22/05/2024 20:10</div>
+              </div>
+
+              <div class="review-stars">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star empty">★</span>
+                <span class="rating-badge">4/5 Tốt</span>
+              </div>
+
+              <div class="review-metadata">
+                <p><strong>Món:</strong> Combo gia đình (2 người)</p>
+              </div>
+
+              <div class="review-text-box">
+                <p>Đồ ăn tươi ngon, giao hàng nhanh chóng. Chất lượng ổn định. Giá hơi cao một chút so với quán khác nhưng chấp nhận được.</p>
+              </div>
+
+              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
+                <input type="hidden" name="maDG" value="7">
+                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
+                <div class="form-footer">
+                  <span class="char-count"><span class="current">0</span>/500</span>
+                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
+                </div>
+              </form>
+            </article>
           </div>
+        </div>
 
-        </div><!-- /chat-workspace -->
-      </div><!-- /support-shell -->
-
+      </section>
     </main>
-  </div><!-- /data-staff-support-root -->
+  </div>
 
-
-  <!-- Toast stack -->
-  <div class="toast-stack" data-admin-toast-stack id="admin-toast-stack"></div>
-
-<script src="js/staff/support.js" defer></script>
-  </body>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <script src="<c:url value='/js/chat.js?v=3'/>"></script>
+  <script src="<c:url value='/js/staff/support.js'/>"></script>
+</body>
 </html>
-
-
-
 

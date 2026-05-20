@@ -6,7 +6,6 @@ import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.web.servlet.ServletWebSecurityAutoConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
 
 // @SpringBootApplication
 //Disable tam spring security
@@ -15,7 +14,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class FastFoodApplication {
 
 	public static void main(String[] args) {
-		ConfigurableApplicationContext jollibug = SpringApplication.run(FastFoodApplication.class, args);
+		SpringApplication.run(FastFoodApplication.class, args);
 	}
 
 }

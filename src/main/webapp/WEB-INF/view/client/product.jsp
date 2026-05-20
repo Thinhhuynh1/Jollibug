@@ -1,23 +1,124 @@
 ﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Product Detail</title>
-  <meta name="description" content="View full product details, ratings, and nutritional notes. Add to cart with custom quantity." />
+  <title>Jollibug | ${monAn.tenMon}</title>
+  <meta name="description" content="Xem chi tiết món ăn ${monAn.tenMon} - Jollibug Fast Food" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/webapp/resources/shared/css/global.css" />
-  <link rel="stylesheet" href="/webapp/resources/shared/css/components.css" />
-    <link rel="stylesheet" href="css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <style>
+    /* ─── Promotion Banner ─── */
+    .promo-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      border: 1.5px solid #ff9800;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+    }
+    .promo-banner__icon {
+      font-size: 1.5rem;
+    }
+    .promo-banner__text {
+      font-size: 0.9rem;
+      color: #e65100;
+      font-weight: 600;
+    }
+    .promo-banner__badge {
+      margin-left: auto;
+      background: #e53935;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      border-radius: 8px;
+      padding: 4px 12px;
+      white-space: nowrap;
+    }
+
+    /* ─── Price Block ─── */
+    .price-block {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .price-block__current {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #e53935;
+    }
+    .price-block__original {
+      font-size: 1.1rem;
+      color: #999;
+      text-decoration: line-through;
+      font-weight: 500;
+    }
+    .price-block__saving {
+      font-size: 0.85rem;
+      color: #43a047;
+      font-weight: 700;
+      background: #e8f5e9;
+      border-radius: 6px;
+      padding: 2px 8px;
+    }
+
+    /* ─── Product Specs ─── */
+    .product-specs {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+    .product-spec {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 8px 14px;
+      min-width: 100px;
+    }
+    .product-spec .muted {
+      font-size: 0.75rem;
+      color: #888;
+    }
+    .product-spec strong {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #222;
+    }
+
+    /* ─── Spotlight Layout ─── */
+    .product-spotlight {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+    @media (max-width: 700px) {
+      .product-spotlight { grid-template-columns: 1fr; }
+    }
+    .product-spotlight__media img {
+      width: 100%;
+      border-radius: 18px;
+      object-fit: cover;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+    .stack { display: flex; flex-direction: column; gap: 14px; }
+    .cluster { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  </style>
 </head>
 <body data-page="menu">
+  <fmt:setLocale value="vi_VN" />
 
   <!-- SHARED HEADER -->
   <jsp:include page="layout/header.jsp"/>
@@ -25,138 +126,96 @@
   <main class="page-shell">
     <section class="section">
       <div class="container">
-        <!--
-          [data-product-page] - detected by main.js -> renderProductPage()
-          JS fills all [data-product-*] slots via querySelector + textContent/src.
-          No innerHTML is used on this section.
-        -->
-        <div class="product-spotlight" data-product-page id="product-page">
 
-          <!-- Product image slot -->
-          <article class="product-detail-card reveal-up">
+        <div class="product-spotlight" id="product-page">
+
+          <!-- Ảnh sản phẩm -->
+          <article class="reveal-up">
             <div class="product-spotlight__media">
-              <!--
-                JS: root.querySelector('[data-product-image]').src = product.image;
-                    root.querySelector('[data-product-image]').alt = product.name;
-              -->
-              <img src="/webapp/resources/shared/images/meal-burger.svg"
-                   alt="Jollibug product" data-product-image id="product-image" />
+              <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
             </div>
           </article>
 
-          <!-- Product details slots -->
-          <article class="product-detail-card reveal-up">
+          <!-- Thông tin sản phẩm -->
+          <article class="reveal-up">
             <div class="stack">
-              <span class="badge" data-product-badge id="product-badge">Best Seller</span>
-              <h1 class="page-title" data-product-name id="product-name">Jollibug Product</h1>
-              <p class="lead" data-product-description id="product-description">Product description.</p>
+              <h1 class="page-title" id="product-name">${monAn.tenMon}</h1>
+              <p class="lead" id="product-description">${monAn.moTa}</p>
 
-              <div class="price-row">
-                <span class="price" data-product-price id="product-price">$0.00</span>
-                <span class="muted" data-product-note id="product-note">0 kcal</span>
-              </div>
-
+              <!-- Thông số -->
               <div class="product-specs">
                 <article class="product-spec">
-                  <span class="muted">Guest rating</span>
-                  <strong data-product-rating id="product-rating">0</strong>
+                  <span class="muted">Danh mục</span>
+                  <strong id="product-category">${monAn.danhMuc.tenDM}</strong>
                 </article>
                 <article class="product-spec">
-                  <span class="muted">Reorder rate</span>
-                  <strong data-product-popularity id="product-popularity">0</strong>
+                  <span class="muted">Tình trạng</span>
+                  <strong style="color:${monAn.available ? '#43a047' : '#e53935'}">
+                    ${monAn.available ? 'Còn hàng' : 'Hết hàng'}
+                  </strong>
                 </article>
                 <article class="product-spec">
-                  <span class="muted">Category</span>
-                  <strong data-product-category id="product-category">Menu</strong>
+                  <span class="muted">Đã bán</span>
+                  <strong>${monAn.soLuongDaBan}</strong>
                 </article>
               </div>
 
-              <!-- SECTION -->
-              <div class="qty-control">
-                <button type="button" data-action="product-qty-minus" id="btn-qty-minus">-</button>
-                <input data-product-qty id="product-qty" value="1" readonly aria-label="Product quantity" />
-                <button type="button" data-action="product-qty-plus" id="btn-qty-plus">+</button>
+              <!-- Banner khuyến mãi -->
+              <c:if test="${monAn.hasGiamGia}">
+                <div class="promo-banner">
+                  <span class="promo-banner__icon">🏷️</span>
+                  <span class="promo-banner__text">Đang áp dụng chương trình khuyến mãi!</span>
+                  <span class="promo-banner__badge">-<fmt:formatNumber value="${monAn.phanTramGiam}" maxFractionDigits="0" />%</span>
+                </div>
+              </c:if>
+
+              <!-- Giá -->
+              <div class="price-block" id="product-price-block">
+                <c:choose>
+                  <c:when test="${monAn.hasGiamGia}">
+                    <span class="price-block__current">
+                      <fmt:formatNumber value="${monAn.giaGiam}" type="number" />đ
+                    </span>
+                    <span class="price-block__original">
+                      <fmt:formatNumber value="${monAn.gia}" type="number" />đ
+                    </span>
+                    <span class="price-block__saving">
+                      Tiết kiệm <fmt:formatNumber value="${monAn.gia - monAn.giaGiam}" type="number" />đ
+                    </span>
+                  </c:when>
+                  <c:otherwise>
+                    <span class="price-block__current">
+                      <fmt:formatNumber value="${monAn.gia}" type="number" />đ
+                    </span>
+                  </c:otherwise>
+                </c:choose>
               </div>
 
+              <!-- Nút hành động -->
               <div class="cluster">
-                <!--
-                  JS: root.querySelector('[data-action="add-product-detail"]').dataset.productId = product.id;
-                -->
-                <button class="btn btn-primary" type="button"
-                        data-action="add-product-detail" data-product-id="1"
-                        id="btn-add-to-cart">Add to cart</button>
-                <a class="btn btn-outline" href="/menu">Back to menu</a>
+                <a class="btn btn-outline" href="/menu">← Quay lại thực đơn</a>
+                <c:if test="${not empty sessionScope.user}">
+                  <form method="post"  data-add-cart-form data-add-cart-api="/api/cart/add">
+                    <input type="hidden" name="productID" value="${monAn.maMon}">
+                    <button class="btn btn-primary" type="submit">🛒 Thêm vào giỏ</button>
+                  </form>
+                </c:if>
+                <c:if test="${empty sessionScope.user}">
+                  <a class="btn btn-primary" href="/login">Đăng nhập để đặt hàng</a>
+                </c:if>
               </div>
+
             </div>
           </article>
 
-        </div><!-- /data-product-page -->
-      </div>
-    </section>
-
-    <!-- Related products -->
-    <section class="section-tight">
-      <div class="container">
-        <div class="page-intro reveal-up">
-          <span class="eyebrow">You May Also Like</span>
-          <h2 class="section-title">More items from the same flavor lane.</h2>
-        </div>
-        <!--
-          JS (renderRelatedGrid) clones #product-card-template for related products.
-        -->
-        <div class="card-grid" data-related-grid id="related-grid"></div>
+        </div><!-- /product-spotlight -->
       </div>
     </section>
   </main>
 
   <!-- SHARED FOOTER -->
-  <footer class="site-footer" id="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="stack"><div class="brand"><span class="brand__mark">JB</span><span class="brand__copy"><span class="brand__title">Jollibug</span><span class="brand__tag">Crave-worthy comfort, delivered fast</span></span></div><p>Ready for Spring MVC storefront.</p></div>
-        <div><h3>Explore</h3><div class="footer-links"><a href="/menu">Signature Menu</a><a href="/about">Brand Story</a></div></div>
-        <div><h3>Support</h3><div class="footer-links"><a href="/cart">Cart &amp; Checkout</a><a href="/login">Sign In</a></div></div>
-        <div><h3>Contact</h3><div class="footer-links"><span>hello@Jollibug.vn</span><span>+84 28 5555 8899</span></div></div>
-      </div>
-      <div class="footer-note"><span>&copy; <span data-current-year id="footer-year"></span> Jollibug.</span></div>
-    </div>
-  </footer>
+  <jsp:include page="layout/footer.jsp"/>
 
-  <!-- Cart Drawer -->
-  <div class="drawer-backdrop" data-drawer-backdrop id="drawer-backdrop"></div>
-  <aside class="cart-drawer" data-cart-drawer id="cart-drawer" aria-label="Shopping cart drawer">
-    <div class="cart-drawer__header"><div class="card-actions"><div class="stack"><strong>Your order</strong><span class="muted">Fresh picks, saved instantly.</span></div><button class="btn btn-outline" type="button" data-action="close-cart">Close</button></div></div>
-    <div class="cart-drawer__body" data-drawer-items id="drawer-items"></div>
-    <div class="cart-drawer__footer stack"><div class="summary-line"><span>Total</span><strong data-drawer-total id="drawer-total">$0.00</strong></div><div class="cluster"><a class="btn btn-outline" href="/cart">Full Cart</a><button class="btn btn-primary" type="button" data-action="checkout-demo">Checkout Demo</button></div></div>
-  </aside>
-  <div class="toast-stack" data-toast-stack id="toast-stack"></div>
-
-  <!-- TEMPLATES -->
-  <template id="product-card-template">
-    <article class="card product-card reveal-up">
-      <div class="product-card__media" data-product-tone><span class="product-card__chip" data-product-badge></span><img data-product-image alt="" /></div>
-      <div class="stack">
-        <div class="product-card__meta"><span data-product-category></span><span data-product-rating></span></div>
-        <h3 class="product-card__title" data-product-name></h3>
-        <p class="muted" data-product-description></p>
-        <div class="price-row"><div class="stack" style="gap:0.15rem;"><span class="price" data-product-price></span><span class="muted" data-product-note></span></div></div>
-        <div class="card-actions"><a class="btn btn-outline" data-product-detail-link href="#">Details</a><button class="btn btn-primary" type="button" data-action="add-product" data-product-id="">Add to cart</button></div>
-      </div>
-    </article>
-  </template>
-  <template id="mini-cart-item-template">
-    <article class="mini-cart-item"><div class="mini-cart-item__media" style="background:rgba(255,248,238,0.92);"><img data-item-image alt="" /></div><div class="stack" style="gap:0.2rem;"><strong data-item-name></strong><span class="muted" data-item-price-qty></span></div><button class="btn btn-outline" type="button" data-action="remove-cart-item" data-cart-id="">Remove</button></article>
-  </template>
-  <template id="cart-drawer-empty-template">
-    <div class="empty-state"><h3>Your cart is still warming up.</h3><p class="muted">Add a burger, combo, or drink to start your order.</p><a class="btn btn-secondary" href="/menu">Browse menu</a></div>
-  </template>
-<script src="js/client/nav.js" defer></script>
-  <script src="js/client/store.js"></script>
-<script src="js/client/main.js" defer></script>
   </body>
+  <script src="/js/client/main.js"></script>
 </html>
-
-
-
-
-

@@ -1,5 +1,6 @@
 package vn.fastfood.controller.client;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -14,12 +15,17 @@ public class CartController {
 
     @GetMapping("/checkout")
     public String getCheckoutPage() {
-        return "client/checkout";
+        return "client/checkout/show";
     }
 
-    @GetMapping("/orders")
-    public String getOrderPage() {
-        return "client/orders";
+    @GetMapping("/checkout/changeAddress")
+    public String getCheckoutAddress() {
+        return "client/checkout/changeAddress";
+    }
+
+    @GetMapping("/pay")
+    public String getPayPage() {
+        return "client/pay";
     }
 
 }
