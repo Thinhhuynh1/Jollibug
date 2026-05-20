@@ -273,8 +273,8 @@ COMMIT;
 -- ===================================================================
 -- MÃ GIẢM GIÁ (COUPONS)
 -- ===================================================================
-INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
-  VALUES ('WELCOME10', 'PERCENTAGE', 10, 100, N'Giảm 10% cho khách hàng mới',
+INSERT INTO MAGIAMGIA (MaGG, MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES (0, 'WELCOME10', 'PERCENTAGE', 10, 100, N'Giảm 10% cho khách hàng mới',
     TIMESTAMP '2026-01-01 00:00:00', TIMESTAMP '2026-12-31 23:59:59');
 INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('SAVE20K', 'AMOUNT', 20000, 50, N'Giảm thẳng 20.000đ cho đơn từ 100.000đ',
