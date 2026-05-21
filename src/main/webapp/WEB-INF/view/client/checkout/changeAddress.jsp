@@ -1,34 +1,43 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Checkout</title>
-  <meta name="description" content="Jollibug checkout page: review order details, choose delivery address, apply voucher, and place your order." />
+
+  <title>Địa chỉ giao hàng</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
 
   <link rel="stylesheet" href="/css/global.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/client/client-checkout.css" />
 </head>
+
 <body class="checkout-page" data-page="checkout">
-  <jsp:include page="../layout/header.jsp"/>
+  <jsp:include page="../layout/header.jsp" />
 
   <main class="page-shell checkout-main">
     <div class="container">
       <div class="page-intro">
-        <h1 class="section-title">Thông tin đặt hàng</h1>
+        <h1 class="section-title">Chọn địa chỉ giao hàng</h1>
+        <p class="lead">Vui lòng chọn một địa chỉ đã lưu để tiếp tục đặt hàng.</p>
       </div>
 
       <div class="checkout-layout">
 
+        <!-- Cột trái: địa chỉ đang chọn -->
         <section class="checkout-card checkout-sticky">
+          <h2 class="checkout-card__title">Địa chỉ đang chọn</h2>
+
           <form class="delivery-form" id="delivery-form">
             <label class="field-label">
               <span>Họ tên</span>
@@ -41,137 +50,139 @@
             </label>
 
             <label class="field-label">
-              <span>Địa chỉ email</span>
+              <span>Email</span>
               <input type="text" id="delivery-email" disabled />
             </label>
 
             <label class="field-label">
               <span>Địa chỉ đặt hàng</span>
-              <input type="text" id="delivery-address" disabled />                
+              <input type="text" id="delivery-address" disabled />
             </label>
           </form>
 
-          <div style="text-align: end;">
-            <button class="btn btn-outline" type="button" disabled style="opacity: 0.5; cursor: not-allowed;">
-              Đổi địa chỉ
-            </button>
-          </div>
-
-          <button id="confirm-address-btn" class="btn btn-primary btn-block" type="button" disabled style="opacity: 0.5; cursor: not-allowed;" onclick="window.location.href='/checkout'">Vui lòng chọn địa chỉ</button>
+          <button
+            id="confirm-address-btn"
+            class="btn btn-primary btn-block"
+            type="button"
+            disabled
+            style="opacity: 0.5; cursor: not-allowed;"
+            onclick="goBackToCheckout()"
+          >
+            Vui lòng chọn địa chỉ
+          </button>
         </section>
+
         <section class="checkout-card">
           <h2 class="checkout-card__title">Chọn địa chỉ giao hàng</h2>
-          
-          <!-- <div class="address-picker-list"> -->
-            <!-- Fake Address 1 -->
-            <!-- <div class="address-picker-item">
-                <div class="address-picker-info">
-                    <p class="address-picker-title"><strong>Nguyễn Văn A</strong> - 0123456789</p>
-                    <p class="address-picker-desc">123 Đường Số 1, Phường 2, Quận 3, TP.HCM</p>
-                </div>
-                <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
-            </div> -->
 
-            <!-- Fake Address 2 -->
-            <!-- <div class="address-picker-item">
-                <div class="address-picker-info">
-                    <p class="address-picker-title"><strong>Trần Thị B</strong> - 0987654321</p>
-                    <p class="address-picker-desc">456 Đường Số 4, Phường 5, Quận 6, TP.HCM</p>
-                </div>
-                <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
-            </div> -->
-            
-            <!-- Fake Address 3 -->
-            <!-- <div class="address-picker-item">
-                <div class="address-picker-info">
-                    <p class="address-picker-title"><strong>Lê Văn C</strong> - 0909090909</p>
-                    <p class="address-picker-desc">789 Đường Láng, Đống Đa, Hà Nội</p>
-                </div>
-                <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
-            </div>
-          </div> -->
           <div class="address-picker-list">
-          <!-- Fake Address 1 -->
-              <div class="address-picker-item"
-                  data-madc="1"
-                  data-name="Nguyễn Văn A"
-                  data-phone="0123456789"
-                  data-email="a@example.com"
-                  data-address="123 Đường Số 1, Phường 2, Quận 3, TP.HCM">
-                  <div class="address-picker-info">
-                      <p class="address-picker-title"><strong>Nguyễn Văn A</strong> - 0123456789</p>
-                      <p class="address-picker-desc">123 Đường Số 1, Phường 2, Quận 3, TP.HCM</p>
+            <c:choose>
+              <c:when test="${not empty addresses}">
+                <c:forEach var="address" items="${addresses}">
+                  <div class="address-picker-item"
+                      data-madc="${address.maDC}"
+                      data-name="${address.tenNguoiNhan}"
+                      data-phone="${address.sdtNguoiNhan}"
+                      data-email="${currentUser != null ? currentUser.email : ''}"
+                      data-address="${address.diaChiCuThe}, ${address.phuongXa}, ${address.quanHuyen}, ${address.tinhThanh}">
+                    <div class="address-picker-info">
+                      <p class="address-picker-title">
+                        <strong>${address.tenNguoiNhan}</strong> - ${address.sdtNguoiNhan}
+                        <c:if test="${address.defaultAddress}">
+                          <span>(Mặc định)</span>
+                        </c:if>
+                      </p>
+                      <p class="address-picker-desc">
+                        <c:if test="${not empty address.tenDiaChi}">
+                          ${address.tenDiaChi}:
+                        </c:if>
+                        ${address.diaChiCuThe}, ${address.phuongXa}, ${address.quanHuyen}, ${address.tinhThanh}
+                      </p>
+                    </div>
+                    <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
                   </div>
-                  <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
-              </div>
-
-              <!-- Fake Address 2 -->
-              <div class="address-picker-item"
-                  data-madc="2"
-                  data-name="Trần Thị B"
-                  data-phone="0987654321"
-                  data-email="b@example.com"
-                  data-address="456 Đường Số 4, Phường 5, Quận 6, TP.HCM">
+                </c:forEach>
+              </c:when>
+              <c:otherwise>
+                <div class="address-picker-item">
                   <div class="address-picker-info">
-                      <p class="address-picker-title"><strong>Trần Thị B</strong> - 0987654321</p>
-                      <p class="address-picker-desc">456 Đường Số 4, Phường 5, Quận 6, TP.HCM</p>
+                    <p class="address-picker-title"><strong>Chưa có địa chỉ nào</strong></p>
+                    <p class="address-picker-desc">Hãy thêm địa chỉ trong tài khoản trước khi đặt hàng.</p>
                   </div>
-                  <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
-              </div>
-              
-              <!-- Fake Address 3 -->
-              <div class="address-picker-item"
-                  data-madc="3"
-                  data-name="Lê Văn C"
-                  data-phone="0909090909"
-                  data-email="c@example.com"
-                  data-address="789 Đường Láng, Đống Đa, Hà Nội">
-                  <div class="address-picker-info">
-                      <p class="address-picker-title"><strong>Lê Văn C</strong> - 0909090909</p>
-                      <p class="address-picker-desc">789 Đường Láng, Đống Đa, Hà Nội</p>
-                  </div>
-                  <button type="button" class="btn btn-primary address-picker-btn" onclick="selectAddress(this)">Chọn</button>
-              </div>
+                  <a href="/address/create" class="btn btn-primary address-picker-btn">Thêm địa chỉ</a>
+                </div>
+              </c:otherwise>
+            </c:choose>
           </div>
 
           <div class="address-picker-actions">
             <a href="/checkout" class="btn btn-secondary">Hủy bỏ</a>
+            <a href="/address/create" class="btn btn-outline">Thêm địa chỉ mới</a>
           </div>
         </section>
+
       </div>
     </div>
   </main>
 
-
-
-
-
-
-    <!-- SHARED FOOTER -->
   <jsp:include page="../layout/footer.jsp" />
 
   <script src="/js/client/main.js"></script>
+
   <script>
-  function selectAddress(button) {
+    document.addEventListener("DOMContentLoaded", function () {
+      restoreSelectedAddressPreview();
+    });
+
+    function selectAddress(button) {
       const item = button.closest(".address-picker-item");
 
       if (!item) {
-          return;
+        return;
       }
 
       const selectedAddress = {
-          maDC: item.dataset.madc,
-          name: item.dataset.name,
-          phone: item.dataset.phone,
-          email: item.dataset.email,
-          address: item.dataset.address
+        maDC: Number(item.dataset.madc),
+        name: item.dataset.name,
+        phone: item.dataset.phone,
+        email: item.dataset.email,
+        address: item.dataset.address
       };
 
       localStorage.setItem("selectedCheckoutAddress", JSON.stringify(selectedAddress));
-
       window.location.href = "/checkout";
-  }
+    }
+
+    function restoreSelectedAddressPreview() {
+      const selectedAddressRaw = localStorage.getItem("selectedCheckoutAddress");
+      const confirmButton = document.getElementById("confirm-address-btn");
+
+      if (!selectedAddressRaw) {
+        return;
+      }
+
+      try {
+        const selectedAddress = JSON.parse(selectedAddressRaw);
+
+        document.getElementById("delivery-name").value = selectedAddress.name || "";
+        document.getElementById("delivery-phone").value = selectedAddress.phone || "";
+        document.getElementById("delivery-email").value = selectedAddress.email || "";
+        document.getElementById("delivery-address").value = selectedAddress.address || "";
+
+        if (confirmButton) {
+          confirmButton.disabled = false;
+          confirmButton.style.opacity = "1";
+          confirmButton.style.cursor = "pointer";
+          confirmButton.textContent = "Xác nhận địa chỉ này";
+        }
+      } catch (error) {
+        localStorage.removeItem("selectedCheckoutAddress");
+      }
+    }
+
+    function goBackToCheckout() {
+      window.location.href = "/checkout";
+    }
   </script>
 </body>
 </html>
-

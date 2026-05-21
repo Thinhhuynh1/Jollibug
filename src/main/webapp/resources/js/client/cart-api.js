@@ -24,7 +24,8 @@ async function loadCart() {
     if (message) message.textContent = "";
 
     try {
-        const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
+        // const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
+        const response = await fetch(CART_API_BASE);
 
         if (!response.ok) {
             throw new Error("Không thể tải giỏ hàng.");
@@ -271,10 +272,10 @@ function closeDeleteModal() {
 }
 
 async function deleteCartItem(maMon) {
-    const customerId = getCustomerId();
+    // const customerId = getCustomerId();
 
     try {
-        const response = await fetch(`${CART_API_BASE}/items?customerId=${customerId}&maMon=${maMon}`, {
+        const response = await fetch(`${CART_API_BASE}/items?maMon=${maMon}`, {
             method: "DELETE"
         });
 

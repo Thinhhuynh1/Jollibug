@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
@@ -126,27 +126,35 @@
   <main class="page-shell">
     <section class="section">
       <div class="container">
-
-        <div class="product-spotlight" id="product-page">
-
-          <!-- Ảnh sản phẩm -->
-          <article class="reveal-up">
+        <div class="product-spotlight" data-product-page id="product-page">
+          <article class="product-detail-card reveal-up">
             <div class="product-spotlight__media">
-              <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
+              <img src="${pageContext.request.contextPath}/resources/images/${monAn.img}"
+                   alt="${monAn.tenMon}" />
             </div>
           </article>
 
-          <!-- Thông tin sản phẩm -->
-          <article class="reveal-up">
+          <article class="product-detail-card reveal-up">
             <div class="stack">
-              <h1 class="page-title" id="product-name">${monAn.tenMon}</h1>
-              <p class="lead" id="product-description">${monAn.moTa}</p>
+              <h1 class="page-title" data-product-name id="product-name">${monAn.tenMon}</h1>
+              <p class="lead" data-product-description id="product-description">${monAn.moTa}</p>
 
-              <!-- Thông số -->
+              <div class="product-rating-summary">
+                <div class="product-rating-summary__score">
+                  <span class="product-rating-summary__value">
+                    <fmt:formatNumber value="${averageRating}" type="number" minFractionDigits="1" maxFractionDigits="1" />
+                  </span>
+                  <span class="product-rating-summary__stars">★★★★★</span>
+                </div>
+                <p class="product-rating-summary__meta">Dựa trên ${reviewCount} đánh giá từ khách hàng</p>
+              </div>
+
               <div class="product-specs">
                 <article class="product-spec">
-                  <span class="muted">Danh mục</span>
-                  <strong id="product-category">${monAn.danhMuc.tenDM}</strong>
+                  <span class="muted">Đánh giá trung bình</span>
+                  <strong data-product-rating id="product-rating">
+                    <fmt:formatNumber value="${averageRating}" type="number" minFractionDigits="1" maxFractionDigits="1" /> / 5
+                  </strong>
                 </article>
                 <article class="product-spec">
                   <span class="muted">Tình trạng</span>
@@ -157,6 +165,10 @@
                 <article class="product-spec">
                   <span class="muted">Đã bán</span>
                   <strong>${monAn.soLuongDaBan}</strong>
+                </article>
+                <article class="product-spec">
+                  <span class="muted">Lượt đánh giá</span>
+                  <strong>${reviewCount}</strong>
                 </article>
               </div>
 
@@ -191,11 +203,10 @@
                 </c:choose>
               </div>
 
-              <!-- Nút hành động -->
               <div class="cluster">
-                <a class="btn btn-outline" href="/menu">← Quay lại thực đơn</a>
+                <a class="btn btn-outline" href="${pageContext.request.contextPath}/menu">Quay lại</a>
                 <c:if test="${not empty sessionScope.user}">
-                  <form method="post"  data-add-cart-form data-add-cart-api="/api/cart/add">
+                  <form method="post" action="${pageContext.request.contextPath}/addCart">
                     <input type="hidden" name="productID" value="${monAn.maMon}">
                     <button class="btn btn-primary" type="submit">🛒 Thêm vào giỏ</button>
                   </form>
@@ -207,15 +218,55 @@
 
             </div>
           </article>
+        </div>
 
-        </div><!-- /product-spotlight -->
+        <section class="product-reviews reveal-up">
+          <div class="product-reviews__header">
+            <div>
+              <p class="eyebrow">Khách hàng nói gì</p>
+              <h2 class="section-title">Đánh giá về ${monAn.tenMon}</h2>
+            </div>
+            <span class="product-reviews__pill">${reviewCount} nhận xét</span>
+          </div>
+
+          <c:choose>
+            <c:when test="${not empty productReviews}">
+              <div class="product-reviews__list">
+                <c:forEach var="review" items="${productReviews}">
+                  <article class="product-review-card">
+                    <div class="product-review-card__top">
+                      <div>
+                        <h3 class="product-review-card__name">${review.khachHang.hoTen}</h3>
+                        <p class="product-review-card__date">
+                          <fmt:formatDate value="${review.ngayDG}" pattern="dd/MM/yyyy HH:mm" />
+                        </p>
+                      </div>
+                      <div class="product-review-card__rating">
+                        <span class="product-review-card__stars">
+                          <c:forEach begin="1" end="5" var="star">
+                            <span class="${star <= review.sao ? 'is-filled' : ''}">★</span>
+                          </c:forEach>
+                        </span>
+                        <strong>${review.sao}.0</strong>
+                      </div>
+                    </div>
+                    <p class="product-review-card__content">${review.noiDung}</p>
+                  </article>
+                </c:forEach>
+              </div>
+            </c:when>
+            <c:otherwise>
+              <article class="product-reviews__empty">
+                <h3>Chưa có đánh giá nào</h3>
+                <p>Món này chưa có nhận xét từ khách hàng. Bạn có thể là người đầu tiên chia sẻ trải nghiệm.</p>
+              </article>
+            </c:otherwise>
+          </c:choose>
+        </section>
       </div>
     </section>
   </main>
 
-  <!-- SHARED FOOTER -->
   <jsp:include page="layout/footer.jsp"/>
-
-  </body>
-  <script src="/js/client/main.js"></script>
+</body>
 </html>

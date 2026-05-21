@@ -32,7 +32,7 @@
                 </a>
             </div>
 
-            <input type="hidden" id="currentCustomerId" value="${sessionScope.userId}">
+            <input type="hidden" id="currentCustomerId" value="${not empty sessionScope.user ? sessionScope.user.maTK : sessionScope.userId}">
 
             <div class="order-tabs" role="tablist" aria-label="Order tabs">
                 <button class="order-tab is-active" type="button" data-tab="active" onclick="switchOrderTab('active')">

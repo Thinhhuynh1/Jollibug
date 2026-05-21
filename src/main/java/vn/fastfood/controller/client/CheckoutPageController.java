@@ -10,52 +10,39 @@ import vn.fastfood.entity.User;
 import vn.fastfood.repository.AddressRepository;
 import vn.fastfood.repository.UserRepository;
 
-@Controller
-public class CartController {
-    // cart, checkout, orders.
+import java.util.List;
 
-    @Autowired
-    private UserRepository userRepository;
+@Controller
+public class CheckoutPageController {
 
     @Autowired
     private AddressRepository addressRepository;
 
-    @GetMapping("/cart")
-    public String getCartPage() {
-        return "client/cart";
-    }
+    @Autowired
+    private UserRepository userRepository;
 
-    @GetMapping("/checkout")
-    public String getCheckoutPage(HttpSession session, Model model) {
+    @GetMapping("/checkout/change-address")
+    public String changeAddress(HttpSession session, Model model) {
         User user = getCurrentUser(session);
 
         if (user == null) {
             return "redirect:/login";
         }
 
-        DiaChi defaultAddress = addressRepository.findByUser_MaTKAndDefaultAddressTrue(user.getMaTK());
-        if (defaultAddress == null) {
-            defaultAddress = addressRepository.findFirstByUser_MaTKOrderByMaDCAsc(user.getMaTK());
-        }
+        long userId = user.getMaTK();
+        List<DiaChi> addresses = addressRepository.findByUserMaTKOrderByDefaultAddressDescMaDCAsc(userId);
 
+        System.out.println("[CHECKOUT ADDRESS] sessionUserId=" + session.getAttribute("userId")
+                + ", sessionUser=" + describeSessionUser(session)
+                + ", resolvedUserId=" + userId
+                + ", email=" + user.getEmail()
+                + ", addressCount=" + addresses.size());
+
+        model.addAttribute("addresses", addresses);
         model.addAttribute("checkoutUser", user);
         model.addAttribute("currentUser", user);
-        model.addAttribute("defaultAddress", defaultAddress);
 
-        System.out.println("[CHECKOUT PAGE] userId=" + user.getMaTK()
-                + ", email=" + user.getEmail());
-
-        return "client/checkout/show";
-    }
-
-    @GetMapping("/checkout/changeAddress")
-    public String oldChangeAddressRoute() {
-        return "redirect:/checkout/change-address";
-    }
-
-    @GetMapping("/pay")
-    public String getPayPage() {
-        return "client/pay";
+        return "client/checkout/changeAddress";
     }
 
     private User getCurrentUser(HttpSession session) {
@@ -74,5 +61,18 @@ public class CartController {
         }
 
         return null;
+    }
+
+    private String describeSessionUser(HttpSession session) {
+        if (session == null) {
+            return "null";
+        }
+
+        Object userObj = session.getAttribute("user");
+        if (userObj instanceof User user) {
+            return "user{maTK=" + user.getMaTK() + "}";
+        }
+
+        return String.valueOf(userObj);
     }
 }

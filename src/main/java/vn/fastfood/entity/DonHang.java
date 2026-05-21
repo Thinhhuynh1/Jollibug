@@ -37,21 +37,15 @@ public class DonHang {
     private Long maDH;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "MaTK")
+    @JoinColumn(name = "MaTK_KH")
     private User user;
 
-    @Column(name = "TongTien")
+    @Column(name = "ThanhTien")
     private Long tongTien;
 
     // PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED
-    @Column(name = "TrangThai")
+    @Column(name = "TrangThaiDon")
     private String trangThai;
-
-    @Column(name = "DiaChiGiaoHang")
-    private String diaChiGiaoHang;
-
-    @Column(name = "SDTNhanHang", length = 15)
-    private String sdtNhanHang;
 
     @Column(name = "GhiChu")
     private String ghiChu;

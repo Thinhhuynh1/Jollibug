@@ -215,6 +215,94 @@ function getCurrentCustomerId() {
     return input ? input.value : "";
 }
 
+async function submitReview() {
+    const orderId = getOrderIdFromUrl();
+    const customerId = Number(getCurrentCustomerId());
+    const maMon = Number(document.getElementById("reviewMaMon")?.value || 0);
+    const sao = Number(document.getElementById("reviewSao")?.value || 0);
+    const noiDung = document.getElementById("reviewNoiDung")?.value?.trim() || "";
+
+    if (!orderId || !customerId || !maMon) {
+        alert("Thiếu thông tin đánh giá.");
+        return;
+    }
+
+    if (!sao || sao < 1 || sao > 5) {
+        alert("Vui lòng chọn số sao hợp lệ.");
+        return;
+    }
+
+    if (!noiDung) {
+        alert("Vui lòng nhập nội dung đánh giá.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/reviews`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                customerId,
+                maMon,
+                sao,
+                noiDung
+            })
+        });
+
+        const data = await response.json();
+        alert(data.message || (response.ok ? "Đánh giá thành công." : "Không thể gửi đánh giá."));
+
+        if (response.ok) {
+            closeReviewModal();
+        }
+    } catch (error) {
+        alert("Lỗi khi gửi đánh giá.");
+    }
+}
+
+function previewReviewImage(event) {
+    const file = event?.target?.files?.[0];
+    const preview = document.getElementById("reviewImagePreview");
+
+    if (!preview) return;
+
+    if (!file) {
+        preview.classList.add("hidden");
+        preview.innerHTML = "";
+        return;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    preview.innerHTML = `<img src="${imageUrl}" alt="Review preview">`;
+    preview.classList.remove("hidden");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const stars = document.querySelectorAll(".review-star");
+    const saoInput = document.getElementById("reviewSao");
+
+    if (!stars.length || !saoInput) return;
+
+    const updateStars = (rating) => {
+        stars.forEach((star) => {
+            const value = Number(star.dataset.rating || 0);
+            star.classList.toggle("is-active", value <= rating);
+        });
+    };
+
+    updateStars(Number(saoInput.value || 5));
+
+    stars.forEach((star) => {
+        star.addEventListener("click", () => {
+            const rating = Number(star.dataset.rating || 0);
+            saoInput.value = String(rating);
+            updateStars(rating);
+        });
+    });
+});
+
 function showMessage(message) {
     const el = document.getElementById("message");
     if (el) el.textContent = message;

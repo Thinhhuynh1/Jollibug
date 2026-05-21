@@ -2,6 +2,8 @@ package vn.fastfood.model;
 
 import java.sql.Timestamp;
 
+import vn.fastfood.entity.User;
+
 public class Review {
     private long maDG;
     private long maTKKH;
@@ -10,6 +12,7 @@ public class Review {
     private int sao;
     private String noiDung;
     private Timestamp ngayDG;
+    private User khachHang;
 
     public Review() {
     }
@@ -68,5 +71,13 @@ public class Review {
 
     public void setNgayDG(Timestamp ngayDG) {
         this.ngayDG = ngayDG;
+    }
+
+    public User getKhachHang() {
+        return khachHang;
+    }
+
+    public void setKhachHang(User khachHang) {
+        this.khachHang = khachHang;
     }
 }

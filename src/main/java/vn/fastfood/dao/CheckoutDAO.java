@@ -1,12 +1,16 @@
 package vn.fastfood.dao;
 
-import vn.fastfood.config.DBConnection;
-import vn.fastfood.model.CheckoutCartItem;
-
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import vn.fastfood.config.DBConnection;
+import vn.fastfood.model.CheckoutCartItem;
 
 public class CheckoutDAO {
 
@@ -14,18 +18,17 @@ public class CheckoutDAO {
         List<CheckoutCartItem> items = new ArrayList<>();
 
         String sql = """
-                    SELECT m.MaMon,
-                           m.TenMon,
-                           ct.SLuong,
-                           m.Gia AS DonGia,
-                           (ct.SLuong * m.Gia) AS ThanhTien
-                    FROM GIOHANG gh
-                    JOIN CHITIETGH ct ON gh.MaGH = ct.MaGH
-                    JOIN MONAN m ON ct.MaMon = m.MaMon
-                    WHERE gh.MaTK = ?
-                      AND m.IsAvailable = 1
-                    ORDER BY ct.added_at DESC
-                """;
+            SELECT m.MAMON,
+                   m.TENMON,
+                   ct.SOLUONG,
+                   m.GIA AS DONGIA,
+                   (ct.SOLUONG * m.GIA) AS THANHTIEN
+            FROM GIOHANG gh
+            JOIN CHITIETGH ct ON gh.MAGH = ct.MAGH
+            JOIN MONAN m ON ct.MAMON = m.MAMON
+            WHERE gh.MATK = ?
+              AND m.ISAVAILABLE = 1
+        """;
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -35,13 +38,11 @@ public class CheckoutDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     CheckoutCartItem item = new CheckoutCartItem();
-
-                    item.setMaMon(rs.getLong("MaMon"));
-                    item.setTenMon(rs.getString("TenMon"));
-                    item.setSoLuong(rs.getInt("SLuong"));
-                    item.setDonGia(rs.getBigDecimal("DonGia"));
-                    item.setThanhTien(rs.getBigDecimal("ThanhTien"));
-
+                    item.setMaMon(rs.getLong("MAMON"));
+                    item.setTenMon(rs.getString("TENMON"));
+                    item.setSoLuong(rs.getInt("SOLUONG"));
+                    item.setDonGia(rs.getBigDecimal("DONGIA"));
+                    item.setThanhTien(rs.getBigDecimal("THANHTIEN"));
                     items.add(item);
                 }
             }
@@ -59,11 +60,11 @@ public class CheckoutDAO {
         }
 
         String sql = """
-                    SELECT MaGG
-                    FROM MAGIAMGIA
-                    WHERE UPPER(MaCode) = UPPER(?)
-                      AND CURRENT_TIMESTAMP BETWEEN NgayBatDau AND NgayKetThuc
-                """;
+            SELECT MAGG
+            FROM MAGIAMGIA
+            WHERE UPPER(MACODE) = UPPER(?)
+              AND CURRENT_TIMESTAMP BETWEEN NGAYBATDAU AND NGAYKETTHUC
+        """;
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -72,12 +73,12 @@ public class CheckoutDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getLong("MaGG");
+                    return rs.getLong("MAGG");
                 }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("[CHECKOUT] Could not resolve discount id for code: " + discountCode);
         }
 
         return null;
@@ -89,11 +90,11 @@ public class CheckoutDAO {
         }
 
         String sql = """
-                    SELECT LoaiGiam, MucGiam, DieuKien
-                    FROM MAGIAMGIA
-                    WHERE UPPER(MaCode) = UPPER(?)
-                      AND CURRENT_TIMESTAMP BETWEEN NgayBatDau AND NgayKetThuc
-                """;
+            SELECT LOAIGIAM, MUCGIAM, DIEUKIEN
+            FROM MAGIAMGIA
+            WHERE UPPER(MACODE) = UPPER(?)
+              AND CURRENT_TIMESTAMP BETWEEN NGAYBATDAU AND NGAYKETTHUC
+        """;
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -102,30 +103,26 @@ public class CheckoutDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    String loaiGiam = rs.getString("LoaiGiam");
-                    BigDecimal mucGiam = rs.getBigDecimal("MucGiam");
-                    BigDecimal dieuKien = rs.getBigDecimal("DieuKien");
+                    String loaiGiam = rs.getString("LOAIGIAM");
+                    BigDecimal mucGiam = rs.getBigDecimal("MUCGIAM");
+                    BigDecimal dieuKien = rs.getBigDecimal("DIEUKIEN");
 
                     if (dieuKien != null && subtotal.compareTo(dieuKien) < 0) {
                         return BigDecimal.ZERO;
                     }
 
-                    if ("PERCENT".equalsIgnoreCase(loaiGiam)) {
+                    if ("PERCENT".equalsIgnoreCase(loaiGiam) || "PERCENTAGE".equalsIgnoreCase(loaiGiam)) {
                         return subtotal.multiply(mucGiam).divide(BigDecimal.valueOf(100));
                     }
 
                     if ("AMOUNT".equalsIgnoreCase(loaiGiam)) {
-                        if (mucGiam.compareTo(subtotal) > 0) {
-                            return subtotal;
-                        }
-
-                        return mucGiam;
+                        return mucGiam.min(subtotal);
                     }
                 }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("[CHECKOUT] Skipping discount because MAGIAMGIA lookup failed.");
         }
 
         return BigDecimal.ZERO;
@@ -138,23 +135,31 @@ public class CheckoutDAO {
             BigDecimal tienGiamGia,
             BigDecimal thanhTien,
             Long maGG,
-            String ghiChu) throws SQLException {
-
+            String ghiChu
+    ) throws SQLException {
         String sql = """
-                    INSERT INTO DONHANG (
-                        MaTK_KH, MaTK_NV, NgayDat, MaDC,
-                        TongTienMon, TienGiamGia, ThanhTien,
-                        TrangThaiDon, MaGG, GhiChu
-                    )
-                    VALUES (?, NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, 'PENDING', ?, ?)
-                """;
+            INSERT INTO DONHANG (
+                MATK_KH,
+                MATK_NV,
+                NGAYDAT,
+                MADC,
+                TONGTIENMON,
+                TIENGIAMGIA,
+                THANHTIEN,
+                TRANGTHAIDON,
+                MAGG,
+                GHICHU,
+                UPDATED_AT
+            )
+            VALUES (?, NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, 'PENDING', ?, ?, CURRENT_TIMESTAMP)
+        """;
 
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql, new String[] { "MaDH" })) {
+             PreparedStatement ps = conn.prepareStatement(sql, new String[]{"MADH"})) {
 
             ps.setLong(1, customerId);
 
-            if (maDC == null) {
+            if (maDC == null || maDC <= 0) {
                 ps.setNull(2, Types.NUMERIC);
             } else {
                 ps.setLong(2, maDC);
@@ -170,7 +175,11 @@ public class CheckoutDAO {
                 ps.setLong(6, maGG);
             }
 
-            ps.setString(7, ghiChu);
+            if (ghiChu == null || ghiChu.trim().isEmpty()) {
+                ps.setNull(7, Types.CLOB);
+            } else {
+                ps.setString(7, ghiChu.trim());
+            }
 
             ps.executeUpdate();
 
@@ -181,16 +190,21 @@ public class CheckoutDAO {
             }
         }
 
-        throw new SQLException("Không lấy được mã đơn hàng vừa tạo.");
+        throw new SQLException("Could not get generated order id after creating DONHANG.");
     }
 
     public void createOrderItem(long orderId, CheckoutCartItem item) throws SQLException {
         String sql = """
-                    INSERT INTO CHITIETDH (
-                        MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?)
-                """;
+            INSERT INTO CHITIETDH (
+                MADH,
+                MAMON,
+                TENMON,
+                SOLUONG,
+                DONGIA,
+                THANHTIEN
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """;
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -201,20 +215,17 @@ public class CheckoutDAO {
             ps.setInt(4, item.getSoLuong());
             ps.setBigDecimal(5, item.getDonGia());
             ps.setBigDecimal(6, item.getThanhTien());
-
             ps.executeUpdate();
         }
     }
 
     public void createPayment(long orderId, String maPT, BigDecimal amount) throws SQLException {
         String sql = """
-                    INSERT INTO THANHTOAN (
-                        MaDH, MaPT, NgayTT, SoTien, TrangThaiTT
-                    )
-                    VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
-                """;
-
-        String paymentStatus = "Pending";
+            INSERT INTO THANHTOAN (
+                MADH, MAPT, NGAYTT, SOTIEN, TRANGTHAITT
+            )
+            VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
+        """;
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -222,23 +233,22 @@ public class CheckoutDAO {
             ps.setLong(1, orderId);
             ps.setString(2, maPT);
             ps.setBigDecimal(3, amount);
-            ps.setString(4, paymentStatus);
-
+            ps.setString(4, "Pending");
             ps.executeUpdate();
         }
     }
 
     public boolean isValidAddress(long customerId, Long maDC) {
-        if (maDC == null) {
+        if (maDC == null || maDC <= 0) {
             return false;
         }
 
         String sql = """
-                    SELECT COUNT(*)
-                    FROM DIACHI
-                    WHERE MaDC = ?
-                      AND MaTK = ?
-                """;
+            SELECT COUNT(*)
+            FROM DIACHI
+            WHERE MADC = ?
+              AND MATK = ?
+        """;
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -247,13 +257,11 @@ public class CheckoutDAO {
             ps.setLong(2, customerId);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
+                return rs.next() && rs.getInt(1) > 0;
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("[CHECKOUT] Failed to validate address for customerId=" + customerId + ", maDC=" + maDC);
         }
 
         return false;
@@ -264,21 +272,28 @@ public class CheckoutDAO {
             return false;
         }
 
+        String normalizedMaPT = maPT.trim().toUpperCase();
+
+        if ("COD".equals(normalizedMaPT)
+                || "BANK".equals(normalizedMaPT)
+                || "EWALLET".equals(normalizedMaPT)
+                || "CREDIT_CARD".equals(normalizedMaPT)) {
+            return true;
+        }
+
         String sql = """
-                    SELECT COUNT(*)
-                    FROM PHUONGTHUCTT
-                    WHERE MaPT = ?
-                """;
+            SELECT COUNT(*)
+            FROM PHUONGTHUCTT
+            WHERE MAPT = ?
+        """;
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, maPT.trim().toUpperCase());
+            ps.setString(1, normalizedMaPT);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
+                return rs.next() && rs.getInt(1) > 0;
             }
 
         } catch (SQLException e) {

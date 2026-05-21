@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import vn.fastfood.dao.ReviewDAO;
 import vn.fastfood.entity.MonAn;
 import vn.fastfood.model.CartItem;
 import vn.fastfood.repository.DanhMucRepository;
@@ -26,6 +27,7 @@ public class MenuController {
     private final MonAnRepository monAnRepository;
     private final DanhMucRepository danhMucRepository;
     private final PromotionService promotionService;
+    private final ReviewDAO reviewDAO = new ReviewDAO();
 
     public MenuController(MonAnRepository monAnRepository,
             DanhMucRepository danhMucRepository,
@@ -65,6 +67,10 @@ public class MenuController {
     public String getProductDetail(Model model,
             @RequestParam("productID") Long productID) {
         MonAn monAn = this.monAnRepository.findProduct(productID);
+        model.addAttribute("monAn", monAn);
+        model.addAttribute("productReviews", this.reviewDAO.findReviewsByProduct(productID));
+        model.addAttribute("averageRating", this.reviewDAO.getAverageRatingByProduct(productID));
+        model.addAttribute("reviewCount", this.reviewDAO.countReviewsByProduct(productID));
         if (monAn != null) {
             this.promotionService.applyPromotions(java.util.List.of(monAn));
         }

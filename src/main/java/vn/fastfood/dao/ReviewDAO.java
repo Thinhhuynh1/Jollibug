@@ -1,13 +1,110 @@
 package vn.fastfood.dao;
 
-import vn.fastfood.config.DBConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import vn.fastfood.config.DBConnection;
+import vn.fastfood.entity.User;
+import vn.fastfood.model.Review;
 
 public class ReviewDAO {
+
+    public List<Review> findReviewsByProduct(long maMon) {
+        String sql = """
+            SELECT dg.MaDG, dg.MaTK_KH, dg.MaMon, dg.MaDH, dg.Sao, dg.NoiDung, dg.NgayDG, nd.HoTen
+            FROM DANHGIA dg
+            JOIN NGUOIDUNG nd ON nd.MaTK = dg.MaTK_KH
+            WHERE dg.MaMon = ?
+            ORDER BY dg.NgayDG DESC
+        """;
+
+        List<Review> reviews = new ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, maMon);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Review review = new Review();
+
+                    User khachHang = new User();
+                    khachHang.setMaTK(rs.getLong("MaTK_KH"));
+                    khachHang.setHoTen(rs.getString("HoTen"));
+
+                    review.setMaDG(rs.getLong("MaDG"));
+                    review.setMaTKKH(rs.getLong("MaTK_KH"));
+                    review.setMaMon(rs.getLong("MaMon"));
+                    review.setMaDH(rs.getLong("MaDH"));
+                    review.setSao(rs.getInt("Sao"));
+                    review.setNoiDung(rs.getString("NoiDung"));
+                    review.setNgayDG(rs.getTimestamp("NgayDG"));
+                    review.setKhachHang(khachHang);
+                    reviews.add(review);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
+    }
+
+    public double getAverageRatingByProduct(long maMon) {
+        String sql = """
+            SELECT NVL(AVG(Sao), 0)
+            FROM DANHGIA
+            WHERE MaMon = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, maMon);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int countReviewsByProduct(long maMon) {
+        String sql = """
+            SELECT COUNT(*)
+            FROM DANHGIA
+            WHERE MaMon = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, maMon);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 
     public boolean isOrderDelivered(long orderId, long customerId) {
         String sql = """

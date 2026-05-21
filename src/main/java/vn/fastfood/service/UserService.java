@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import jakarta.servlet.http.HttpSession;
 import vn.fastfood.entity.User;
 import vn.fastfood.entity.VaiTro;
@@ -25,6 +27,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     UserService(VaiTroRepository roleRepository) {
         this.roleRepository = roleRepository;
@@ -52,16 +57,16 @@ public class UserService {
     }
 
     public User login(String email, String password) {
-        User user = userRepository.findByEmail(email);
+        email = email == null ? "" : email.trim().toLowerCase();
+        User user = userRepository.findByEmailClean(email);
+
         if (user == null) {
             throw new RuntimeException("Email không tồn tại");
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Mật khẩu sai");
         }
-        if ("BANNED".equalsIgnoreCase(user.getTrangThai())) {
-            throw new RuntimeException("Tài khoản này đã bị khóa");
-        }
+
         return user;
     }
 
