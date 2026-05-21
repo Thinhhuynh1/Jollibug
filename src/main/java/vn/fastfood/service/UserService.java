@@ -3,10 +3,9 @@ package vn.fastfood.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import jakarta.servlet.http.HttpSession;
 import vn.fastfood.entity.User;
