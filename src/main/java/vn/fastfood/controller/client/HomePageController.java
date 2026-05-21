@@ -22,18 +22,23 @@ public class HomePageController {
     private final MonAnRepository monAnRepository;
     private final YeuCauHoTroRepository yeuCauRepo;
     private final ChiTietHoTroRepository chiTietRepo;
+    private final vn.fastfood.service.PromotionService promotionService;
 
     HomePageController(MonAnRepository monAnRepository,
             YeuCauHoTroRepository yeuCauRepo,
-            ChiTietHoTroRepository chiTietRepo) {
+            ChiTietHoTroRepository chiTietRepo,
+            vn.fastfood.service.PromotionService promotionService) {
         this.monAnRepository = monAnRepository;
         this.yeuCauRepo = yeuCauRepo;
         this.chiTietRepo = chiTietRepo;
+        this.promotionService = promotionService;
     }
 
     @GetMapping("/")
     public String getHomePage(Model model) {
-        model.addAttribute("listMonAn", this.monAnRepository.findMonAnBestSeller(null, ""));
+        List<vn.fastfood.entity.MonAn> list = this.monAnRepository.findMonAnBestSeller(null, "");
+        this.promotionService.applyPromotions(list);
+        model.addAttribute("listMonAn", list);
         return "client/homepage";
     }
 

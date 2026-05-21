@@ -31,7 +31,7 @@ public class CheckoutDAO {
         """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, customerId);
 
@@ -67,7 +67,7 @@ public class CheckoutDAO {
         """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, discountCode.trim());
 
@@ -97,7 +97,7 @@ public class CheckoutDAO {
         """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, discountCode.trim());
 
@@ -207,7 +207,7 @@ public class CheckoutDAO {
         """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, orderId);
             ps.setLong(2, item.getMaMon());
@@ -228,7 +228,7 @@ public class CheckoutDAO {
         """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, orderId);
             ps.setString(2, maPT);
@@ -251,7 +251,7 @@ public class CheckoutDAO {
         """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, maDC);
             ps.setLong(2, customerId);
@@ -288,7 +288,7 @@ public class CheckoutDAO {
         """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, normalizedMaPT);
 

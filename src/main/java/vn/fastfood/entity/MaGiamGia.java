@@ -66,13 +66,15 @@ public class MaGiamGia {
 
     @Transient
     public String getNgayBatDauValue() {
-        if (ngayBatDau == null) return "";
+        if (ngayBatDau == null)
+            return "";
         return ngayBatDau.toLocalDate().toString();
     }
 
     @Transient
     public String getNgayKetThucValue() {
-        if (ngayKetThuc == null) return "";
+        if (ngayKetThuc == null)
+            return "";
         return ngayKetThuc.toLocalDate().toString();
     }
 

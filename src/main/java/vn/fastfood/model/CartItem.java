@@ -8,6 +8,7 @@ public class CartItem {
     private String tenMon;
     private int soLuong;
     private BigDecimal donGia;
+    private BigDecimal donGiaGoc;
     private BigDecimal thanhTien;
     private String imageUrl;
 
@@ -68,5 +69,13 @@ public class CartItem {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public BigDecimal getDonGiaGoc() {
+        return donGiaGoc != null ? donGiaGoc : donGia;
+    }
+
+    public void setDonGiaGoc(BigDecimal donGiaGoc) {
+        this.donGiaGoc = donGiaGoc;
     }
 }

@@ -100,8 +100,7 @@ public class CheckoutService {
                     "PENDING",
                     "CUSTOMER",
                     customerId,
-                    null
-            );
+                    null);
 
             if (!historyRecorded) {
                 System.out.println("[ORDER HISTORY] Could not record initial PENDING history for orderId=" + orderId);
@@ -132,8 +131,7 @@ public class CheckoutService {
                     null,
                     subtotal,
                     discountAmount,
-                    total
-            );
+                    total);
         }
     }
 
