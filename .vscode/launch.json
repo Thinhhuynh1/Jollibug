@@ -3,7 +3,7 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Spring Boot: Jollibug",
+      "name": "Spring Boot-FastFoodApplication<fast-food>",
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "mainClass": "vn.fastfood.FastFoodApplication",

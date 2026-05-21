@@ -77,11 +77,9 @@ function renderOrderDetail(order, payment) {
 
     if (!content) return;
 
+    const delivery = parseDeliveryInfo(order.ghiChu);
     const paymentStatus = payment ? displayPaymentStatus(payment.trangThaiTT) : "Chưa có dữ liệu";
     const paymentMethod = payment ? displayPaymentMethod(payment.maPT) : "Chưa có dữ liệu";
-    const orderNote = getOrderNote(order);
-    const resolvedPaymentMethod = order.tenPT || (order.maPT ? displayPaymentMethod(order.maPT) : paymentMethod);
-    const resolvedPaymentStatus = order.trangThaiTT ? displayPaymentStatus(order.trangThaiTT) : paymentStatus;
 
     content.innerHTML = `
         <div class="detail-two-columns">
@@ -93,9 +91,8 @@ function renderOrderDetail(order, payment) {
                     <p><strong>Trạng thái đơn:</strong> 
                         <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
                     </p>
-                    <p><strong>Phương thức thanh toán:</strong> ${escapeHtml(resolvedPaymentMethod)}</p>
-                    <p><strong>Trạng thái thanh toán:</strong> ${escapeHtml(resolvedPaymentStatus)}</p>
-                    <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
+                    <p><strong>Phương thức thanh toán:</strong> ${order.tenPT || displayPaymentMethod(order.maPT)}</p>
+                    <p><strong>Trạng thái thanh toán:</strong> ${displayPaymentStatus(order.trangThaiTT)}</p>                    <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
                     <p><strong>Giảm giá:</strong> ${formatMoney(order.tienGiamGia)}</p>
                     <p><strong>Thành tiền:</strong> ${formatMoney(order.thanhTien)}</p>
                     <p><strong>Mã giảm giá:</strong> ${order.maGG || "-"}</p>
@@ -107,13 +104,10 @@ function renderOrderDetail(order, payment) {
 
                 <div class="detail-info-list">
                     <p><strong>Mã khách:</strong> ${order.maTKKH}</p>
-                    <p><strong>Tên khách hàng:</strong> ${escapeHtml(order.tenKhachHang || order.hoTenKhachHang || "Khách hàng #" + order.maTKKH)}</p>
-                    <p><strong>Số điện thoại:</strong> ${escapeHtml(order.sdtKhachHang || "-")}</p>
-                    <p><strong>Email:</strong> ${escapeHtml(order.emailKhachHang || "-")}</p>
-                    <p><strong>Người nhận:</strong> ${escapeHtml(order.tenNguoiNhan || "-")}</p>
-                    <p><strong>SĐT người nhận:</strong> ${escapeHtml(order.sdtNguoiNhan || "-")}</p>
-                    <p class="full"><strong>Địa chỉ giao hàng:</strong><br>${escapeHtml(order.diaChiGiaoHang || "-")}</p>
-                    <p class="full"><strong>Ghi chú khách hàng:</strong><br>${formatMultilineText(orderNote || "-")}</p>
+                    <p><strong>Tên khách hàng:</strong> ${delivery.name || order.tenKhachHang || order.hoTenKhachHang || "Khách hàng #" + order.maTKKH}</p>
+                    <p><strong>Số điện thoại:</strong> ${delivery.phone || order.sdtKhachHang || "-"}</p>
+                    <p><strong>Email:</strong> ${delivery.email || order.emailKhachHang || "-"}</p>
+                    <p class="full"><strong>Địa chỉ giao hàng:</strong><br>${delivery.address || order.diaChiGiaoHang || order.ghiChu || "-"}</p>
                 </div>
             </section>
         </div>
@@ -183,7 +177,6 @@ function displayStatus(status) {
         CONFIRMED: "Đã xác nhận",
         SHIPPING: "Đang giao",
         DELIVERED: "Đã giao",
-        RECEIVED: "Đã nhận hàng",
         CANCEL_REQUESTED: "Yêu cầu hủy",
         CANCELLED: "Đã hủy"
     };
@@ -205,22 +198,27 @@ function formatDate(value) {
     return new Date(value).toLocaleString("vi-VN");
 }
 
-function getOrderNote(order) {
-    const note = order.ghiChu ?? order.orderNote ?? order.note ?? "";
-    return typeof note === "string" ? note.trim() : "";
-}
+function parseDeliveryInfo(note) {
+    const result = {
+        name: "",
+        phone: "",
+        email: "",
+        address: ""
+    };
 
-function formatMultilineText(value) {
-    return escapeHtml(value).replace(/\n/g, "<br>");
-}
+    if (!note) return result;
 
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
+    const nameMatch = note.match(/Người nhận:\s*([^;]+)/i);
+    const phoneMatch = note.match(/SĐT:\s*([^;]+)/i);
+    const emailMatch = note.match(/Email:\s*([^;]+)/i);
+    const addressMatch = note.match(/Địa chỉ nhập:\s*([^;]+)/i) || note.match(/Địa chỉ:\s*([^;]+)/i);
+
+    result.name = nameMatch ? nameMatch[1].trim() : "";
+    result.phone = phoneMatch ? phoneMatch[1].trim() : "";
+    result.email = emailMatch ? emailMatch[1].trim() : "";
+    result.address = addressMatch ? addressMatch[1].trim() : "";
+
+    return result;
 }
 
 function displayPaymentStatus(status) {

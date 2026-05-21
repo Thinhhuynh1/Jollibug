@@ -32,26 +32,16 @@
                 <button onclick="loadStaffOrders()" class="primary-btn" type="button">Tải lại</button>
             </div>
 
-            <div class="staff-orders-tabs" role="tablist" aria-label="Staff order views">
-                <button id="ordersTabButton" class="staff-orders-tab is-active" type="button" onclick="switchStaffOrdersTab('orders')">
-                    Đơn hàng
-                </button>
-                <button id="reviewsTabButton" class="staff-orders-tab" type="button" onclick="switchStaffOrdersTab('reviews')">
-                    Đánh giá khách hàng
-                </button>
-            </div>
-
             <section class="filter-card" aria-label="Bộ lọc đơn hàng">
                 <div class="filter-grid">
                     <div class="form-group">
-                        <label id="statusFilterLabel" for="statusFilter">Trạng thái</label>
+                        <label for="statusFilter">Trạng thái</label>
                         <select id="statusFilter">
                             <option value="">Tất cả</option>
                             <option value="PENDING">Chờ xác nhận</option>
                             <option value="CONFIRMED">Đã xác nhận</option>
                             <option value="SHIPPING">Đang giao</option>
                             <option value="DELIVERED">Đã giao</option>
-                            <option value="RECEIVED">Đã nhận hàng</option>
                             <option value="CANCEL_REQUESTED">Yêu cầu hủy</option>
                             <option value="CANCELLED">Đã hủy</option>
                         </select>
@@ -83,10 +73,10 @@
 
             <section class="table-card">
                 <div class="table-card__header">
-                    <h2 id="staffTableTitle">Danh sách đơn</h2>
+                    <h2>Danh sách đơn</h2>
                 </div>
 
-                <div id="staffOrderPanel" class="table-wrap admin-table-wrap">
+                <div class="table-wrap admin-table-wrap">
                     <table class="admin-table staff-order-table">
                         <thead>
                         <tr>
@@ -100,10 +90,6 @@
                         </thead>
                         <tbody id="staffOrderTableBody"></tbody>
                     </table>
-                </div>
-
-                <div id="staffReviewPanel" class="staff-review-panel hidden">
-                    <div id="staffReviewList" class="staff-review-list"></div>
                 </div>
             </section>
         </section>

@@ -5,9 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.fastfood.dto.OrderDetailResponse;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
-import vn.fastfood.model.Review;
 import vn.fastfood.service.OrderService;
-import vn.fastfood.service.ReviewService;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +15,6 @@ import java.util.Map;
 public class StaffOrderController {
 
     private final OrderService orderService = new OrderService();
-    private final ReviewService reviewService = new ReviewService();
 
     @GetMapping
     public ResponseEntity<List<Order>> getOrdersForStaff(
@@ -28,17 +25,6 @@ public class StaffOrderController {
     ) {
         List<Order> orders = orderService.getOrdersForStaff(status, keyword, fromDate, toDate);
         return ResponseEntity.ok(orders);
-    }
-
-    @GetMapping("/reviews")
-    public ResponseEntity<List<Review>> getReviewsForStaff(
-            @RequestParam(value = "rating", required = false) String rating,
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "fromDate", required = false) String fromDate,
-            @RequestParam(value = "toDate", required = false) String toDate
-    ) {
-        List<Review> reviews = reviewService.getReviewsForStaff(rating, keyword, fromDate, toDate);
-        return ResponseEntity.ok(reviews);
     }
 
     @GetMapping("/{orderId}")

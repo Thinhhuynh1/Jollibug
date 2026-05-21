@@ -9,8 +9,6 @@ public class OrderItem {
     private int soLuong;
     private BigDecimal donGia;
     private BigDecimal thanhTien;
-    private String imageUrl;
-    private boolean reviewed;
 
     public OrderItem() {
     }
@@ -63,22 +61,6 @@ public class OrderItem {
         this.thanhTien = thanhTien;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public boolean isReviewed() {
-        return reviewed;
-    }
-
-    public void setReviewed(boolean reviewed) {
-        this.reviewed = reviewed;
-    }
-
     @Override
     public String toString() {
         return "OrderItem{" +
@@ -88,8 +70,6 @@ public class OrderItem {
                 ", soLuong=" + soLuong +
                 ", donGia=" + donGia +
                 ", thanhTien=" + thanhTien +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", reviewed=" + reviewed +
                 '}';
     }
 }

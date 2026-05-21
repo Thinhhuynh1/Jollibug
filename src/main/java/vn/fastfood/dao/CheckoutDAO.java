@@ -1,12 +1,16 @@
 package vn.fastfood.dao;
 
-import vn.fastfood.config.DBConnection;
-import vn.fastfood.model.CheckoutCartItem;
-
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import vn.fastfood.config.DBConnection;
+import vn.fastfood.model.CheckoutCartItem;
 
 public class CheckoutDAO {
 
@@ -14,16 +18,16 @@ public class CheckoutDAO {
         List<CheckoutCartItem> items = new ArrayList<>();
 
         String sql = """
-            SELECT m.MA_MON,
-                   m.TEN_MON,
-                   ct.SO_LUONG,
-                   m.GIA AS DON_GIA,
-                   (ct.SO_LUONG * m.GIA) AS THANH_TIEN
+            SELECT m.MAMON,
+                   m.TENMON,
+                   ct.SOLUONG,
+                   m.GIA AS DONGIA,
+                   (ct.SOLUONG * m.GIA) AS THANHTIEN
             FROM GIOHANG gh
             JOIN CHITIETGH ct ON gh.MAGH = ct.MAGH
-            JOIN MONAN m ON ct.MA_MON = m.MA_MON
+            JOIN MONAN m ON ct.MAMON = m.MAMON
             WHERE gh.MATK = ?
-              AND m.IS_AVAILABLE = 1
+              AND m.ISAVAILABLE = 1
         """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -34,13 +38,11 @@ public class CheckoutDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     CheckoutCartItem item = new CheckoutCartItem();
-
-                    item.setMaMon(rs.getLong("MA_MON"));
-                    item.setTenMon(rs.getString("TEN_MON"));
-                    item.setSoLuong(rs.getInt("SO_LUONG"));
-                    item.setDonGia(rs.getBigDecimal("DON_GIA"));
-                    item.setThanhTien(rs.getBigDecimal("THANH_TIEN"));
-
+                    item.setMaMon(rs.getLong("MAMON"));
+                    item.setTenMon(rs.getString("TENMON"));
+                    item.setSoLuong(rs.getInt("SOLUONG"));
+                    item.setDonGia(rs.getBigDecimal("DONGIA"));
+                    item.setThanhTien(rs.getBigDecimal("THANHTIEN"));
                     items.add(item);
                 }
             }
@@ -76,7 +78,7 @@ public class CheckoutDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println("[CHECKOUT] Không tìm thấy bảng/cột mã giảm giá hoặc mã giảm giá không hợp lệ.");
+            System.out.println("[CHECKOUT] Could not resolve discount id for code: " + discountCode);
         }
 
         return null;
@@ -109,22 +111,18 @@ public class CheckoutDAO {
                         return BigDecimal.ZERO;
                     }
 
-                    if ("PERCENT".equalsIgnoreCase(loaiGiam)) {
+                    if ("PERCENT".equalsIgnoreCase(loaiGiam) || "PERCENTAGE".equalsIgnoreCase(loaiGiam)) {
                         return subtotal.multiply(mucGiam).divide(BigDecimal.valueOf(100));
                     }
 
                     if ("AMOUNT".equalsIgnoreCase(loaiGiam)) {
-                        if (mucGiam.compareTo(subtotal) > 0) {
-                            return subtotal;
-                        }
-
-                        return mucGiam;
+                        return mucGiam.min(subtotal);
                     }
                 }
             }
 
         } catch (SQLException e) {
-            System.out.println("[CHECKOUT] Bỏ qua giảm giá do bảng/cột MAGIAMGIA chưa sẵn sàng.");
+            System.out.println("[CHECKOUT] Skipping discount because MAGIAMGIA lookup failed.");
         }
 
         return BigDecimal.ZERO;
@@ -141,87 +139,46 @@ public class CheckoutDAO {
     ) throws SQLException {
         String sql = """
             INSERT INTO DONHANG (
-                MATK,
                 MATK_KH,
                 MATK_NV,
                 NGAYDAT,
-                NGAY_DAT,
                 MADC,
-                TONGTIEN,
-                TONG_TIEN,
                 TONGTIENMON,
                 TIENGIAMGIA,
                 THANHTIEN,
-                TRANGTHAI,
-                TRANG_THAI,
                 TRANGTHAIDON,
-                SDTNHANHANG,
-                SDTNHAN_HANG,
-                DIACHIGIAOHANG,
-                DIA_CHI_GIAO_HANG,
-                GHICHU,
-                GHI_CHU,
                 MAGG,
+                GHICHU,
                 UPDATED_AT
             )
-            VALUES (
-                ?,
-                ?,
-                NULL,
-                CURRENT_TIMESTAMP,
-                CURRENT_TIMESTAMP,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                'PENDING',
-                'PENDING',
-                'PENDING',
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?,
-                CURRENT_TIMESTAMP
-            )
+            VALUES (?, NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, 'PENDING', ?, ?, CURRENT_TIMESTAMP)
         """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, new String[]{"MADH"})) {
 
-            DeliverySnapshot delivery = getDeliverySnapshot(conn, customerId, maDC);
-            String note = normalizeNote(ghiChu);
-
             ps.setLong(1, customerId);
-            ps.setLong(2, customerId);
 
             if (maDC == null || maDC <= 0) {
-                ps.setNull(3, Types.NUMERIC);
+                ps.setNull(2, Types.NUMERIC);
             } else {
-                ps.setLong(3, maDC);
+                ps.setLong(2, maDC);
             }
 
-            ps.setBigDecimal(4, thanhTien);
+            ps.setBigDecimal(3, tongTienMon);
+            ps.setBigDecimal(4, tienGiamGia);
             ps.setBigDecimal(5, thanhTien);
-            ps.setBigDecimal(6, tongTienMon);
-            ps.setBigDecimal(7, tienGiamGia);
-            ps.setBigDecimal(8, thanhTien);
-
-            ps.setString(9, delivery.phone());
-            ps.setString(10, delivery.phone());
-            ps.setString(11, delivery.address());
-            ps.setString(12, delivery.address());
-            ps.setString(13, note);
-            ps.setString(14, note);
 
             if (maGG == null) {
-                ps.setNull(15, Types.NUMERIC);
+                ps.setNull(6, Types.NUMERIC);
             } else {
-                ps.setLong(15, maGG);
+                ps.setLong(6, maGG);
+            }
+
+            if (ghiChu == null || ghiChu.trim().isEmpty()) {
+                ps.setNull(7, Types.CLOB);
+            } else {
+                ps.setString(7, ghiChu.trim());
             }
 
             ps.executeUpdate();
@@ -233,7 +190,7 @@ public class CheckoutDAO {
             }
         }
 
-        throw new SQLException("Không lấy được mã đơn hàng vừa tạo.");
+        throw new SQLException("Could not get generated order id after creating DONHANG.");
     }
 
     public void createOrderItem(long orderId, CheckoutCartItem item) throws SQLException {
@@ -241,15 +198,12 @@ public class CheckoutDAO {
             INSERT INTO CHITIETDH (
                 MADH,
                 MAMON,
-                MA_MON,
                 TENMON,
                 SOLUONG,
-                SO_LUONG,
                 DONGIA,
-                DON_GIA,
                 THANHTIEN
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
         """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -257,14 +211,10 @@ public class CheckoutDAO {
 
             ps.setLong(1, orderId);
             ps.setLong(2, item.getMaMon());
-            ps.setLong(3, item.getMaMon());
-            ps.setString(4, item.getTenMon());
-            ps.setInt(5, item.getSoLuong());
-            ps.setInt(6, item.getSoLuong());
-            ps.setBigDecimal(7, item.getDonGia());
-            ps.setBigDecimal(8, item.getDonGia());
-            ps.setBigDecimal(9, item.getThanhTien());
-
+            ps.setString(3, item.getTenMon());
+            ps.setInt(4, item.getSoLuong());
+            ps.setBigDecimal(5, item.getDonGia());
+            ps.setBigDecimal(6, item.getThanhTien());
             ps.executeUpdate();
         }
     }
@@ -277,16 +227,13 @@ public class CheckoutDAO {
             VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
         """;
 
-        String paymentStatus = "Pending";
-
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, orderId);
             ps.setString(2, maPT);
             ps.setBigDecimal(3, amount);
-            ps.setString(4, paymentStatus);
-
+            ps.setString(4, "Pending");
             ps.executeUpdate();
         }
     }
@@ -310,13 +257,11 @@ public class CheckoutDAO {
             ps.setLong(2, customerId);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
+                return rs.next() && rs.getInt(1) > 0;
             }
 
         } catch (SQLException e) {
-            System.out.println("[CHECKOUT] Không kiểm tra được địa chỉ, sẽ cho phép đặt bằng thông tin nhập tay.");
+            System.out.println("[CHECKOUT] Failed to validate address for customerId=" + customerId + ", maDC=" + maDC);
         }
 
         return false;
@@ -325,6 +270,15 @@ public class CheckoutDAO {
     public boolean isValidPaymentMethod(String maPT) {
         if (maPT == null || maPT.trim().isEmpty()) {
             return false;
+        }
+
+        String normalizedMaPT = maPT.trim().toUpperCase();
+
+        if ("COD".equals(normalizedMaPT)
+                || "BANK".equals(normalizedMaPT)
+                || "EWALLET".equals(normalizedMaPT)
+                || "CREDIT_CARD".equals(normalizedMaPT)) {
+            return true;
         }
 
         String sql = """
@@ -336,12 +290,10 @@ public class CheckoutDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, maPT.trim().toUpperCase());
+            ps.setString(1, normalizedMaPT);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
+                return rs.next() && rs.getInt(1) > 0;
             }
 
         } catch (SQLException e) {
@@ -349,56 +301,5 @@ public class CheckoutDAO {
         }
 
         return false;
-    }
-
-    private DeliverySnapshot getDeliverySnapshot(Connection conn, long customerId, Long maDC) throws SQLException {
-        if (maDC == null || maDC <= 0) {
-            return new DeliverySnapshot("", "");
-        }
-
-        String sql = """
-            SELECT
-                SDTNguoiNhan,
-                TRIM(
-                    NVL(DiaChiCuThe, '') ||
-                    CASE WHEN PhuongXa IS NOT NULL THEN ', ' || PhuongXa ELSE '' END ||
-                    CASE WHEN QuanHuyen IS NOT NULL THEN ', ' || QuanHuyen ELSE '' END ||
-                    CASE WHEN TinhThanh IS NOT NULL THEN ', ' || TinhThanh ELSE '' END
-                ) AS DiaChiGiaoHang
-            FROM DIACHI
-            WHERE MaDC = ?
-              AND MaTK = ?
-        """;
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, maDC);
-            ps.setLong(2, customerId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new DeliverySnapshot(
-                            defaultString(rs.getString("SDTNguoiNhan")),
-                            defaultString(rs.getString("DiaChiGiaoHang"))
-                    );
-                }
-            }
-        }
-
-        return new DeliverySnapshot("", "");
-    }
-
-    private String normalizeNote(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return null;
-        }
-
-        return value.trim();
-    }
-
-    private String defaultString(String value) {
-        return value == null ? "" : value.trim();
-    }
-
-    private record DeliverySnapshot(String phone, String address) {
     }
 }
