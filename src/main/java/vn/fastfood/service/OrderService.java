@@ -104,7 +104,6 @@ public class OrderService {
             responses.add(new OrderStatusHistoryResponse(
                     item.getTrangThaiCu(),
                     item.getTrangThaiMoi(),
-                    item.getNguoiThucHienLoai(),
                     item.getMaNguoiThucHien(),
                     item.getLyDo(),
                     item.getThoiGian(),
@@ -156,19 +155,6 @@ public class OrderService {
         }
 
         System.out.println("[STAFF UPDATE] result=" + result);
-
-        if (result) {
-            String historyReason = "CANCELLED".equals(normalizedNextStatus) ? cancelReason : null;
-            recordOrderStatusHistory(
-                    orderId,
-                    currentStatus,
-                    normalizedNextStatus,
-                    "STAFF",
-                    staffId,
-                    historyReason
-            );
-        }
-
         return result;
     }
 
@@ -179,49 +165,7 @@ public class OrderService {
             String newStatus,
             String reason
     ) {
-        boolean updated = orderDAO.updateOrderStatus(orderId, newStatus);
-
-        if (updated) {
-            recordOrderStatusHistory(orderId, oldStatus, newStatus, "CUSTOMER", customerId, reason);
-        }
-
-        return updated;
-    }
-
-    private void recordOrderStatusHistory(
-            long orderId,
-            String oldStatus,
-            String newStatus,
-            String actorType,
-            Long actorId,
-            String reason
-    ) {
-        boolean recorded = orderDAO.insertOrderStatusHistory(
-                orderId,
-                normalizeStatus(oldStatus).isEmpty() ? null : normalizeStatus(oldStatus),
-                normalizeStatus(newStatus),
-                normalizeActorType(actorType),
-                actorId,
-                reason
-        );
-
-        if (!recorded) {
-            System.out.println("[ORDER HISTORY] Could not record status history for orderId=" + orderId);
-        }
-    }
-
-    private String normalizeActorType(String actorType) {
-        String normalizedActorType = actorType == null ? "" : actorType.trim().toUpperCase();
-
-        if ("CUSTOMER".equals(normalizedActorType)
-                || "STAFF".equals(normalizedActorType)
-                || "MANAGER".equals(normalizedActorType)
-                || "ADMIN".equals(normalizedActorType)
-                || "SYSTEM".equals(normalizedActorType)) {
-            return normalizedActorType;
-        }
-
-        return "SYSTEM";
+        return orderDAO.updateOrderStatus(orderId, newStatus);
     }
 
     private String displayStatus(String status) {

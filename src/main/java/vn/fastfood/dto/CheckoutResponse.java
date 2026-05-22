@@ -1,20 +1,18 @@
 package vn.fastfood.dto;
 
-import java.math.BigDecimal;
-
 public class CheckoutResponse {
     private boolean success;
     private String message;
     private Long orderId;
-    private BigDecimal tongTienMon;
-    private BigDecimal tienGiamGia;
-    private BigDecimal thanhTien;
+    private Double tongTienMon;
+    private Double tienGiamGia;
+    private Double thanhTien;
 
     public CheckoutResponse() {
     }
 
     public CheckoutResponse(boolean success, String message, Long orderId,
-                            BigDecimal tongTienMon, BigDecimal tienGiamGia, BigDecimal thanhTien) {
+            Double tongTienMon, Double tienGiamGia, Double thanhTien) {
         this.success = success;
         this.message = message;
         this.orderId = orderId;
@@ -35,15 +33,15 @@ public class CheckoutResponse {
         return orderId;
     }
 
-    public BigDecimal getTongTienMon() {
+    public Double getTongTienMon() {
         return tongTienMon;
     }
 
-    public BigDecimal getTienGiamGia() {
+    public Double getTienGiamGia() {
         return tienGiamGia;
     }
 
-    public BigDecimal getThanhTien() {
+    public Double getThanhTien() {
         return thanhTien;
     }
 }

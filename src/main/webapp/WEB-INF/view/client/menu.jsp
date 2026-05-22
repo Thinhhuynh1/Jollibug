@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/client/menu.css" />
 </head>
 <body data-page="menu">
@@ -113,12 +113,61 @@
     </section>
   </main>
 
-    <!-- SHARED FOOTER -->
+    <!--  FOOTER -->
   <jsp:include page="layout/footer.jsp" />
   
+    <div class="jb-ai-chat" data-jb-ai-chat>
+    <section class="jb-ai-chat__panel" data-chat-panel aria-label="Jollibug AI chat" aria-hidden="true">
+      <header class="jb-ai-chat__header">
+        <div class="jb-ai-chat__avatar" aria-hidden="true">JB</div>
+        <div class="jb-ai-chat__identity">
+          <strong>Jollibug AI</strong>
+          <span>Trợ lý đặt món 24/7</span>
+        </div>
+        <button class="jb-ai-chat__close" type="button" data-chat-close aria-label="Đóng chat">×</button>
+      </header>
 
-  </body>
-  <script src="js/client/main.js"></script>  <!-- mui ten qua lai danh muc-->
+      <div class="jb-ai-chat__messages" data-chat-messages>
+        <div class="jb-ai-chat__bubble jb-ai-chat__bubble--bot">
+          Xin chào! 🍗 Tôi là Jollibug AI. Tôi có thể giúp bạn tìm món, gợi ý combo, hoặc giải đáp thắc mắc về menu!
+        </div>
+      </div>
+
+      <div class="jb-ai-chat__quick" aria-label="Câu hỏi gợi ý">
+        <button type="button" data-quick-reply="Gợi ý món hôm nay">Gợi ý món hôm nay</button>
+        <button type="button" data-quick-reply="Combo tiết kiệm">Combo tiết kiệm</button>
+        <button type="button" data-quick-reply="Xem menu gà rán">Xem menu gà rán</button>
+      </div>
+
+      <form class="jb-ai-chat__composer" data-chat-form>
+        <input type="text" data-chat-input placeholder="Nhập tin nhắn..." autocomplete="off" />
+        <button type="submit" aria-label="Gửi tin nhắn">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 12L20 4L16.5 20L11 13L4 12Z"></path>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+      <button class="jb-ai-chat__toggle" type="button" data-chat-toggle aria-label="Chat với AI Jollibug">
+        <span class="jb-ai-chat__tooltip">Chat với AI Jollibug</span>
+        <span class="jb-ai-chat__badge" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5V3"></path>
+          <path d="M8 3H16"></path>
+          <rect x="5" y="7" width="14" height="11" rx="4"></rect>
+          <path d="M9 12H9.01"></path>
+          <path d="M15 12H15.01"></path>
+          <path d="M10 16H14"></path>
+          <path d="M4 11H3"></path>
+          <path d="M21 11H20"></path>
+        </svg>
+      </button>
+    </div>
+
+  <script src="/js/client/main.js"></script>
+  <script src="/js/client/jollibug-ai-chat.js"></script>
+</body>
 </html>
 
 

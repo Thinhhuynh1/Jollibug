@@ -239,3 +239,143 @@ INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG) VALUES (9, 27, 
 INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG) VALUES (1, 6, 4, 5, '.', CURRENT_TIMESTAMP - INTERVAL '2' DAY);
 
 COMMIT;
+
+-- ===================================================================
+-- CHƯƠNG TRÌNH GIẢM GIÁ (PROMOTIONS)
+-- ===================================================================
+INSERT INTO CHUONGTRINHGIAMGIA (TenCT, PhanTramGiam, PhamViApDung, MaDM, DanhSachMonAn, NgayBatDau, NgayKetThuc)
+  VALUES (N'Sale Hè - Tất Cả Món', 10, 'ALL', NULL, NULL,
+    TIMESTAMP '2026-05-01 00:00:00', TIMESTAMP '2026-05-31 23:59:59');
+INSERT INTO CHUONGTRINHGIAMGIA (TenCT, PhanTramGiam, PhamViApDung, MaDM, DanhSachMonAn, NgayBatDau, NgayKetThuc)
+  VALUES (N'Khuyến Mãi Gà Rán 20%', 20, 'CATEGORY', 1, NULL,
+    TIMESTAMP '2026-05-15 00:00:00', TIMESTAMP '2026-06-15 23:59:59');
+INSERT INTO CHUONGTRINHGIAMGIA (TenCT, PhanTramGiam, PhamViApDung, MaDM, DanhSachMonAn, NgayBatDau, NgayKetThuc)
+  VALUES (N'Burger Siêu Ngon -15%', 15, 'CATEGORY', 2, NULL,
+    TIMESTAMP '2026-05-10 00:00:00', TIMESTAMP '2026-05-25 23:59:59');
+INSERT INTO CHUONGTRINHGIAMGIA (TenCT, PhanTramGiam, PhamViApDung, MaDM, DanhSachMonAn, NgayBatDau, NgayKetThuc)
+  VALUES (N'Flash Sale Cuối Tuần', 25, 'ITEM', NULL, '1,2,6,7',
+    TIMESTAMP '2026-05-17 00:00:00', TIMESTAMP '2026-05-19 23:59:59');
+INSERT INTO CHUONGTRINHGIAMGIA (TenCT, PhanTramGiam, PhamViApDung, MaDM, DanhSachMonAn, NgayBatDau, NgayKetThuc)
+  VALUES (N'Tráng Miệng Ngọt Ngào -30%', 30, 'CATEGORY', 6, NULL,
+    TIMESTAMP '2026-04-01 00:00:00', TIMESTAMP '2026-04-30 23:59:59');
+INSERT INTO CHUONGTRINHGIAMGIA (TenCT, PhanTramGiam, PhamViApDung, MaDM, DanhSachMonAn, NgayBatDau, NgayKetThuc)
+  VALUES (N'Khuyến Mãi Tháng 6', 12, 'ALL', NULL, NULL,
+    TIMESTAMP '2026-06-01 00:00:00', TIMESTAMP '2026-06-30 23:59:59');
+INSERT INTO CHUONGTRINHGIAMGIA (TenCT, PhanTramGiam, PhamViApDung, MaDM, DanhSachMonAn, NgayBatDau, NgayKetThuc)
+  VALUES (N'Ưu Đãi Thức Uống', 15, 'CATEGORY', 5, NULL,
+    TIMESTAMP '2026-03-01 00:00:00', TIMESTAMP '2026-03-31 23:59:59');
+INSERT INTO CHUONGTRINHGIAMGIA (TenCT, PhanTramGiam, PhamViApDung, MaDM, DanhSachMonAn, NgayBatDau, NgayKetThuc)
+  VALUES (N'Mì Ý Đặc Biệt -18%', 18, 'CATEGORY', 3, NULL,
+    TIMESTAMP '2026-02-14 00:00:00', TIMESTAMP '2026-02-28 23:59:59');
+COMMIT;
+
+-- ===================================================================
+-- MÃ GIẢM GIÁ (COUPONS)
+-- ===================================================================
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('WELCOME10', 'PERCENTAGE', 10, 100, N'Giảm 10% cho khách hàng mới',
+    TIMESTAMP '2026-01-01 00:00:00', TIMESTAMP '2026-12-31 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('SAVE20K', 'AMOUNT', 20000, 50, N'Giảm thẳng 20.000đ cho đơn từ 100.000đ',
+    TIMESTAMP '2026-05-01 00:00:00', TIMESTAMP '2026-05-31 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('SUMMER15', 'PERCENTAGE', 15, 200, N'Khuyến mãi hè - giảm 15%',
+    TIMESTAMP '2026-05-15 00:00:00', TIMESTAMP '2026-08-31 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('FLASH50K', 'AMOUNT', 50000, 20, N'Flash sale - giảm 50.000đ, số lượng có hạn',
+    TIMESTAMP '2026-05-19 00:00:00', TIMESTAMP '2026-05-19 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('BIRTHDAY25', 'PERCENTAGE', 25, 30, N'Ưu đãi sinh nhật - giảm 25%',
+    TIMESTAMP '2026-05-01 00:00:00', TIMESTAMP '2026-05-31 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('LOYAL30K', 'AMOUNT', 30000, 80, N'Khách hàng thân thiết - giảm 30.000đ',
+    TIMESTAMP '2026-04-01 00:00:00', TIMESTAMP '2026-06-30 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('NEWYEAR20', 'PERCENTAGE', 20, 500, N'Mừng năm mới - giảm 20%',
+    TIMESTAMP '2026-01-01 00:00:00', TIMESTAMP '2026-01-15 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('COMBO10K', 'AMOUNT', 10000, 0, N'Combo đặc biệt - đã hết lượt dùng',
+    TIMESTAMP '2026-03-01 00:00:00', TIMESTAMP '2026-03-31 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('VIP5', 'PERCENTAGE', 5, 1000, N'Giảm 5% cho thành viên VIP',
+    TIMESTAMP '2026-01-01 00:00:00', TIMESTAMP '2026-12-31 23:59:59');
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+  VALUES ('WEEKEND30', 'PERCENTAGE', 30, 100, N'Sale cuối tuần - giảm 30%',
+    TIMESTAMP '2026-05-17 00:00:00', TIMESTAMP '2026-05-18 23:59:59');
+COMMIT;
+
+-- ===================================================================
+-- ĐƠN HÀNG MẪU (SAMPLE ORDERS) - dùng cho thống kê
+-- ===================================================================
+-- Tháng 1/2026
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 115000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-01-05 10:30:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 78000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-01-08 12:00:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 135000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-01-12 18:45:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 92000, 'CANCELLED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-01-15 09:20:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 210000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-01-20 20:15:00');
+-- Tháng 2/2026
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 88000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-02-03 11:00:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 156000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-02-10 19:30:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 74000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-02-14 12:30:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 195000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-02-20 17:00:00');
+-- Tháng 3/2026
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 120000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-03-02 10:00:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 98000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-03-07 13:20:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 265000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-03-15 20:00:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 143000, 'PENDING', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-03-22 09:00:00');
+-- Tháng 4/2026
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 175000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-04-04 11:30:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 320000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-04-10 18:00:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 88000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-04-18 14:15:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 240000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-04-25 19:45:00');
+-- Tháng 5/2026 (hiện tại)
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 185000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-05-02 10:30:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 95000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-05-05 12:00:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 310000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-05-08 18:30:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 128000, 'CONFIRMED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-05-12 09:00:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 77000, 'DELIVERED', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-05-15 15:20:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (1, 420000, 'DELIVERED', N'123 Nguyễn Huệ, Q1', '0900000001', TIMESTAMP '2026-05-17 20:00:00');
+INSERT INTO DONHANG (MaTK, TongTien, TrangThai, DiaChiGiaoHang, SDTNhanHang, NgayDat)
+  VALUES (6, 156000, 'PENDING', N'45 Lê Lợi, Q1', '0900000006', TIMESTAMP '2026-05-19 08:00:00');
+COMMIT;
+
+-- ===================================================================
+-- CHI TIẾT ĐƠN HÀNG (ORDER ITEMS) - cho đơn đầu tiên
+-- ===================================================================
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (1, 1, 2, 38000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (1, 13, 1, 20000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (2, 6, 1, 45000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (2, 16, 1, 20000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (2, 22, 1, 12000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (3, 2, 2, 36000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (3, 3, 1, 42000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (3, 19, 1, 20000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 8, 2, 40000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 7, 1, 45000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 11, 2, 35000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 15, 1, 15000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 24, 3, 12000);
+COMMIT;
