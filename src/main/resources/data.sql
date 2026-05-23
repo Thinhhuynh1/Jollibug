@@ -82,21 +82,21 @@ INSERT INTO DIACHI (MaTK, TenDiaChi, TenNguoiNhan, SDTNguoiNhan, DiaChiCuThe, Ti
 INSERT INTO DIACHI (MaTK, TenDiaChi, TenNguoiNhan, SDTNguoiNhan, DiaChiCuThe, TinhThanh, QuanHuyen, PhuongXa, IsDefault) VALUES (1, 'Cong ty', 'Nguyen Bao Ai Vy', '0901000001', '789 Nguyen Van Linh', 'TP. Ho Chi Minh', 'Quan 7', 'Tan Phong', 0);
 INSERT INTO DIACHI (MaTK, TenDiaChi, TenNguoiNhan, SDTNguoiNhan, DiaChiCuThe, TinhThanh, QuanHuyen, PhuongXa, IsDefault) VALUES (1, 'Nha ban', 'Tran Thi Bao Chau', '0912000001', '22 Cach Mang Thang 8', 'TP. Ho Chi Minh', 'Quan 10', 'Phuong 5', 0);
 INSERT INTO DIACHI (MaTK, TenDiaChi, TenNguoiNhan, SDTNguoiNhan, DiaChiCuThe, TinhThanh, QuanHuyen, PhuongXa, IsDefault) VALUES (1, 'Ky tuc xa', 'Nguyen Bao Ai Vy', '0901000001', 'KTX Khu B', 'TP. Ho Chi Minh', 'Di An', 'Dong Hoa', 0);
-
+COMMIT;
 -- MA GIAM GIA
 INSERT INTO MAGIAMGIA (MaCode, LoaiGiam, MucGiam, DieuKien, NgayBatDau, NgayKetThuc, SoLanSuDung) VALUES ('JOLLI10', 'PERCENT', 10, 50000, CURRENT_TIMESTAMP - INTERVAL '1' DAY, CURRENT_TIMESTAMP + INTERVAL '30' DAY, 0);
 INSERT INTO MAGIAMGIA (MaCode, LoaiGiam, MucGiam, DieuKien, NgayBatDau, NgayKetThuc, SoLanSuDung) VALUES ('FREESHIP20', 'AMOUNT', 20000, 80000, CURRENT_TIMESTAMP - INTERVAL '1' DAY, CURRENT_TIMESTAMP + INTERVAL '30' DAY, 0);
 INSERT INTO MAGIAMGIA (MaCode, LoaiGiam, MucGiam, DieuKien, NgayBatDau, NgayKetThuc, SoLanSuDung) VALUES ('COMBO15', 'PERCENT', 15, 120000, CURRENT_TIMESTAMP - INTERVAL '1' DAY, CURRENT_TIMESTAMP + INTERVAL '20' DAY, 0);
 INSERT INTO MAGIAMGIA (MaCode, LoaiGiam, MucGiam, DieuKien, NgayBatDau, NgayKetThuc, SoLanSuDung) VALUES ('SAVE30K', 'AMOUNT', 30000, 150000, CURRENT_TIMESTAMP - INTERVAL '1' DAY, CURRENT_TIMESTAMP + INTERVAL '15' DAY, 0);
 INSERT INTO MAGIAMGIA (MaCode, LoaiGiam, MucGiam, DieuKien, NgayBatDau, NgayKetThuc, SoLanSuDung) VALUES ('VIP25', 'PERCENT', 25, 250000, CURRENT_TIMESTAMP - INTERVAL '1' DAY, CURRENT_TIMESTAMP + INTERVAL '10' DAY, 0);
-
+COMMIT;
 -- PHUONG THUC THANH TOAN
 INSERT INTO PHUONGTHUCTT (MaPT, TenPT) VALUES ('COD', 'Thanh toan khi nhan hang');
 INSERT INTO PHUONGTHUCTT (MaPT, TenPT) VALUES ('BANK', 'Chuyen khoan ngan hang');
 INSERT INTO PHUONGTHUCTT (MaPT, TenPT) VALUES ('EWALLET', 'Vi dien tu');
 INSERT INTO PHUONGTHUCTT (MaPT, TenPT) VALUES ('MOMO', 'Vi MoMo');
 INSERT INTO PHUONGTHUCTT (MaPT, TenPT) VALUES ('CREDIT_CARD', 'The tin dung / ghi no');
-
+COMMIT;
 -- DON HANG
 -- 1..5: giữ lại các trạng thái để test luồng đơn hàng
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, NULL, CURRENT_TIMESTAMP - INTERVAL '6' DAY, 1, 90000, 0, 90000, 'PENDING', NULL, 'Don PENDING de test khach huy truc tiep');
@@ -104,6 +104,7 @@ INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, 
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '4' DAY, 3, 121000, 10000, 111000, 'SHIPPING', 1, 'Don SHIPPING de test xac nhan da nhan hang');
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '3' DAY, 4, 45000, 0, 45000, 'DELIVERED', NULL, 'Don DELIVERED de test danh gia');
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, NULL, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 5, 15000, 0, 15000, 'CANCELLED', NULL, 'Don CANCELLED de test lich su don hang');
+COMMIT;
 
 -- 6..32: đơn DELIVERED để seed đánh giá cho từng món
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (6, 2, CURRENT_TIMESTAMP - INTERVAL '14' DAY, 1, 38000, 0, 38000, 'DELIVERED', NULL, 'Seed review mon 1');
@@ -133,7 +134,7 @@ INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, 
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (7, 2, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 5, 15000, 0, 15000, 'DELIVERED', NULL, 'Seed review mon 25');
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (8, 2, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 1, 7000, 0, 7000, 'DELIVERED', NULL, 'Seed review mon 26');
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (9, 2, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 2, 5000, 0, 5000, 'DELIVERED', NULL, 'Seed review mon 27');
-
+COMMIT;
 -- 33: đơn DELIVERED chưa review để test chức năng đánh giá
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 3, 42000, 0, 42000, 'DELIVERED', NULL, 'Đơn đã giao nhưng chưa có đánh giá để test tạo mới');
 
@@ -173,7 +174,7 @@ INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (31, 26, 'Kem Socola', 1, 7000, 7000);
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (32, 27, 'Kem Sua Tuoi', 1, 5000, 5000);
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (33, 3, 'Ga Phu Sot Pho Mai', 1, 42000, 42000);
-
+COMMIT;
 -- THANH TOÁN
 INSERT INTO THANHTOAN (MaDH, MaPT, NgayTT, SoTien, TrangThaiTT) VALUES (1, 'COD', CURRENT_TIMESTAMP - INTERVAL '6' DAY, 90000, 'Pending');
 INSERT INTO THANHTOAN (MaDH, MaPT, NgayTT, SoTien, TrangThaiTT) VALUES (2, 'COD', CURRENT_TIMESTAMP - INTERVAL '5' DAY, 76000, 'Pending');
@@ -208,7 +209,7 @@ INSERT INTO THANHTOAN (MaDH, MaPT, NgayTT, SoTien, TrangThaiTT) VALUES (30, 'COD
 INSERT INTO THANHTOAN (MaDH, MaPT, NgayTT, SoTien, TrangThaiTT) VALUES (31, 'BANK', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 7000, 'Paid');
 INSERT INTO THANHTOAN (MaDH, MaPT, NgayTT, SoTien, TrangThaiTT) VALUES (32, 'MOMO', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 5000, 'Paid');
 INSERT INTO THANHTOAN (MaDH, MaPT, NgayTT, SoTien, TrangThaiTT) VALUES (33, 'COD', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 42000, 'Paid');
-
+COMMIT;
 -- ĐÁNH GIÁ: mỗi món có ít nhất một đánh giá, chỉ gắn với đơn đã giao
 INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG) VALUES (6, 1, 6, 5, '.', CURRENT_TIMESTAMP - INTERVAL '13' DAY);
 INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG) VALUES (7, 2, 7, 4, '.', CURRENT_TIMESTAMP - INTERVAL '13' DAY);

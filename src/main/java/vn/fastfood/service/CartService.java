@@ -4,10 +4,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import vn.fastfood.dao.CartDAO;
+import vn.fastfood.entity.MonAn;
 import vn.fastfood.model.CartItem;
+import vn.fastfood.repository.MonAnRepository;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
+import jakarta.servlet.http.HttpSession;
+
+@Service
 public class CartService {
     private final CartDAO cartDAO = new CartDAO();
     private final MonAnRepository monAnRepository;
@@ -73,5 +80,25 @@ public class CartService {
 
     public boolean removeItem(long customerId, long maMon) {
         return cartDAO.removeCartItem(customerId, maMon);
+    }
+
+    private CartItem findCartItem(List<CartItem> cart, long maMon) {
+        for (CartItem item : cart) {
+            if (item.getMaMon() == maMon) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private int countCartItems(List<CartItem> cart) {
+        int total = 0;
+        for (CartItem item : cart) {
+            total += item.getSoLuong();
+        }
+        return total;
+    }
+
+    public record CartAddResult(boolean success, String message, int cartCount) {
     }
 }
