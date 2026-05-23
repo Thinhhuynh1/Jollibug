@@ -1,5 +1,12 @@
 package vn.fastfood.service;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,8 +20,17 @@ public class AddressService {
     @Autowired
     private AddressRepository addressRepository;
 
+    @Autowired
+    private DataSource dataSource;
+
     public DiaChi saveDiaChi(DiaChi diaChi) {
-        return this.addressRepository.save(diaChi);
+        if (diaChi.getMaDC() > 0) {
+            updateAddress(diaChi);
+            return this.addressRepository.findByMaDC(diaChi.getMaDC());
+        }
+
+        long maDC = createAddress(diaChi);
+        return this.addressRepository.findByMaDC(maDC);
     }
 
     public DiaChi findDiaChi(long maDC) {
@@ -25,6 +41,21 @@ public class AddressService {
         return this.addressRepository.countByUser_MaTK(maTK) > 0;
     }
 
+    private void callProcedure(String sql, SqlConsumer consumer) {
+        try (Connection connection = dataSource.getConnection();
+                CallableStatement statement = connection.prepareCall(sql)) {
+            consumer.accept(statement);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Không thể chạy procedure", e);
+        }
+    }
+
+    @FunctionalInterface
+    private interface SqlConsumer {
+        void accept(CallableStatement statement) throws SQLException;
+    }
+    
     public boolean setDefaultAddress(long maTK, long maDC) {
         DiaChi selectedAddress = this.addressRepository.findByMaDC(maDC);
         if (selectedAddress == null || selectedAddress.getUser() == null
@@ -32,14 +63,10 @@ public class AddressService {
             return false;
         }
 
-        DiaChi currentDefault = this.addressRepository.findByUser_MaTKAndDefaultAddressTrue(maTK);
-        if (currentDefault != null && currentDefault.getMaDC() != maDC) {
-            currentDefault.setDefaultAddress(false);
-            this.addressRepository.save(currentDefault);
-        }
-
-        selectedAddress.setDefaultAddress(true);
-        this.addressRepository.save(selectedAddress);
+        callProcedure("{call PROC_SET_DEFAULT_ADDRESS(?, ?)}", statement -> {
+            statement.setLong(1, maTK);
+            statement.setLong(2, maDC);
+        });
         return true;
     }
 
@@ -51,17 +78,51 @@ public class AddressService {
         }
 
         boolean wasDefault = address.isDefaultAddress();
-        this.addressRepository.delete(address);
+        callProcedure("{call PROC_DELETE_ADDRESS(?)}", statement -> statement.setLong(1, maDC));
 
         if (wasDefault) {
             DiaChi nextDefault = this.addressRepository.findFirstByUser_MaTKOrderByMaDCAsc(maTK);
             if (nextDefault != null) {
-                nextDefault.setDefaultAddress(true);
-                this.addressRepository.save(nextDefault);
+                callProcedure("{call PROC_SET_DEFAULT_ADDRESS(?, ?)}", statement -> {
+                    statement.setLong(1, maTK);
+                    statement.setLong(2, nextDefault.getMaDC());
+                });
             }
         }
 
         return true;
     }
 
+    private long createAddress(DiaChi diaChi) {
+        try (Connection connection = dataSource.getConnection();
+                CallableStatement statement = connection.prepareCall("{call PROC_CREATE_ADDRESS(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}")) {
+            statement.setLong(1, diaChi.getUser().getMaTK());
+            statement.setString(2, diaChi.getTenDiaChi());
+            statement.setString(3, diaChi.getTenNguoiNhan());
+            statement.setString(4, diaChi.getSdtNguoiNhan());
+            statement.setString(5, diaChi.getDiaChiCuThe());
+            statement.setString(6, diaChi.getTinhThanh());
+            statement.setString(7, diaChi.getQuanHuyen());
+            statement.setString(8, diaChi.getPhuongXa());
+            statement.setInt(9, diaChi.isDefaultAddress() ? 1 : 0);
+            statement.registerOutParameter(10, Types.BIGINT);
+            statement.execute();
+            return statement.getLong(10);
+        } catch (SQLException e) {
+            throw new RuntimeException("Không thể chạy procedure", e);
+        }
+    }
+
+    private void updateAddress(DiaChi diaChi) {
+        callProcedure("{call PROC_UPDATE_ADDRESS(?, ?, ?, ?, ?, ?, ?, ?)}", statement -> {
+            statement.setLong(1, diaChi.getMaDC());
+            statement.setString(2, diaChi.getTenDiaChi());
+            statement.setString(3, diaChi.getTenNguoiNhan());
+            statement.setString(4, diaChi.getSdtNguoiNhan());
+            statement.setString(5, diaChi.getDiaChiCuThe());
+            statement.setString(6, diaChi.getTinhThanh());
+            statement.setString(7, diaChi.getQuanHuyen());
+            statement.setString(8, diaChi.getPhuongXa());
+        });
+    }
 }

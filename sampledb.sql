@@ -1194,7 +1194,6 @@ CREATE TABLE LICHSUTRANGTHAIDH (
     TrangThaiCu VARCHAR2(30),
     TrangThaiMoi VARCHAR2(30) NOT NULL,
 
-    NguoiThucHienLoai VARCHAR2(20) DEFAULT 'SYSTEM' NOT NULL,
     MaNguoiThucHien NUMBER,
 
     LyDo CLOB,
@@ -1214,16 +1213,6 @@ CREATE TABLE LICHSUTRANGTHAIDH (
             'CANCEL_REQUESTED',
             'CANCELLED'
         )
-    ),
-
-    CONSTRAINT CK_LSTT_NGUOI_THUC_HIEN CHECK (
-        NguoiThucHienLoai IN (
-            'CUSTOMER',
-            'STAFF',
-            'MANAGER',
-            'ADMIN',
-            'SYSTEM'
-        )
     )
 );
 
@@ -1234,7 +1223,6 @@ INSERT INTO LICHSUTRANGTHAIDH (
     MaDH,
     TrangThaiCu,
     TrangThaiMoi,
-    NguoiThucHienLoai,
     MaNguoiThucHien,
     LyDo,
     ThoiGian
@@ -1243,11 +1231,6 @@ SELECT
     MaDH,
     'PENDING',
     TrangThaiDon,
-    CASE
-        WHEN TrangThaiDon = 'CANCELLED' AND MaTK_NV IS NULL THEN 'CUSTOMER'
-        WHEN MaTK_NV IS NOT NULL THEN 'STAFF'
-        ELSE 'SYSTEM'
-    END,
     CASE
         WHEN MaTK_NV IS NOT NULL THEN MaTK_NV
         ELSE MaTK_KH

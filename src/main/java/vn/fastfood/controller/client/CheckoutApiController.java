@@ -11,7 +11,11 @@ import vn.fastfood.service.CheckoutService;
 @RestController
 @RequestMapping("/api/checkout")
 public class CheckoutApiController {
-    private final CheckoutService checkoutService = new CheckoutService();
+    private final CheckoutService checkoutService;
+
+    public CheckoutApiController(CheckoutService checkoutService) {
+        this.checkoutService = checkoutService;
+    }
 
     @PostMapping
     public ResponseEntity<CheckoutResponse> checkout(

@@ -1,25 +1,32 @@
 package vn.fastfood.service;
 
-import vn.fastfood.dao.CheckoutDAO;
-import vn.fastfood.dao.OrderDAO;
-import vn.fastfood.dto.CheckoutRequest;
-import vn.fastfood.dto.CheckoutResponse;
-import vn.fastfood.model.CartItem;
-import vn.fastfood.model.CheckoutCartItem;
-
-import jakarta.servlet.http.HttpSession;
-
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.springframework.stereotype.Service;
+
+import jakarta.servlet.http.HttpSession;
+import vn.fastfood.dao.CheckoutDAO;
+import vn.fastfood.dto.CheckoutRequest;
+import vn.fastfood.dto.CheckoutResponse;
+import vn.fastfood.entity.MaGiamGia;
+import vn.fastfood.entity.User;
+import vn.fastfood.model.CartItem;
+import vn.fastfood.model.CheckoutCartItem;
+
+@Service
 public class CheckoutService {
-    private final CheckoutDAO checkoutDAO = new CheckoutDAO();
-    private final OrderDAO orderDAO = new OrderDAO();
+    private final CheckoutDAO checkoutDAO;
+    private final CouponService couponService;
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{9,15}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+
+    public CheckoutService(CouponService couponService) {
+        this.checkoutDAO = new CheckoutDAO();
+        this.couponService = couponService;
+    }
 
     public CheckoutResponse checkout(CheckoutRequest request, HttpSession session) {
         if (request == null) {
@@ -30,26 +37,22 @@ public class CheckoutService {
             return new CheckoutResponse(false, "Phiên làm việc không hợp lệ. Vui lòng đăng nhập lại.", null, null, null, null);
         }
 
-        long customerId = request.getCustomerId();
+        Long customerId = resolveCustomerId(session);
+        if (customerId == null || customerId <= 0) {
+            return new CheckoutResponse(false, "Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.", null, null, null, null);
+        }
 
-        /*
-         * Không bắt buộc địa chỉ phải tồn tại trong bảng DIACHI.
-         * Nếu khách chọn địa chỉ đã lưu và MaDC hợp lệ, dùng MaDC đó.
-         * Nếu MaDC không hợp lệ hoặc khách nhập địa chỉ mới, vẫn cho đặt hàng,
-         * thông tin giao hàng sẽ được lưu trong GhiChu.
-         */
         Long maDC = request.getMaDC();
-
         if (maDC != null && maDC <= 0) {
             maDC = null;
         }
 
-        if (maDC == null || maDC <= 0) {
-            return new CheckoutResponse(false, "Vui lòng chọn địa chỉ giao hàng.", null, null, null, null);
+        if (maDC != null && !checkoutDAO.isValidAddress(customerId, maDC)) {
+            return new CheckoutResponse(false, "Địa chỉ giao hàng không hợp lệ hoặc không thuộc tài khoản hiện tại.", null, null, null, null);
         }
 
-        if (!checkoutDAO.isValidAddress(customerId, maDC)) {
-            return new CheckoutResponse(false, "Địa chỉ giao hàng không hợp lệ hoặc không thuộc tài khoản hiện tại.", null, null, null, null);
+        if (maDC == null && !hasText(request.getDeliveryAddress())) {
+            return new CheckoutResponse(false, "Vui lòng nhập địa chỉ giao hàng.", null, null, null, null);
         }
 
         String maPT = request.getMaPT();
@@ -58,60 +61,59 @@ public class CheckoutService {
         }
 
         maPT = maPT.trim().toUpperCase();
-
-        if (!checkoutDAO.isValidPaymentMethod(maPT)) {
+        if (!checkoutDAO.isValidPTTT(maPT)) {
             return new CheckoutResponse(false, "Phương thức thanh toán không hợp lệ.", null, null, null, null);
         }
 
         List<CheckoutCartItem> items = getCheckoutItemsFromSession(session);
-
         if (items.isEmpty()) {
             return new CheckoutResponse(false, "Giỏ hàng đang trống.", null, null, null, null);
         }
 
-        BigDecimal subtotal = BigDecimal.ZERO;
+        double subtotal = 0;
         for (CheckoutCartItem item : items) {
-            subtotal = subtotal.add(item.getThanhTien());
+            subtotal += checkoutDAO.calcSubtotal(item.getDonGia(), item.getSoLuong());
         }
 
-        BigDecimal discountAmount = checkoutDAO.calculateDiscount(request.getDiscountCode(), subtotal);
-        if (discountAmount.compareTo(subtotal) > 0) {
-            discountAmount = subtotal;
+        MaGiamGia coupon = couponService.findValidCoupon(request.getDiscountCode()).orElse(null);
+        double discountTotal = couponService.calculateDiscount(coupon, subtotal);
+        if (discountTotal > subtotal) {
+            discountTotal = subtotal;
         }
 
-        BigDecimal total = subtotal.subtract(discountAmount);
-        Long maGG = checkoutDAO.findDiscountIdByCode(request.getDiscountCode());
-        String orderNote = buildOrderNote(request);
+        double total = subtotal - discountTotal;
+        Long maGG = coupon != null ? coupon.getMaGG() : null;
+
+        String orderNote;
+        try {
+            orderNote = buildOrderNote(request);
+        } catch (IllegalArgumentException e) {
+            return new CheckoutResponse(
+                false, 
+                e.getMessage(), 
+                null, 
+                subtotal, 
+                discountTotal, 
+                total
+            );
+        }
 
         try {
             long orderId = checkoutDAO.createOrder(
                     customerId,
                     maDC,
                     subtotal,
-                    discountAmount,
+                    discountTotal,
                     total,
                     maGG,
                     orderNote
             );
-
-            boolean historyRecorded = orderDAO.insertOrderStatusHistory(
-                    orderId,
-                    null,
-                    "PENDING",
-                    "CUSTOMER",
-                    customerId,
-                    null);
-
-            if (!historyRecorded) {
-                System.out.println("[ORDER HISTORY] Could not record initial PENDING history for orderId=" + orderId);
-            }
 
             for (CheckoutCartItem item : items) {
                 checkoutDAO.createOrderItem(orderId, item);
             }
 
             checkoutDAO.createPayment(orderId, maPT, total);
-
             session.removeAttribute("cart");
 
             return new CheckoutResponse(
@@ -119,7 +121,7 @@ public class CheckoutService {
                     "Đặt hàng thành công.",
                     orderId,
                     subtotal,
-                    discountAmount,
+                    discountTotal,
                     total
             );
         } catch (SQLException e) {
@@ -130,19 +132,16 @@ public class CheckoutService {
                     "Đặt hàng thất bại do lỗi hệ thống.",
                     null,
                     subtotal,
-                    discountAmount,
-                    total);
+                    discountTotal,
+                    total
+            );
         }
     }
 
     private List<CheckoutCartItem> getCheckoutItemsFromSession(HttpSession session) {
         Object cartObj = session.getAttribute("cart");
 
-        if (cartObj == null) {
-            return new ArrayList<>();
-        }
-
-        if (!(cartObj instanceof List<?>)) {
+        if (cartObj == null || !(cartObj instanceof List<?>)) {
             return new ArrayList<>();
         }
 
@@ -155,25 +154,16 @@ public class CheckoutService {
             }
 
             CartItem cartItem = (CartItem) obj;
-
             if (cartItem.getSoLuong() <= 0) {
                 continue;
             }
 
-            if (cartItem.getDonGia() == null) {
-                continue;
-            }
-
             CheckoutCartItem item = new CheckoutCartItem();
-
             item.setMaMon(cartItem.getMaMon());
             item.setTenMon(cartItem.getTenMon());
             item.setSoLuong(cartItem.getSoLuong());
             item.setDonGia(cartItem.getDonGia());
-
-            BigDecimal thanhTien = cartItem.getDonGia().multiply(BigDecimal.valueOf(cartItem.getSoLuong()));
-            item.setThanhTien(thanhTien);
-
+            item.setThanhTien(checkoutDAO.calcSubtotal(cartItem.getDonGia(), cartItem.getSoLuong()));
             checkoutItems.add(item);
         }
 
@@ -193,21 +183,17 @@ public class CheckoutService {
 
         if (hasText(request.getDeliveryPhone())) {
             String phone = request.getDeliveryPhone().trim();
-
             if (!PHONE_PATTERN.matcher(phone).matches()) {
                 throw new IllegalArgumentException("Số điện thoại nhận hàng không hợp lệ.");
             }
-
             parts.add("SĐT: " + phone);
         }
 
         if (hasText(request.getEmail())) {
             String email = request.getEmail().trim();
-
             if (!EMAIL_PATTERN.matcher(email).matches()) {
                 throw new IllegalArgumentException("Email không hợp lệ.");
             }
-
             parts.add("Email: " + email);
         }
 
@@ -215,10 +201,28 @@ public class CheckoutService {
             parts.add("Địa chỉ nhập: " + request.getDeliveryAddress().trim());
         }
 
+        if (parts.isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng nhập thông tin giao hàng hợp lệ.");
+        }
+
         return String.join("; ", parts);
     }
 
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
+    }
+
+    private Long resolveCustomerId(HttpSession session) {
+        Object userObj = session.getAttribute("user");
+        if (userObj instanceof User user) {
+            return user.getMaTK();
+        }
+
+        Object userIdObj = session.getAttribute("userId");
+        if (userIdObj instanceof Number userIdNumber) {
+            return userIdNumber.longValue();
+        }
+
+        return null;
     }
 }

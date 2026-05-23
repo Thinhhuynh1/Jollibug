@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="/css/global.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <style>
-    /* ─── Promotion Banner ─── */
+    /* ─── Banner CTGG  ─── */
     .promo-banner {
       display: flex;
       align-items: center;
@@ -71,7 +71,7 @@
       padding: 2px 8px;
     }
 
-    /* ─── Product Specs ─── */
+    /* ─── Product  ─── */
     .product-specs {
       display: flex;
       gap: 16px;
@@ -120,7 +120,7 @@
 <body data-page="menu">
   <fmt:setLocale value="vi_VN" />
 
-  <!-- SHARED HEADER -->
+  <!-- HEADER -->
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell">
@@ -177,7 +177,7 @@
                 <div class="promo-banner">
                   <span class="promo-banner__icon">🏷️</span>
                   <span class="promo-banner__text">Đang áp dụng chương trình khuyến mãi!</span>
-                  <span class="promo-banner__badge">-<fmt:formatNumber value="${monAn.phanTramGiam}" maxFractionDigits="0" />%</span>
+                  <span class="promo-banner__badge">-<fmt:formatNumber value="${monAn.phanTramGiam}" />%</span>
                 </div>
               </c:if>
 
@@ -192,7 +192,7 @@
                       <fmt:formatNumber value="${monAn.gia}" type="number" />đ
                     </span>
                     <span class="price-block__saving">
-                      Tiết kiệm <fmt:formatNumber value="${monAn.gia - monAn.giaGiam}" type="number" />đ
+                    Giảm <fmt:formatNumber value="${monAn.gia - monAn.giaGiam}" type="number" />đ
                     </span>
                   </c:when>
                   <c:otherwise>
@@ -208,7 +208,7 @@
                 <c:if test="${not empty sessionScope.user}">
                   <form method="post" action="${pageContext.request.contextPath}/addCart">
                     <input type="hidden" name="productID" value="${monAn.maMon}">
-                    <button class="btn btn-primary" type="submit">🛒 Thêm vào giỏ</button>
+                    <button class="btn btn-primary" type="submit">Thêm vào giỏ</button>
                   </form>
                 </c:if>
                 <c:if test="${empty sessionScope.user}">
@@ -223,7 +223,7 @@
         <section class="product-reviews reveal-up">
           <div class="product-reviews__header">
             <div>
-              <p class="eyebrow">Khách hàng nói gì</p>
+              <p class="eyebrow">Danh sách Đánh giá</p>
               <h2 class="section-title">Đánh giá về ${monAn.tenMon}</h2>
             </div>
             <span class="product-reviews__pill">${reviewCount} nhận xét</span>

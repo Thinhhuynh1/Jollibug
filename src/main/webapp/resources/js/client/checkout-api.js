@@ -1,4 +1,5 @@
 const CHECKOUT_API_BASE = "/api/checkout";
+const VOUCHER_VALIDATE_API = "/api/voucher/validate";
 
 let checkoutSubtotal = 0;
 let checkoutDiscount = 0;
@@ -9,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
     restoreCheckoutAddress();
     initializeInvoiceFromSession();
     bindVoucherPreview();
+    initializeVoucherCarousel();
+    bindManualDeliveryInputs();
 
     const checkoutButton = document.getElementById("checkoutButton");
     if (checkoutButton) {
@@ -88,6 +91,21 @@ function applyAddressToForm(address) {
     setValue("delivery-address", address.address || "");
 }
 
+function bindManualDeliveryInputs() {
+    const fieldIds = ["delivery-name", "delivery-phone", "delivery-email", "delivery-address"];
+
+    fieldIds.forEach(function (id) {
+        const input = document.getElementById(id);
+        if (!input) {
+            return;
+        }
+
+        input.addEventListener("input", function () {
+            setValue("addressSelect", "");
+        });
+    });
+}
+
 function initializeInvoiceFromSession() {
     const rows = document.querySelectorAll(".checkout-session-item");
 
@@ -109,7 +127,12 @@ function bindVoucherPreview() {
     const applyButton = document.getElementById("voucher-apply");
 
     if (voucherInput) {
-        voucherInput.addEventListener("input", applyVoucherPreview);
+        voucherInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                applyVoucherPreview();
+            }
+        });
     }
 
     if (applyButton) {
@@ -117,32 +140,80 @@ function bindVoucherPreview() {
     }
 }
 
-function applyVoucherPreview() {
+function initializeVoucherCarousel() {
+    const list = document.querySelector("[data-voucher-list]");
+    const prevButton = document.querySelector('[data-voucher-arrow="prev"]');
+    const nextButton = document.querySelector('[data-voucher-arrow="next"]');
+
+    if (!list || !prevButton || !nextButton) {
+        return;
+    }
+
+    const getStep = function () {
+        const firstCard = list.querySelector(".voucher-card");
+        if (!firstCard) {
+            return 260;
+        }
+
+        const listStyles = window.getComputedStyle(list);
+        const gap = Number.parseFloat(listStyles.columnGap || listStyles.gap || "0");
+        return firstCard.getBoundingClientRect().width + gap;
+    };
+
+    const updateArrowState = function () {
+        const maxScrollLeft = Math.max(0, list.scrollWidth - list.clientWidth);
+        const current = Math.ceil(list.scrollLeft);
+
+        prevButton.classList.toggle("is-hidden", current <= 0);
+        nextButton.classList.toggle("is-hidden", current >= maxScrollLeft - 2);
+    };
+
+    prevButton.addEventListener("click", function () {
+        list.scrollBy({ left: -getStep(), behavior: "smooth" });
+    });
+
+    nextButton.addEventListener("click", function () {
+        list.scrollBy({ left: getStep(), behavior: "smooth" });
+    });
+
+    list.addEventListener("scroll", updateArrowState, { passive: true });
+    window.addEventListener("resize", updateArrowState);
+    updateArrowState();
+}
+
+async function applyVoucherPreview() {
     const code = getValue("voucher-code").trim().toUpperCase();
 
     if (!code) {
         checkoutDiscount = 0;
         updateInvoice(checkoutSubtotal, checkoutDiscount);
-        showCheckoutMessage("");
+        showVoucherMessage("");
         return;
     }
 
-    if (code === "JOLLI10") {
-        checkoutDiscount = Math.round(checkoutSubtotal * 0.1);
-        showCheckoutMessage("Da ap dung ma JOLLI10. Giam 10% tam tinh.");
-    } else if (code === "FREESHIP20") {
-        checkoutDiscount = checkoutSubtotal >= 80000 ? 20000 : 0;
-        showCheckoutMessage(
-            checkoutDiscount > 0
-                ? "Da ap dung ma FREESHIP20."
-                : "Ma FREESHIP20 chi ap dung cho don tu 80.000 VND."
+    try {
+        const response = await fetch(
+            `${VOUCHER_VALIDATE_API}?code=${encodeURIComponent(code)}&subtotal=${encodeURIComponent(checkoutSubtotal)}`
         );
-    } else {
-        checkoutDiscount = 0;
-        showCheckoutMessage("Ma giam gia se duoc kiem tra khi dat hang.");
-    }
 
-    updateInvoice(checkoutSubtotal, checkoutDiscount);
+        const data = await response.json();
+
+        if (!response.ok || !data.valid) {
+            checkoutDiscount = 0;
+            updateInvoice(checkoutSubtotal, checkoutDiscount);
+            showVoucherMessage(data.message || "Mã giảm giá không hợp lệ.");
+            return;
+        }
+
+        checkoutDiscount = Number(data.discountAmount || 0);
+        updateInvoice(checkoutSubtotal, checkoutDiscount);
+        showVoucherMessage(data.message || "Áp dụng mã giảm giá thành công.");
+    } catch (error) {
+        console.error("[VOUCHER VALIDATE ERROR]", error);
+        checkoutDiscount = 0;
+        updateInvoice(checkoutSubtotal, checkoutDiscount);
+        showVoucherMessage("Không thể kiểm tra mã giảm giá lúc này.");
+    }
 }
 
 function updateInvoice(subtotal, discount) {
@@ -189,17 +260,17 @@ async function submitCheckout() {
     };
 
     if (!payload.customerId) {
-        alert("Khong tim thay thong tin tai khoan. Vui long dang nhap lai.");
-        return;
-    }
-
-    if (!payload.maDC) {
-        alert("Vui long chon dia chi giao hang.");
+        alert("Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.");
         return;
     }
 
     if (!payload.maPT) {
-        alert("Vui long chon phuong thuc thanh toan.");
+        alert("Vui lòng chọn phương thức thanh toán.");
+        return;
+    }
+
+    if (!payload.maDC && !payload.deliveryAddress) {
+        alert("Vui lòng nhập địa chỉ giao hàng.");
         return;
     }
 
@@ -215,13 +286,13 @@ async function submitCheckout() {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            alert(data.message || "Thanh toan that bai.");
+            alert(data.message || "Thanh toán thất bại.");
             return;
         }
 
         if (payload.maPT === "COD") {
             localStorage.removeItem("selectedCheckoutAddress");
-            alert("Dat hang thanh cong");
+            alert("Đặt hàng thành công");
             window.location.href = "/orders/detail?orderId=" + encodeURIComponent(data.orderId);
             return;
         }
@@ -234,12 +305,12 @@ async function submitCheckout() {
             + encodeURIComponent(payload.maPT);
     } catch (error) {
         console.error("[CHECKOUT ERROR]", error);
-        alert("Co loi xay ra khi thanh toan. Vui long thu lai.");
+        alert("Có lỗi xảy ra khi thanh toán. Vui lòng thử lại.");
     }
 }
 
-function showCheckoutMessage(message) {
-    const messageEl = document.getElementById("checkoutMessage");
+function showVoucherMessage(message) {
+    const messageEl = document.getElementById("voucher-message");
     if (messageEl) {
         messageEl.textContent = message || "";
     }

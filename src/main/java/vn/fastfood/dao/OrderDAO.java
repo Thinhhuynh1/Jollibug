@@ -231,52 +231,6 @@ public class OrderDAO {
         return items;
     }
 
-    public boolean insertOrderStatusHistory(
-            long orderId,
-            String oldStatus,
-            String newStatus,
-            String actorType,
-            Long actorId,
-            String reason
-    ) {
-        String sql = """
-            INSERT INTO LICHSUTRANGTHAIDH (
-                MaDH,
-                TrangThaiCu,
-                TrangThaiMoi,
-                NguoiThucHienLoai,
-                MaNguoiThucHien,
-                LyDo,
-                ThoiGian
-            )
-            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setLong(1, orderId);
-            setNullableVarchar(ps, 2, oldStatus);
-            ps.setString(3, newStatus);
-            ps.setString(4, actorType);
-
-            if (actorId == null) {
-                ps.setNull(5, Types.NUMERIC);
-            } else {
-                ps.setLong(5, actorId);
-            }
-
-            setNullableClob(ps, 6, reason);
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
     public List<OrderStatusHistory> getOrderStatusHistory(long orderId) {
         List<OrderStatusHistory> history = new ArrayList<>();
 
@@ -286,7 +240,6 @@ public class OrderDAO {
                 MaDH,
                 TrangThaiCu,
                 TrangThaiMoi,
-                NguoiThucHienLoai,
                 MaNguoiThucHien,
                 LyDo,
                 ThoiGian
@@ -545,8 +498,6 @@ public class OrderDAO {
         history.setMaDH(rs.getLong("MaDH"));
         history.setTrangThaiCu(rs.getString("TrangThaiCu"));
         history.setTrangThaiMoi(rs.getString("TrangThaiMoi"));
-        history.setNguoiThucHienLoai(rs.getString("NguoiThucHienLoai"));
-
         long actorId = rs.getLong("MaNguoiThucHien");
         history.setMaNguoiThucHien(rs.wasNull() ? null : actorId);
 

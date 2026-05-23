@@ -3,7 +3,7 @@ INSERT INTO VAITRO (TenVT) VALUES ('STAFF');
 INSERT INTO VAITRO (TenVT) VALUES ('MANAGER');
 INSERT INTO VAITRO (TenVT) VALUES ('ADMIN');
 
--- Tài khoản mẫu với pass là 123456 | pass ở dưới là 123456 đổi thành BCrypt lên Page BCrypt đổi thử đi
+-- Tài khoản mẫu với mật khẩu 123456
 INSERT INTO NGUOIDUNG (Password, Email, HoTen, SDT, TrangThai, MaVT) VALUES ('$2a$12$3iN4vL5Rclp3TgCOvlYi9Ow5huS.YavR922zHw1WhfchxgPwlMq.e', 'user1@fastfood.vn', 'User A', '0900000001', 'ACTIVE', 1);
 INSERT INTO NGUOIDUNG (Password, Email, HoTen, SDT, TrangThai, MaVT) VALUES ('$2a$12$3iN4vL5Rclp3TgCOvlYi9Ow5huS.YavR922zHw1WhfchxgPwlMq.e', 'user2@fastfood.vn', 'User B', '0900000002', 'ACTIVE', 2);
 INSERT INTO NGUOIDUNG (Password, Email, HoTen, SDT, TrangThai, MaVT) VALUES ('$2a$12$3iN4vL5Rclp3TgCOvlYi9Ow5huS.YavR922zHw1WhfchxgPwlMq.e', 'user3@fastfood.vn', 'User C', '0900000003', 'ACTIVE', 3);
@@ -27,12 +27,12 @@ INSERT INTO NGUOIDUNG (Password, Email, HoTen, SDT, TrangThai, MaVT) VALUES ('$2
 
 COMMIT;
 
-INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Gà Rán', N'Các món gà rán giòn rụm', 1, SYSDATE, SYSDATE);
-INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Burger', N'Các loại burger hấp dẫn', 1, SYSDATE, SYSDATE);
-INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Mì Ý', N'Mì Ý đậm đà hương vị', 1, SYSDATE, SYSDATE);
-INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Đồ Ăn Kèm', N'Các món ăn kèm đa dạng', 1, SYSDATE, SYSDATE);
-INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Thức Uống', N'Đồ uống giải khát mát lạnh', 1, SYSDATE, SYSDATE);
-INSERT INTO danhmuc (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Tráng Miệng', N'Các món tráng miệng ngọt ngào', 1, SYSDATE, SYSDATE);
+INSERT INTO DANHMUC (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Gà rán', N'Những món gà rán giòn rụm, đậm vị và dễ ăn.', 1, SYSDATE, SYSDATE);
+INSERT INTO DANHMUC (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Burger', N'Burger nóng hổi với phần nhân đầy đặn, hợp cho bữa ăn nhanh.', 1, SYSDATE, SYSDATE);
+INSERT INTO DANHMUC (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Mì Ý', N'Mì Ý sốt đậm đà, dễ ăn và vừa miệng.', 1, SYSDATE, SYSDATE);
+INSERT INTO DANHMUC (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Đồ ăn kèm', N'Những món ăn kèm giúp bữa ăn tròn vị hơn.', 1, SYSDATE, SYSDATE);
+INSERT INTO DANHMUC (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Thức uống', N'Thức uống mát lạnh, dễ kết hợp với nhiều món chính.', 1, SYSDATE, SYSDATE);
+INSERT INTO DANHMUC (TenDM, MoTa, isAvailable, created_at, updated_at) VALUES (N'Tráng miệng', N'Các món ngọt nhẹ để khép lại bữa ăn.', 1, SYSDATE, SYSDATE);
 COMMIT;
 
 -- MON AN
@@ -145,7 +145,6 @@ INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (3, 1, 'Ga Ran Gion Cay', 2, 38000, 76000);
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (4, 6, 'Burger Bo Pho Mai', 1, 45000, 45000);
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (5, 24, 'Kem Sundae Dau', 1, 15000, 15000);
-
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (6, 1, 'Ga Ran Gion Cay', 1, 38000, 38000);
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (7, 2, 'Ga Ran Truyen Thong', 1, 36000, 36000);
 INSERT INTO CHITIETDH (MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien) VALUES (8, 3, 'Ga Phu Sot Pho Mai', 1, 42000, 42000);

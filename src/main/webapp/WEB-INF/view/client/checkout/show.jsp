@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,7 +21,7 @@
   <jsp:include page="../layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="${sessionScope.userId}">
+    <input type="hidden" id="customerId" value="${sessionScope.userId != null ? sessionScope.userId : (sessionScope.user != null ? sessionScope.user.maTK : '')}">
     <input type="hidden" id="addressSelect" value="${defaultAddress != null ? defaultAddress.maDC : ''}">
     <input type="hidden" id="currentUserName" value="${currentUser != null ? currentUser.hoTen : ''}">
     <input type="hidden" id="currentUserPhone" value="${currentUser != null ? currentUser.sdt : ''}">
@@ -60,13 +60,12 @@
             <label class="field-label" style="position: relative;">
               <span>Địa chỉ đặt hàng</span>
               <input type="text" id="delivery-address" autocomplete="off" required />
-              <!-- Dropdown gợi ý địa chỉ -->
               <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
             </label>
           </form>
 
           <div style="text-align: end;">
-            <a class="btn btn-outline" href="${pageContext.request.contextPath}/checkout/change-address" >
+            <a class="btn btn-outline" href="${pageContext.request.contextPath}/checkout/change-address">
               Đổi địa chỉ
             </a>
           </div>
@@ -111,123 +110,102 @@
             Thanh toán
           </button>
         </section>
+
         <section class="checkout-card">
           <h2 class="checkout-card__title">Tóm tắt đơn hàng</h2>
           <div id="checkoutItemList">
             <c:set var="checkoutSubtotal" value="0" />
 
             <c:forEach var="cartItem" items="${sessionScope.cart}">
-                <c:set var="checkoutSubtotal" value="${checkoutSubtotal + cartItem.thanhTien}" />
+              <c:set var="checkoutSubtotal" value="${checkoutSubtotal + cartItem.thanhTien}" />
 
-                <div class="invoice-line checkout-session-item"
-                    data-line-total="${cartItem.thanhTien}">
-                    <strong>${cartItem.soLuong}x ${cartItem.tenMon}</strong>
-                    <strong>
-                        <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> VND
-                    </strong>
-                </div>
+              <div class="invoice-line checkout-session-item" data-line-total="${cartItem.thanhTien}">
+                <strong>${cartItem.soLuong}x ${cartItem.tenMon}</strong>
+                <strong>
+                  <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> VND
+                </strong>
+              </div>
             </c:forEach>
 
             <c:if test="${empty sessionScope.cart}">
-                <div class="invoice-line">
-                    <span>Giỏ hàng đang trống</span>
-                    <strong>0 VND</strong>
-                </div>
+              <div class="invoice-line">
+                <span>Giỏ hàng đang trống</span>
+                <strong>0 VND</strong>
+              </div>
             </c:if>
-        </div>
+          </div>
 
           <hr class="checkout-divider" />
           <div class="voucher-inline">
-            <p class="section-subtitle">Bạn có Mã giảm giá?</p>
+            <p class="section-subtitle">Bạn có mã giảm giá?</p>
             <div class="voucher-box__row">
               <input id="voucher-code" type="text" placeholder="Nhập mã giảm giá" style="min-width: 0; box-sizing: border-box;" />
               <button class="btn btn-outline voucher-inline__apply" id="voucher-apply" type="button">Áp dụng</button>
             </div>
             <div id="voucher-message" style="min-height: 1.4rem; margin-top: 0.75rem; font-size: 0.95rem;"></div>
 
-            
-            <!-- Danh sách Voucher có sẵn -->
             <div class="voucher-carousel-wrapper">
               <button class="voucher-carousel-arrow voucher-carousel-arrow--prev" data-voucher-arrow="prev">❮</button>
-              
+
               <div class="voucher-carousel-list" data-voucher-list>
-                
-                <!-- Fake Voucher 1 -->
-                <div class="voucher-card">
-                  <div class="voucher-card__header">
-                    <span class="voucher-card__title">GIAM20K</span>
-                    <span class="voucher-card__tag voucher-card__tag--blue">Freeship</span>
+                <c:forEach var="coupon" items="${activeCoupons}">
+                  <div class="voucher-card">
+                    <div class="voucher-card__header">
+                      <span class="voucher-card__title">${coupon.tenMa}</span>
+                      <span class="voucher-card__tag voucher-card__tag--blue">
+                        <c:choose>
+                          <c:when test="${coupon.loaiGiam == 'AMOUNT'}">Tiền mặt</c:when>
+                          <c:otherwise>Phần trăm</c:otherwise>
+                        </c:choose>
+                      </span>
+                    </div>
+                    <p class="voucher-card__desc">
+                      <c:choose>
+                        <c:when test="${not empty coupon.moTa}">
+                          ${coupon.moTa}
+                        </c:when>
+                        <c:otherwise>
+                          Giảm ${coupon.discountDisplay}
+                          <c:if test="${coupon.dieuKien != null && coupon.dieuKien > 0}">
+                            cho đơn từ <fmt:formatNumber type="number" value="${coupon.dieuKien}" /> VND
+                          </c:if>
+                        </c:otherwise>
+                      </c:choose>
+                    </p>
+                    <div class="voucher-card__actions">
+                      <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='${coupon.tenMa}'">Chọn</button>
+                    </div>
                   </div>
-                  <p class="voucher-card__desc">Giảm 20k phí vận chuyển cho đơn từ 100k</p>
-                  <div class="voucher-card__actions">
-                    <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='GIAM20K'">Chọn</button>
-                  </div>
-                </div>
-
-                <!-- Fake Voucher 2 -->
-                <div class="voucher-card">
-                  <div class="voucher-card__header">
-                    <span class="voucher-card__title">NEWUSER50</span>
-                    <span class="voucher-card__tag voucher-card__tag--yellow">Bạn mới</span>
-                  </div>
-                  <p class="voucher-card__desc">Giảm 50% tối đa 30k cho khách mới</p>
-                  <div class="voucher-card__actions">
-                    <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='NEWUSER50'">Chọn</button>
-                  </div>
-                </div>
-
-                <!-- Fake Voucher 3 -->
-                <div class="voucher-card">
-                  <div class="voucher-card__header">
-                    <span class="voucher-card__title">HOAN10K</span>
-                    <span class="voucher-card__tag voucher-card__tag--green">Hoàn tiền</span>
-                  </div>
-                  <p class="voucher-card__desc">Hoàn ngay 10k vào ví Jollibug</p>
-                  <div class="voucher-card__actions">
-                    <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='HOAN10K'">Chọn</button>
-                  </div>
-                </div>
-
-                <!-- Fake Voucher 4 -->
-                <div class="voucher-card">
-                  <div class="voucher-card__header">
-                    <span class="voucher-card__title">LUNCH15</span>
-                    <span class="voucher-card__tag voucher-card__tag--purple">Ăn trưa</span>
-                  </div>
-                  <p class="voucher-card__desc">Giảm 15% cho khung giờ 11h-13h</p>
-                  <div class="voucher-card__actions">
-                    <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='LUNCH15'">Chọn</button>
-                  </div>
-                </div>
-
+                </c:forEach>
               </div>
+
               <button class="voucher-carousel-arrow voucher-carousel-arrow--next" data-voucher-arrow="next">❯</button>
             </div>
           </div>
-          
+
           <div>
             <div class="invoice-line">
-                <span>Tạm tính</span>
-                <strong id="invoice-subtotal">
-                    <fmt:formatNumber type="number" value="${checkoutSubtotal}" /> VND
-                </strong>
+              <span>Tạm tính</span>
+              <strong id="invoice-subtotal">
+                <fmt:formatNumber type="number" value="${checkoutSubtotal}" /> VND
+              </strong>
             </div>
 
             <div class="invoice-line">
-                <span>Phí giao hàng</span>
-                <strong id="invoice-delivery-fee">0 VND</strong>
+              <span>Phí giao hàng</span>
+              <strong id="invoice-delivery-fee">0 VND</strong>
             </div>
 
             <div class="invoice-line">
-                <span>Giảm giá</span>
-                <strong id="invoice-discount">-0 VND</strong>
+              <span>Giảm giá</span>
+              <strong id="invoice-discount">-0 VND</strong>
             </div>
 
             <div class="invoice-line summary-line--strong">
-                <span>Tổng cộng</span>
-                <strong id="invoice-total">
-                    <fmt:formatNumber type="number" value="${checkoutSubtotal}" /> VND
-                </strong>
+              <span>Tổng cộng</span>
+              <strong id="invoice-total">
+                <fmt:formatNumber type="number" value="${checkoutSubtotal}" /> VND
+              </strong>
             </div>
           </div>
         </section>
@@ -235,14 +213,9 @@
     </div>
   </main>
 
-
-
-
-    <!-- SHARED FOOTER -->
   <jsp:include page="../layout/footer.jsp" />
 
   <script src="/js/client/main.js"></script>
   <script src="${pageContext.request.contextPath}/resources/js/client/checkout-api.js" defer></script>
 </body>
 </html>
-

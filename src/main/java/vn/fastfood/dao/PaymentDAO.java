@@ -1,12 +1,12 @@
 package vn.fastfood.dao;
 
-import vn.fastfood.config.DBConnection;
-import vn.fastfood.model.Payment;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import vn.fastfood.config.DBConnection;
+import vn.fastfood.model.Payment;
 
 public class PaymentDAO {
 

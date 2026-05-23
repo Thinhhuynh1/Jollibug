@@ -1,6 +1,9 @@
 package vn.fastfood.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -22,8 +25,8 @@ public class CouponService {
             return Optional.empty();
         }
 
-        String normalizedCode = code.trim().toUpperCase();
-        Optional<MaGiamGia> coupon = couponRepository.findByTenMa(normalizedCode);
+        String codedef = code.trim().toUpperCase();
+        Optional<MaGiamGia> coupon = couponRepository.findByTenMa(codedef);
         if (coupon.isEmpty()) {
             return Optional.empty();
         }
@@ -34,6 +37,20 @@ public class CouponService {
         }
 
         return Optional.of(maGiamGia);
+    }
+
+    public List<MaGiamGia> findActiveCoupons() {
+        List<MaGiamGia> result = new ArrayList<>();
+
+        for (MaGiamGia coupon : couponRepository.findAll()) {
+            if (isCouponActive(coupon)) {
+                result.add(coupon);
+            }
+        }
+
+        result.sort(Comparator.comparing(MaGiamGia::getNgayKetThuc));
+
+        return result;
     }
 
     public double calculateDiscount(MaGiamGia coupon, double subtotal) {

@@ -1,13 +1,11 @@
 package vn.fastfood.model;
 
-import java.math.BigDecimal;
-
 public class CheckoutCartItem {
     private long maMon;
     private String tenMon;
     private int soLuong;
-    private BigDecimal donGia;
-    private BigDecimal thanhTien;
+    private double donGia;
+    private double thanhTien;
 
     public CheckoutCartItem() {
     }
@@ -36,19 +34,19 @@ public class CheckoutCartItem {
         this.soLuong = soLuong;
     }
 
-    public BigDecimal getDonGia() {
+    public double getDonGia() {
         return donGia;
     }
 
-    public void setDonGia(BigDecimal donGia) {
+    public void setDonGia(double donGia) {
         this.donGia = donGia;
     }
 
-    public BigDecimal getThanhTien() {
+    public double getThanhTien() {
         return thanhTien;
     }
 
-    public void setThanhTien(BigDecimal thanhTien) {
+    public void setThanhTien(double thanhTien) {
         this.thanhTien = thanhTien;
     }
 }

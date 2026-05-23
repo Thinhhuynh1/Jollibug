@@ -1,6 +1,6 @@
 package vn.fastfood.dao;
 
-import java.math.BigDecimal;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,12 +41,11 @@ public class CheckoutDAO {
                     item.setMaMon(rs.getLong("MAMON"));
                     item.setTenMon(rs.getString("TENMON"));
                     item.setSoLuong(rs.getInt("SOLUONG"));
-                    item.setDonGia(rs.getBigDecimal("DONGIA"));
-                    item.setThanhTien(rs.getBigDecimal("THANHTIEN"));
+                    item.setDonGia(rs.getDouble("DONGIA"));
+                    item.setThanhTien(rs.getDouble("THANHTIEN"));
                     items.add(item);
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -59,182 +58,117 @@ public class CheckoutDAO {
             return null;
         }
 
-        String sql = """
-            SELECT MAGG
-            FROM MAGIAMGIA
-            WHERE UPPER(MACODE) = UPPER(?)
-              AND CURRENT_TIMESTAMP BETWEEN NGAYBATDAU AND NGAYKETTHUC
-        """;
-
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                CallableStatement cs = conn.prepareCall("{? = call FUNC_FIND_DISCOUNT_ID(?)}")) {
 
-            ps.setString(1, discountCode.trim());
+            cs.registerOutParameter(1, Types.NUMERIC);
+            cs.setString(2, discountCode.trim());
+            cs.execute();
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getLong("MAGG");
-                }
-            }
-
+            long maGG = cs.getLong(1);
+            return cs.wasNull() ? null : maGG;
         } catch (SQLException e) {
-            System.out.println("[CHECKOUT] Could not resolve discount id for code: " + discountCode);
+            throw new RuntimeException("Không thể tìm mã giảm giá.", e);
         }
-
-        return null;
     }
 
-    public BigDecimal calculateDiscount(String discountCode, BigDecimal subtotal) {
+    public double calcDiscount(String discountCode, double subtotal) {
         if (discountCode == null || discountCode.trim().isEmpty()) {
-            return BigDecimal.ZERO;
+            return 0;
         }
-
-        String sql = """
-            SELECT LOAIGIAM, MUCGIAM, DIEUKIEN
-            FROM MAGIAMGIA
-            WHERE UPPER(MACODE) = UPPER(?)
-              AND CURRENT_TIMESTAMP BETWEEN NGAYBATDAU AND NGAYKETTHUC
-        """;
 
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                CallableStatement cs = conn.prepareCall("{? = call FUNC_CALC_DISCOUNT(?, ?)}")) {
 
-            ps.setString(1, discountCode.trim());
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String loaiGiam = rs.getString("LOAIGIAM");
-                    BigDecimal mucGiam = rs.getBigDecimal("MUCGIAM");
-                    BigDecimal dieuKien = rs.getBigDecimal("DIEUKIEN");
-
-                    if (dieuKien != null && subtotal.compareTo(dieuKien) < 0) {
-                        return BigDecimal.ZERO;
-                    }
-
-                    if ("PERCENT".equalsIgnoreCase(loaiGiam) || "PERCENTAGE".equalsIgnoreCase(loaiGiam)) {
-                        return subtotal.multiply(mucGiam).divide(BigDecimal.valueOf(100));
-                    }
-
-                    if ("AMOUNT".equalsIgnoreCase(loaiGiam)) {
-                        return mucGiam.min(subtotal);
-                    }
-                }
-            }
-
+            cs.registerOutParameter(1, Types.NUMERIC);
+            cs.setString(2, discountCode.trim());
+            cs.setDouble(3, subtotal);
+            cs.execute();
+            return cs.getDouble(1);
         } catch (SQLException e) {
-            System.out.println("[CHECKOUT] Skipping discount because MAGIAMGIA lookup failed.");
+            throw new RuntimeException("Không thể tính tiền giảm giá.", e);
         }
+    }
 
-        return BigDecimal.ZERO;
+    public double calcSubtotal(double donGia, int soLuong) {
+        try (Connection conn = DBConnection.getConnection();
+                CallableStatement cs = conn.prepareCall("{? = call FUNC_CALC_SUBTOTAL(?, ?)}")) {
+
+            cs.registerOutParameter(1, Types.NUMERIC);
+            cs.setDouble(2, donGia);
+            cs.setInt(3, soLuong);
+            cs.execute();
+            return cs.getDouble(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Không thể tính tạm tính đơn hàng.", e);
+        }
     }
 
     public long createOrder(
             long customerId,
             Long maDC,
-            BigDecimal tongTienMon,
-            BigDecimal tienGiamGia,
-            BigDecimal thanhTien,
+            double tongTienMon,
+            double tienGiamGia,
+            double thanhTien,
             Long maGG,
             String ghiChu
     ) throws SQLException {
-        String sql = """
-            INSERT INTO DONHANG (
-                MATK_KH,
-                MATK_NV,
-                NGAYDAT,
-                MADC,
-                TONGTIENMON,
-                TIENGIAMGIA,
-                THANHTIEN,
-                TRANGTHAIDON,
-                MAGG,
-                GHICHU,
-                UPDATED_AT
-            )
-            VALUES (?, NULL, CURRENT_TIMESTAMP, ?, ?, ?, ?, 'PENDING', ?, ?, CURRENT_TIMESTAMP)
-        """;
-
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, new String[]{"MADH"})) {
+                CallableStatement cs = conn.prepareCall("{call PROC_CREATE_ORDER(?, ?, ?, ?, ?, ?, ?, ?)}")) {
 
-            ps.setLong(1, customerId);
+            cs.setLong(1, customerId);
 
             if (maDC == null || maDC <= 0) {
-                ps.setNull(2, Types.NUMERIC);
+                cs.setNull(2, Types.NUMERIC);
             } else {
-                ps.setLong(2, maDC);
+                cs.setLong(2, maDC);
             }
 
-            ps.setBigDecimal(3, tongTienMon);
-            ps.setBigDecimal(4, tienGiamGia);
-            ps.setBigDecimal(5, thanhTien);
+            cs.setDouble(3, tongTienMon);
+            cs.setDouble(4, tienGiamGia);
+            cs.setDouble(5, thanhTien);
 
             if (maGG == null) {
-                ps.setNull(6, Types.NUMERIC);
+                cs.setNull(6, Types.NUMERIC);
             } else {
-                ps.setLong(6, maGG);
+                cs.setLong(6, maGG);
             }
 
             if (ghiChu == null || ghiChu.trim().isEmpty()) {
-                ps.setNull(7, Types.CLOB);
+                cs.setNull(7, Types.CLOB);
             } else {
-                ps.setString(7, ghiChu.trim());
+                cs.setString(7, ghiChu.trim());
             }
 
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getLong(1);
-                }
-            }
+            cs.registerOutParameter(8, Types.NUMERIC);
+            cs.execute();
+            return cs.getLong(8);
         }
-
-        throw new SQLException("Could not get generated order id after creating DONHANG.");
     }
 
     public void createOrderItem(long orderId, CheckoutCartItem item) throws SQLException {
-        String sql = """
-            INSERT INTO CHITIETDH (
-                MADH,
-                MAMON,
-                TENMON,
-                SOLUONG,
-                DONGIA,
-                THANHTIEN
-            )
-            VALUES (?, ?, ?, ?, ?, ?)
-        """;
-
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                CallableStatement cs = conn.prepareCall("{call PROC_CREATE_ORDER_ITEM(?, ?, ?, ?, ?, ?)}")) {
 
-            ps.setLong(1, orderId);
-            ps.setLong(2, item.getMaMon());
-            ps.setString(3, item.getTenMon());
-            ps.setInt(4, item.getSoLuong());
-            ps.setBigDecimal(5, item.getDonGia());
-            ps.setBigDecimal(6, item.getThanhTien());
-            ps.executeUpdate();
+            cs.setLong(1, orderId);
+            cs.setLong(2, item.getMaMon());
+            cs.setString(3, item.getTenMon());
+            cs.setInt(4, item.getSoLuong());
+            cs.setDouble(5, item.getDonGia());
+            cs.setDouble(6, item.getThanhTien());
+            cs.execute();
         }
     }
 
-    public void createPayment(long orderId, String maPT, BigDecimal amount) throws SQLException {
-        String sql = """
-            INSERT INTO THANHTOAN (
-                MADH, MAPT, NGAYTT, SOTIEN, TRANGTHAITT
-            )
-            VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
-        """;
-
+    public void createPayment(long orderId, String maPT, double amount) throws SQLException {
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                CallableStatement cs = conn.prepareCall("{call PROC_CREATE_PAYMENT(?, ?, ?, ?)}")) {
 
-            ps.setLong(1, orderId);
-            ps.setString(2, maPT);
-            ps.setBigDecimal(3, amount);
-            ps.setString(4, "Pending");
-            ps.executeUpdate();
+            cs.setLong(1, orderId);
+            cs.setString(2, maPT);
+            cs.setDouble(3, amount);
+            cs.setString(4, "Pending");
+            cs.execute();
         }
     }
 
@@ -243,63 +177,35 @@ public class CheckoutDAO {
             return false;
         }
 
-        String sql = """
-            SELECT COUNT(*)
-            FROM DIACHI
-            WHERE MADC = ?
-              AND MATK = ?
-        """;
-
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                CallableStatement cs = conn.prepareCall("{? = call FUNC_IS_VALID_ADDRESS(?, ?)}")) {
 
-            ps.setLong(1, maDC);
-            ps.setLong(2, customerId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-
+            cs.registerOutParameter(1, Types.NUMERIC);
+            cs.setLong(2, customerId);
+            cs.setLong(3, maDC);
+            cs.execute();
+            return cs.getInt(1) == 1;
         } catch (SQLException e) {
-            System.out.println("[CHECKOUT] Failed to validate address for customerId=" + customerId + ", maDC=" + maDC);
+            throw new RuntimeException("Không thể kiểm tra địa chỉ giao hàng. Oracle: " + e.getMessage(), e);
         }
-
-        return false;
     }
 
-    public boolean isValidPaymentMethod(String maPT) {
+    public boolean isValidPTTT(String maPT) {
         if (maPT == null || maPT.trim().isEmpty()) {
             return false;
         }
 
         String normalizedMaPT = maPT.trim().toUpperCase();
 
-        if ("COD".equals(normalizedMaPT)
-                || "BANK".equals(normalizedMaPT)
-                || "EWALLET".equals(normalizedMaPT)
-                || "CREDIT_CARD".equals(normalizedMaPT)) {
-            return true;
-        }
-
-        String sql = """
-            SELECT COUNT(*)
-            FROM PHUONGTHUCTT
-            WHERE MAPT = ?
-        """;
-
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                CallableStatement cs = conn.prepareCall("{? = call FUNC_IS_VALID_PTTT(?)}")) {
 
-            ps.setString(1, normalizedMaPT);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() && rs.getInt(1) > 0;
-            }
-
+            cs.registerOutParameter(1, Types.NUMERIC);
+            cs.setString(2, normalizedMaPT);
+            cs.execute();
+            return cs.getInt(1) == 1;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Không thể kiểm tra phương thức thanh toán. Oracle: " + e.getMessage(), e);
         }
-
-        return false;
     }
 }

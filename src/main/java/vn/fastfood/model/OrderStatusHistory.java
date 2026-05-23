@@ -7,7 +7,6 @@ public class OrderStatusHistory {
     private long maDH;
     private String trangThaiCu;
     private String trangThaiMoi;
-    private String nguoiThucHienLoai;
     private Long maNguoiThucHien;
     private String lyDo;
     private Timestamp thoiGian;
@@ -45,14 +44,6 @@ public class OrderStatusHistory {
 
     public void setTrangThaiMoi(String trangThaiMoi) {
         this.trangThaiMoi = trangThaiMoi;
-    }
-
-    public String getNguoiThucHienLoai() {
-        return nguoiThucHienLoai;
-    }
-
-    public void setNguoiThucHienLoai(String nguoiThucHienLoai) {
-        this.nguoiThucHienLoai = nguoiThucHienLoai;
     }
 
     public Long getMaNguoiThucHien() {

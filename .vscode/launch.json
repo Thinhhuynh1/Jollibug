@@ -1,4 +1,5 @@
 {
+  "version": "0.2.0",
   "configurations": [
     {
       "type": "java",
@@ -7,8 +8,8 @@
       "cwd": "${workspaceFolder}",
       "mainClass": "vn.fastfood.FastFoodApplication",
       "projectName": "fast-food",
-      "args": "",
-      "envFile": "${workspaceFolder}/.env"
+      "console": "integratedTerminal",
+      "args": ""
     }
   ]
 }
