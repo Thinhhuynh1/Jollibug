@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import vn.fastfood.entity.DanhMuc;
-import vn.fastfood.entity.MonAn;
+import vn.fastfood.dto.ProductRequest;
 import vn.fastfood.repository.DanhMucRepository;
 import vn.fastfood.repository.MonAnRepository;
 import vn.fastfood.service.ProductService;
@@ -40,7 +40,7 @@ public class ManagerProductController {
             keyword = keyword.trim();
         }
 
-        List<MonAn> listMonAn;
+        List<vn.fastfood.entity.MonAn> listMonAn;
         if ("price-low".equals(filter)) {
             listMonAn = this.monAnRepository.findMonAnPriceLow(categoryID, keyword);
         } else if ("price-high".equals(filter)) {
@@ -84,47 +84,40 @@ public class ManagerProductController {
             @RequestParam("soLuongTon") long soLuongTon,
             @RequestParam(value = "moTa", required = false) String moTa,
             @RequestParam(value = "productFile", required = false) MultipartFile productFile,
-            @RequestParam("available") boolean available) {
-        DanhMuc danhMuc = this.danhMucRepository.findById(maDM).orElse(null);
-        if (danhMuc == null) {
-            return "redirect:/manager/products";
+            @RequestParam("available") boolean available,
+            RedirectAttributes redirectAttributes) {
+        try {
+            productService.createProduct(buildRequest(tenMon, maDM, gia, soLuongTon, moTa, available), productFile);
+            redirectAttributes.addFlashAttribute("message", "Đã thêm món ăn thành công.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Không thể thêm món ăn.");
         }
-
-        MonAn monAn = new MonAn();
-        monAn.setTenMon(tenMon);
-        monAn.setDanhMuc(danhMuc);
-        monAn.setGia(gia);
-        monAn.setSoLuongTon(soLuongTon);
-        monAn.setSoLuongDaBan(0);
-        monAn.setMoTa(moTa);
-        monAn.setImg(this.productService.storeProductImage(productFile, null));
-        monAn.setAvailable(available);
-        this.monAnRepository.save(monAn);
-
         return "redirect:/manager/products";
     }
 
     @GetMapping("/manager/products/detail")
     public String getProductsDetailPage(@RequestParam(value = "productID", required = false) Long productID,
             Model model) {
-        MonAn monAn = this.monAnRepository.findProduct(productID);
-        if (monAn == null) {
-            return "redirect:/manager/products";
-        }
-        model.addAttribute("monAn", monAn);
-        return "manager/products/detail";
+        return productService.findProduct(productID)
+                .map(monAn -> {
+                    model.addAttribute("monAn", monAn);
+                    return "manager/products/detail";
+                })
+                .orElse("redirect:/manager/products");
     }
 
     @GetMapping("/manager/products/update")
     public String getProductsUpdatePage(@RequestParam(value = "productID", required = false) Long productID,
             Model model) {
-        MonAn monAn = this.monAnRepository.findProduct(productID);
-        if (monAn == null) {
-            return "redirect:/manager/products";
-        }
-        model.addAttribute("monAn", monAn);
-        model.addAttribute("listDanhMuc", this.danhMucRepository.findListDanhMuc());
-        return "manager/products/update";
+        return productService.findProduct(productID)
+                .map(monAn -> {
+                    model.addAttribute("monAn", monAn);
+                    model.addAttribute("listDanhMuc", this.danhMucRepository.findListDanhMuc());
+                    return "manager/products/update";
+                })
+                .orElse("redirect:/manager/products");
     }
 
     @PostMapping("/manager/products/update")
@@ -136,43 +129,54 @@ public class ManagerProductController {
             @RequestParam("soLuongTon") long soLuongTon,
             @RequestParam(value = "moTa", required = false) String moTa,
             @RequestParam(value = "productFile", required = false) MultipartFile productFile,
-            @RequestParam("available") boolean available) {
-        MonAn monAn = this.monAnRepository.findProduct(productID);
-        DanhMuc danhMuc = this.danhMucRepository.findById(maDM).orElse(null);
-        if (monAn == null || danhMuc == null) {
-            return "redirect:/manager/products";
+            @RequestParam("available") boolean available,
+            RedirectAttributes redirectAttributes) {
+        try {
+            productService.updateProduct(productID, buildRequest(tenMon, maDM, gia, soLuongTon, moTa, available),
+                    productFile);
+            redirectAttributes.addFlashAttribute("message", "Đã cập nhật món ăn thành công.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Không thể cập nhật món ăn.");
         }
-
-        monAn.setTenMon(tenMon);
-        monAn.setDanhMuc(danhMuc);
-        monAn.setGia(gia);
-        monAn.setSoLuongTon(soLuongTon);
-        monAn.setMoTa(moTa);
-        monAn.setImg(this.productService.storeProductImage(productFile, monAn.getImg()));
-        monAn.setAvailable(available);
-        this.monAnRepository.save(monAn);
-
         return "redirect:/manager/products";
     }
 
     @GetMapping("/manager/products/delete")
     public String getProductsDeletePage(@RequestParam(value = "productID", required = false) Long productID,
             Model model) {
-        MonAn monAn = this.monAnRepository.findProduct(productID);
-        if (monAn == null) {
-            return "redirect:/manager/products";
-        }
-        model.addAttribute("monAn", monAn);
-        return "manager/products/delete";
+        return productService.findProduct(productID)
+                .map(monAn -> {
+                    model.addAttribute("monAn", monAn);
+                    return "manager/products/delete";
+                })
+                .orElse("redirect:/manager/products");
     }
 
     @PostMapping("/manager/products/delete")
-    public String postProductsDelete(@RequestParam("productID") Long productID) {
-        MonAn monAn = this.monAnRepository.findProduct(productID);
-        if (monAn != null) {
-            this.monAnRepository.delete(monAn);
+    public String postProductsDelete(@RequestParam("productID") Long productID,
+            RedirectAttributes redirectAttributes) {
+        try {
+            productService.deleteProduct(productID);
+            redirectAttributes.addFlashAttribute("message", "Đã xóa món ăn thành công.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Không thể xóa món ăn. Món có thể đang được dùng trong đơn hàng.");
         }
         return "redirect:/manager/products";
     }
 
+    private ProductRequest buildRequest(String tenMon, Long maDM, long gia, long soLuongTon, String moTa,
+            boolean available) {
+        ProductRequest request = new ProductRequest();
+        request.setTenMon(tenMon);
+        request.setMaDM(maDM);
+        request.setGia(gia);
+        request.setSoLuongTon(soLuongTon);
+        request.setMoTa(moTa);
+        request.setAvailable(available);
+        return request;
+    }
 }
