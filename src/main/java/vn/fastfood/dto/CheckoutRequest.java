@@ -1,7 +1,7 @@
 package vn.fastfood.dto;
 
 public class CheckoutRequest {
-    private long customerId;
+    private long maKH;
     private Long maDC;
     private String discountCode;
     private String maPT;
@@ -14,12 +14,12 @@ public class CheckoutRequest {
     public CheckoutRequest() {
     }
 
-    public long getCustomerId() {
-        return customerId;
+    public long getMaKH() {
+        return maKH;
     }
 
-    public void setCustomerId(long customerId) {
-        this.customerId = customerId;
+    public void setMaKH(long maKH) {
+        this.maKH = maKH;
     }
 
     public Long getMaDC() {

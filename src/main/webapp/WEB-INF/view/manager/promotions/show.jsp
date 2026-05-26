@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -62,17 +62,39 @@
 <c:when test="${not empty promotions}">
 <c:forEach var="promotion" items="${promotions}">
 <tr>
-<td>${promotion.tenCT}</td>
-<td>${promotion.discountDisplay}</td>
-<td>${promotion.thoiGianDisplay}</td>
+<td>${promotion.tenKM}</td>
+<td>${promotion.phanTramGiam}%</td>
 <td>
-<span class="status-badge" data-status="${promotion.status == 'Đang hoạt động' ? 'active' : (promotion.status == 'Sắp diễn ra' ? 'featured' : 'inactive')}">${promotion.status}</span>
+<%= ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayBatDau() == null
+        ? "Không giới hạn"
+        : ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayBatDau().toLocalDate() %>
+ -
+<%= ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayKetThuc() == null
+        ? "Không giới hạn"
+        : ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayKetThuc().toLocalDate() %>
+</td>
+<td>
+<span class="status-badge"
+      data-status="<%= ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayBatDau() != null
+              && ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayBatDau().isAfter(java.time.LocalDateTime.now())
+                      ? "featured"
+                      : ((((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayKetThuc() != null
+                              && ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayKetThuc().isBefore(java.time.LocalDateTime.now()))
+                                      ? "inactive"
+                                      : "active") %>">
+<%= ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayBatDau() != null
+        && ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayBatDau().isAfter(java.time.LocalDateTime.now())
+                ? "Sắp diễn ra"
+                : ((((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayKetThuc() != null
+                        && ((vn.fastfood.entity.ChuongTrinhKhuyenMai) pageContext.getAttribute("promotion")).getNgayKetThuc().isBefore(java.time.LocalDateTime.now()))
+                                ? "Đã kết thúc"
+                                : "Đang hoạt động") %></span>
 </td>
 <td>
 <div class="action-row">
-<a href="<c:url value='/manager/promotions/detail'/>?promotionID=${promotion.maCT}" class="btn btn-ghost icon-btn">Xem</a>
-<a href="<c:url value='/manager/promotions/update'/>?promotionID=${promotion.maCT}" class="btn btn-ghost icon-btn">Sửa</a>
-<a href="<c:url value='/manager/promotions/delete'/>?promotionID=${promotion.maCT}" class="btn btn-ghost icon-btn">Xóa</a>
+<a href="<c:url value='/manager/promotions/detail'/>?promotionID=${promotion.maKM}" class="btn btn-ghost icon-btn">Xem</a>
+<a href="<c:url value='/manager/promotions/update'/>?promotionID=${promotion.maKM}" class="btn btn-ghost icon-btn">Sửa</a>
+<a href="<c:url value='/manager/promotions/delete'/>?promotionID=${promotion.maKM}" class="btn btn-ghost icon-btn">Xóa</a>
 </div>
 </td>
 </tr>

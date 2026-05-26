@@ -74,7 +74,7 @@
                           </div>
                           <p class="ticket-item__preview"><c:out value="${ticket.tieuDe}"/></p>
                           <span class="status-badge" style="font-size:.7rem;margin-top:.25rem;display:inline-block"
-                                data-status="${ticket.trangThai == 'Pending' ? 'pending' : ticket.trangThai == 'Processing' ? 'active' : 'done'}">
+                                data-status="${ticket.trangThai == 'PENDING' ? 'pending' : ticket.trangThai == 'PROCESSING' ? 'active' : 'done'}">
                             <c:out value="${ticket.trangThai}"/>
                           </span>
                         </article>
@@ -111,7 +111,7 @@
                       <c:otherwise><span>Đang hoạt động</span></c:otherwise>
                     </c:choose>
                   </div>
-                  <c:if test="${not empty activeYC and activeYC.trangThai != 'Done'}">
+                  <c:if test="${not empty activeYC and activeYC.trangThai != 'DONE'}">
                     <a href="/api/chat/close?maYC=${activeYC.maYC}"
                        class="btn btn-ghost" style="margin-left:auto;font-size:.8rem"
                        onclick="return confirm('Đánh dấu hoàn thành yêu cầu này?')">✓ Hoàn thành</a>
@@ -151,9 +151,9 @@
                 <form class="chat-input-bar" data-chat-form>
                   <input id="chat-input" data-chat-input name="message" type="text"
                          placeholder="Nhập phản hồi cho khách hàng..."
-                         <c:if test="${empty activeConvId or activeYC.trangThai == 'Done'}">disabled</c:if>/>
+                         <c:if test="${empty activeConvId or activeYC.trangThai == 'DONE'}">disabled</c:if>/>
                   <button class="chat-send-btn" type="submit" aria-label="Gửi tin nhắn"
-                          <c:if test="${empty activeConvId or activeYC.trangThai == 'Done'}">disabled</c:if>>
+                          <c:if test="${empty activeConvId or activeYC.trangThai == 'DONE'}">disabled</c:if>>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="m22 2-7 20-4-9-9-4z" />
                       <path d="M22 2 11 13" />

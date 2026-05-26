@@ -19,141 +19,71 @@ import vn.fastfood.model.CheckoutCartItem;
 @Service
 public class CheckoutService {
     private final CheckoutDAO checkoutDAO;
-    private final CouponService couponService;
+    private final MaGiamGiaService maGiamGiaService;
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{9,15}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
 
-    public CheckoutService(CouponService couponService) {
+    public CheckoutService(MaGiamGiaService maGiamGiaService) {
         this.checkoutDAO = new CheckoutDAO();
-        this.couponService = couponService;
+        this.maGiamGiaService = maGiamGiaService;
     }
 
-    public CheckoutResponse checkout(CheckoutRequest request, HttpSession session) {
-        if (request == null) {
-            return new CheckoutResponse(false, "Dữ liệu đặt hàng không hợp lệ.", null, null, null, null);
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private String buildGhiChu(CheckoutRequest request) {
+        List<String> parts = new ArrayList<>();
+
+        if (hasText(request.getGhiChu())) {
+            parts.add(request.getGhiChu().trim());
         }
 
-        if (session == null) {
-            return new CheckoutResponse(false, "Phiên làm việc không hợp lệ. Vui lòng đăng nhập lại.", null, null, null, null);
+        if (hasText(request.getDeliveryName())) {
+            parts.add("NgÆ°á»i nháº­n: " + request.getDeliveryName().trim());
         }
 
-        Long customerId = resolveCustomerId(session);
-        if (customerId == null || customerId <= 0) {
-            return new CheckoutResponse(false, "Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.", null, null, null, null);
-        }
-
-        Long maDC = request.getMaDC();
-        if (maDC != null && maDC <= 0) {
-            maDC = null;
-        }
-
-        if (maDC != null && !checkoutDAO.isValidAddress(customerId, maDC)) {
-            return new CheckoutResponse(false, "Địa chỉ giao hàng không hợp lệ hoặc không thuộc tài khoản hiện tại.", null, null, null, null);
-        }
-
-        if (maDC == null && !hasText(request.getDeliveryAddress())) {
-            return new CheckoutResponse(false, "Vui lòng nhập địa chỉ giao hàng.", null, null, null, null);
-        }
-
-        String maPT = request.getMaPT();
-        if (maPT == null || maPT.trim().isEmpty()) {
-            return new CheckoutResponse(false, "Vui lòng chọn phương thức thanh toán.", null, null, null, null);
-        }
-
-        maPT = maPT.trim().toUpperCase();
-        if (!checkoutDAO.isValidPTTT(maPT)) {
-            return new CheckoutResponse(false, "Phương thức thanh toán không hợp lệ.", null, null, null, null);
-        }
-
-        List<CheckoutCartItem> items = getCheckoutItemsFromSession(session);
-        if (items.isEmpty()) {
-            return new CheckoutResponse(false, "Giỏ hàng đang trống.", null, null, null, null);
-        }
-
-        double subtotal = 0;
-        for (CheckoutCartItem item : items) {
-            subtotal += checkoutDAO.calcSubtotal(item.getDonGia(), item.getSoLuong());
-        }
-
-        MaGiamGia coupon = couponService.findValidCoupon(request.getDiscountCode()).orElse(null);
-        double discountTotal = couponService.calculateDiscount(coupon, subtotal);
-        if (discountTotal > subtotal) {
-            discountTotal = subtotal;
-        }
-
-        double total = subtotal - discountTotal;
-        Long maGG = coupon != null ? coupon.getMaGG() : null;
-
-        String orderNote;
-        try {
-            orderNote = buildOrderNote(request);
-        } catch (IllegalArgumentException e) {
-            return new CheckoutResponse(
-                false, 
-                e.getMessage(), 
-                null, 
-                subtotal, 
-                discountTotal, 
-                total
-            );
-        }
-
-        try {
-            long orderId = checkoutDAO.createOrder(
-                    customerId,
-                    maDC,
-                    subtotal,
-                    discountTotal,
-                    total,
-                    maGG,
-                    orderNote
-            );
-
-            for (CheckoutCartItem item : items) {
-                checkoutDAO.createOrderItem(orderId, item);
+        if (hasText(request.getDeliveryPhone())) {
+            String phone = request.getDeliveryPhone().trim();
+            if (!PHONE_PATTERN.matcher(phone).matches()) {
+                throw new IllegalArgumentException("Sá»‘ Ä‘iá»‡n thoáº¡i nháº­n hÃ ng khÃ´ng há»£p lá»‡.");
             }
-
-            checkoutDAO.createPayment(orderId, maPT, total);
-            session.removeAttribute("cart");
-
-            return new CheckoutResponse(
-                    true,
-                    "Đặt hàng thành công.",
-                    orderId,
-                    subtotal,
-                    discountTotal,
-                    total
-            );
-        } catch (SQLException e) {
-            e.printStackTrace();
-
-            return new CheckoutResponse(
-                    false,
-                    "Đặt hàng thất bại do lỗi hệ thống.",
-                    null,
-                    subtotal,
-                    discountTotal,
-                    total
-            );
+            parts.add("SÄT: " + phone);
         }
+
+        if (hasText(request.getEmail())) {
+            String email = request.getEmail().trim();
+            if (!EMAIL_PATTERN.matcher(email).matches()) {
+                throw new IllegalArgumentException("Email khÃ´ng há»£p lá»‡.");
+            }
+            parts.add("Email: " + email);
+        }
+
+        if (hasText(request.getDeliveryAddress())) {
+            parts.add("Äá»‹a chá»‰ nháº­p: " + request.getDeliveryAddress().trim());
+        }
+
+        if (parts.isEmpty()) {
+            throw new IllegalArgumentException("Vui lÃ²ng nháº­p thÃ´ng tin giao hÃ ng há»£p lá»‡.");
+        }
+
+        return String.join("; ", parts);
     }
 
     private List<CheckoutCartItem> getCheckoutItemsFromSession(HttpSession session) {
         Object cartObj = session.getAttribute("cart");
 
-        if (cartObj == null || !(cartObj instanceof List<?>)) {
+        if (!(cartObj instanceof List<?> rawCart)) {
             return new ArrayList<>();
         }
 
-        List<?> rawCart = (List<?>) cartObj;
         List<CheckoutCartItem> checkoutItems = new ArrayList<>();
 
         for (Object obj : rawCart) {
-            if (!(obj instanceof CartItem)) {
+            if (!(obj instanceof CartItem cartItem)) {
                 continue;
             }
 
-            CartItem cartItem = (CartItem) obj;
             if (cartItem.getSoLuong() <= 0) {
                 continue;
             }
@@ -163,66 +93,104 @@ public class CheckoutService {
             item.setTenMon(cartItem.getTenMon());
             item.setSoLuong(cartItem.getSoLuong());
             item.setDonGia(cartItem.getDonGia());
-            item.setThanhTien(checkoutDAO.calcSubtotal(cartItem.getDonGia(), cartItem.getSoLuong()));
+            item.setThanhTien(cartItem.getDonGia() * cartItem.getSoLuong());
             checkoutItems.add(item);
         }
 
         return checkoutItems;
     }
 
-    private String buildOrderNote(CheckoutRequest request) {
-        List<String> parts = new ArrayList<>();
-
-        if (hasText(request.getGhiChu())) {
-            parts.add(request.getGhiChu().trim());
+    public CheckoutResponse checkout(CheckoutRequest request, HttpSession session) {
+        if (request == null) {
+            return new CheckoutResponse(false, "Dá»¯ liá»‡u Ä‘áº·t hÃ ng khÃ´ng há»£p lá»‡.", null, null, null, null);
         }
 
-        if (hasText(request.getDeliveryName())) {
-            parts.add("Người nhận: " + request.getDeliveryName().trim());
+        if (session == null) {
+            return new CheckoutResponse(false, "PhiÃªn lÃ m viá»‡c khÃ´ng há»£p lá»‡. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.", null, null, null, null);
         }
 
-        if (hasText(request.getDeliveryPhone())) {
-            String phone = request.getDeliveryPhone().trim();
-            if (!PHONE_PATTERN.matcher(phone).matches()) {
-                throw new IllegalArgumentException("Số điện thoại nhận hàng không hợp lệ.");
-            }
-            parts.add("SĐT: " + phone);
-        }
-
-        if (hasText(request.getEmail())) {
-            String email = request.getEmail().trim();
-            if (!EMAIL_PATTERN.matcher(email).matches()) {
-                throw new IllegalArgumentException("Email không hợp lệ.");
-            }
-            parts.add("Email: " + email);
-        }
-
-        if (hasText(request.getDeliveryAddress())) {
-            parts.add("Địa chỉ nhập: " + request.getDeliveryAddress().trim());
-        }
-
-        if (parts.isEmpty()) {
-            throw new IllegalArgumentException("Vui lòng nhập thông tin giao hàng hợp lệ.");
-        }
-
-        return String.join("; ", parts);
-    }
-
-    private boolean hasText(String value) {
-        return value != null && !value.trim().isEmpty();
-    }
-
-    private Long resolveCustomerId(HttpSession session) {
+        Long maKH = null;
         Object userObj = session.getAttribute("user");
         if (userObj instanceof User user) {
-            return user.getMaTK();
+            maKH = user.getMaTK();
+        } else {
+            Object maTKObj = session.getAttribute("userId");
+            if (maTKObj instanceof Number maTKNumber) {
+                maKH = maTKNumber.longValue();
+            }
         }
 
-        Object userIdObj = session.getAttribute("userId");
-        if (userIdObj instanceof Number userIdNumber) {
-            return userIdNumber.longValue();
+        if (maKH == null || maKH <= 0) {
+            return new CheckoutResponse(false, "KhÃ´ng tÃ¬m tháº¥y thÃ´ng tin tÃ i khoáº£n. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.", null, null, null, null);
         }
 
-        return null;
+        Long maDC = request.getMaDC();
+        if (maDC != null && maDC <= 0) {
+            maDC = null;
+        }
+
+        if (maDC != null && !checkoutDAO.isValidAddress(maKH, maDC)) {
+            return new CheckoutResponse(false, "Äá»‹a chá»‰ giao hÃ ng khÃ´ng há»£p lá»‡ hoáº·c khÃ´ng thuá»™c tÃ i khoáº£n hiá»‡n táº¡i.", null, null, null, null);
+        }
+
+        if (maDC == null && !hasText(request.getDeliveryAddress())) {
+            return new CheckoutResponse(false, "Vui lÃ²ng nháº­p Ä‘á»‹a chá»‰ giao hÃ ng.", null, null, null, null);
+        }
+
+        String maPT = request.getMaPT();
+        if (maPT == null || maPT.trim().isEmpty()) {
+            return new CheckoutResponse(false, "Vui lÃ²ng chá»n phÆ°Æ¡ng thá»©c thanh toÃ¡n.", null, null, null, null);
+        }
+
+        maPT = maPT.trim().toUpperCase();
+        if (!checkoutDAO.isValidPTTT(maPT)) {
+            return new CheckoutResponse(false, "PhÆ°Æ¡ng thá»©c thanh toÃ¡n khÃ´ng há»£p lá»‡.", null, null, null, null);
+        }
+
+        List<CheckoutCartItem> items = getCheckoutItemsFromSession(session);
+        if (items.isEmpty()) {
+            return new CheckoutResponse(false, "Giá» hÃ ng Ä‘ang trá»‘ng.", null, null, null, null);
+        }
+
+        double subtotal = 0;
+        for (CheckoutCartItem item : items) {
+            subtotal += item.getThanhTien();
+        }
+
+        MaGiamGia coupon = maGiamGiaService.findValidCoupon(request.getDiscountCode()).orElse(null);
+        double discountTotal = maGiamGiaService.calculateDiscount(coupon, subtotal);
+        if (discountTotal > subtotal) {
+            discountTotal = subtotal;
+        }
+
+        double total = subtotal - discountTotal;
+        Long maGG = coupon != null ? coupon.getMaGG() : null;
+
+        String orderNote;
+        try {
+            orderNote = buildGhiChu(request);
+        } catch (IllegalArgumentException e) {
+            return new CheckoutResponse(false, e.getMessage(), null, subtotal, discountTotal, total);
+        }
+
+        try {
+            long orderId = checkoutDAO.checkout(
+                    maKH,
+                    maDC,
+                    subtotal,
+                    discountTotal,
+                    total,
+                    maPT,
+                    maGG,
+                    orderNote,
+                    items
+            );
+
+            session.removeAttribute("cart");
+            return new CheckoutResponse(true, "Äáº·t hÃ ng thÃ nh cÃ´ng.", orderId, subtotal, discountTotal, total);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new CheckoutResponse(false, "Äáº·t hÃ ng tháº¥t báº¡i do lá»—i há»‡ thá»‘ng.", null, subtotal, discountTotal, total);
+        }
     }
 }

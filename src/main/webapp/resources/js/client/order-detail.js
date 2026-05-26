@@ -1,27 +1,27 @@
 const CLIENT_ORDER_API = "/api/orders";
 
 document.addEventListener("DOMContentLoaded", () => {
-    const orderId = getOrderIdFromUrl();
+    const maDH = getMaDHFromUrl();
 
-    if (!orderId) {
+    if (!maDH) {
         showMessage("Thiếu mã đơn hàng.");
         return;
     }
 
-    loadOrderDetail(orderId);
+    loadOrderDetail(maDH);
 });
 
-function getOrderIdFromUrl() {
+function getMaDHFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("orderId");
+    return params.get("maDH");
 }
 
-async function loadOrderDetail(orderId) {
-    const customerId = getCurrentCustomerId();
+async function loadOrderDetail(maDH) {
+    const maKH = getCurrentMaKH();
     const detailContent = document.getElementById("orderDetailContent");
     const itemBody = document.getElementById("orderItemBody");
 
-    if (!customerId) {
+    if (!maKH) {
         showMessage("Bạn cần đăng nhập để xem chi tiết đơn hàng.");
         return;
     }
@@ -30,7 +30,7 @@ async function loadOrderDetail(orderId) {
     if (itemBody) itemBody.innerHTML = "";
 
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}?customerId=${customerId}`);
+        const response = await fetch(`${CLIENT_ORDER_API}/${maDH}?maKH=${maKH}`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -44,7 +44,6 @@ async function loadOrderDetail(orderId) {
         renderOrderTimeline(order.trangThaiDon);
         renderOrderItems(items, order.trangThaiDon);
         renderOrderActions(order);
-
     } catch (error) {
         showMessage(error.message);
         if (detailContent) detailContent.innerHTML = "";
@@ -62,7 +61,6 @@ function renderOrderInfo(order) {
     if (!detailContent) return;
 
     const delivery = parseDeliveryInfo(order.ghiChu);
-
     const receiverName = order.tenNguoiNhan || delivery.name || order.tenKhachHang || "-";
     const receiverPhone = order.sdtNguoiNhan || delivery.phone || order.sdtKhachHang || "-";
     const receiverEmail = order.emailKhachHang || delivery.email || "-";
@@ -75,7 +73,7 @@ function renderOrderInfo(order) {
 
                 <div class="client-detail-info-list">
                     <p><strong>Ngày đặt:</strong> ${formatDate(order.ngayDat)}</p>
-                    <p><strong>Trạng thái đơn:</strong> 
+                    <p><strong>Trạng thái đơn:</strong>
                         <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
                     </p>
                     <p><strong>Phương thức thanh toán:</strong> ${order.tenPT || displayPaymentMethod(order.maPT)}</p>
@@ -117,12 +115,10 @@ function renderOrderItems(items, orderStatus) {
     }
 
     itemBody.innerHTML = "";
-
     const canReview = normalizeStatus(orderStatus) === "DELIVERED";
 
-    items.forEach(item => {
+    items.forEach((item) => {
         const row = document.createElement("tr");
-
         row.innerHTML = `
             <td>${item.tenMon || `Món #${item.maMon}`}</td>
             <td>${item.soLuong || 0}</td>
@@ -131,12 +127,11 @@ function renderOrderItems(items, orderStatus) {
             <td>
                 ${
                     canReview
-                    ? `<button type="button" class="btn btn-ghost" onclick="openReviewModal(${item.maMon})">Đánh giá</button>`
-                    : `<span class="order-note">Chưa thể đánh giá</span>`
+                        ? `<button type="button" class="btn btn-ghost" onclick="openReviewModal(${item.maMon})">Đánh giá</button>`
+                        : `<span class="order-note">Chưa thể đánh giá</span>`
                 }
             </td>
         `;
-
         itemBody.appendChild(row);
     });
 }
@@ -146,7 +141,6 @@ function renderOrderActions(order) {
     if (!actionBox) return;
 
     const status = normalizeStatus(order.trangThaiDon);
-
     let buttons = "";
 
     if (status === "PENDING" || status === "CONFIRMED") {
@@ -172,14 +166,14 @@ function renderOrderActions(order) {
     actionBox.innerHTML = buttons;
 }
 
-async function requestCancelOrder(orderId) {
-    const customerId = getCurrentCustomerId();
+async function requestCancelOrder(maDH) {
+    const maKH = getCurrentMaKH();
 
     if (!confirm("Bạn có chắc muốn hủy đơn hàng này không?")) {
         return;
     }
 
-    const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/cancel?customerId=${customerId}`, {
+    const response = await fetch(`${CLIENT_ORDER_API}/${maDH}/cancel?maKH=${maKH}`, {
         method: "POST"
     });
 
@@ -187,18 +181,18 @@ async function requestCancelOrder(orderId) {
     alert(data.message || "Đã xử lý yêu cầu hủy đơn.");
 
     if (response.ok) {
-        loadOrderDetail(orderId);
+        loadOrderDetail(maDH);
     }
 }
 
-async function confirmReceived(orderId) {
-    const customerId = getCurrentCustomerId();
+async function confirmReceived(maDH) {
+    const maKH = getCurrentMaKH();
 
     if (!confirm("Bạn xác nhận đã nhận được đơn hàng này?")) {
         return;
     }
 
-    const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/received?customerId=${customerId}`, {
+    const response = await fetch(`${CLIENT_ORDER_API}/${maDH}/received?maKH=${maKH}`, {
         method: "POST"
     });
 
@@ -206,23 +200,23 @@ async function confirmReceived(orderId) {
     alert(data.message || "Đã xác nhận nhận hàng.");
 
     if (response.ok) {
-        loadOrderDetail(orderId);
+        loadOrderDetail(maDH);
     }
 }
 
-function getCurrentCustomerId() {
-    const input = document.getElementById("currentCustomerId");
+function getCurrentMaKH() {
+    const input = document.getElementById("currentMaKH");
     return input ? input.value : "";
 }
 
 async function submitReview() {
-    const orderId = getOrderIdFromUrl();
-    const customerId = Number(getCurrentCustomerId());
+    const maDH = getMaDHFromUrl();
+    const maKH = Number(getCurrentMaKH());
     const maMon = Number(document.getElementById("reviewMaMon")?.value || 0);
     const sao = Number(document.getElementById("reviewSao")?.value || 0);
     const noiDung = document.getElementById("reviewNoiDung")?.value?.trim() || "";
 
-    if (!orderId || !customerId || !maMon) {
+    if (!maDH || !maKH || !maMon) {
         alert("Thiếu thông tin đánh giá.");
         return;
     }
@@ -238,13 +232,13 @@ async function submitReview() {
     }
 
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/reviews`, {
+        const response = await fetch(`${CLIENT_ORDER_API}/${maDH}/reviews`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                customerId,
+                maKH,
                 maMon,
                 sao,
                 noiDung
@@ -412,7 +406,6 @@ function renderOrderTimeline(status) {
     if (!timeline) return;
 
     const currentStatus = normalizeStatus(status);
-
     let steps = [
         { key: "PENDING", label: "Chờ xác nhận" },
         { key: "CONFIRMED", label: "Đã xác nhận" },
@@ -435,7 +428,7 @@ function renderOrderTimeline(status) {
         ];
     }
 
-    const currentIndex = steps.findIndex(step => step.key === currentStatus);
+    const currentIndex = steps.findIndex((step) => step.key === currentStatus);
 
     timeline.innerHTML = steps.map((step, index) => {
         let stateClass = "";

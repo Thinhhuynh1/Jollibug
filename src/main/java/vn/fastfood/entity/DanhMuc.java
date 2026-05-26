@@ -35,6 +35,9 @@ public class DanhMuc {
     @Nationalized
     private String moTa;
 
+    @Column(name = "imageUrl")
+    private String imageUrl;
+
     @Column(name = "isAvailable")
     private boolean available = true;
 

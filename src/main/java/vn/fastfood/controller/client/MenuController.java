@@ -2,6 +2,7 @@ package vn.fastfood.controller.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -17,23 +18,23 @@ import vn.fastfood.entity.MonAn;
 import vn.fastfood.repository.DanhMucRepository;
 import vn.fastfood.repository.MonAnRepository;
 import vn.fastfood.service.CartService;
-import vn.fastfood.service.PromotionService;
+import vn.fastfood.service.KhuyenMaiService;
 
 @Controller
 public class MenuController {
     private final MonAnRepository monAnRepository;
     private final DanhMucRepository danhMucRepository;
-    private final PromotionService promotionService;
+    private final KhuyenMaiService khuyenmaiService;
     private final CartService cartService;
     private final ReviewDAO reviewDAO = new ReviewDAO();
 
     public MenuController(MonAnRepository monAnRepository,
             DanhMucRepository danhMucRepository,
-            PromotionService promotionService,
+            KhuyenMaiService khuyenmaiService,
             CartService cartService) {
         this.monAnRepository = monAnRepository;
         this.danhMucRepository = danhMucRepository;
-        this.promotionService = promotionService;
+        this.khuyenmaiService = khuyenmaiService;
         this.cartService = cartService;
     }
 
@@ -54,7 +55,8 @@ public class MenuController {
             list = this.monAnRepository.findMonAn(categoryID, keyword);
         }
 
-        this.promotionService.applyPromotions(list);
+        this.khuyenmaiService.applyKhuyenMai(list);
+        sortByDiscountedPrice(list, filter);
 
         model.addAttribute("listMonAn", list);
         model.addAttribute("selectCategoryID", categoryID);
@@ -72,7 +74,7 @@ public class MenuController {
         model.addAttribute("averageRating", this.reviewDAO.getAverageRatingByProduct(productID));
         model.addAttribute("reviewCount", this.reviewDAO.countReviewsByProduct(productID));
         if (monAn != null) {
-            this.promotionService.applyPromotions(java.util.List.of(monAn));
+            this.khuyenmaiService.applyKhuyenMai(java.util.List.of(monAn));
         }
         model.addAttribute("monAn", monAn);
         return "client/product";
@@ -89,7 +91,7 @@ public class MenuController {
             return "redirect:/menu";
         }
 
-        this.promotionService.applyPromotions(java.util.List.of(monAn));
+        this.khuyenmaiService.applyKhuyenMai(java.util.List.of(monAn));
         cartService.addSessionCart(monAn, 1, session);
 
         String referer = request.getHeader("Referer");
@@ -105,5 +107,25 @@ public class MenuController {
             }
         }
         return "redirect:/menu";
+    }
+
+    private void sortByDiscountedPrice(List<MonAn> products, String filter) {
+        if (products == null || products.isEmpty()) {
+            return;
+        }
+
+        if ("price-low".equals(filter)) {
+            products.sort(Comparator.comparingLong(MonAn::getGiaGiam)
+                    .thenComparingLong(MonAn::getGia)
+                    .thenComparingLong(MonAn::getMaMon));
+            return;
+        }
+
+        if ("price-high".equals(filter)) {
+            products.sort(Comparator.comparingLong(MonAn::getGiaGiam)
+                    .reversed()
+                    .thenComparing(Comparator.comparingLong(MonAn::getGia).reversed())
+                    .thenComparingLong(MonAn::getMaMon));
+        }
     }
 }

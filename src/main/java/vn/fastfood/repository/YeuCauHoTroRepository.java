@@ -27,14 +27,14 @@ public interface YeuCauHoTroRepository extends JpaRepository<YeuCauHoTro, Long> 
     List<YeuCauHoTro> findByMaTKNV(@Param("maTKNV") Long maTKNV);
 
     /**
-     * Tất cả yêu cầu theo trạng thái (Pending / Processing / Done).
+     * Tất cả yêu cầu theo trạng thái (PENDING / PROCESSING / DONE).
      */
     @Query("SELECT y FROM YeuCauHoTro y WHERE y.trangThai = :trangThai ORDER BY y.createdAt DESC")
     List<YeuCauHoTro> findByTrangThai(@Param("trangThai") String trangThai);
 
     /**
-     * Tất cả yêu cầu còn active (Pending + Processing) – dùng cho sidebar staff.
+     * Tất cả yêu cầu còn active (PENDING + PROCESSING) – dùng cho sidebar staff.
      */
-    @Query("SELECT y FROM YeuCauHoTro y WHERE y.trangThai <> 'Done' ORDER BY y.createdAt DESC")
+    @Query("SELECT y FROM YeuCauHoTro y WHERE y.trangThai <> 'DONE' ORDER BY y.createdAt DESC")
     List<YeuCauHoTro> findActiveRequests();
 }

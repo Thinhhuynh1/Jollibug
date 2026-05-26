@@ -22,7 +22,7 @@
 <main class="profile-page order-page">
     <div class="container container--account-wide">
         <section class="profile-content orders-content">
-            <input type="hidden" id="currentCustomerId" value="${not empty sessionScope.user ? sessionScope.user.maTK : sessionScope.userId}">
+            <input type="hidden" id="currentMaKH" value="${not empty sessionScope.user ? sessionScope.user.maTK : sessionScope.userId}">
 
             <div class="client-order-top-actions">
                 <a class="btn btn-outline order-back-btn" href="<c:url value='/orders'/>">

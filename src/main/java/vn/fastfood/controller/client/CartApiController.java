@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,25 +32,17 @@ public class CartApiController {
     }
 
     @PutMapping("/items")
-    public ResponseEntity<Map<String, Object>> updateCartItem(
-            @RequestBody CartUpdateRequest request,
-            HttpSession session) {
+    public ResponseEntity<Map<String, Object>> updateCartItem(@RequestBody CartUpdateRequest request, HttpSession session) {
         if (request == null || request.getSoLuong() < 1) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "Dữ liệu cập nhật giỏ hàng không hợp lệ."));
+            return error(HttpStatus.BAD_REQUEST, "Dữ liệu cập nhật giỏ hàng không hợp lệ.");
         }
 
         boolean updated = cartService.updateSessionQuantity(session, request.getMaMon(), request.getSoLuong());
         if (!updated) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "Không tìm thấy món trong giỏ hàng."));
+            return error(HttpStatus.BAD_REQUEST, "Không tìm thấy món trong giỏ hàng.");
         }
 
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Cập nhật số lượng trong giỏ hàng thành công."));
+        return ok("Cập nhật số lượng trong giỏ hàng thành công.");
     }
 
     @DeleteMapping("/items")
@@ -57,15 +50,24 @@ public class CartApiController {
             @RequestParam("maMon") long maMon,
             HttpSession session) {
         boolean removed = cartService.removeSessionItem(session, maMon);
-
         if (!removed) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "Không tìm thấy món trong giỏ hàng."));
+            return error(HttpStatus.BAD_REQUEST, "Không tìm thấy món trong giỏ hàng.");
         }
 
+        return ok("Xóa món khỏi giỏ hàng thành công.");
+    }
+
+    private ResponseEntity<Map<String, Object>> ok(String message) {
         return ResponseEntity.ok(Map.of(
                 "success", true,
-                "message", "Xóa món khỏi giỏ hàng thành công."));
+                "message", message
+        ));
+    }
+
+    private ResponseEntity<Map<String, Object>> error(HttpStatus status, String message) {
+        return ResponseEntity.status(status).body(Map.of(
+                "success", false,
+                "message", message
+        ));
     }
 }

@@ -3,7 +3,7 @@ package vn.fastfood.dto;
 public class CheckoutResponse {
     private boolean success;
     private String message;
-    private Long orderId;
+    private Long maDH;
     private Double tongTienMon;
     private Double tienGiamGia;
     private Double thanhTien;
@@ -11,11 +11,11 @@ public class CheckoutResponse {
     public CheckoutResponse() {
     }
 
-    public CheckoutResponse(boolean success, String message, Long orderId,
+    public CheckoutResponse(boolean success, String message, Long maDH,
             Double tongTienMon, Double tienGiamGia, Double thanhTien) {
         this.success = success;
         this.message = message;
-        this.orderId = orderId;
+        this.maDH = maDH;
         this.tongTienMon = tongTienMon;
         this.tienGiamGia = tienGiamGia;
         this.thanhTien = thanhTien;
@@ -29,8 +29,8 @@ public class CheckoutResponse {
         return message;
     }
 
-    public Long getOrderId() {
-        return orderId;
+    public Long getMaDH() {
+        return maDH;
     }
 
     public Double getTongTienMon() {

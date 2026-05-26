@@ -21,8 +21,8 @@
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="${param.customerId}">
-    <input type="hidden" id="orderId" value="${param.orderId}">
+    <input type="hidden" id="maKH" value="${param.maKH}">
+    <input type="hidden" id="maDH" value="${param.maDH}">
     <input type="hidden" id="maPT" value="${param.maPT}">
     <div class="container">
       <div class="page-intro">

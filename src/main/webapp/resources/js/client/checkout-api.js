@@ -31,8 +31,8 @@ function setValue(id, value) {
     }
 }
 
-function getCustomerId() {
-    return Number(getValue("customerId") || 0);
+function getMaKH() {
+    return Number(getValue("maKH") || 0);
 }
 
 function restoreCheckoutAddress() {
@@ -48,14 +48,14 @@ function restoreCheckoutAddress() {
 }
 
 function readSelectedAddress() {
-    const selectedAddressRaw = localStorage.getItem("selectedCheckoutAddress");
+    const selectedAddress = localStorage.getItem("selectedCheckoutAddress");
 
-    if (!selectedAddressRaw) {
+    if (!selectedAddress) {
         return null;
     }
 
     try {
-        return JSON.parse(selectedAddressRaw);
+        return JSON.parse(selectedAddress);
     } catch (error) {
         localStorage.removeItem("selectedCheckoutAddress");
         return null;
@@ -241,16 +241,16 @@ function updateInvoice(subtotal, discount) {
 }
 
 async function submitCheckout() {
-    const customerId = getCustomerId();
+    const maKH = getMaKH();
     const addressValue = getValue("addressSelect").trim();
     const maDC = addressValue ? Number(addressValue) : null;
     const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
     const maPT = selectedPayment ? selectedPayment.value : null;
 
     const payload = {
-        customerId: customerId,
-        maDC: maDC,
-        maPT: maPT,
+        maKH,
+        maDC,
+        maPT,
         discountCode: getValue("voucher-code").trim() || null,
         ghiChu: "",
         deliveryName: getValue("delivery-name").trim(),
@@ -259,7 +259,7 @@ async function submitCheckout() {
         deliveryAddress: getValue("delivery-address").trim()
     };
 
-    if (!payload.customerId) {
+    if (!payload.maKH) {
         alert("Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.");
         return;
     }
@@ -293,14 +293,14 @@ async function submitCheckout() {
         if (payload.maPT === "COD") {
             localStorage.removeItem("selectedCheckoutAddress");
             alert("Đặt hàng thành công");
-            window.location.href = "/orders/detail?orderId=" + encodeURIComponent(data.orderId);
+            window.location.href = "/orders/detail?maDH=" + encodeURIComponent(data.maDH);
             return;
         }
 
-        window.location.href = "/pay?orderId="
-            + encodeURIComponent(data.orderId)
-            + "&customerId="
-            + encodeURIComponent(payload.customerId)
+        window.location.href = "/pay?maDH="
+            + encodeURIComponent(data.maDH)
+            + "&maKH="
+            + encodeURIComponent(payload.maKH)
             + "&maPT="
             + encodeURIComponent(payload.maPT);
     } catch (error) {

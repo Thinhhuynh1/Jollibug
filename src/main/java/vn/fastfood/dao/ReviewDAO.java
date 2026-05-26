@@ -106,7 +106,7 @@ public class ReviewDAO {
         return 0;
     }
 
-    public boolean isOrderDelivered(long orderId, long customerId) {
+    public boolean isOrderDelivered(long maDH, long maKH) {
         String sql = """
             SELECT COUNT(*)
             FROM DONHANG
@@ -118,8 +118,8 @@ public class ReviewDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, orderId);
-            ps.setLong(2, customerId);
+            ps.setLong(1, maDH);
+            ps.setLong(2, maKH);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -134,7 +134,7 @@ public class ReviewDAO {
         return false;
     }
 
-    public boolean isFoodInOrder(long orderId, long maMon) {
+    public boolean isFoodInOrder(long maDH, long maMon) {
         String sql = """
             SELECT COUNT(*)
             FROM CHITIETDH
@@ -145,7 +145,7 @@ public class ReviewDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, orderId);
+            ps.setLong(1, maDH);
             ps.setLong(2, maMon);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -161,7 +161,7 @@ public class ReviewDAO {
         return false;
     }
 
-    public boolean hasReviewed(long orderId, long customerId, long maMon) {
+    public boolean hasReviewed(long maDH, long maKH, long maMon) {
         String sql = """
             SELECT COUNT(*)
             FROM DANHGIA
@@ -173,8 +173,8 @@ public class ReviewDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, orderId);
-            ps.setLong(2, customerId);
+            ps.setLong(1, maDH);
+            ps.setLong(2, maKH);
             ps.setLong(3, maMon);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -190,7 +190,7 @@ public class ReviewDAO {
         return false;
     }
 
-    public boolean insertReview(long orderId, long customerId, long maMon, int sao, String noiDung) {
+    public boolean insertReview(long maDH, long maKH, long maMon, int sao, String noiDung) {
         String sql = """
             INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG)
             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -199,9 +199,9 @@ public class ReviewDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, customerId);
+            ps.setLong(1, maKH);
             ps.setLong(2, maMon);
-            ps.setLong(3, orderId);
+            ps.setLong(3, maDH);
             ps.setInt(4, sao);
             ps.setString(5, noiDung);
 

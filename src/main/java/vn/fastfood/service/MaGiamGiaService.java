@@ -12,12 +12,34 @@ import vn.fastfood.entity.MaGiamGia;
 import vn.fastfood.repository.MaGiamGiaRepository;
 
 @Service
-public class CouponService {
+public class MaGiamGiaService {
 
     private final MaGiamGiaRepository couponRepository;
 
-    public CouponService(MaGiamGiaRepository couponRepository) {
+    public MaGiamGiaService(MaGiamGiaRepository couponRepository) {
         this.couponRepository = couponRepository;
+    }
+
+    private boolean isCouponActive(MaGiamGia coupon) {
+        if (coupon == null) {
+            return false;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (coupon.getNgayBatDau() == null || coupon.getNgayKetThuc() == null) {
+            return false;
+        }
+
+        if (now.isBefore(coupon.getNgayBatDau()) || now.isAfter(coupon.getNgayKetThuc())) {
+            return false;
+        }
+
+        if (coupon.getSoLuong() != null && coupon.getSoLanSuDung() != null
+                && coupon.getSoLanSuDung() >= coupon.getSoLuong()) {
+            return false;
+        }
+
+        return true;
     }
 
     public Optional<MaGiamGia> findValidCoupon(String code) {
@@ -49,7 +71,6 @@ public class CouponService {
         }
 
         result.sort(Comparator.comparing(MaGiamGia::getNgayKetThuc));
-
         return result;
     }
 
@@ -58,15 +79,16 @@ public class CouponService {
             return 0;
         }
 
+        Double minimumOrderAmount = coupon.getDieuKien();
+        if (minimumOrderAmount != null && minimumOrderAmount > 0 && subtotal < minimumOrderAmount) {
+            return 0;
+        }
+
         double discount = 0;
         String type = coupon.getLoaiGiam();
         Double amount = coupon.getMucGiam();
 
-        if (amount == null || amount <= 0) {
-            return 0;
-        }
-
-        if (type == null) {
+        if (amount == null || amount <= 0 || type == null) {
             return 0;
         }
 
@@ -87,26 +109,5 @@ public class CouponService {
             discount = subtotal;
         }
         return discount;
-    }
-
-    private boolean isCouponActive(MaGiamGia coupon) {
-        if (coupon == null) {
-            return false;
-        }
-
-        LocalDateTime now = LocalDateTime.now();
-        if (coupon.getNgayBatDau() == null || coupon.getNgayKetThuc() == null) {
-            return false;
-        }
-
-        if (now.isBefore(coupon.getNgayBatDau()) || now.isAfter(coupon.getNgayKetThuc())) {
-            return false;
-        }
-
-        if (coupon.getSoLuong() != null && coupon.getSoLuong() <= 0) {
-            return false;
-        }
-
-        return true;
     }
 }

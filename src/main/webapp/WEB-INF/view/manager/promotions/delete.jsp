@@ -23,11 +23,11 @@
 <div style="max-width:52rem; margin:0 auto; width:100%;">
 <section class="profile-content">
 <section class="profile-section">
-<h1 class="profile-title">Xóa khuyến mãi ${promotion.tenCT}</h1>
+<h1 class="profile-title">Xóa khuyến mãi ${promotion.tenKM}</h1>
 <p class="profile-subtitle">Hành động này không thể hoàn tác.</p>
 
 <form action="<c:url value='/manager/promotions/delete'/>" method="post">
-<input type="hidden" name="promotionID" value="${promotion.maCT}" />
+<input type="hidden" name="promotionID" value="${promotion.maKM}" />
 <div style="margin-top:1.25rem; padding:0.9rem 1rem; border:1px solid #f1c0c4; background:#fff4f5; border-radius:var(--radius-md); color:#9f1d24;">
 Bạn có chắc chắn muốn xóa khuyến mãi này không?
 </div>
