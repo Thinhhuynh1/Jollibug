@@ -21,7 +21,7 @@
   <jsp:include page="../layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="${sessionScope.userId != null ? sessionScope.userId : (sessionScope.user != null ? sessionScope.user.maTK : '')}">
+    <input type="hidden" id="maKH" value="${sessionScope.userId != null ? sessionScope.userId : (sessionScope.user != null ? sessionScope.user.maTK : '')}">
     <input type="hidden" id="addressSelect" value="${defaultAddress != null ? defaultAddress.maDC : ''}">
     <input type="hidden" id="currentUserName" value="${currentUser != null ? currentUser.hoTen : ''}">
     <input type="hidden" id="currentUserPhone" value="${currentUser != null ? currentUser.sdt : ''}">

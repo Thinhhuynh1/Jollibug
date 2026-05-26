@@ -30,23 +30,22 @@
         <div class="hp-hero__grid">
           <div class="hp-hero__copy reveal-up">
             <span class="eyebrow">Thức Ăn Nhanh #1 Việt Nam</span>
-            <h1>Đói bụng? <span>Jollibug</span> giao ngay trong 30 phút!</h1>
+            <h1>Quá nghèo để đặt jollibee?
+              <div></div>
+              <div>đặt <span>Jollibug</span></div>
+            </h1>
             <div class="hp-hero__cta">
               <a class="btn btn-primary" href="/menu" id="hero-order-btn">Đặt Món Ngay</a>
               <a class="btn btn-secondary" href="/menu" id="hero-menu-btn">Xem Thực Đơn</a>
             </div>
             <div class="hp-stats">
               <div class="hp-stats__item">
-                <strong>30 phút</strong>
-                <span>Giao hàng nhanh</span>
+                <strong>Jollibug</strong>
+                <span>không phải jollibee</span>
               </div>
               <div class="hp-stats__item">
                 <strong>50+</strong>
-                <span>Món ngon đa dạng</span>
-              </div>
-              <div class="hp-stats__item">
-                <strong>4.9 ★</strong>
-                <span>Đánh giá khách hàng</span>
+                <span>Món ăn trong menu</span>
               </div>
               <div class="hp-stats__item">
                 <strong>10.000+</strong>
@@ -100,7 +99,6 @@
       <div class="container">
         <div class="page-intro reveal-up">
           <h2 class="section-title">Những món được yêu thích nhất</h2>
-          <p class="lead">Được chọn lọc từ hàng nghìn đánh giá thực tế của khách hàng — đây là những món bạn không thể bỏ qua.</p>
         </div>
 
         <div class="hp-menu-grid">
@@ -115,7 +113,6 @@
               <div class="hp-prod-card__body">
                 <div class="hp-prod-card__meta">
                   <span>${monAn.danhMuc.tenDM}</span>
-                  <span class="stars">★ 4.9</span>
                 </div>
                 <div class="hp-prod-card__name">
                   <div>${monAn.tenMon}</div>

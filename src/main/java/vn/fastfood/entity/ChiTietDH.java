@@ -17,11 +17,17 @@ public class ChiTietDH {
     @Column(name = "MaMon")
     private Long maMon;
 
+    @Column(name = "TenMon")
+    private String tenMon;
+
     @Column(name = "SoLuong")
     private Integer soLuong;
 
     @Column(name = "DonGia")
     private Long donGia;
+
+    @Column(name = "ThanhTien")
+    private Long thanhTien;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaDH", insertable = false, updatable = false)

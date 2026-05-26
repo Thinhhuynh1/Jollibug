@@ -1,7 +1,7 @@
 package vn.fastfood.dto;
 
 public class ReviewRequest {
-    private long customerId;
+    private long maKH;
     private long maMon;
     private int sao;
     private String noiDung;
@@ -9,12 +9,12 @@ public class ReviewRequest {
     public ReviewRequest() {
     }
 
-    public long getCustomerId() {
-        return customerId;
+    public long getMaKH() {
+        return maKH;
     }
 
-    public void setCustomerId(long customerId) {
-        this.customerId = customerId;
+    public void setMaKH(long maKH) {
+        this.maKH = maKH;
     }
 
     public long getMaMon() {

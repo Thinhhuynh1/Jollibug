@@ -9,14 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadOrders() {
-    const customerId = getCurrentCustomerId();
+    const maKH = getCurrentMaKH();
     const list = document.getElementById("orderCardList");
     const message = document.getElementById("message");
 
     if (!list) return;
     if (message) message.textContent = "";
 
-    if (!customerId) {
+    if (!maKH) {
         list.innerHTML = `<p class="empty-cell">Bạn cần đăng nhập để xem lịch sử đơn hàng.</p>`;
         return;
     }
@@ -24,7 +24,7 @@ async function loadOrders() {
     list.innerHTML = `<p class="empty-cell">Đang tải đơn hàng...</p>`;
 
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}?customerId=${customerId}`);
+        const response = await fetch(`${CLIENT_ORDER_API}?maKH=${maKH}`);
         const orders = await response.json();
 
         if (!response.ok) {
@@ -32,28 +32,25 @@ async function loadOrders() {
         }
 
         allOrders = Array.isArray(orders) ? orders : [];
-
         await preloadOrderSummaries(allOrders);
         renderOrdersByTab();
-
     } catch (error) {
         list.innerHTML = `<p class="empty-cell">${error.message}</p>`;
     }
 }
 
 async function preloadOrderSummaries(orders) {
-    const customerId = getCurrentCustomerId();
+    const maKH = getCurrentMaKH();
 
     const tasks = orders.map(async (order) => {
         if (!order || !order.maDH || orderDetailCache.has(order.maDH)) return;
 
         try {
-            const response = await fetch(`${CLIENT_ORDER_API}/${order.maDH}?customerId=${customerId}`);
+            const response = await fetch(`${CLIENT_ORDER_API}/${order.maDH}?maKH=${maKH}`);
             if (!response.ok) return;
 
             const data = await response.json();
             const items = data.orderItems || data.chiTietDH || [];
-
             orderDetailCache.set(order.maDH, items);
         } catch (error) {
             orderDetailCache.set(order.maDH, []);
@@ -66,7 +63,7 @@ async function preloadOrderSummaries(orders) {
 function switchOrderTab(tab) {
     currentTab = tab;
 
-    document.querySelectorAll(".order-tab").forEach(button => {
+    document.querySelectorAll(".order-tab").forEach((button) => {
         button.classList.toggle("is-active", button.dataset.tab === tab);
     });
 
@@ -79,7 +76,7 @@ function renderOrdersByTab() {
 
     if (!list) return;
 
-    let filteredOrders = allOrders.filter(order => {
+    let filteredOrders = allOrders.filter((order) => {
         const status = normalizeStatus(order.trangThaiDon);
 
         if (currentTab === "active") {
@@ -98,7 +95,6 @@ function renderOrdersByTab() {
     });
 
     filteredOrders = sortOrdersForCurrentTab(filteredOrders);
-
     updateSectionTitle(title);
 
     if (!filteredOrders.length) {
@@ -107,11 +103,7 @@ function renderOrdersByTab() {
     }
 
     list.innerHTML = "";
-
-    filteredOrders.forEach(order => {
-        const card = createOrderCard(order);
-        list.appendChild(card);
-    });
+    filteredOrders.forEach((order) => list.appendChild(createOrderCard(order)));
 }
 
 function updateSectionTitle(title) {
@@ -152,24 +144,15 @@ function sortOrdersForCurrentTab(orders) {
         });
     }
 
-    return copiedOrders.sort((a, b) => {
-        return getOrderImportantTime(b) - getOrderImportantTime(a);
-    });
+    return copiedOrders.sort((a, b) => getOrderImportantTime(b) - getOrderImportantTime(a));
 }
 
 function getActiveOrderPriority(order) {
     const status = normalizeStatus(order.trangThaiDon);
 
-    // Ưu tiên cao nhất: đơn đang giao, tức khách cần xác nhận đã nhận hàng.
     if (status === "SHIPPING") return 1;
-
-    // Sau đó là đơn đã xác nhận, đang chờ giao.
     if (status === "CONFIRMED") return 2;
-
-    // Sau đó là đơn mới, chờ xác nhận.
     if (status === "PENDING") return 3;
-
-    // Cuối cùng là đơn đang yêu cầu hủy.
     if (status === "CANCEL_REQUESTED") return 4;
 
     return 99;
@@ -184,7 +167,6 @@ function getOrderImportantTime(order) {
         order.ngayDat;
 
     const time = new Date(rawTime).getTime();
-
     return Number.isNaN(time) ? 0 : time;
 }
 
@@ -193,13 +175,14 @@ function createOrderCard(order) {
     card.className = "customer-order-card";
     card.tabIndex = 0;
 
-    card.onclick = () => {
-        window.location.href = `/orders/detail?orderId=${order.maDH}`;
+    const goToDetail = () => {
+        window.location.href = `/orders/detail?maDH=${order.maDH}`;
     };
 
+    card.onclick = goToDetail;
     card.onkeydown = (event) => {
         if (event.key === "Enter") {
-            window.location.href = `/orders/detail?orderId=${order.maDH}`;
+            goToDetail();
         }
     };
 
@@ -222,14 +205,14 @@ function createOrderCard(order) {
         <div class="customer-order-card__items">
             ${
                 previewItems.length
-                ? previewItems.map(item => renderOrderItemPreview(item)).join("")
-                : `<p class="order-note">Chưa có thông tin món ăn.</p>`
+                    ? previewItems.map((item) => renderOrderItemPreview(item)).join("")
+                    : `<p class="order-note">Chưa có thông tin món ăn.</p>`
             }
 
             ${
                 remainingCount > 0
-                ? `<p class="order-more-items">+ ${remainingCount} món khác</p>`
-                : ""
+                    ? `<p class="order-more-items">+ ${remainingCount} món khác</p>`
+                    : ""
             }
         </div>
 
@@ -288,7 +271,7 @@ function renderOrderAction(order) {
 
     if (currentTab === "review" && status === "DELIVERED") {
         return `
-            <a class="btn btn-outline" href="/orders/detail?orderId=${order.maDH}" onclick="event.stopPropagation();">
+            <a class="btn btn-outline" href="/orders/detail?maDH=${order.maDH}" onclick="event.stopPropagation();">
                 Đánh giá món
             </a>
         `;
@@ -305,11 +288,11 @@ function renderOrderAction(order) {
     return "";
 }
 
-async function reorderOrder(orderId) {
-    const customerId = getCurrentCustomerId();
+async function reorderOrder(maDH) {
+    const maKH = getCurrentMaKH();
 
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/reorder?customerId=${customerId}`, {
+        const response = await fetch(`${CLIENT_ORDER_API}/${maDH}/reorder?maKH=${maKH}`, {
             method: "POST"
         });
 
@@ -319,66 +302,61 @@ async function reorderOrder(orderId) {
         if (response.ok && confirm("Bạn có muốn sang giỏ hàng ngay không?")) {
             window.location.href = "/cart";
         }
-
     } catch (error) {
         alert("Lỗi khi đặt lại đơn hàng.");
     }
 }
 
-async function requestCancelOrder(orderId) {
-    const customerId = getCurrentCustomerId();
+async function requestCancelOrder(maDH) {
+    const maKH = getCurrentMaKH();
 
     if (!confirm("Bạn có chắc muốn hủy đơn hàng này không?")) {
         return;
     }
 
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/cancel?customerId=${customerId}`, {
+        const response = await fetch(`${CLIENT_ORDER_API}/${maDH}/cancel?maKH=${maKH}`, {
             method: "POST"
         });
 
         const data = await response.json();
-
         alert(data.message || "Đã xử lý yêu cầu hủy đơn.");
 
         if (response.ok) {
-            orderDetailCache.delete(orderId);
+            orderDetailCache.delete(maDH);
             await loadOrders();
         }
-
     } catch (error) {
         alert("Lỗi khi gửi yêu cầu hủy đơn.");
     }
 }
 
-async function confirmReceived(orderId) {
-    const customerId = getCurrentCustomerId();
+async function confirmReceived(maDH) {
+    const maKH = getCurrentMaKH();
 
     if (!confirm("Bạn xác nhận đã nhận được đơn hàng này?")) {
         return;
     }
 
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${orderId}/received?customerId=${customerId}`, {
+        const response = await fetch(`${CLIENT_ORDER_API}/${maDH}/received?maKH=${maKH}`, {
             method: "POST"
         });
 
         const data = await response.json();
-
         alert(data.message || "Đã xác nhận nhận hàng.");
 
         if (response.ok) {
-            orderDetailCache.delete(orderId);
+            orderDetailCache.delete(maDH);
             await loadOrders();
         }
-
     } catch (error) {
         alert("Lỗi khi xác nhận nhận hàng.");
     }
 }
 
-function getCurrentCustomerId() {
-    const input = document.getElementById("currentCustomerId");
+function getCurrentMaKH() {
+    const input = document.getElementById("currentMaKH");
     return input ? input.value : "";
 }
 

@@ -22,22 +22,22 @@ public class HomePageController {
     private final MonAnRepository monAnRepository;
     private final YeuCauHoTroRepository yeuCauRepo;
     private final ChiTietHoTroRepository chiTietRepo;
-    private final vn.fastfood.service.PromotionService promotionService;
+    private final vn.fastfood.service.KhuyenMaiService khuyenmaiService;
 
     HomePageController(MonAnRepository monAnRepository,
             YeuCauHoTroRepository yeuCauRepo,
             ChiTietHoTroRepository chiTietRepo,
-            vn.fastfood.service.PromotionService promotionService) {
+            vn.fastfood.service.KhuyenMaiService khuyenmaiService) {
         this.monAnRepository = monAnRepository;
         this.yeuCauRepo = yeuCauRepo;
         this.chiTietRepo = chiTietRepo;
-        this.promotionService = promotionService;
+        this.khuyenmaiService = khuyenmaiService;
     }
 
     @GetMapping("/")
     public String getHomePage(Model model) {
         List<vn.fastfood.entity.MonAn> list = this.monAnRepository.findMonAnBestSeller(null, "");
-        this.promotionService.applyPromotions(list);
+        this.khuyenmaiService.applyKhuyenMai(list);
         model.addAttribute("listMonAn", list);
         return "client/homepage";
     }
@@ -63,7 +63,7 @@ public class HomePageController {
         List<YeuCauHoTro> myRequests = yeuCauRepo
                 .findByMaTKKH(user.getMaTK())
                 .stream()
-                .filter(y -> !"Done".equals(y.getTrangThai()))
+                .filter(y -> !"DONE".equals(y.getTrangThai()))
                 .toList();
 
         if (myRequests.isEmpty()) {
@@ -94,7 +94,7 @@ public class HomePageController {
         newYC.setKhachHang(user);
         newYC.setTieuDe(tieuDe);
         newYC.setNoiDung(noiDung);
-        newYC.setTrangThai("Pending");
+        newYC.setTrangThai("PENDING");
         yeuCauRepo.save(newYC);
 
         // Lưu Nội dung thành tin nhắn đầu tiên luôn để hiển thị trong chat

@@ -49,6 +49,7 @@ public class ManagerCouponController {
             @RequestParam("code") String code,
             @RequestParam("loaiGiam") String loaiGiam,
             @RequestParam("mucGiam") Double mucGiam,
+            @RequestParam(value = "dieuKien", required = false) Double dieuKien,
             @RequestParam("soLuong") Integer soLuong,
             @RequestParam(value = "moTa", required = false) String moTa,
             @RequestParam(value = "startDate", required = false) String startDate,
@@ -57,6 +58,7 @@ public class ManagerCouponController {
         coupon.setTenMa(code.toUpperCase());
         coupon.setLoaiGiam(loaiGiam);
         coupon.setMucGiam(mucGiam);
+        coupon.setDieuKien(normalizeMinimumOrder(dieuKien));
         coupon.setSoLuong(soLuong);
         coupon.setMoTa(moTa);
         coupon.setNgayBatDau(parseDateTime(startDate, LocalTime.MIN));
@@ -99,6 +101,7 @@ public class ManagerCouponController {
             @RequestParam("code") String code,
             @RequestParam("loaiGiam") String loaiGiam,
             @RequestParam("mucGiam") Double mucGiam,
+            @RequestParam(value = "dieuKien", required = false) Double dieuKien,
             @RequestParam("soLuong") Integer soLuong,
             @RequestParam(value = "moTa", required = false) String moTa,
             @RequestParam(value = "startDate", required = false) String startDate,
@@ -110,6 +113,7 @@ public class ManagerCouponController {
         coupon.setTenMa(code.toUpperCase());
         coupon.setLoaiGiam(loaiGiam);
         coupon.setMucGiam(mucGiam);
+        coupon.setDieuKien(normalizeMinimumOrder(dieuKien));
         coupon.setSoLuong(soLuong);
         coupon.setMoTa(moTa);
         coupon.setNgayBatDau(parseDateTime(startDate, LocalTime.MIN));
@@ -148,5 +152,12 @@ public class ManagerCouponController {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private Double normalizeMinimumOrder(Double dieuKien) {
+        if (dieuKien == null || dieuKien <= 0) {
+            return null;
+        }
+        return dieuKien;
     }
 }

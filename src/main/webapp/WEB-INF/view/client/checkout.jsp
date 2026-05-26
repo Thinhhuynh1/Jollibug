@@ -25,7 +25,7 @@
         <jsp:include page="../layout/header.jsp"/>
 
         <c:if test="${not empty sessionScope.user}">
-          <input type="hidden" id="customerId" value="${sessionScope.user.maTK}" />
+          <input type="hidden" id="maKH" value="${sessionScope.user.maTK}" />
         </c:if>
 
         <input type="hidden" id="addressSelect" value="" />

@@ -9,7 +9,7 @@ import vn.fastfood.entity.DiaChi;
 import vn.fastfood.entity.User;
 import vn.fastfood.repository.AddressRepository;
 import vn.fastfood.repository.UserRepository;
-import vn.fastfood.service.CouponService;
+import vn.fastfood.service.MaGiamGiaService;
 
 @Controller
 public class CartController {
@@ -22,7 +22,7 @@ public class CartController {
     private AddressRepository addressRepository;
 
     @Autowired
-    private CouponService couponService;
+    private MaGiamGiaService maGiamGiaService;
 
     @GetMapping("/cart")
     public String getCartPage() {
@@ -45,7 +45,7 @@ public class CartController {
         model.addAttribute("checkoutUser", user);
         model.addAttribute("currentUser", user);
         model.addAttribute("defaultAddress", defaultAddress);
-        model.addAttribute("activeCoupons", couponService.findActiveCoupons());
+        model.addAttribute("activeCoupons", maGiamGiaService.findActiveCoupons());
 
         System.out.println("[CHECKOUT PAGE] userId=" + user.getMaTK()
                 + ", email=" + user.getEmail());

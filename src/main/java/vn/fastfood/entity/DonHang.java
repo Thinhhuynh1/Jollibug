@@ -8,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -40,8 +42,26 @@ public class DonHang {
     @JoinColumn(name = "MaTK_KH")
     private User user;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MaTK_NV")
+    private User nhanVien;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MaDC")
+    private DiaChi diaChi;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MaGG")
+    private MaGiamGia maGiamGia;
+
+    @Column(name = "TongTienMon")
+    private Double tongTienMon;
+
+    @Column(name = "TienGiamGia")
+    private Double tienGiamGia;
+
     @Column(name = "ThanhTien")
-    private Long tongTien;
+    private Double tongTien;
 
     // PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED
     @Column(name = "TrangThaiDon")

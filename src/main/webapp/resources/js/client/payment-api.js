@@ -1,76 +1,74 @@
 const PAYMENT_API_BASE = "/api/payments";
-const PAYMENT_REDIRECT_DELAY_SECONDS = 5;
-
-let paymentCountdownTimer = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     const params = getPaymentParams();
 
-    if (!params.orderId || !params.customerId || !params.maPT) {
-        showPaymentMessage("Thiếu thông tin thanh toán. Vui lòng quay lại lịch sử đơn hàng.");
+    if (!params.maDH || !params.maKH || !params.maPT) {
+        showPaymentMessage("Thiếu thông tin thanh toán, vui lòng quay lại lịch sử đơn hàng");
         disableConfirmButton("Không thể xử lý thanh toán");
         return;
     }
 
-    setHiddenValue("orderId", params.orderId);
-    setHiddenValue("customerId", params.customerId);
+    setHiddenValue("maDH", params.maDH);
+    setHiddenValue("maKH", params.maKH);
     setHiddenValue("maPT", params.maPT);
     lockPaymentMethods(params.maPT);
     showPaymentView(params.maPT);
     renderPaymentParams(params);
-    loadPaymentInfo(params).finally(() => startFakePayment(params));
+    bindConfirmButton(params);
+    loadPaymentInfo(params).finally(() => enableConfirmButton(getConfirmButtonLabel(params.maPT)));
 });
 
 function getPaymentParams() {
     const params = new URLSearchParams(window.location.search);
 
     return {
-        orderId: params.get("orderId"),
-        customerId: params.get("customerId"),
+        maDH: params.get("maDH"),
+        maKH: params.get("maKH"),
         maPT: (params.get("maPT") || "").trim().toUpperCase()
     };
 }
 
 async function loadPaymentInfo(params) {
     try {
-        const response = await fetch(`${PAYMENT_API_BASE}/order/${encodeURIComponent(params.orderId)}`);
+        const response = await fetch(
+            `${PAYMENT_API_BASE}/order/${encodeURIComponent(params.maDH)}?maPT=${encodeURIComponent(params.maPT)}`
+        );
         const data = await response.json();
 
         if (!response.ok) {
-            showPaymentMessage(data.message || "Không tìm thấy thông tin thanh toán.");
+            showPaymentMessage(data.message || "Không tìm thấy thông tin thanh toán");
             return;
         }
 
         renderPaymentInfo(data);
     } catch (error) {
-        showPaymentMessage("Lỗi khi tải thông tin thanh toán. Hệ thống vẫn tiếp tục xác thực thử.");
+        showPaymentMessage("Lỗi khi tải thông tin thanh toán");
     }
 }
 
-function startFakePayment(params) {
-    let remaining = PAYMENT_REDIRECT_DELAY_SECONDS;
+function bindConfirmButton(params) {
+    const confirmBtn = document.getElementById("confirmPaymentBtn");
+    if (!confirmBtn) {
+        return;
+    }
 
-    updateProcessingState(remaining);
-
-    clearInterval(paymentCountdownTimer);
-    paymentCountdownTimer = setInterval(async () => {
-        remaining -= 1;
-
-        if (remaining > 0) {
-            updateProcessingState(remaining);
+    confirmBtn.addEventListener("click", async () => {
+        if (confirmBtn.disabled) {
             return;
         }
 
-        clearInterval(paymentCountdownTimer);
-        await completeFakePayment(params);
-    }, 1000);
+        await completePayment(params);
+    });
 }
 
-async function completeFakePayment(params) {
-    disableConfirmButton("Thanh toán thành công");
+async function completePayment(params) {
+    showPaymentMessage("Đang xử lý thanh toán...");
+    disableConfirmButton("Đang xử lý thanh toán...");
+    setText("paymentStatus", "Đang xử lý thanh toán");
 
     try {
-        const response = await fetch(`${PAYMENT_API_BASE}/order/${encodeURIComponent(params.orderId)}/confirm`, {
+        const response = await fetch(`${PAYMENT_API_BASE}/order/${encodeURIComponent(params.maDH)}/confirm`, {
             method: "PUT"
         });
 
@@ -81,32 +79,40 @@ async function completeFakePayment(params) {
             data = {};
         }
 
-        if (!response.ok && !data.success) {
-            showPaymentMessage(data.message || "Không thể cập nhật trạng thái thanh toán.");
+        if (!response.ok || data.success === false) {
+            showPaymentMessage(data.message || "Không thể cập nhật trạng thái thanh toán");
+            enableConfirmButton(getConfirmButtonLabel(params.maPT));
+            setText("paymentStatus", "Chờ thanh toán");
             return;
         }
 
         showPaymentMessage("Thanh toán thành công");
+        disableConfirmButton("Thanh toán thành công");
+        setText("paymentStatus", "Đã thanh toán");
         localStorage.removeItem("selectedCheckoutAddress");
 
         window.setTimeout(() => {
-            window.location.href = "/orders/detail?orderId=" + encodeURIComponent(params.orderId);
+            window.location.href = "/orders/detail?maDH=" + encodeURIComponent(params.maDH);
         }, 1000);
     } catch (error) {
-        showPaymentMessage("Thanh toán thành công, nhưng chưa cập nhật được trạng thái thanh toán.");
+        showPaymentMessage("Không thể xử lý thanh toán, vui lòng thử lại");
+        enableConfirmButton(getConfirmButtonLabel(params.maPT));
+        setText("paymentStatus", "Chờ thanh toán");
     }
 }
 
-function updateProcessingState(remaining) {
-    showPaymentMessage(`Đang xử lý thanh toán. Vui lòng chờ ${remaining} giây...`);
-    disableConfirmButton(`Đang xử lý thanh toán (${remaining}s)`);
-    setText("paymentStatus", "Đang xử lý thanh toán");
+function getConfirmButtonLabel(maPT) {
+    const normalized = normalizePaymentMethod(maPT);
+    if (normalized === "COD") {
+        return "Xác nhận đặt hàng";
+    }
+    return "Xác nhận thanh toán";
 }
 
 function renderPaymentParams(params) {
-    setText("paymentOrderId", "#" + params.orderId);
+    setText("paymentOrderId", "#" + params.maDH);
     setText("paymentMethod", displayPaymentMethod(params.maPT));
-    setText("paymentStatus", "Đang xử lý thanh toán");
+    setText("paymentStatus", "Chờ thanh toán");
 }
 
 function renderPaymentInfo(payment) {
@@ -117,12 +123,17 @@ function renderPaymentInfo(payment) {
     setText("paymentStatus", displayPaymentStatus(payment.trangThaiTT));
     showPaymentView(payment.maPT);
     lockPaymentMethods(payment.maPT);
+
+    if (normalizeStatus(payment.trangThaiTT) === "PAID") {
+        disableConfirmButton("Thanh toán thành công");
+        showPaymentMessage("Đơn hàng đã được thanh toán");
+    }
 }
 
 function lockPaymentMethods(maPT) {
     const selectedValue = normalizePaymentMethod(maPT);
 
-    document.querySelectorAll('input[name="payment-method"]').forEach(input => {
+    document.querySelectorAll('input[name="payment-method"]').forEach((input) => {
         input.checked = normalizePaymentMethod(input.value) === selectedValue;
         input.disabled = true;
     });
@@ -137,7 +148,7 @@ function showPaymentView(maPT) {
         CREDIT_CARD: "view-credit-card"
     };
 
-    document.querySelectorAll(".payment-view").forEach(view => {
+    document.querySelectorAll(".payment-view").forEach((view) => {
         view.style.display = "none";
     });
 
@@ -148,12 +159,12 @@ function showPaymentView(maPT) {
 }
 
 function normalizePaymentMethod(method) {
-    const m = (method || "").trim().toUpperCase();
+    const value = (method || "").trim().toUpperCase();
 
-    if (m === "BANKING") return "BANK";
-    if (m === "CREDIT-CARD") return "CREDIT_CARD";
+    if (value === "BANKING") return "BANK";
+    if (value === "CREDIT-CARD") return "CREDIT_CARD";
 
-    return m;
+    return value;
 }
 
 function displayPaymentMethod(method) {
@@ -171,7 +182,8 @@ function displayPaymentStatus(status) {
     const map = {
         PENDING: "Chờ thanh toán",
         PAID: "Đã thanh toán",
-        FAILED: "Thanh toán thất bại"
+        FAILED: "Thanh toán thất bại",
+        CANCELLED: "Đã hủy"
     };
 
     return map[normalizeStatus(status)] || status || "-";
@@ -194,6 +206,17 @@ function disableConfirmButton(text) {
 
     if (confirmBtn) {
         confirmBtn.disabled = true;
+        if (text) {
+            confirmBtn.textContent = text;
+        }
+    }
+}
+
+function enableConfirmButton(text) {
+    const confirmBtn = document.getElementById("confirmPaymentBtn");
+
+    if (confirmBtn) {
+        confirmBtn.disabled = false;
         if (text) {
             confirmBtn.textContent = text;
         }

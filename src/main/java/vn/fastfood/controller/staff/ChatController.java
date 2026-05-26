@@ -61,9 +61,9 @@ public class ChatController {
             return;
 
         // Nếu yêu cầu còn Pending và nhân viên gửi → chuyển sang Processing
-        if ("Pending".equals(yeuCau.getTrangThai()) && "NhanVien".equals(message.getVaiTroGui())) {
+        if ("PENDING".equals(yeuCau.getTrangThai()) && "NhanVien".equals(message.getVaiTroGui())) {
             yeuCau.setNhanVien(nguoiGui);
-            yeuCau.setTrangThai("Processing");
+            yeuCau.setTrangThai("PROCESSING");
             yeuCauRepo.save(yeuCau);
         }
 
@@ -97,7 +97,7 @@ public class ChatController {
     @GetMapping("/api/chat/close")
     public String closeRequest(@RequestParam("maYC") Long maYC) {
         yeuCauRepo.findById(maYC).ifPresent(yc -> {
-            yc.setTrangThai("Done");
+            yc.setTrangThai("DONE");
             yeuCauRepo.save(yc);
         });
         return "redirect:/staff/support";

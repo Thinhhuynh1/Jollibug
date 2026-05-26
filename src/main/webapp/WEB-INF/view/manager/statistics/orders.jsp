@@ -129,7 +129,7 @@
                 <c:forEach var="order" items="${stats.recentOrders}">
                   <tr>
                     <td style="padding:0.75rem; border-bottom:1px solid var(--clr-border);">#${order.maDH}</td>
-                    <td style="padding:0.75rem; border-bottom:1px solid var(--clr-border);">${order.user.hoTen}</td>
+                    <td style="padding:0.75rem; border-bottom:1px solid var(--clr-border);">${order.hoTen}</td>
                     <td style="padding:0.75rem; text-align:right; border-bottom:1px solid var(--clr-border);"><fmt:formatNumber value="${order.tongTien}" pattern="#,###"/>đ</td>
                     <td style="padding:0.75rem; text-align:center; border-bottom:1px solid var(--clr-border);">
                       <span class="badge badge--${order.trangThai == 'DELIVERED' ? 'success' : order.trangThai == 'CANCELLED' ? 'danger' : order.trangThai == 'PENDING' ? 'warning' : 'info'}">${order.trangThai}</span>

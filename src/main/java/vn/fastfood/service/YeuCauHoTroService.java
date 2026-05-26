@@ -40,10 +40,15 @@ public class YeuCauHoTroService {
             return null;
         }
 
-        executeProcedure("{call PROC_UPDATE_SUPPORT_STATUS(?, ?)}", statement -> {
+        try (Connection connection = dataSource.getConnection();
+             CallableStatement statement = connection.prepareCall("{call PROC_UPDATE_SUPPORT_STATUS(?, ?)}")) {
             statement.setLong(1, maYC);
             statement.setString(2, trangThai);
-        });
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Không thể chạy procedure", e);
+        }
+
         return yeuCauHoTroRepository.findById(maYC).orElse(null);
     }
 
@@ -53,10 +58,15 @@ public class YeuCauHoTroService {
             return null;
         }
 
-        executeProcedure("{call PROC_ASSIGN_SUPPORT_REQUEST(?, ?)}", statement -> {
+        try (Connection connection = dataSource.getConnection();
+             CallableStatement statement = connection.prepareCall("{call PROC_ASSIGN_SUPPORT_REQUEST(?, ?)}")) {
             statement.setLong(1, maYC);
             statement.setLong(2, maTKNV);
-        });
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Không thể chạy procedure", e);
+        }
+
         return yeuCauHoTroRepository.findById(maYC).orElse(null);
     }
 
@@ -81,12 +91,18 @@ public class YeuCauHoTroService {
     }
 
     public void deleteYeuCau(Long maYC) {
-        executeProcedure("{call PROC_DELETE_SUPPORT_REQUEST(?)}", statement -> statement.setLong(1, maYC));
+        try (Connection connection = dataSource.getConnection();
+             CallableStatement statement = connection.prepareCall("{call PROC_DELETE_SUPPORT_REQUEST(?)}")) {
+            statement.setLong(1, maYC);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Không thể chạy procedure", e);
+        }
     }
 
     private Long createSupportRequest(Long maTKKH, String tieuDe, String noiDung) {
         try (Connection connection = dataSource.getConnection();
-                CallableStatement statement = connection.prepareCall("{call PROC_CREATE_SUPPORT_REQUEST(?, ?, ?, ?)}")) {
+             CallableStatement statement = connection.prepareCall("{call PROC_CREATE_SUPPORT_REQUEST(?, ?, ?, ?)}")) {
             statement.setLong(1, maTKKH);
             statement.setString(2, tieuDe);
             statement.setString(3, noiDung);
@@ -96,20 +112,5 @@ public class YeuCauHoTroService {
         } catch (SQLException e) {
             throw new RuntimeException("Không thể chạy procedure", e);
         }
-    }
-
-    private void executeProcedure(String sql, SqlConsumer consumer) {
-        try (Connection connection = dataSource.getConnection();
-                CallableStatement statement = connection.prepareCall(sql)) {
-            consumer.accept(statement);
-            statement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException("Không thể chạy procedure", e);
-        }
-    }
-
-    @FunctionalInterface
-    private interface SqlConsumer {
-        void accept(CallableStatement statement) throws SQLException;
     }
 }

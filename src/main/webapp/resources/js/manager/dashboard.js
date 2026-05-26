@@ -348,7 +348,7 @@
       new Chart(ordersCtx, {
         type: "doughnut",
         data: {
-          labels: ["Pending", "Processing", "Delivered", "Cancelled"],
+          labels: ["Chờ xác nhận", "Đang xử lý", "Đã giao", "Đã hủy"],
           datasets: [{
             data: Object.values(counts),
             backgroundColor: [
