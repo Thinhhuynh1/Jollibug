@@ -19,7 +19,6 @@
 
 <body data-page="home">
 
-  <%-- 1. NAVBAR (shared header) --%>
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell">
@@ -134,7 +133,7 @@
                 <div class="hp-prod-card__footer">
                   <a class="hp-prod-card__btn" href="/product?productID=${monAn.maMon}">Xem chi tiết</a>
                   <c:if test="${not empty sessionScope.user}">
-                    <form method="post" action="/addCart" >
+                    <form method="post" action="/addCart" data-ajax-add-cart>
                       <input type="hidden" name="productID" value="${monAn.maMon}">
                       <button class="hp-prod-card__btn"  type="submit">+ Thêm</button>
                     </form>
@@ -198,8 +197,8 @@
 
   </main>
 
-  <%-- 7. FOOTER (shared) --%>
   <jsp:include page="layout/footer.jsp" />
+  <script src="/js/client/add-to-cart.js"></script>
 
   <!-- <script>
     /* Category bar active toggle */

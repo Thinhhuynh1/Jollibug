@@ -103,7 +103,7 @@ public class MenuController {
                 String redirectUrl = path + (query != null ? "?" + query : "");
                 return "redirect:" + redirectUrl;
             } catch (MalformedURLException e) {
-                // fallback neu referer khong hop le
+                // Chuyển về thực đơn nếu referer không hợp lệ
             }
         }
         return "redirect:/menu";

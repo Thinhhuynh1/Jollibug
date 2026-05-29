@@ -263,7 +263,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Product page quantity control and hidden input sync
     const qtyInput = document.querySelector('[data-product-qty]');
     const qtyHidden = document.getElementById('product-qty-input');
     const minusBtn = document.querySelector('[data-action="product-qty-minus"]');
@@ -284,11 +283,9 @@ document.addEventListener('DOMContentLoaded', function() {
             setQty(Number(qtyInput.value) + 1);
         });
 
-        // Sync initial value
         setQty(Number(qtyInput.value));
     }
 
-    // Menu search and sort support
     const menuSearch = document.querySelector('[data-menu-search]');
     const menuSort = document.querySelector('[data-menu-sort]');
     const menuGrid = document.getElementById('menu-grid');
@@ -329,7 +326,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Checkout and voucher handling
 document.addEventListener('DOMContentLoaded', function() {
     const checkoutItemsContainer = document.getElementById('order-items');
     const invoiceSubtotal = document.getElementById('invoice-subtotal');

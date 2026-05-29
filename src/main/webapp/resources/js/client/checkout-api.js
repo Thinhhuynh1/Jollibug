@@ -201,18 +201,18 @@ async function applyVoucherPreview() {
         if (!response.ok || !data.valid) {
             checkoutDiscount = 0;
             updateInvoice(checkoutSubtotal, checkoutDiscount);
-            showVoucherMessage(data.message || "Mã giảm giá không hợp lệ.");
+            showVoucherMessage(data.message || "Mã giảm giá không hợp lệ");
             return;
         }
 
         checkoutDiscount = Number(data.discountAmount || 0);
         updateInvoice(checkoutSubtotal, checkoutDiscount);
-        showVoucherMessage(data.message || "Áp dụng mã giảm giá thành công.");
+        showVoucherMessage(data.message || "Áp dụng mã giảm giá thành công");
     } catch (error) {
         console.error("[VOUCHER VALIDATE ERROR]", error);
         checkoutDiscount = 0;
         updateInvoice(checkoutSubtotal, checkoutDiscount);
-        showVoucherMessage("Không thể kiểm tra mã giảm giá lúc này.");
+        showVoucherMessage("Không thể kiểm tra mã giảm giá lúc này");
     }
 }
 
@@ -260,17 +260,17 @@ async function submitCheckout() {
     };
 
     if (!payload.maKH) {
-        alert("Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.");
+        alert("Không tìm thấy thông tin tài khoản, vui lòng đăng nhập lại");
         return;
     }
 
     if (!payload.maPT) {
-        alert("Vui lòng chọn phương thức thanh toán.");
+        alert("Vui lòng chọn phương thức thanh toán");
         return;
     }
 
     if (!payload.maDC && !payload.deliveryAddress) {
-        alert("Vui lòng nhập địa chỉ giao hàng.");
+        alert("Vui lòng nhập địa chỉ giao hàng");
         return;
     }
 
@@ -286,7 +286,7 @@ async function submitCheckout() {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            alert(data.message || "Thanh toán thất bại.");
+            alert(data.message || "Thanh toán thất bại");
             return;
         }
 
@@ -305,7 +305,7 @@ async function submitCheckout() {
             + encodeURIComponent(payload.maPT);
     } catch (error) {
         console.error("[CHECKOUT ERROR]", error);
-        alert("Có lỗi xảy ra khi thanh toán. Vui lòng thử lại.");
+        alert("Có lỗi xảy ra khi thanh toán, vui lòng thử lại");
     }
 }
 

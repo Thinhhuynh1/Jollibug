@@ -32,12 +32,6 @@ public class CheckoutPageController {
         long userId = user.getMaTK();
         List<DiaChi> addresses = addressRepository.findByUserMaTKOrderByDefaultAddressDescMaDCAsc(userId);
 
-        System.out.println("[CHECKOUT ADDRESS] sessionUserId=" + session.getAttribute("userId")
-                + ", sessionUser=" + describeSessionUser(session)
-                + ", resolvedUserId=" + userId
-                + ", email=" + user.getEmail()
-                + ", addressCount=" + addresses.size());
-
         model.addAttribute("addresses", addresses);
         model.addAttribute("checkoutUser", user);
         model.addAttribute("currentUser", user);
@@ -61,18 +55,5 @@ public class CheckoutPageController {
         }
 
         return null;
-    }
-
-    private String describeSessionUser(HttpSession session) {
-        if (session == null) {
-            return "null";
-        }
-
-        Object userObj = session.getAttribute("user");
-        if (userObj instanceof User user) {
-            return "user{maTK=" + user.getMaTK() + "}";
-        }
-
-        return String.valueOf(userObj);
     }
 }

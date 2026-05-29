@@ -5,8 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jollibug | Lịch sử mua hàng</title>
-    <meta name="description" content="Theo dõi lịch sử đơn hàng và trạng thái giao món của bạn tại Jollibug.">
+    <title>Jollibug | Lịch sử đơn hàng</title>
+    <meta name="description" content="Theo dõi lịch sử đơn hàng và trạng thái giao món của bạn tại Jollibug">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
         <section class="profile-content orders-content">
             <div class="orders-header">
                 <div>
-                    <h1 class="profile-title">Lịch sử mua hàng</h1>
+                    <h1 class="profile-title">Lịch sử đơn hàng</h1>
                 </div>
 
                 <a class="btn btn-outline orders-header__action" href="<c:url value='/menu'/>">
@@ -34,7 +34,7 @@
 
             <input type="hidden" id="currentMaKH" value="${not empty sessionScope.user ? sessionScope.user.maTK : sessionScope.userId}">
 
-            <div class="order-tabs" role="tablist" aria-label="Order tabs">
+            <div class="order-tabs" role="tablist" aria-label="Danh sách đơn hàng">
                 <button class="order-tab is-active" type="button" data-tab="active" onclick="switchOrderTab('active')">
                     Đơn đang đến
                 </button>

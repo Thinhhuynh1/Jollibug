@@ -1,53 +1,4 @@
-
--- Trigger
---Luu lich su khi thao tac tren don hang
-CREATE OR REPLACE TRIGGER trg_donhang_ins_lishsu
-AFTER INSERT ON DONHANG
-FOR EACH ROW
-BEGIN
-    INSERT INTO LICHSUTRANGTHAIDH (
-        MaDH,
-        TrangThaiCu,
-        TrangThaiMoi,
-        MaNguoiThucHien,
-        LyDo,
-        ThoiGian
-    )
-    VALUES (
-        :NEW.MaDH,
-        NULL,
-        :NEW.TrangThaiDon,
-        :NEW.MaTK_NV,
-        'Tao don hang moi',
-        CURRENT_TIMESTAMP
-    );
-END;
-/
-
-CREATE OR REPLACE TRIGGER trg_donhang_upd_trangthai
-AFTER UPDATE OF TrangThaiDon ON DONHANG
-FOR EACH ROW
-WHEN (OLD.TrangThaiDon <> NEW.TrangThaiDon)
-BEGIN
-    INSERT INTO LICHSUTRANGTHAIDH (
-        MaDH,
-        TrangThaiCu,
-        TrangThaiMoi,
-        MaNguoiThucHien,
-        LyDo,
-        ThoiGian
-    )
-    VALUES (
-        :NEW.MaDH,
-        :OLD.TrangThaiDon,
-        :NEW.TrangThaiDon,
-        :NEW.MaTK_NV,
-        'Cap nhat trang thai don hang',
-        CURRENT_TIMESTAMP
-    );
-END;
-/
-
+--TRIGGER
 --Mua hang udp SoLuongTon
 CREATE OR REPLACE TRIGGER trg_ctdh_upd_soluongton
 BEFORE INSERT ON CHITIETDH
@@ -62,7 +13,7 @@ BEGIN
     FOR UPDATE; --Khoa dong cho update, Tranh bi concurence
 
     IF v_so_luong_ton < :NEW.SoLuong THEN
-        RAISE_APPLICATION_ERROR(-20002, 'So luong ton kho khong du de dat hang');
+        RAISE_APPLICATION_ERROR(-20002, 'Số lượng tồn kho không đủ để đặt hàng');
     END IF;
 
     UPDATE MONAN
@@ -194,7 +145,7 @@ EXCEPTION
 END;
 /
 
-CREATE OR REPLACE FUNCTION FUNC_CALC_DISCOUNT(
+CREATE OR REPLACE FUNCTION FUNC_CALC_GIAGIAM(
     p_macode IN VARCHAR2,
     p_subtotal IN NUMBER
 )
@@ -267,6 +218,57 @@ BEGIN
     WHERE MAPT = v_mapt;
 
     RETURN CASE WHEN v_count > 0 THEN 1 ELSE 0 END;
+END;
+/
+
+CREATE OR REPLACE FUNCTION FUNC_GET_SOLUONGTON(
+    p_mamon IN NUMBER
+)
+RETURN NUMBER
+AS
+    v_soluongton MONAN.SoLuongTon%TYPE;
+BEGIN
+    SELECT SoLuongTon
+    INTO v_soluongton
+    FROM MONAN
+    WHERE MaMon = p_mamon;
+
+    RETURN v_soluongton;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN -1;
+END;
+/
+
+CREATE OR REPLACE FUNCTION FUNC_CAN_CHANGE_ORDER_STATUS(
+    p_current_status IN VARCHAR2,
+    p_next_status IN VARCHAR2
+)
+RETURN NUMBER
+AS
+    v_current VARCHAR2(30);
+    v_next VARCHAR2(30);
+BEGIN
+    v_current := UPPER(TRIM(p_current_status));
+    v_next := UPPER(TRIM(p_next_status));
+
+    IF v_current = 'PENDING' AND v_next IN ('CONFIRMED', 'CANCELLED') THEN
+        RETURN 1;
+    END IF;
+
+    IF v_current = 'CONFIRMED' AND v_next IN ('SHIPPING', 'CANCELLED') THEN
+        RETURN 1;
+    END IF;
+
+    IF v_current = 'SHIPPING' AND v_next = 'DELIVERED' THEN
+        RETURN 1;
+    END IF;
+
+    IF v_current = v_next THEN
+        RETURN 1;
+    END IF;
+
+    RETURN 0;
 END;
 /
 
@@ -448,9 +450,26 @@ CREATE OR REPLACE PROCEDURE PROC_UPDATE_SUPPORT_STATUS(
     p_trangthai IN VARCHAR2
 )
 AS
+    v_trangthai VARCHAR2(20);
+    v_count NUMBER;
 BEGIN
+    v_trangthai := UPPER(TRIM(p_trangthai));
+
+    IF v_trangthai NOT IN ('PENDING', 'PROCESSING', 'DONE') THEN
+        RAISE_APPLICATION_ERROR(-20050, 'Trạng thái hỗ trợ không hợp lệ');
+    END IF;
+
+    SELECT COUNT(*)
+    INTO v_count
+    FROM YEUCAUHOTRO
+    WHERE MaYC = p_mayc;
+
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20051, 'Không tìm thấy yêu cầu hỗ trợ');
+    END IF;
+
     UPDATE YEUCAUHOTRO
-    SET TrangThai = p_trangthai
+    SET TrangThai = v_trangthai
     WHERE MaYC = p_mayc;
 END;
 /
@@ -460,7 +479,27 @@ CREATE OR REPLACE PROCEDURE PROC_ASSIGN_SUPPORT_REQUEST(
     p_matk_nv IN NUMBER
 )
 AS
+    v_count_yc NUMBER;
+    v_count_nv NUMBER;
 BEGIN
+    SELECT COUNT(*)
+    INTO v_count_yc
+    FROM YEUCAUHOTRO
+    WHERE MaYC = p_mayc;
+
+    IF v_count_yc = 0 THEN
+        RAISE_APPLICATION_ERROR(-20051, 'Không tìm thấy yêu cầu hỗ trợ');
+    END IF;
+
+    SELECT COUNT(*)
+    INTO v_count_nv
+    FROM NGUOIDUNG
+    WHERE MaTK = p_matk_nv;
+
+    IF v_count_nv = 0 THEN
+        RAISE_APPLICATION_ERROR(-20052, 'Không tìm thấy nhân viên hỗ trợ');
+    END IF;
+
     UPDATE YEUCAUHOTRO
     SET MaTK_NV = p_matk_nv,
         TrangThai = 'PROCESSING'
@@ -478,7 +517,7 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE PROCEDURE PROC_RESERVE_VOUCHER(
+CREATE OR REPLACE PROCEDURE PROC_LOCK_VOUCHER(
     p_magg IN NUMBER
 )
 AS
@@ -493,7 +532,7 @@ BEGIN
     FOR UPDATE;
 
     IF v_solansudung >= v_soluong THEN
-        RAISE_APPLICATION_ERROR(-20021, 'Hết lượng sử dụng');
+        RAISE_APPLICATION_ERROR(-20021, 'Mã giảm giá đã hết lượt sử dụng');
     END IF;
 
     UPDATE MAGIAMGIA
@@ -501,35 +540,34 @@ BEGIN
     WHERE MaGG = p_magg;
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
-        RAISE_APPLICATION_ERROR(-20022, 'Voucher không có hiệu lực');
+        RAISE_APPLICATION_ERROR(-20022, 'Mã giảm giá không còn hiệu lực');
 END;
 /
 
-CREATE OR REPLACE PROCEDURE PROC_CHECKOUT(
+CREATE OR REPLACE PROCEDURE PROC_RESERVE_VOUCHER(
+    p_magg IN NUMBER
+)
+AS
+BEGIN
+    PROC_LOCK_VOUCHER(p_magg);
+END;
+/
+
+CREATE OR REPLACE PROCEDURE PROC_CREATE_ORDER(
     p_matk_kh IN NUMBER,
     p_madc IN NUMBER,
     p_tongtienmon IN NUMBER,
     p_tiengiamgia IN NUMBER,
     p_thanhtien IN NUMBER,
-    p_mapt IN VARCHAR2,
     p_magg IN NUMBER,
     p_ghichu IN CLOB,
-    p_items IN CLOB,
     p_madh OUT NUMBER
 )
 AS
-    v_mapt VARCHAR2(20);
     v_count NUMBER;
-    v_items VARCHAR2(32767);
-    v_line VARCHAR2(4000);
-    v_mamon NUMBER;
-    v_tenmon VARCHAR2(255);
-    v_soluong NUMBER;
-    v_dongia NUMBER;
-    v_thanhtien NUMBER;
 BEGIN
     IF p_matk_kh IS NULL OR p_matk_kh <= 0 THEN
-        RAISE_APPLICATION_ERROR(-20030, 'Khach hang khong hop le.');
+        RAISE_APPLICATION_ERROR(-20030, 'Khách hàng không hợp lệ');
     END IF;
 
     IF p_madc IS NOT NULL THEN
@@ -540,30 +578,12 @@ BEGIN
           AND MaTK = p_matk_kh;
 
         IF v_count = 0 THEN
-            RAISE_APPLICATION_ERROR(-20031, 'Dia chi giao hang khong hop le.');
+            RAISE_APPLICATION_ERROR(-20031, 'Địa chỉ giao hàng không hợp lệ');
         END IF;
     END IF;
 
-    v_mapt := UPPER(TRIM(p_mapt));
-    IF v_mapt IS NULL THEN
-        RAISE_APPLICATION_ERROR(-20032, 'Phuong thuc thanh toan khong hop le.');
-    END IF;
-
-    SELECT COUNT(*)
-    INTO v_count
-    FROM PHUONGTHUCTT
-    WHERE MaPT = v_mapt;
-
-    IF v_count = 0 THEN
-        RAISE_APPLICATION_ERROR(-20032, 'Phuong thuc thanh toan khong hop le.');
-    END IF;
-
-    IF p_items IS NULL OR DBMS_LOB.GETLENGTH(p_items) = 0 THEN
-        RAISE_APPLICATION_ERROR(-20033, 'Gio hang trong.');
-    END IF;
-
     IF p_magg IS NOT NULL THEN
-        PROC_RESERVE_VOUCHER(p_magg);
+        PROC_LOCK_VOUCHER(p_magg);
     END IF;
 
     INSERT INTO DONHANG (
@@ -593,40 +613,99 @@ BEGIN
         CURRENT_TIMESTAMP
     )
     RETURNING MaDH INTO p_madh;
+END;
+/
 
-    v_items := DBMS_LOB.SUBSTR(p_items, 32767, 1);
+CREATE OR REPLACE PROCEDURE PROC_REPORT_DOANHTHU(
+    p_from_date IN TIMESTAMP,
+    p_to_date IN TIMESTAMP,
+    p_result OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+    OPEN p_result FOR
+        SELECT TRUNC(NgayDat) AS Ngay,
+               COUNT(*) AS SoDon,
+               NVL(SUM(TongTienMon), 0) AS TongTienMon,
+               NVL(SUM(TienGiamGia), 0) AS TongTienGiamGia,
+               NVL(SUM(ThanhTien), 0) AS DoanhThu
+        FROM DONHANG
+        WHERE TrangThaiDon = 'DELIVERED'
+          AND NgayDat BETWEEN p_from_date AND p_to_date
+        GROUP BY TRUNC(NgayDat)
+        ORDER BY TRUNC(NgayDat);
+END;
+/
 
-    FOR i IN 1 .. REGEXP_COUNT(v_items, CHR(10)) + 1
-    LOOP
-        v_line := REGEXP_SUBSTR(v_items, '[^' || CHR(10) || ']+', 1, i);
+CREATE OR REPLACE PROCEDURE PROC_COUNT_ORDER_STATUS(
+    p_from_date IN TIMESTAMP,
+    p_to_date IN TIMESTAMP,
+    p_result OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+    OPEN p_result FOR
+        SELECT TrangThaiDon,
+               COUNT(*) AS SoLuongDon
+        FROM DONHANG
+        WHERE NgayDat BETWEEN p_from_date AND p_to_date
+        GROUP BY TrangThaiDon
+        ORDER BY TrangThaiDon;
+END;
+/
 
-        IF v_line IS NULL THEN
-            CONTINUE;
-        END IF;
+CREATE OR REPLACE PROCEDURE PROC_CREATE_ORDER_ITEM(
+    p_madh IN NUMBER,
+    p_mamon IN NUMBER,
+    p_tenmon IN VARCHAR2,
+    p_soluong IN NUMBER,
+    p_dongia IN NUMBER,
+    p_thanhtien IN NUMBER
+)
+AS
+BEGIN
+    INSERT INTO CHITIETDH (
+        MaDH,
+        MaMon,
+        TenMon,
+        SoLuong,
+        DonGia,
+        ThanhTien
+    )
+    VALUES (
+        p_madh,
+        p_mamon,
+        p_tenmon,
+        p_soluong,
+        p_dongia,
+        p_thanhtien
+    );
+END;
+/
 
-        v_mamon := TO_NUMBER(REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 1));
-        v_tenmon := REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 2);
-        v_soluong := TO_NUMBER(REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 3));
-        v_dongia := TO_NUMBER(REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 4));
-        v_thanhtien := TO_NUMBER(REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 5));
+CREATE OR REPLACE PROCEDURE PROC_CREATE_PAYMENT(
+    p_madh IN NUMBER,
+    p_mapt IN VARCHAR2,
+    p_sotien IN NUMBER,
+    p_trangthai IN VARCHAR2
+)
+AS
+    v_mapt VARCHAR2(20);
+    v_count NUMBER;
+BEGIN
+    v_mapt := UPPER(TRIM(p_mapt));
+    IF v_mapt IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20032, 'Phương thức thanh toán không hợp lệ');
+    END IF;
 
-        INSERT INTO CHITIETDH (
-            MaDH,
-            MaMon,
-            TenMon,
-            SoLuong,
-            DonGia,
-            ThanhTien
-        )
-        VALUES (
-            p_madh,
-            v_mamon,
-            v_tenmon,
-            v_soluong,
-            v_dongia,
-            v_thanhtien
-        );
-    END LOOP;
+    SELECT COUNT(*)
+    INTO v_count
+    FROM PHUONGTHUCTT
+    WHERE MaPT = v_mapt;
+
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20032, 'Phương thức thanh toán không hợp lệ');
+    END IF;
 
     INSERT INTO THANHTOAN (
         MaDH,
@@ -639,8 +718,58 @@ BEGIN
         p_madh,
         v_mapt,
         CURRENT_TIMESTAMP,
-        p_thanhtien,
-        'PENDING'
+        p_sotien,
+        p_trangthai
     );
 END;
 /
+
+CREATE OR REPLACE PROCEDURE PROC_UPDATE_ORDER_STATUS(
+    p_madh IN NUMBER,
+    p_matk_nv IN NUMBER,
+    p_new_status IN VARCHAR2,
+    p_reason IN CLOB
+)
+AS
+    v_current_status DONHANG.TrangThaiDon%TYPE;
+    v_new_status VARCHAR2(30);
+BEGIN
+    v_new_status := UPPER(TRIM(p_new_status));
+
+    SELECT TrangThaiDon
+    INTO v_current_status
+    FROM DONHANG
+    WHERE MaDH = p_madh
+    FOR UPDATE;
+
+    IF FUNC_CAN_CHANGE_ORDER_STATUS(v_current_status, v_new_status) = 0 THEN
+        RAISE_APPLICATION_ERROR(-20040, 'Trạng thái đơn hàng không hợp lệ');
+    END IF;
+
+    UPDATE DONHANG
+    SET TrangThaiDon = v_new_status,
+        MaTK_NV = CASE
+            WHEN p_matk_nv IS NULL THEN MaTK_NV
+            WHEN MaTK_NV IS NULL THEN p_matk_nv
+            ELSE MaTK_NV
+        END,
+        GhiChu = CASE
+            WHEN p_reason IS NULL THEN GhiChu
+            WHEN GhiChu IS NULL THEN p_reason
+            ELSE GhiChu || TO_CLOB(CHR(10)) || p_reason
+        END
+    WHERE MaDH = p_madh;
+END;
+/
+
+SELECT *
+FROM THANHTOAN
+WHERE MaDH = 1;
+
+SELECT MaDH, TrangThaiDon
+FROM DONHANG
+WHERE MaDH = 58;
+
+SELECT MaDH, TrangThaiTT, NgayTT
+FROM THANHTOAN
+WHERE MaDH = 58;

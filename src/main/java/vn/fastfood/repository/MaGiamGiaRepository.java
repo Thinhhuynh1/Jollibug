@@ -19,5 +19,6 @@ public interface MaGiamGiaRepository extends JpaRepository<MaGiamGia, Long> {
            "lower(m.loaiGiam) like lower(concat('%', :keyword, '%'))")
     List<MaGiamGia> searchByCode(@Param("keyword") String keyword);
 
-    Optional<MaGiamGia> findByTenMa(String tenMa);
+    @Query("select m from MaGiamGia m where lower(trim(m.tenMa)) = lower(trim(:tenMa))")
+    Optional<MaGiamGia> findByTenMaNormalized(@Param("tenMa") String tenMa);
 }

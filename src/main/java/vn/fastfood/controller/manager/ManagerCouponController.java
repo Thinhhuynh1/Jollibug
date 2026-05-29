@@ -27,6 +27,7 @@ public class ManagerCouponController {
             @RequestParam(value = "keyword", required = false) String keyword) {
         if (keyword != null) {
             keyword = keyword.trim();
+
             if (keyword.isEmpty()) {
                 keyword = null;
             }
@@ -58,11 +59,27 @@ public class ManagerCouponController {
         coupon.setTenMa(code.toUpperCase());
         coupon.setLoaiGiam(loaiGiam);
         coupon.setMucGiam(mucGiam);
-        coupon.setDieuKien(normalizeMinimumOrder(dieuKien));
+        if (dieuKien == null || dieuKien <= 0) {
+            coupon.setDieuKien(null);
+        }
+        else {
+            coupon.setDieuKien(dieuKien);
+        }
         coupon.setSoLuong(soLuong);
         coupon.setMoTa(moTa);
-        coupon.setNgayBatDau(parseDateTime(startDate, LocalTime.MIN));
-        coupon.setNgayKetThuc(parseDateTime(endDate, LocalTime.MAX));
+        if (startDate == null || startDate.isBlank()) {
+            coupon.setNgayBatDau(null);
+        }
+        else {
+            coupon.setNgayBatDau(LocalDateTime.of(LocalDate.parse(startDate), LocalTime.MIN));
+        }
+
+        if (endDate == null || endDate.isBlank()) {
+            coupon.setNgayKetThuc(null);
+        }
+        else {
+            coupon.setNgayKetThuc(LocalDateTime.of(LocalDate.parse(endDate), LocalTime.MAX));
+        }
         this.couponRepository.save(coupon);
         return "redirect:/manager/coupons";
     }
@@ -73,10 +90,12 @@ public class ManagerCouponController {
         if (couponID == null) {
             return "redirect:/manager/coupons";
         }
+
         MaGiamGia coupon = this.couponRepository.findById(couponID).orElse(null);
         if (coupon == null) {
             return "redirect:/manager/coupons";
         }
+
         model.addAttribute("coupon", coupon);
         return "manager/coupons/detail";
     }
@@ -87,10 +106,12 @@ public class ManagerCouponController {
         if (couponID == null) {
             return "redirect:/manager/coupons";
         }
+
         MaGiamGia coupon = this.couponRepository.findById(couponID).orElse(null);
         if (coupon == null) {
             return "redirect:/manager/coupons";
         }
+
         model.addAttribute("coupon", coupon);
         return "manager/coupons/update";
     }
@@ -110,14 +131,31 @@ public class ManagerCouponController {
         if (coupon == null) {
             return "redirect:/manager/coupons";
         }
+
         coupon.setTenMa(code.toUpperCase());
         coupon.setLoaiGiam(loaiGiam);
         coupon.setMucGiam(mucGiam);
-        coupon.setDieuKien(normalizeMinimumOrder(dieuKien));
+        if (dieuKien == null || dieuKien <= 0) {
+            coupon.setDieuKien(null);
+        }
+        else {
+            coupon.setDieuKien(dieuKien);
+        }
         coupon.setSoLuong(soLuong);
         coupon.setMoTa(moTa);
-        coupon.setNgayBatDau(parseDateTime(startDate, LocalTime.MIN));
-        coupon.setNgayKetThuc(parseDateTime(endDate, LocalTime.MAX));
+        if (startDate == null || startDate.isBlank()) {
+            coupon.setNgayBatDau(null);
+        }
+        else {
+            coupon.setNgayBatDau(LocalDateTime.of(LocalDate.parse(startDate), LocalTime.MIN));
+        }
+
+        if (endDate == null || endDate.isBlank()) {
+            coupon.setNgayKetThuc(null);
+        }
+        else {
+            coupon.setNgayKetThuc(LocalDateTime.of(LocalDate.parse(endDate), LocalTime.MAX));
+        }
         this.couponRepository.save(coupon);
         return "redirect:/manager/coupons";
     }
@@ -128,10 +166,12 @@ public class ManagerCouponController {
         if (couponID == null) {
             return "redirect:/manager/coupons";
         }
+
         MaGiamGia coupon = this.couponRepository.findById(couponID).orElse(null);
         if (coupon == null) {
             return "redirect:/manager/coupons";
         }
+
         model.addAttribute("coupon", coupon);
         return "manager/coupons/delete";
     }
@@ -140,24 +180,5 @@ public class ManagerCouponController {
     public String postCouponsDelete(@RequestParam("couponID") Long couponID) {
         this.couponRepository.deleteById(couponID);
         return "redirect:/manager/coupons";
-    }
-
-    private LocalDateTime parseDateTime(String dateValue, LocalTime fallbackTime) {
-        if (dateValue == null || dateValue.isBlank()) {
-            return null;
-        }
-        try {
-            LocalDate date = LocalDate.parse(dateValue);
-            return LocalDateTime.of(date, fallbackTime);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private Double normalizeMinimumOrder(Double dieuKien) {
-        if (dieuKien == null || dieuKien <= 0) {
-            return null;
-        }
-        return dieuKien;
     }
 }

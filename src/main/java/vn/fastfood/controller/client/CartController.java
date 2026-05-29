@@ -1,10 +1,11 @@
 package vn.fastfood.controller.client;
 
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import jakarta.servlet.http.HttpSession;
 import vn.fastfood.entity.DiaChi;
 import vn.fastfood.entity.User;
 import vn.fastfood.repository.AddressRepository;
@@ -13,8 +14,7 @@ import vn.fastfood.service.MaGiamGiaService;
 
 @Controller
 public class CartController {
-    // cart, checkout, orders.
-
+    // cart, checkout, orders
     @Autowired
     private UserRepository userRepository;
 
@@ -46,9 +46,6 @@ public class CartController {
         model.addAttribute("currentUser", user);
         model.addAttribute("defaultAddress", defaultAddress);
         model.addAttribute("activeCoupons", maGiamGiaService.findActiveCoupons());
-
-        System.out.println("[CHECKOUT PAGE] userId=" + user.getMaTK()
-                + ", email=" + user.getEmail());
 
         return "client/checkout/show";
     }

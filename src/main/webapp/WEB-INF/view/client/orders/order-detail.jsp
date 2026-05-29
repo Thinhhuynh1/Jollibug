@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jollibug | Chi tiết đơn hàng</title>
-    <meta name="description" content="Xem chi tiết đơn hàng, danh sách món đã đặt và đánh giá món ăn tại Jollibug.">
+    <meta name="description" content="Xem chi tiết đơn hàng, danh sách món đã đặt và đánh giá món ăn tại Jollibug">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +40,7 @@
 
             <div id="message" class="message" role="status" aria-live="polite"></div>
 
-            <section class="orders-card order-timeline-card" aria-label="Order status timeline">
+            <section class="orders-card order-timeline-card" aria-label="Tiến trình đơn hàng">
                 <div id="orderTimeline" class="order-timeline"></div>
                 <div id="orderTimelineCancelInfo" class="order-timeline-cancel-info hidden"></div>
             </section>
@@ -91,7 +91,7 @@
         </div>
 
         <label for="reviewNoiDung">Nội dung đánh giá</label>
-        <textarea id="reviewNoiDung" rows="4" placeholder="Nhập cảm nhận của bạn..."></textarea>
+        <textarea id="reviewNoiDung" rows="4" placeholder="Nhập cảm nhận của bạn"></textarea>
 
         <label for="reviewImageInput">Ảnh đánh giá</label>
         <input id="reviewImageInput" class="review-image-input" type="file" accept="image/*" onchange="previewReviewImage(event)">

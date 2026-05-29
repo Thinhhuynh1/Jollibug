@@ -41,14 +41,14 @@ public class ChuongTrinhKhuyenMai {
     private LocalDateTime ngayKetThuc;
 
     @OneToMany(mappedBy = "khuyenMai", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ChiTietKhuyenMai> chiTietKhuyenMais;
+    private List<ChiTietKhuyenMai> chiTietKhuyenMai;
 
     @Transient
     public List<Long> getMonAnDuocApDungIds() {
-        if (chiTietKhuyenMais == null || chiTietKhuyenMais.isEmpty()) {
+        if (chiTietKhuyenMai == null || chiTietKhuyenMai.isEmpty()) {
             return List.of();
         }
-        return chiTietKhuyenMais.stream()
+        return chiTietKhuyenMai.stream()
                 .map(ChiTietKhuyenMai::getMonAn)
                 .filter(Objects::nonNull)
                 .map(MonAn::getMaMon)

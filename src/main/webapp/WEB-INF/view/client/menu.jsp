@@ -18,7 +18,6 @@
 <body data-page="menu">
   <fmt:setLocale value="vi_VN" />
 
-  <!-- SECTION -->
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell">
@@ -28,16 +27,11 @@
           <h1 class="section-title">Thực đơn Jollibug</h1>
         </div>
 
-        <!-- SECTION -->
         <section class="menu-toolbar reveal-up" aria-label="Menu filters">
           
           <form class="toolbar-row" method="get" action="/menu">
             <input type="hidden" name="categoryID" value="${selectCategoryID}" />
             <div class="searchbar">
-              <!--
-                main.js attaches an 'input' listener to this element.
-                The search icon SVG is now static inline - no JS injection.
-              -->
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>
               </svg>
@@ -99,7 +93,7 @@
                 
                 <a class="hp-prod-card__btn" href="/product?productID=${monAn.maMon}">Xem chi tiết</a>
                 <c:if test="${not empty sessionScope.user}">
-                  <form method="post" action="/addCart" >
+                  <form method="post" action="/addCart" data-ajax-add-cart>
                     <input type="hidden" name="productID" value="${monAn.maMon}">
                     <button class="hp-prod-card__btn" type="submit">+ Thêm</button>
                   </form>
@@ -166,6 +160,7 @@
     </div>
 
   <script src="/js/client/main.js"></script>
+  <script src="/js/client/add-to-cart.js"></script>
   <script src="/js/client/jollibug-ai-chat.js"></script>
 </body>
 </html>

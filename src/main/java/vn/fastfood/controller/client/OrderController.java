@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import vn.fastfood.dto.OrderDetailResponse;
-import vn.fastfood.dto.OrderStatusHistoryResponse;
 import vn.fastfood.entity.MonAn;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
@@ -46,7 +45,7 @@ public class OrderController {
             @RequestParam("maKH") long maKH) {
         Order donHang = orderService.getOrderByMaDH(maDH, maKH);
         if (donHang == null) {
-            return error(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng hoặc đơn không thuộc khách hàng này.");
+            return error(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng hoặc đơn không thuộc khách hàng này");
         }
 
         List<OrderItem> chiTietDonHang = orderService.getOrderItemsByMaDH(maDH);
@@ -58,10 +57,10 @@ public class OrderController {
             @PathVariable("maDH") long maDH,
             @RequestParam("maKH") long maKH) {
         if (!orderService.requestCancelOrder(maDH, maKH)) {
-            return error(HttpStatus.BAD_REQUEST, "Không thể hủy đơn hàng này.");
+            return error(HttpStatus.BAD_REQUEST, "Không thể hủy đơn hàng này");
         }
 
-        return ok("Cập nhật hủy/yêu cầu hủy đơn thành công.");
+        return ok("Cập nhật hủy đơn thành công");
     }
 
     @PostMapping("/{maDH}/received")
@@ -69,22 +68,10 @@ public class OrderController {
             @PathVariable("maDH") long maDH,
             @RequestParam("maKH") long maKH) {
         if (!orderService.confirmReceived(maDH, maKH)) {
-            return error(HttpStatus.BAD_REQUEST, "Không thể xác nhận đã nhận hàng cho đơn này.");
+            return error(HttpStatus.BAD_REQUEST, "Không thể xác nhận đã nhận hàng cho đơn này");
         }
 
-        return ok("Xác nhận đã nhận hàng thành công.");
-    }
-
-    @GetMapping("/{maDH}/status-history")
-    public ResponseEntity<?> getOrderStatusHistory(
-            @PathVariable("maDH") long maDH,
-            @RequestParam("maKH") long maKH) {
-        List<OrderStatusHistoryResponse> history = orderService.getOrderStatusHistoryForCustomer(maDH, maKH);
-        if (history == null) {
-            return error(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng cho khách hàng này.");
-        }
-
-        return ResponseEntity.ok(history);
+        return ok("Xác nhận đã nhận hàng thành công");
     }
 
     @PostMapping("/{maDH}/reorder")
@@ -94,16 +81,16 @@ public class OrderController {
             HttpSession session) {
         Order donHang = orderService.getOrderByMaDH(maDH, maKH);
         if (donHang == null) {
-            return error(HttpStatus.BAD_REQUEST, "Không thể đặt lại đơn hàng này.");
+            return error(HttpStatus.BAD_REQUEST, "Không thể đặt lại đơn hàng này");
         }
 
         List<OrderItem> chiTietDonHang = orderService.getOrderItemsByMaDH(maDH);
         int soMonDaThem = addItemsToSessionCart(chiTietDonHang, session);
         if (soMonDaThem == 0) {
-            return error(HttpStatus.BAD_REQUEST, "Không thể đặt lại đơn hàng này.");
+            return error(HttpStatus.BAD_REQUEST, "Không thể đặt lại đơn hàng này");
         }
 
-        return ok("Đã thêm lại các món trong đơn vào giỏ hàng.");
+        return ok("Đã thêm lại các món trong đơn vào giỏ hàng");
     }
 
     @GetMapping("/{maDH}/can-review")

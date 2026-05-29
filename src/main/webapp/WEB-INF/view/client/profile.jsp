@@ -1,13 +1,12 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Profile</title>
-  <meta name="description" content="Quản lý tài khoản, mật khẩu và địa chỉ giao hàng của bạn." />
+  <title>Jollibug | Tài khoản</title>
+  <meta name="description" content="Quản lý thông tin tài khoản của bạn tại Jollibug" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,7 +25,7 @@
         <jsp:include page="layout/sidebar-profile.jsp" />
 
         <section class="profile-content">
-          <h1 class="profile-title">Chi tiết tài khoản</h1>
+          <h1 class="profile-title">Thông tin tài khoản</h1>
 
           <c:if test="${not empty successMsg}">
               <div style="color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 12px; margin-bottom: 20px; border-radius: 5px; font-weight: 600;">
@@ -39,12 +38,12 @@
                   ${errorMsg}
               </div>
           </c:if>
+
           <form class="profile-form" action="${pageContext.request.contextPath}/profile/update" method="post">
-            
             <div class="profile-grid">
               <label class="profile-field">
-                <span>Họ và Tên</span>
-                <input type="text" name="hoTen" value="${user.hoTen}" placeholder="Nhập tên" />
+                <span>Họ và tên</span>
+                <input type="text" name="hoTen" value="${user.hoTen}" placeholder="Nhập họ và tên" />
               </label>
             </div>
 
@@ -63,3 +62,11 @@
             <div class="profile-actions">
               <button class="profile-submit" type="submit">Cập nhật tài khoản</button>
             </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

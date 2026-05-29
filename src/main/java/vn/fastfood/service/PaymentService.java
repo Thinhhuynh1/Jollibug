@@ -32,20 +32,54 @@ public class PaymentService {
             return null;
         }
 
-        String phuongThucThanhToan = normalizeMethod(maPT);
-        if (phuongThucThanhToan.isEmpty()) {
-            phuongThucThanhToan = normalizeMethod(donHang.getMaPT());
+        String phuongThucThanhToan = "";
+        if (maPT != null) {
+            phuongThucThanhToan = maPT.trim().toUpperCase();
         }
+
+        if (phuongThucThanhToan.isEmpty()) {
+            if (donHang.getMaPT() != null) {
+                phuongThucThanhToan = donHang.getMaPT().trim().toUpperCase();
+            }
+        }
+
         if (phuongThucThanhToan.isEmpty()) {
             phuongThucThanhToan = "COD";
         }
 
-        paymentDAO.createPayment(
-                maDH,
-                phuongThucThanhToan,
-                donHang.getThanhTien().doubleValue(),
-                "PENDING"
-        );
+        try (Connection conn = DBConnection.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            int originalIsolation = conn.getTransactionIsolation();
+            conn.setAutoCommit(false);
+            conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+            try {
+                orderDAO.lockOrder(conn, maDH);
+
+                Payment existingPayment = paymentDAO.getPaymentByOrderId(maDH);
+                if (existingPayment == null) {
+                    paymentDAO.createPayment(
+                            conn,
+                            maDH,
+                            phuongThucThanhToan,
+                            donHang.getThanhTien().doubleValue(),
+                            "PENDING"
+                    );
+                }
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return null;
+            } finally {
+                conn.setTransactionIsolation(originalIsolation);
+                conn.setAutoCommit(originalAutoCommit);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
 
         return paymentDAO.getPaymentByOrderId(maDH);
     }
@@ -59,16 +93,7 @@ public class PaymentService {
     }
 
     public boolean confirmPayment(long maDH) {
-        Payment thanhToan = paymentDAO.getPaymentByOrderId(maDH);
-        if (thanhToan == null) {
-            return false;
-        }
-
-        if (isPaid(thanhToan)) {
-            return true;
-        }
-
-        return paymentDAO.updatePaymentStatus(maDH, "PAID");
+        return confirmPaymentWithTransaction(maDH);
     }
 
     public boolean confirmPaymentWithTransaction(long maDH) {
@@ -77,7 +102,7 @@ public class PaymentService {
             return false;
         }
 
-        if (isPaid(thanhToan)) {
+        if ("PAID".equalsIgnoreCase(thanhToan.getTrangThaiTT())) {
             return true;
         }
 
@@ -113,18 +138,33 @@ public class PaymentService {
 
     public boolean failPayment(long maDH) {
         Payment thanhToan = paymentDAO.getPaymentByOrderId(maDH);
-        if (thanhToan == null || isPaid(thanhToan)) {
+        if (thanhToan == null || "PAID".equalsIgnoreCase(thanhToan.getTrangThaiTT())) {
             return false;
         }
 
-        return paymentDAO.updatePaymentStatus(maDH, "FAILED");
+        try (Connection conn = DBConnection.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            int originalIsolation = conn.getTransactionIsolation();
+            conn.setAutoCommit(false);
+            conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+            try {
+                paymentDAO.lockPayment(conn, maDH);
+                paymentDAO.updatePaymentStatus(conn, maDH, "FAILED");
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            } finally {
+                conn.setTransactionIsolation(originalIsolation);
+                conn.setAutoCommit(originalAutoCommit);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    private boolean isPaid(Payment thanhToan) {
-        return "PAID".equalsIgnoreCase(thanhToan.getTrangThaiTT());
-    }
-
-    private String normalizeMethod(String method) {
-        return method == null ? "" : method.trim().toUpperCase();
-    }
 }

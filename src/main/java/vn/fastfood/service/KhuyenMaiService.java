@@ -24,29 +24,24 @@ public class KhuyenMaiService {
     private final ChuongTrinhKhuyenMaiRepository khuyenMaiRepository;
     private final MonAnRepository monAnRepository;
 
-    public KhuyenMaiService(ChuongTrinhKhuyenMaiRepository khuyenMaiRepository,
-            MonAnRepository monAnRepository) {
+    public KhuyenMaiService(ChuongTrinhKhuyenMaiRepository khuyenMaiRepository, MonAnRepository monAnRepository) {
         this.khuyenMaiRepository = khuyenMaiRepository;
         this.monAnRepository = monAnRepository;
     }
 
     public List<ChuongTrinhKhuyenMai> findKhuyenMai(String keyword) {
-        if (keyword == null) {
+        if (keyword == null || keyword.trim().isEmpty()) {
             return khuyenMaiRepository.searchByName(null);
         }
 
-        String normalizedKeyword = keyword.trim();
-        if (normalizedKeyword.isEmpty()) {
-            normalizedKeyword = null;
-        }
-
-        return khuyenMaiRepository.searchByName(normalizedKeyword);
+        return khuyenMaiRepository.searchByName(keyword.trim());
     }
 
     public ChuongTrinhKhuyenMai findKhuyenMaiById(Long maKM) {
         if (maKM == null) {
             return null;
         }
+
         return khuyenMaiRepository.findById(maKM).orElse(null);
     }
 
@@ -64,32 +59,29 @@ public class KhuyenMaiService {
     }
 
     @Transactional
-    public ChuongTrinhKhuyenMai createKhuyenMai(String tenKM,
-            Double phanTramGiam,
-            String phamViApDung,
-            List<Long> selectedMonAnIds,
-            String startDate,
-            String endDate) {
+    public ChuongTrinhKhuyenMai createKhuyenMai(String tenKM, Double phanTramGiam, String phamViApDung,
+            List<Long> selectedMonAnIds, String startDate, String endDate) {
+        validateTenKhuyenMai(tenKM);
+        validatePhanTramGiam(phanTramGiam);
+
+        String phamVi = APPLY_ALL;
+        if (APPLY_ITEM.equalsIgnoreCase(phamViApDung)) {
+            phamVi = APPLY_ITEM;
+        }
+        validateSelectedMonAn(phamVi, selectedMonAnIds);
+
+        LocalDateTime ngayBatDau = null;
+        if (startDate != null && !startDate.isBlank()) {
+            ngayBatDau = LocalDate.parse(startDate).atTime(LocalTime.MIN);
+        }
+
+        LocalDateTime ngayKetThuc = null;
+        if (endDate != null && !endDate.isBlank()) {
+            ngayKetThuc = LocalDate.parse(endDate).atTime(LocalTime.MAX);
+        }
+        validateKhoangNgay(ngayBatDau, ngayKetThuc);
+
         ChuongTrinhKhuyenMai khuyenMai = new ChuongTrinhKhuyenMai();
-        if (tenKM == null || tenKM.trim().isEmpty()) {
-            throw new IllegalArgumentException("Tên khuyến mãi không được để trống.");
-        }
-        if (phanTramGiam == null || phanTramGiam <= 0 || phanTramGiam > 100) {
-            throw new IllegalArgumentException("Phần trăm giảm phải lớn hơn 0 và không vượt quá 100.");
-        }
-
-        String phamVi = APPLY_ITEM.equals(phamViApDung) ? APPLY_ITEM : APPLY_ALL;
-        if (APPLY_ITEM.equals(phamVi) && (selectedMonAnIds == null || selectedMonAnIds.isEmpty())) {
-            throw new IllegalArgumentException("Vui lòng chọn ít nhất một món áp dụng.");
-        }
-
-        LocalDateTime ngayBatDau = startDate == null || startDate.isBlank()
-                ? null
-                : LocalDate.parse(startDate).atTime(LocalTime.MIN);
-        LocalDateTime ngayKetThuc = endDate == null || endDate.isBlank()
-                ? null
-                : LocalDate.parse(endDate).atTime(LocalTime.MAX);
-
         khuyenMai.setTenKM(tenKM.trim());
         khuyenMai.setPhanTramGiam(phanTramGiam);
         khuyenMai.setPhamViApDung(phamVi);
@@ -100,36 +92,32 @@ public class KhuyenMaiService {
     }
 
     @Transactional
-    public ChuongTrinhKhuyenMai updateKhuyenMai(Long maKM,
-            String tenKM,
-            Double phanTramGiam,
-            String phamViApDung,
-            List<Long> selectedMonAnIds,
-            String startDate,
-            String endDate) {
+    public ChuongTrinhKhuyenMai updateKhuyenMai(Long maKM, String tenKM, Double phanTramGiam,
+            String phamViApDung, List<Long> selectedMonAnIds, String startDate, String endDate) {
         ChuongTrinhKhuyenMai khuyenMai = findKhuyenMaiById(maKM);
         if (khuyenMai == null) {
             return null;
         }
 
-        if (tenKM == null || tenKM.trim().isEmpty()) {
-            throw new IllegalArgumentException("Tên khuyến mãi không được để trống.");
+        validateTenKhuyenMai(tenKM);
+        validatePhanTramGiam(phanTramGiam);
+
+        String phamVi = APPLY_ALL;
+        if (APPLY_ITEM.equalsIgnoreCase(phamViApDung)) {
+            phamVi = APPLY_ITEM;
         }
-        if (phanTramGiam == null || phanTramGiam <= 0 || phanTramGiam > 100) {
-            throw new IllegalArgumentException("Phần trăm giảm phải lớn hơn 0 và không vượt quá 100.");
+        validateSelectedMonAn(phamVi, selectedMonAnIds);
+
+        LocalDateTime ngayBatDau = null;
+        if (startDate != null && !startDate.isBlank()) {
+            ngayBatDau = LocalDate.parse(startDate).atTime(LocalTime.MIN);
         }
 
-        String phamVi = APPLY_ITEM.equals(phamViApDung) ? APPLY_ITEM : APPLY_ALL;
-        if (APPLY_ITEM.equals(phamVi) && (selectedMonAnIds == null || selectedMonAnIds.isEmpty())) {
-            throw new IllegalArgumentException("Vui lòng chọn ít nhất một món áp dụng.");
+        LocalDateTime ngayKetThuc = null;
+        if (endDate != null && !endDate.isBlank()) {
+            ngayKetThuc = LocalDate.parse(endDate).atTime(LocalTime.MAX);
         }
-
-        LocalDateTime ngayBatDau = startDate == null || startDate.isBlank()
-                ? null
-                : LocalDate.parse(startDate).atTime(LocalTime.MIN);
-        LocalDateTime ngayKetThuc = endDate == null || endDate.isBlank()
-                ? null
-                : LocalDate.parse(endDate).atTime(LocalTime.MAX);
+        validateKhoangNgay(ngayBatDau, ngayKetThuc);
 
         khuyenMai.setTenKM(tenKM.trim());
         khuyenMai.setPhanTramGiam(phanTramGiam);
@@ -154,9 +142,8 @@ public class KhuyenMaiService {
 
         resetKhuyenMai(monAnList);
 
-        List<ChuongTrinhKhuyenMai> khuyenMaiDangHoatDong =
-                khuyenMaiRepository.findActivePromotions(LocalDateTime.now());
-        if (khuyenMaiDangHoatDong.isEmpty()) {
+        List<ChuongTrinhKhuyenMai> khuyenMaiDangHoatDong = khuyenMaiRepository.findActivePromotions(LocalDateTime.now());
+        if (khuyenMaiDangHoatDong == null || khuyenMaiDangHoatDong.isEmpty()) {
             return;
         }
 
@@ -164,7 +151,37 @@ public class KhuyenMaiService {
             double phanTramGiamMax = 0;
 
             for (ChuongTrinhKhuyenMai khuyenMai : khuyenMaiDangHoatDong) {
-                double phanTramGiam = getDiscountPercent(monAn, khuyenMai);
+                double phanTramGiam = 0;
+
+                if (khuyenMai != null) {
+                    if (APPLY_ALL.equals(khuyenMai.getPhamViApDung())) {
+                        if (khuyenMai.getPhanTramGiam() == null) {
+                            phanTramGiam = 0;
+                        }
+                        else {
+                            phanTramGiam = khuyenMai.getPhanTramGiam();
+                        }
+                    }
+                    else if (APPLY_ITEM.equals(khuyenMai.getPhamViApDung())
+                            && khuyenMai.getChiTietKhuyenMai() != null) {
+                        for (ChiTietKhuyenMai chiTiet : khuyenMai.getChiTietKhuyenMai()) {
+                            if (chiTiet.getMonAn() != null
+                                    && Objects.equals(chiTiet.getMonAn().getMaMon(), monAn.getMaMon())) {
+                                if (chiTiet.getPhanTramGiam() != null) {
+                                    phanTramGiam = chiTiet.getPhanTramGiam();
+                                }
+                                else if (khuyenMai.getPhanTramGiam() == null) {
+                                    phanTramGiam = 0;
+                                }
+                                else {
+                                    phanTramGiam = khuyenMai.getPhanTramGiam();
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 if (phanTramGiam > phanTramGiamMax) {
                     phanTramGiamMax = phanTramGiam;
                 }
@@ -180,11 +197,10 @@ public class KhuyenMaiService {
         }
     }
 
-    private void updateChiTietKhuyenMai(ChuongTrinhKhuyenMai khuyenMai,
-            String phamViApDung,
+    private void updateChiTietKhuyenMai(ChuongTrinhKhuyenMai khuyenMai, String phamViApDung,
             List<Long> selectedMonAnIds) {
         if (!APPLY_ITEM.equals(phamViApDung) || selectedMonAnIds == null || selectedMonAnIds.isEmpty()) {
-            khuyenMai.setChiTietKhuyenMais(new ArrayList<>());
+            khuyenMai.setChiTietKhuyenMai(new ArrayList<>());
             return;
         }
 
@@ -199,7 +215,7 @@ public class KhuyenMaiService {
             chiTietKhuyenMaiList.add(chiTiet);
         }
 
-        khuyenMai.setChiTietKhuyenMais(chiTietKhuyenMaiList);
+        khuyenMai.setChiTietKhuyenMai(chiTietKhuyenMaiList);
     }
 
     private void resetKhuyenMai(List<MonAn> monAnList) {
@@ -210,44 +226,27 @@ public class KhuyenMaiService {
         }
     }
 
-    private double getDiscountPercent(MonAn monAn, ChuongTrinhKhuyenMai khuyenMai) {
-        if (khuyenMai == null) {
-            return 0;
+    private void validateTenKhuyenMai(String tenKM) {
+        if (tenKM == null || tenKM.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên khuyến mãi không được để trống");
         }
-
-        String phamViApDung = khuyenMai.getPhamViApDung();
-        if (APPLY_ALL.equals(phamViApDung)) {
-            return getDefaultDiscountPercent(khuyenMai);
-        }
-        if (APPLY_ITEM.equals(phamViApDung)) {
-            return getItemDiscountPercent(monAn, khuyenMai);
-        }
-        return 0;
     }
 
-    private double getItemDiscountPercent(MonAn monAn, ChuongTrinhKhuyenMai khuyenMai) {
-        List<ChiTietKhuyenMai> chiTietKhuyenMaiList = khuyenMai.getChiTietKhuyenMais();
-        if (chiTietKhuyenMaiList == null || chiTietKhuyenMaiList.isEmpty()) {
-            return 0;
+    private void validatePhanTramGiam(Double phanTramGiam) {
+        if (phanTramGiam == null || phanTramGiam <= 0 || phanTramGiam > 100) {
+            throw new IllegalArgumentException("Phần trăm giảm phải lớn hơn 0 và không vượt quá 100");
         }
-
-        for (ChiTietKhuyenMai chiTiet : chiTietKhuyenMaiList) {
-            if (chiTiet.getMonAn() == null) {
-                continue;
-            }
-            if (!Objects.equals(chiTiet.getMonAn().getMaMon(), monAn.getMaMon())) {
-                continue;
-            }
-            return chiTiet.getPhanTramGiam() != null
-                    ? chiTiet.getPhanTramGiam()
-                    : getDefaultDiscountPercent(khuyenMai);
-        }
-
-        return 0;
     }
 
-    private double getDefaultDiscountPercent(ChuongTrinhKhuyenMai khuyenMai) {
-        return khuyenMai.getPhanTramGiam() == null ? 0 : khuyenMai.getPhanTramGiam();
+    private void validateSelectedMonAn(String phamViApDung, List<Long> selectedMonAnIds) {
+        if (APPLY_ITEM.equals(phamViApDung) && (selectedMonAnIds == null || selectedMonAnIds.isEmpty())) {
+            throw new IllegalArgumentException("Vui lòng chọn ít nhất một món");
+        }
     }
 
+    private void validateKhoangNgay(LocalDateTime ngayBatDau, LocalDateTime ngayKetThuc) {
+        if (ngayBatDau != null && ngayKetThuc != null && ngayKetThuc.isBefore(ngayBatDau)) {
+            throw new IllegalArgumentException("Ngày kết thúc không được nhỏ hơn ngày bắt đầu");
+        }
+    }
 }

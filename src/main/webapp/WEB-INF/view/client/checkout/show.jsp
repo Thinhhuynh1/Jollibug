@@ -6,8 +6,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Checkout</title>
-  <meta name="description" content="Jollibug checkout page: review order details, choose delivery address, apply voucher, and place your order." />
+  <title>Jollibug | Thanh toán</title>
+  <meta name="description" content="Trang đặt món và thanh toán đơn hàng Jollibug" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import vn.fastfood.dao.CheckoutDAO;
 import vn.fastfood.entity.MaGiamGia;
 import vn.fastfood.repository.MaGiamGiaRepository;
 
@@ -15,6 +16,7 @@ import vn.fastfood.repository.MaGiamGiaRepository;
 public class MaGiamGiaService {
 
     private final MaGiamGiaRepository couponRepository;
+    private final CheckoutDAO checkoutDAO = new CheckoutDAO();
 
     public MaGiamGiaService(MaGiamGiaRepository couponRepository) {
         this.couponRepository = couponRepository;
@@ -47,8 +49,8 @@ public class MaGiamGiaService {
             return Optional.empty();
         }
 
-        String codedef = code.trim().toUpperCase();
-        Optional<MaGiamGia> coupon = couponRepository.findByTenMa(codedef);
+        String codedef = code.trim();
+        Optional<MaGiamGia> coupon = couponRepository.findByTenMaNormalized(codedef);
         if (coupon.isEmpty()) {
             return Optional.empty();
         }
@@ -75,39 +77,9 @@ public class MaGiamGiaService {
     }
 
     public double calculateDiscount(MaGiamGia coupon, double subtotal) {
-        if (coupon == null || subtotal <= 0) {
+        if (coupon == null || subtotal <= 0 || coupon.getTenMa() == null || coupon.getTenMa().trim().isEmpty()) {
             return 0;
         }
-
-        Double minimumOrderAmount = coupon.getDieuKien();
-        if (minimumOrderAmount != null && minimumOrderAmount > 0 && subtotal < minimumOrderAmount) {
-            return 0;
-        }
-
-        double discount = 0;
-        String type = coupon.getLoaiGiam();
-        Double amount = coupon.getMucGiam();
-
-        if (amount == null || amount <= 0 || type == null) {
-            return 0;
-        }
-
-        switch (type.trim().toUpperCase()) {
-            case "PERCENT":
-            case "PERCENTAGE":
-                discount = subtotal * (amount / 100.0);
-                break;
-            case "AMOUNT":
-                discount = amount;
-                break;
-            default:
-                discount = 0;
-                break;
-        }
-
-        if (discount > subtotal) {
-            discount = subtotal;
-        }
-        return discount;
+        return checkoutDAO.calcGiaGiam(coupon.getTenMa(), subtotal);
     }
 }

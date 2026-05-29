@@ -179,14 +179,14 @@ async function updateCartItem(maMon, soLuong) {
         const data = await response.json();
 
         if (!response.ok) {
-            alert(data.message || "Không thể cập nhật số lượng.");
+            alert(data.message || "Không thể cập nhật số lượng");
             return false;
         }
 
         return true;
 
     } catch (error) {
-        alert("Lỗi khi cập nhật số lượng.");
+        alert("Lỗi khi cập nhật số lượng");
         return false;
     }
 }
@@ -282,7 +282,7 @@ async function deleteCartItem(maMon) {
         const data = await response.json();
 
         if (!response.ok) {
-            alert(data.message || "Không thể xóa món khỏi giỏ hàng.");
+            alert(data.message || "Không thể xóa món khỏi giỏ hàng");
             return false;
         }
 
@@ -301,7 +301,7 @@ async function deleteCartItem(maMon) {
         return true;
 
     } catch (error) {
-        alert("Lỗi khi xóa món khỏi giỏ hàng.");
+        alert("Lỗi khi xóa món khỏi giỏ hàng");
         return false;
     }
 }
