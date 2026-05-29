@@ -58,6 +58,8 @@
                     <th>Mô tả</th>
                     <th>Giảm</th>
                     <th>Số lượng</th>
+                    <th>Đã dùng</th>
+                    <th>Còn lại</th>
                     <th>Bắt đầu</th>
                     <th>Kết thúc</th>
                     <th>Trạng thái</th>
@@ -71,6 +73,8 @@
                       <td>${coupon.moTa}</td>
                       <td>${coupon.discountDisplay}</td>
                       <td>${coupon.soLuong}</td>
+                      <td>${coupon.soLanSuDung}</td>
+                      <td>${coupon.remainingQuantity}</td>
                       <td>${coupon.ngayBatDauValue}</td>
                       <td>${coupon.ngayKetThucValue}</td>
                       <td>
@@ -89,7 +93,7 @@
                   </c:forEach>
                   <c:if test="${empty coupons}">
                     <tr>
-                      <td colspan="8" style="text-align: center;">Không có mã giảm giá nào</td>
+                      <td colspan="10" style="text-align: center;">Không có mã giảm giá nào</td>
                     </tr>
                   </c:if>
                 </tbody>

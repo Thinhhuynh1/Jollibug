@@ -36,6 +36,17 @@
             </nav>
 
             <div class="header-actions">
+              <div class="demo-mode-control" aria-label="Cháº¿ Ä‘á»™ demo Ä‘á»“ng thá»i">
+                <button class="demo-mode-toggle" type="button" data-demo-mode-toggle data-mode="SAFE">
+                  <span class="demo-mode-toggle__track" aria-hidden="true">
+                    <span class="demo-mode-toggle__knob"></span>
+                  </span>
+                  <strong data-demo-mode-label>SAFE</strong>
+                </button>
+                <button class="demo-mode-reset" type="button" data-demo-reset-voucher title="Reset MaGG=1 vá» 5/10">
+                  Reset
+                </button>
+              </div>
               <c:if test="${not empty sessionScope.user}">
                 <a class="btn btn-primary" href="${cartUrl}">
                   <c:set var="cartCount" value="0" />
@@ -52,7 +63,6 @@
             </div>
           </div>
         </header>
-    </div>
-  </header>
+        <script src="<c:url value='/js/client/concurrency-demo-toggle.js'/>" defer></script>
 
 

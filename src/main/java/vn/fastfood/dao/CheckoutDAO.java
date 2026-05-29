@@ -146,9 +146,99 @@ public class CheckoutDAO {
         }
     }
 
+    public long createOrderWithItemsAndPayment(
+            long customerId,
+            Long maDC,
+            double tongTienMon,
+            double tienGiamGia,
+            double thanhTien,
+            Long maGG,
+            String ghiChu,
+            List<CheckoutCartItem> items,
+            String maPT
+    ) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+
+            try {
+                long orderId = createOrder(conn, customerId, maDC, tongTienMon, tienGiamGia, thanhTien, maGG, ghiChu);
+
+                for (CheckoutCartItem item : items) {
+                    createOrderItem(conn, orderId, item);
+                }
+
+                createPayment(conn, orderId, maPT, thanhTien);
+
+                conn.commit();
+                return orderId;
+            } catch (SQLException | RuntimeException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
+            }
+        }
+    }
+
+    private long createOrder(
+            Connection conn,
+            long customerId,
+            Long maDC,
+            double tongTienMon,
+            double tienGiamGia,
+            double thanhTien,
+            Long maGG,
+            String ghiChu
+    ) throws SQLException {
+        try (CallableStatement cs = conn.prepareCall("{call PROC_CREATE_ORDER(?, ?, ?, ?, ?, ?, ?, ?)}")) {
+
+            cs.setLong(1, customerId);
+
+            if (maDC == null || maDC <= 0) {
+                cs.setNull(2, Types.NUMERIC);
+            } else {
+                cs.setLong(2, maDC);
+            }
+
+            cs.setDouble(3, tongTienMon);
+            cs.setDouble(4, tienGiamGia);
+            cs.setDouble(5, thanhTien);
+
+            if (maGG == null) {
+                cs.setNull(6, Types.NUMERIC);
+            } else {
+                cs.setLong(6, maGG);
+            }
+
+            if (ghiChu == null || ghiChu.trim().isEmpty()) {
+                cs.setNull(7, Types.CLOB);
+            } else {
+                cs.setString(7, ghiChu.trim());
+            }
+
+            cs.registerOutParameter(8, Types.NUMERIC);
+            cs.execute();
+            return cs.getLong(8);
+        }
+    }
+
     public void createOrderItem(long orderId, CheckoutCartItem item) throws SQLException {
         try (Connection conn = DBConnection.getConnection();
                 CallableStatement cs = conn.prepareCall("{call PROC_CREATE_ORDER_ITEM(?, ?, ?, ?, ?, ?)}")) {
+
+            cs.setLong(1, orderId);
+            cs.setLong(2, item.getMaMon());
+            cs.setString(3, item.getTenMon());
+            cs.setInt(4, item.getSoLuong());
+            cs.setDouble(5, item.getDonGia());
+            cs.setDouble(6, item.getThanhTien());
+            cs.execute();
+        }
+    }
+
+    private void createOrderItem(Connection conn, long orderId, CheckoutCartItem item) throws SQLException {
+        try (CallableStatement cs = conn.prepareCall("{call PROC_CREATE_ORDER_ITEM(?, ?, ?, ?, ?, ?)}")) {
 
             cs.setLong(1, orderId);
             cs.setLong(2, item.getMaMon());
@@ -167,7 +257,18 @@ public class CheckoutDAO {
             cs.setLong(1, orderId);
             cs.setString(2, maPT);
             cs.setDouble(3, amount);
-            cs.setString(4, "Pending");
+            cs.setString(4, "PENDING");
+            cs.execute();
+        }
+    }
+
+    private void createPayment(Connection conn, long orderId, String maPT, double amount) throws SQLException {
+        try (CallableStatement cs = conn.prepareCall("{call PROC_CREATE_PAYMENT(?, ?, ?, ?)}")) {
+
+            cs.setLong(1, orderId);
+            cs.setString(2, maPT);
+            cs.setDouble(3, amount);
+            cs.setString(4, "PENDING");
             cs.execute();
         }
     }

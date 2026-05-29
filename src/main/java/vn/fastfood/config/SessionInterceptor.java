@@ -34,6 +34,7 @@ public class SessionInterceptor implements HandlerInterceptor {
                 || requestURI.startsWith("/new-password")
                 || requestURI.startsWith("/logout")
                 || requestURI.startsWith("/api/ai")
+                || requestURI.startsWith("/api/demo")
                 || requestURI.startsWith("/menu")
                 || requestURI.startsWith("/product")
                 || requestURI.startsWith("/about")

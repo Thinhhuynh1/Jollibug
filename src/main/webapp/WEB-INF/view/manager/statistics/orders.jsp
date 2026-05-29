@@ -16,6 +16,13 @@
   <link rel="stylesheet" href="<c:url value='/css/components.css'/>" />
   <link rel="stylesheet" href="<c:url value='/css/admin.css'/>" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <style>
+    /* Keyframes for spinning loader */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 
 <body data-admin-role="manager" data-admin-page="statistics-orders">
@@ -29,23 +36,44 @@
 
       <section class="admin-dashboard">
 
-        <!-- Period Filter -->
-        <div style="display:flex; gap:0.5rem; margin-bottom:var(--space-4); flex-wrap:wrap;">
-          <a href="<c:url value='/manager/statistics/orders?period=today'/>"
-             class="btn ${selectedPeriod == 'today' ? 'btn-primary' : 'btn-outline'}">Hôm nay</a>
-          <a href="<c:url value='/manager/statistics/orders?period=week'/>"
-             class="btn ${selectedPeriod == 'week' ? 'btn-primary' : 'btn-outline'}">7 ngày</a>
-          <a href="<c:url value='/manager/statistics/orders?period=month'/>"
-             class="btn ${selectedPeriod == 'month' ? 'btn-primary' : 'btn-outline'}">30 ngày</a>
-          <a href="<c:url value='/manager/statistics/orders?period=year'/>"
-             class="btn ${selectedPeriod == 'year' ? 'btn-primary' : 'btn-outline'}">Năm nay</a>
+        <!-- Period Filter & Phantom Read Demo Reload Button -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-4); flex-wrap:wrap; gap:0.75rem;">
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <a href="<c:url value='/manager/statistics/orders?period=today'/>"
+               class="btn ${selectedPeriod == 'today' ? 'btn-primary' : 'btn-outline'}">Hôm nay</a>
+            <a href="<c:url value='/manager/statistics/orders?period=week'/>"
+               class="btn ${selectedPeriod == 'week' ? 'btn-primary' : 'btn-outline'}">7 ngày</a>
+            <a href="<c:url value='/manager/statistics/orders?period=month'/>"
+               class="btn ${selectedPeriod == 'month' ? 'btn-primary' : 'btn-outline'}">30 ngày</a>
+            <a href="<c:url value='/manager/statistics/orders?period=year'/>"
+               class="btn ${selectedPeriod == 'year' ? 'btn-primary' : 'btn-outline'}">Năm nay</a>
+          </div>
+
+          <!-- Nút Tải lại và demo 5s -->
+          <div>
+            <button id="btn-phantom-read-run" class="btn btn-outline" style="border-color:#9b59b6; color:#9b59b6; gap:0.4rem; display:flex; align-items:center; font-weight:600; min-height: 2.85rem;">
+              🔄 Tải lại & Thống kê (5s)
+            </button>
+          </div>
+        </div>
+
+        <!-- STATS LOADING AREA (Hidden by default, shown only during demo reload) -->
+        <div id="stats-loading-area" class="admin-panel" style="display: none; padding: 3rem 2rem; text-align: center; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; min-height: 250px; background: #ffffff; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); border: 1px solid rgba(26, 26, 26, 0.05); margin-bottom: var(--space-5);">
+          <!-- Circular spinning red loader -->
+          <div class="loader-spinner" style="width: 3.5rem; height: 3.5rem; border: 4px solid rgba(230,0,0,0.1); border-top: 4px solid var(--color-red-500, #e60000); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 0.5rem;"></div>
+          
+          <div style="font-weight: 800; font-size: 1.15rem; color: var(--color-ink-900, #1a1a1a);">Đang truy xuất thông tin thống kê đơn hàng...</div>
+          <div class="muted" style="font-size: 0.9rem; color: var(--color-ink-500, #666);">Demo chờ 5 giây theo chế độ SAFE/UNSAFE trên header.</div>
+          
+          <!-- Countdown indicator -->
+          <div style="font-size: 2.5rem; font-weight: 900; color: var(--color-red-500, #e60000); margin-top: 0.5rem;" id="loading-countdown-number">5</div>
         </div>
 
         <!-- Order Metric Cards -->
         <div class="metric-grid" style="margin-bottom:var(--space-5);">
           <article class="metric-card">
             <span class="muted">Tổng đơn hàng</span>
-            <strong>${stats.totalOrders}</strong>
+            <strong id="card-total-orders">${stats.totalOrders}</strong>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
                 <span class="badge badge--${stats.ordersGrowth >= 0 ? 'success' : 'danger'}" style="font-size: 0.8rem;">
                     ${stats.ordersGrowth >= 0 ? '↑' : '↓'} <fmt:formatNumber value="${stats.ordersGrowth}" maxFractionDigits="1"/>%
@@ -55,27 +83,27 @@
           </article>
           <article class="metric-card">
             <span class="muted">Chờ xác nhận</span>
-            <strong>${stats.pending}</strong>
+            <strong id="card-pending">${stats.pending}</strong>
             <span class="metric-delta" data-tone="warm">PENDING</span>
           </article>
           <article class="metric-card">
             <span class="muted">Đã xác nhận</span>
-            <strong>${stats.confirmed}</strong>
+            <strong id="card-confirmed">${stats.confirmed}</strong>
             <span class="metric-delta" data-tone="info">CONFIRMED</span>
           </article>
           <article class="metric-card">
             <span class="muted">Đang giao</span>
-            <strong>${stats.shipping}</strong>
+            <strong id="card-shipping">${stats.shipping}</strong>
             <span class="metric-delta" data-tone="warm">SHIPPING</span>
           </article>
           <article class="metric-card">
             <span class="muted">Đã giao</span>
-            <strong>${stats.delivered}</strong>
+            <strong id="card-delivered">${stats.delivered}</strong>
             <span class="metric-delta" data-tone="up">DELIVERED</span>
           </article>
           <article class="metric-card">
             <span class="muted">Đã hủy</span>
-            <strong>${stats.cancelled}</strong>
+            <strong id="card-cancelled">${stats.cancelled}</strong>
             <span class="metric-delta" data-tone="down">CANCELLED</span>
           </article>
         </div>
@@ -129,12 +157,12 @@
                 <c:forEach var="order" items="${stats.recentOrders}">
                   <tr>
                     <td style="padding:0.75rem; border-bottom:1px solid var(--clr-border);">#${order.maDH}</td>
-                    <td style="padding:0.75rem; border-bottom:1px solid var(--clr-border);">${order.user.hoTen}</td>
+                    <td style="padding:0.75rem; border-bottom:1px solid var(--clr-border);">${order.hoTen}</td>
                     <td style="padding:0.75rem; text-align:right; border-bottom:1px solid var(--clr-border);"><fmt:formatNumber value="${order.tongTien}" pattern="#,###"/>đ</td>
                     <td style="padding:0.75rem; text-align:center; border-bottom:1px solid var(--clr-border);">
                       <span class="badge badge--${order.trangThai == 'DELIVERED' ? 'success' : order.trangThai == 'CANCELLED' ? 'danger' : order.trangThai == 'PENDING' ? 'warning' : 'info'}">${order.trangThai}</span>
                     </td>
-                    <td style="padding:0.75rem; border-bottom:1px solid var(--clr-border);">${order.ngayDatDisplay}</td>
+                    <td style="padding:0.75rem; border-bottom:1px solid var(--clr-border);">${order.ngayDat}</td>
                   </tr>
                 </c:forEach>
               </tbody>
@@ -200,5 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+<script src="<c:url value='/js/manager/phantom-read-stats-demo.js'/>"></script>
 </body>
 </html>
