@@ -48,12 +48,39 @@ public class OrderDAO {
 
     public Order getOrderByMaDH(long maDH, long maKH) {
         String sql = """
-            SELECT MaDH, MaTK_KH, MaTK_NV, NgayDat, MaDC,
-                   TongTienMon, TienGiamGia, ThanhTien,
-                   TrangThaiDon, MaGG, GhiChu
-            FROM DONHANG
-            WHERE MaDH = ?
-              AND MaTK_KH = ?
+            SELECT
+                dh.MaDH,
+                dh.MaTK_KH,
+                dh.MaTK_NV,
+                dh.NgayDat,
+                dh.MaDC,
+                dh.TongTienMon,
+                dh.TienGiamGia,
+                dh.ThanhTien,
+                dh.TrangThaiDon,
+                dh.MaGG,
+                dh.GhiChu,
+                u.HoTen AS TenKhachHang,
+                u.SDT AS SDTKhachHang,
+                u.Email AS EmailKhachHang,
+                dc.TenNguoiNhan AS TenNguoiNhan,
+                dc.SDTNguoiNhan AS SDTNguoiNhan,
+                TRIM(
+                    NVL(dc.DiaChiCuThe, '') ||
+                    CASE WHEN dc.PhuongXa IS NOT NULL AND dc.PhuongXa <> '-' THEN ', ' || dc.PhuongXa ELSE '' END ||
+                    CASE WHEN dc.QuanHuyen IS NOT NULL AND dc.QuanHuyen <> '-' THEN ', ' || dc.QuanHuyen ELSE '' END ||
+                    CASE WHEN dc.TinhThanh IS NOT NULL AND dc.TinhThanh <> '-' THEN ', ' || dc.TinhThanh ELSE '' END
+                ) AS DiaChiGiaoHang,
+                tt.MaPT AS MaPT,
+                pt.TenPT AS TenPT,
+                tt.TrangThaiTT AS TrangThaiTT
+            FROM DONHANG dh
+            LEFT JOIN NGUOIDUNG u ON dh.MaTK_KH = u.MaTK
+            LEFT JOIN DIACHI dc ON dh.MaDC = dc.MaDC
+            LEFT JOIN THANHTOAN tt ON dh.MaDH = tt.MaDH
+            LEFT JOIN PHUONGTHUCTT pt ON tt.MaPT = pt.MaPT
+            WHERE dh.MaDH = ?
+              AND dh.MaTK_KH = ?
         """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -64,7 +91,7 @@ public class OrderDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapResultSetToOrder(rs);
+                    return mapOrderDetailResultSetToOrder(rs);
                 }
             }
         } catch (SQLException e) {
@@ -179,7 +206,7 @@ public class OrderDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapStaffOrderDetailResultSetToOrder(rs);
+                    return mapOrderDetailResultSetToOrder(rs);
                 }
             }
         } catch (SQLException e) {
@@ -193,10 +220,18 @@ public class OrderDAO {
         List<OrderItem> items = new ArrayList<>();
 
         String sql = """
-            SELECT MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien
-            FROM CHITIETDH
-            WHERE MaDH = ?
-            ORDER BY MaMon
+            SELECT
+                ctdh.MaDH,
+                ctdh.MaMon,
+                ctdh.TenMon,
+                ctdh.SoLuong,
+                ctdh.DonGia,
+                ctdh.ThanhTien,
+                ma.image_url AS ImageUrl
+            FROM CHITIETDH ctdh
+            LEFT JOIN MONAN ma ON ctdh.MaMon = ma.MaMon
+            WHERE ctdh.MaDH = ?
+            ORDER BY ctdh.MaMon
         """;
 
         try (Connection conn = DBConnection.getConnection();
@@ -213,6 +248,7 @@ public class OrderDAO {
                     item.setSoLuong(rs.getInt("SoLuong"));
                     item.setDonGia(rs.getBigDecimal("DonGia"));
                     item.setThanhTien(rs.getBigDecimal("ThanhTien"));
+                    item.setImg(rs.getString("ImageUrl"));
                     items.add(item);
                 }
             }
@@ -392,7 +428,7 @@ public class OrderDAO {
         return order;
     }
 
-    private Order mapStaffOrderDetailResultSetToOrder(ResultSet rs) throws SQLException {
+    private Order mapOrderDetailResultSetToOrder(ResultSet rs) throws SQLException {
         Order order = mapResultSetToOrder(rs);
         order.setTenKhachHang(rs.getString("TenKhachHang"));
         order.setSdtKhachHang(rs.getString("SDTKhachHang"));

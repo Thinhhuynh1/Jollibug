@@ -1,8 +1,23 @@
 const CLIENT_ORDER_API = "/api/orders";
+const DEFAULT_FOOD_IMAGE = "/images/jollibug.png";
+
+let currentOrderItems = [];
+let currentOrderStatus = "";
+let currentReviews = [];
+let currentReviewTab = "pending";
+
+const RATING_TEXT = {
+    1: "Rất tệ",
+    2: "Không hài lòng",
+    3: "Bình thường",
+    4: "Hài lòng",
+    5: "Rất hài lòng"
+};
 
 document.addEventListener("DOMContentLoaded", () => {
-    const maDH = getMaDHFromUrl();
+    initializeReviewStars();
 
+    const maDH = getMaDHFromUrl();
     if (!maDH) {
         showMessage("Thiếu mã đơn hàng.");
         return;
@@ -30,19 +45,26 @@ async function loadOrderDetail(maDH) {
     if (itemBody) itemBody.innerHTML = "";
 
     try {
-        const response = await fetch(`${CLIENT_ORDER_API}/${maDH}?maKH=${maKH}`);
-        const data = await response.json();
+        const [detailResponse, reviewResponse] = await Promise.all([
+            fetch(`${CLIENT_ORDER_API}/${maDH}?maKH=${maKH}`),
+            fetch(`${CLIENT_ORDER_API}/${maDH}/reviews?maKH=${maKH}`)
+        ]);
 
-        if (!response.ok) {
+        const data = await detailResponse.json();
+        if (!detailResponse.ok) {
             throw new Error(data.message || "Không thể tải chi tiết đơn hàng.");
         }
 
+        const reviewData = reviewResponse.ok ? await reviewResponse.json() : [];
         const order = data.order || data.donHang;
-        const items = data.orderItems || data.chiTietDH || [];
+
+        currentOrderItems = data.orderItems || data.chiTietDH || [];
+        currentOrderStatus = order.trangThaiDon || "";
+        currentReviews = Array.isArray(reviewData) ? reviewData : [];
 
         renderOrderInfo(order);
         renderOrderTimeline(order.trangThaiDon);
-        renderOrderItems(items, order.trangThaiDon);
+        renderOrderItems();
         renderOrderActions(order);
     } catch (error) {
         showMessage(error.message);
@@ -60,11 +82,11 @@ function renderOrderInfo(order) {
 
     if (!detailContent) return;
 
-    const delivery = parseDeliveryInfo(order.ghiChu);
-    const receiverName = order.tenNguoiNhan || delivery.name || order.tenKhachHang || "-";
-    const receiverPhone = order.sdtNguoiNhan || delivery.phone || order.sdtKhachHang || "-";
-    const receiverEmail = order.emailKhachHang || delivery.email || "-";
-    const deliveryAddress = order.diaChiGiaoHang || delivery.address || "-";
+    const receiverName = order.tenNguoiNhan || order.tenKhachHang || "-";
+    const receiverPhone = order.sdtNguoiNhan || order.sdtKhachHang || "-";
+    const receiverEmail = order.emailKhachHang || "-";
+    const deliveryAddress = order.diaChiGiaoHang || "-";
+    const note = hasText(order.ghiChu) ? escapeHtml(order.ghiChu.trim()) : "-";
 
     detailContent.innerHTML = `
         <div class="client-detail-two-columns">
@@ -76,7 +98,7 @@ function renderOrderInfo(order) {
                     <p><strong>Trạng thái đơn:</strong>
                         <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
                     </p>
-                    <p><strong>Phương thức thanh toán:</strong> ${order.tenPT || displayPaymentMethod(order.maPT)}</p>
+                    <p><strong>Phương thức thanh toán:</strong> ${escapeHtml(order.tenPT || displayPaymentMethod(order.maPT))}</p>
                     <p><strong>Trạng thái thanh toán:</strong> ${displayPaymentStatus(order.trangThaiTT)}</p>
                     <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
                     <p><strong>Giảm giá:</strong> ${formatMoney(order.tienGiamGia)}</p>
@@ -89,38 +111,82 @@ function renderOrderInfo(order) {
                 <h2>Thông tin giao hàng</h2>
 
                 <div class="client-detail-info-list">
-                    <p><strong>Người nhận:</strong> ${receiverName}</p>
-                    <p><strong>Số điện thoại:</strong> ${receiverPhone}</p>
-                    <p><strong>Email:</strong> ${receiverEmail}</p>
-                    <p class="full"><strong>Địa chỉ giao hàng:</strong><br>${deliveryAddress}</p>
-                    <p class="full"><strong>Ghi chú / xử lý đơn:</strong><br>${order.ghiChu || "-"}</p>
+                    <p><strong>Người nhận:</strong> ${escapeHtml(receiverName)}</p>
+                    <p><strong>Số điện thoại:</strong> ${escapeHtml(receiverPhone)}</p>
+                    <p><strong>Email:</strong> ${escapeHtml(receiverEmail)}</p>
+                    <p class="full"><strong>Địa chỉ giao hàng:</strong><br>${escapeHtml(deliveryAddress)}</p>
+                    <p class="full"><strong>Ghi chú / xử lý đơn:</strong><br>${note}</p>
                 </div>
             </section>
         </div>
     `;
 }
 
-function renderOrderItems(items, orderStatus) {
-    const itemBody = document.getElementById("orderItemBody");
+function switchReviewTab(tab) {
+    currentReviewTab = tab;
+    document.querySelectorAll("[data-review-tab]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.reviewTab === tab);
+    });
+    renderOrderItems();
+}
 
-    if (!itemBody) return;
+function renderOrderItems() {
+    const itemHead = document.getElementById("orderItemHead");
+    const itemBody = document.getElementById("orderItemBody");
+    const title = document.getElementById("orderItemsTitle");
+
+    if (!itemHead || !itemBody) return;
+
+    if (title) {
+        title.textContent = currentReviewTab === "done" ? "Đã đánh giá" : "Danh sách món ăn";
+    }
+
+    if (currentReviewTab === "done") {
+        renderReviewedItems(itemHead, itemBody);
+        return;
+    }
+
+    renderPendingReviewItems(itemHead, itemBody);
+}
+
+function renderPendingReviewItems(itemHead, itemBody) {
+    itemHead.innerHTML = `
+        <tr>
+            <th>Món ăn</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+            <th>Đánh giá</th>
+        </tr>
+    `;
+
+    const reviewedIds = new Set(currentReviews.map((review) => Number(review.maMon)));
+    const items = currentOrderItems.filter((item) => !reviewedIds.has(Number(item.maMon)));
 
     if (!items.length) {
         itemBody.innerHTML = `
             <tr>
-                <td colspan="5" class="empty-cell">Đơn hàng chưa có món.</td>
+                <td colspan="5" class="empty-cell">Không còn món nào cần đánh giá.</td>
             </tr>
         `;
         return;
     }
 
     itemBody.innerHTML = "";
-    const canReview = normalizeStatus(orderStatus) === "DELIVERED";
+    const canReview = normalizeStatus(currentOrderStatus) === "DELIVERED";
 
     items.forEach((item) => {
         const row = document.createElement("tr");
+        const itemName = item.tenMon || `Món #${item.maMon}`;
+        const imageSrc = buildFoodImageUrl(item);
+
         row.innerHTML = `
-            <td>${item.tenMon || `Món #${item.maMon}`}</td>
+            <td>
+                <div class="order-detail-product">
+                    <img src="${imageSrc}" alt="${escapeHtml(itemName)}" loading="lazy" onerror="this.onerror=null;this.src='${DEFAULT_FOOD_IMAGE}';">
+                    <strong>${escapeHtml(itemName)}</strong>
+                </div>
+            </td>
             <td>${item.soLuong || 0}</td>
             <td>${formatMoney(item.donGia)}</td>
             <td><strong>${formatMoney(item.thanhTien)}</strong></td>
@@ -134,6 +200,60 @@ function renderOrderItems(items, orderStatus) {
         `;
         itemBody.appendChild(row);
     });
+}
+
+function renderReviewedItems(itemHead, itemBody) {
+    itemHead.innerHTML = `
+        <tr>
+            <th>Món ăn</th>
+            <th>Số sao</th>
+            <th>Nội dung</th>
+            <th>Ảnh</th>
+            <th>Ngày đánh giá</th>
+        </tr>
+    `;
+
+    if (!currentReviews.length) {
+        itemBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="empty-cell">Bạn chưa gửi đánh giá nào cho đơn này.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    itemBody.innerHTML = "";
+    currentReviews.forEach((review) => {
+        const row = document.createElement("tr");
+        const itemName = review.tenMon || findItemName(review.maMon);
+        const productImage = buildFoodImageUrl(review);
+        const reviewImage = buildReviewImageUrl(review.anhDG);
+
+        row.innerHTML = `
+            <td>
+                <div class="order-detail-product">
+                    <img src="${productImage}" alt="${escapeHtml(itemName)}" loading="lazy" onerror="this.onerror=null;this.src='${DEFAULT_FOOD_IMAGE}';">
+                    <strong>${escapeHtml(itemName)}</strong>
+                </div>
+            </td>
+            <td><span class="review-stars-text">${"★".repeat(review.sao || 0)}</span><br><span class="order-note">${getRatingText(review.sao)}</span></td>
+            <td>${escapeHtml(review.noiDung || "-")}</td>
+            <td>
+                ${
+                    reviewImage
+                        ? `<img class="review-table-image" src="${reviewImage}" alt="Ảnh đánh giá" loading="lazy">`
+                        : `<span class="order-note">-</span>`
+                }
+            </td>
+            <td>${formatDate(review.ngayDG)}</td>
+        `;
+        itemBody.appendChild(row);
+    });
+}
+
+function findItemName(maMon) {
+    const item = currentOrderItems.find((orderItem) => Number(orderItem.maMon) === Number(maMon));
+    return item?.tenMon || `Món #${maMon}`;
 }
 
 function renderOrderActions(order) {
@@ -215,6 +335,7 @@ async function submitReview() {
     const maMon = Number(document.getElementById("reviewMaMon")?.value || 0);
     const sao = Number(document.getElementById("reviewSao")?.value || 0);
     const noiDung = document.getElementById("reviewNoiDung")?.value?.trim() || "";
+    const imageFile = document.getElementById("reviewImageInput")?.files?.[0] || null;
 
     if (!maDH || !maKH || !maMon) {
         alert("Thiếu thông tin đánh giá.");
@@ -231,18 +352,19 @@ async function submitReview() {
         return;
     }
 
+    const formData = new FormData();
+    formData.append("maKH", String(maKH));
+    formData.append("maMon", String(maMon));
+    formData.append("sao", String(sao));
+    formData.append("noiDung", noiDung);
+    if (imageFile) {
+        formData.append("image", imageFile);
+    }
+
     try {
         const response = await fetch(`${CLIENT_ORDER_API}/${maDH}/reviews`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                maKH,
-                maMon,
-                sao,
-                noiDung
-            })
+            body: formData
         });
 
         const data = await response.json();
@@ -250,10 +372,24 @@ async function submitReview() {
 
         if (response.ok) {
             closeReviewModal();
+            await loadReviews(maDH);
+            renderOrderItems();
         }
     } catch (error) {
         alert("Lỗi khi gửi đánh giá.");
     }
+}
+
+async function loadReviews(maDH) {
+    const maKH = getCurrentMaKH();
+    const response = await fetch(`${CLIENT_ORDER_API}/${maDH}/reviews?maKH=${maKH}`);
+    if (!response.ok) {
+        currentReviews = [];
+        return;
+    }
+
+    const data = await response.json();
+    currentReviews = Array.isArray(data) ? data : [];
 }
 
 function previewReviewImage(event) {
@@ -269,24 +405,15 @@ function previewReviewImage(event) {
     }
 
     const imageUrl = URL.createObjectURL(file);
-    preview.innerHTML = `<img src="${imageUrl}" alt="Review preview">`;
+    preview.innerHTML = `<img src="${imageUrl}" alt="Xem trước ảnh đánh giá">`;
     preview.classList.remove("hidden");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function initializeReviewStars() {
     const stars = document.querySelectorAll(".review-star");
     const saoInput = document.getElementById("reviewSao");
 
     if (!stars.length || !saoInput) return;
-
-    const updateStars = (rating) => {
-        stars.forEach((star) => {
-            const value = Number(star.dataset.rating || 0);
-            star.classList.toggle("is-active", value <= rating);
-        });
-    };
-
-    updateStars(Number(saoInput.value || 5));
 
     stars.forEach((star) => {
         star.addEventListener("click", () => {
@@ -295,7 +422,25 @@ document.addEventListener("DOMContentLoaded", () => {
             updateStars(rating);
         });
     });
-});
+
+    updateStars(Number(saoInput.value || 0));
+}
+
+function updateStars(rating) {
+    document.querySelectorAll(".review-star").forEach((star) => {
+        const value = Number(star.dataset.rating || 0);
+        star.classList.toggle("is-active", value <= rating);
+    });
+
+    const ratingText = document.getElementById("reviewRatingText");
+    if (ratingText) {
+        ratingText.textContent = getRatingText(rating);
+    }
+}
+
+function getRatingText(rating) {
+    return RATING_TEXT[Number(rating)] || "Chọn mức đánh giá";
+}
 
 function showMessage(message) {
     const el = document.getElementById("message");
@@ -308,7 +453,7 @@ function normalizeStatus(status) {
 
 function displayStatus(status) {
     const map = {
-        PENDING: "Chờ xác nhận",
+        PENDING: "Đã đặt hàng",
         CONFIRMED: "Đã xác nhận",
         SHIPPING: "Đang giao",
         DELIVERED: "Đã giao",
@@ -338,14 +483,22 @@ function openReviewModal(maMon) {
     const maMonInput = document.getElementById("reviewMaMon");
     const noiDungInput = document.getElementById("reviewNoiDung");
     const saoInput = document.getElementById("reviewSao");
+    const imageInput = document.getElementById("reviewImageInput");
+    const imagePreview = document.getElementById("reviewImagePreview");
 
     if (!modal || !maMonInput) return;
 
     maMonInput.value = maMon;
 
     if (noiDungInput) noiDungInput.value = "";
-    if (saoInput) saoInput.value = "5";
+    if (saoInput) saoInput.value = "";
+    if (imageInput) imageInput.value = "";
+    if (imagePreview) {
+        imagePreview.innerHTML = "";
+        imagePreview.classList.add("hidden");
+    }
 
+    updateStars(0);
     modal.classList.remove("hidden");
 }
 
@@ -358,7 +511,8 @@ function displayPaymentStatus(status) {
     const map = {
         PENDING: "Chờ thanh toán",
         PAID: "Đã thanh toán",
-        FAILED: "Thanh toán thất bại"
+        FAILED: "Thanh toán thất bại",
+        CANCELLED: "Đã hủy"
     };
 
     return map[normalizeStatus(status)] || status || "-";
@@ -375,83 +529,96 @@ function displayPaymentMethod(method) {
     return map[normalizeStatus(method)] || method || "-";
 }
 
-function parseDeliveryInfo(note) {
-    const result = {
-        name: "",
-        phone: "",
-        email: "",
-        address: ""
-    };
-
-    if (!note) return result;
-
-    const nameMatch = note.match(/Người nhận:\s*([^;]+)/i);
-    const phoneMatch = note.match(/SĐT:\s*([^;]+)/i);
-    const emailMatch = note.match(/Email:\s*([^;]+)/i);
-    const addressMatch =
-        note.match(/Địa chỉ nhập:\s*([^;\n]+)/i) ||
-        note.match(/Địa chỉ giao hàng:\s*([^;\n]+)/i) ||
-        note.match(/Địa chỉ:\s*([^;\n]+)/i);
-
-    result.name = nameMatch ? nameMatch[1].trim() : "";
-    result.phone = phoneMatch ? phoneMatch[1].trim() : "";
-    result.email = emailMatch ? emailMatch[1].trim() : "";
-    result.address = addressMatch ? addressMatch[1].trim() : "";
-
-    return result;
-}
-
 function renderOrderTimeline(status) {
     const timeline = document.getElementById("orderTimeline");
+    const cancelInfo = document.getElementById("orderTimelineCancelInfo");
     if (!timeline) return;
 
     const currentStatus = normalizeStatus(status);
-    let steps = [
-        { key: "PENDING", label: "Chờ xác nhận" },
+    const steps = [
+        { key: "PENDING", label: "Đã đặt hàng" },
         { key: "CONFIRMED", label: "Đã xác nhận" },
         { key: "SHIPPING", label: "Đang giao" },
         { key: "DELIVERED", label: "Đã giao" }
     ];
-
-    if (currentStatus === "CANCEL_REQUESTED") {
-        steps = [
-            { key: "PENDING", label: "Chờ xác nhận" },
-            { key: "CONFIRMED", label: "Đã xác nhận" },
-            { key: "CANCEL_REQUESTED", label: "Yêu cầu hủy" }
-        ];
-    }
-
-    if (currentStatus === "CANCELLED") {
-        steps = [
-            { key: "PENDING", label: "Chờ xác nhận" },
-            { key: "CANCELLED", label: "Đã hủy" }
-        ];
-    }
-
     const currentIndex = steps.findIndex((step) => step.key === currentStatus);
+    const isCancelled = currentStatus === "CANCELLED";
+    const isCancelRequested = currentStatus === "CANCEL_REQUESTED";
 
+    timeline.classList.toggle("is-cancelled", isCancelled);
     timeline.innerHTML = steps.map((step, index) => {
         let stateClass = "";
 
-        if (index < currentIndex) {
-            stateClass = "is-done";
-        } else if (index === currentIndex) {
-            stateClass = "is-current";
-        }
-
-        if (currentStatus === "CANCELLED" && step.key === "CANCELLED") {
-            stateClass = "is-cancelled";
+        if (!isCancelled && currentIndex >= 0 && index <= currentIndex) {
+            stateClass = "is-complete";
         }
 
         return `
-            <div class="timeline-step ${stateClass}">
+            <div class="timeline-step ${stateClass}" data-tooltip="${step.label}" aria-label="${step.label}">
                 <div class="timeline-step__dot">
-                    ${index < currentIndex ? "✓" : ""}
-                </div>
-                <div class="timeline-step__content">
-                    <strong>${step.label}</strong>
+                    ${index <= currentIndex && !isCancelled ? "✓" : ""}
                 </div>
             </div>
         `;
     }).join("");
+
+    if (!cancelInfo) return;
+
+    if (isCancelled) {
+        cancelInfo.innerHTML = `<strong>Đơn hàng đã hủy</strong><span>Trạng thái hủy được hiển thị riêng và không làm thay đổi các bước giao hàng.</span>`;
+        cancelInfo.classList.remove("hidden");
+        return;
+    }
+
+    if (isCancelRequested) {
+        cancelInfo.innerHTML = `<strong>Đang yêu cầu hủy</strong><span>Nhân viên sẽ xử lý yêu cầu hủy đơn của bạn.</span>`;
+        cancelInfo.classList.remove("hidden");
+        return;
+    }
+
+    cancelInfo.innerHTML = "";
+    cancelInfo.classList.add("hidden");
+}
+
+function buildFoodImageUrl(item) {
+    const rawImage = item?.img || item?.imageUrl || item?.hinhAnh || "";
+    const image = String(rawImage).trim();
+
+    if (!image) {
+        return DEFAULT_FOOD_IMAGE;
+    }
+
+    if (/^(https?:)?\/\//i.test(image) || image.startsWith("/")) {
+        return image;
+    }
+
+    return `/images/${encodeURI(image)}`;
+}
+
+function buildReviewImageUrl(imagePath) {
+    const image = String(imagePath || "").trim();
+    if (!image) {
+        return "";
+    }
+
+    if (/^(https?:)?\/\//i.test(image) || image.startsWith("/")) {
+        return image;
+    }
+
+    return `/images/${encodeURI(image)}`;
+}
+
+function hasText(value) {
+    return value !== null && value !== undefined && String(value).trim() !== "";
+}
+
+function escapeHtml(value) {
+    if (!hasText(value)) return "-";
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

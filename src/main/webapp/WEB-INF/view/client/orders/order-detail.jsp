@@ -40,7 +40,7 @@
 
             <div id="message" class="message" role="status" aria-live="polite"></div>
 
-            <section class="orders-card order-timeline-card" aria-label="Order status timeline">
+            <section class="orders-card order-timeline-card" aria-label="Tiến trình trạng thái đơn hàng">
                 <div id="orderTimeline" class="order-timeline"></div>
                 <div id="orderTimelineCancelInfo" class="order-timeline-cancel-info hidden"></div>
             </section>
@@ -51,21 +51,22 @@
 
             <section class="orders-card">
                 <div class="orders-card__header">
-                    <h2>Danh sách món ăn</h2>
+                    <h2 id="orderItemsTitle">Danh sách món ăn</h2>
                     <span class="orders-card__hint">Có thể đánh giá từng món khi đơn đã giao</span>
+                </div>
+
+                <div class="order-tabs order-review-tabs" role="tablist" aria-label="Bộ lọc đánh giá">
+                    <button class="order-tab is-active" type="button" data-review-tab="pending" onclick="switchReviewTab('pending')">
+                        Đánh giá
+                    </button>
+                    <button class="order-tab" type="button" data-review-tab="done" onclick="switchReviewTab('done')">
+                        Đã đánh giá
+                    </button>
                 </div>
 
                 <div class="orders-table-wrap">
                     <table class="order-table order-table--detail">
-                        <thead>
-                        <tr>
-                            <th>Món ăn</th>
-                            <th>Số lượng</th>
-                            <th>Đơn giá</th>
-                            <th>Thành tiền</th>
-                            <th>Đánh giá</th>
-                        </tr>
-                        </thead>
+                        <thead id="orderItemHead"></thead>
                         <tbody id="orderItemBody"></tbody>
                     </table>
                 </div>
@@ -79,15 +80,18 @@
         <h2 id="reviewModalTitle">Đánh giá món ăn</h2>
 
         <input type="hidden" id="reviewMaMon">
-        <input type="hidden" id="reviewSao" value="5">
+        <input type="hidden" id="reviewSao" value="">
 
         <label>Chọn sao</label>
-        <div id="reviewStarRating" class="review-star-rating" role="radiogroup" aria-label="Chọn số sao đánh giá">
-            <button type="button" class="review-star" data-rating="1" aria-label="1 sao">★</button>
-            <button type="button" class="review-star" data-rating="2" aria-label="2 sao">★</button>
-            <button type="button" class="review-star" data-rating="3" aria-label="3 sao">★</button>
-            <button type="button" class="review-star" data-rating="4" aria-label="4 sao">★</button>
-            <button type="button" class="review-star" data-rating="5" aria-label="5 sao">★</button>
+        <div class="review-rating-row">
+            <div id="reviewStarRating" class="review-star-rating" role="radiogroup" aria-label="Chọn số sao đánh giá">
+                <button type="button" class="review-star" data-rating="1" aria-label="1 sao">★</button>
+                <button type="button" class="review-star" data-rating="2" aria-label="2 sao">★</button>
+                <button type="button" class="review-star" data-rating="3" aria-label="3 sao">★</button>
+                <button type="button" class="review-star" data-rating="4" aria-label="4 sao">★</button>
+                <button type="button" class="review-star" data-rating="5" aria-label="5 sao">★</button>
+            </div>
+            <span id="reviewRatingText" class="review-rating-text">Chọn mức đánh giá</span>
         </div>
 
         <label for="reviewNoiDung">Nội dung đánh giá</label>
