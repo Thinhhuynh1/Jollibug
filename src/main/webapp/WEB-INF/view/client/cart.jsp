@@ -94,7 +94,7 @@
               </c:forEach>
             </div>
 
-            <div id="cartMessage" class="cart-message"></div>
+            <div id="cartMessage" class="cart-message"><c:out value="${cartMessage}" /></div>
           </article>
         </section>
 
@@ -117,7 +117,22 @@
               </div>
             </div>
 
-            <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
+            <c:choose>
+              <c:when test="${tongSoLuong > 0}">
+                <a class="btn btn-primary btn-block"
+                   id="checkout-button"
+                   href="${pageContext.request.contextPath}/checkout"
+                   data-checkout-url="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
+              </c:when>
+              <c:otherwise>
+                <a class="btn btn-primary btn-block is-disabled"
+                   id="checkout-button"
+                   href="#"
+                   data-checkout-url="${pageContext.request.contextPath}/checkout"
+                   aria-disabled="true"
+                   tabindex="-1">Đặt hàng</a>
+              </c:otherwise>
+            </c:choose>
           </article>
         </aside>
       </div>
