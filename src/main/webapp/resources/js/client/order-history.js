@@ -1,4 +1,5 @@
 const CLIENT_ORDER_API = "/api/orders";
+const DEFAULT_FOOD_IMAGE = "/images/jollibug.png";
 
 let allOrders = [];
 let currentTab = "active";
@@ -35,7 +36,7 @@ async function loadOrders() {
         await preloadOrderSummaries(allOrders);
         renderOrdersByTab();
     } catch (error) {
-        list.innerHTML = `<p class="empty-cell">${error.message}</p>`;
+        list.innerHTML = `<p class="empty-cell">${escapeHtml(error.message)}</p>`;
     }
 }
 
@@ -232,13 +233,14 @@ function createOrderCard(order) {
 }
 
 function renderOrderItemPreview(item) {
-    const imageSrc = item.hinhAnh || item.imageUrl || getFallbackFoodImage(item.maMon);
+    const imageSrc = buildFoodImageUrl(item);
+    const itemName = item.tenMon || `Món #${item.maMon}`;
 
     return `
         <div class="customer-order-item">
-            <img src="${imageSrc}" alt="${item.tenMon || "Món ăn"}" loading="lazy">
+            <img src="${imageSrc}" alt="${escapeHtml(itemName)}" loading="lazy" onerror="this.onerror=null;this.src='${DEFAULT_FOOD_IMAGE}';">
             <div>
-                <strong>${item.tenMon || `Món #${item.maMon}`}</strong>
+                <strong>${escapeHtml(itemName)}</strong>
                 <span>x${item.soLuong || 0}</span>
             </div>
             <b>${formatMoney(item.thanhTien)}</b>
@@ -391,14 +393,28 @@ function formatDate(value) {
     return new Date(value).toLocaleString("vi-VN");
 }
 
-function getFallbackFoodImage(maMon) {
-    const images = [
-        "https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg",
-        "https://static.kfcvietnam.com.vn/images/items/lg/D1-new.jpg?v=3ydVxg",
-        "https://static.kfcvietnam.com.vn/images/items/lg/Burger-Zinger.jpg?v=3ydVxg",
-        "https://static.kfcvietnam.com.vn/images/items/lg/FF-R.jpg?v=3ydVxg"
-    ];
+function buildFoodImageUrl(item) {
+    const rawImage = item?.img || item?.imageUrl || item?.hinhAnh || "";
+    const image = String(rawImage).trim();
 
-    const index = Math.abs(Number(maMon || 0)) % images.length;
-    return images[index];
+    if (!image) {
+        return DEFAULT_FOOD_IMAGE;
+    }
+
+    if (/^(https?:)?\/\//i.test(image) || image.startsWith("/")) {
+        return image;
+    }
+
+    return `/images/${encodeURI(image)}`;
+}
+
+function escapeHtml(value) {
+    if (value === null || value === undefined) return "";
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

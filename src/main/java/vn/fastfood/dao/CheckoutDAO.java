@@ -20,6 +20,10 @@ public class CheckoutDAO {
             String maPT,
             Long maGG,
             String ghiChu,
+            String deliveryName,
+            String deliveryPhone,
+            String deliveryEmail,
+            String deliveryAddress,
             List<CheckoutCartItem> items
     ) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
@@ -30,10 +34,22 @@ public class CheckoutDAO {
             conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
             try {
+                Long checkoutMaDC = maDC;
+                if (checkoutMaDC == null || checkoutMaDC <= 0) {
+                    checkoutMaDC = createCheckoutAddress(
+                            conn,
+                            maKH,
+                            deliveryName,
+                            deliveryPhone,
+                            deliveryEmail,
+                            deliveryAddress
+                    );
+                }
+
                 long orderId = runCheckoutProcedure(
                         conn,
                         maKH,
-                        maDC,
+                        checkoutMaDC,
                         tongTienMon,
                         tienGiamGia,
                         thanhTien,
@@ -94,11 +110,54 @@ public class CheckoutDAO {
                 cs.setString(8, ghiChu.trim());
             }
 
-            cs.setString(9, serializeItems(items));
+            String serializedItems = serializeItems(items);
+            System.out.println("CHECKOUT ITEMS = [" + serializedItems + "]");
+            cs.setString(9, serializedItems);
+            //cs.setString(9, serializeItems(items));
             cs.registerOutParameter(10, Types.NUMERIC);
             cs.execute();
             return cs.getLong(10);
         }
+    }
+
+    private Long createCheckoutAddress(
+            Connection conn,
+            long maKH,
+            String deliveryName,
+            String deliveryPhone,
+            String deliveryEmail,
+            String deliveryAddress
+    ) throws SQLException {
+        if (!hasText(deliveryName) || !hasText(deliveryPhone) || !hasText(deliveryAddress)) {
+            return null;
+        }
+
+        try (CallableStatement cs = conn.prepareCall("{call PROC_CREATE_ADDRESS(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}")) {
+            cs.setLong(1, maKH);
+            cs.setString(2, "Địa chỉ đặt hàng");
+            cs.setString(3, deliveryName.trim());
+            cs.setString(4, deliveryPhone.trim());
+            cs.setString(5, buildAddressLine(deliveryAddress, deliveryEmail));
+            cs.setString(6, "-");
+            cs.setString(7, "-");
+            cs.setString(8, "-");
+            cs.setInt(9, 0);
+            cs.registerOutParameter(10, Types.NUMERIC);
+            cs.executeUpdate();
+            return cs.getLong(10);
+        }
+    }
+
+    private String buildAddressLine(String deliveryAddress, String deliveryEmail) {
+        String address = deliveryAddress == null ? "" : deliveryAddress.trim();
+        if (!hasText(deliveryEmail)) {
+            return address;
+        }
+        return address + " (Email: " + deliveryEmail.trim() + ")";
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     public boolean isValidAddress(long maKH, Long maDC) {
@@ -155,10 +214,10 @@ public class CheckoutDAO {
             }
 
             payload.append(item.getMaMon()).append('\t')
-                    .append(sanitizeField(item.getTenMon())).append('\t')
-                    .append(item.getSoLuong()).append('\t')
-                    .append(item.getDonGia()).append('\t')
-                    .append(item.getThanhTien());
+                .append(sanitizeField(item.getTenMon())).append('\t')
+                .append(item.getSoLuong()).append('\t')
+                .append(Math.round(item.getDonGia())).append('\t')
+                .append(Math.round(item.getThanhTien()));
         }
 
         return payload.toString();

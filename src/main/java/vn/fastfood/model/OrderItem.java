@@ -9,6 +9,7 @@ public class OrderItem {
     private int soLuong;
     private BigDecimal donGia;
     private BigDecimal thanhTien;
+    private String img;
 
     public OrderItem() {
     }
@@ -61,6 +62,14 @@ public class OrderItem {
         this.thanhTien = thanhTien;
     }
 
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
     @Override
     public String toString() {
         return "OrderItem{" +
@@ -70,6 +79,7 @@ public class OrderItem {
                 ", soLuong=" + soLuong +
                 ", donGia=" + donGia +
                 ", thanhTien=" + thanhTien +
+                ", img='" + img + '\'' +
                 '}';
     }
 }
