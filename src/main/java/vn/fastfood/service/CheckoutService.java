@@ -19,14 +19,73 @@ import vn.fastfood.model.CheckoutCartItem;
 @Service
 public class CheckoutService {
     private final CheckoutDAO checkoutDAO;
-    private final CouponService couponService;
-    private final PaymentService paymentService = new PaymentService();
+    private final MaGiamGiaService maGiamGiaService;
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{9,15}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
 
-    public CheckoutService(CouponService couponService) {
+    public CheckoutService(MaGiamGiaService maGiamGiaService) {
         this.checkoutDAO = new CheckoutDAO();
-        this.couponService = couponService;
+        this.maGiamGiaService = maGiamGiaService;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private String buildGhiChu(CheckoutRequest request) {
+        return hasText(request.getGhiChu()) ? request.getGhiChu().trim() : null;
+    }
+
+    private void validateDeliveryInfo(CheckoutRequest request, Long maDC) {
+        if (maDC == null && (!hasText(request.getDeliveryName())
+                || !hasText(request.getDeliveryPhone())
+                || !hasText(request.getDeliveryAddress()))) {
+            throw new IllegalArgumentException("Vui lòng nhập thông tin giao hàng hợp lệ.");
+        }
+
+        if (hasText(request.getDeliveryPhone())) {
+            String phone = request.getDeliveryPhone().trim();
+            if (!PHONE_PATTERN.matcher(phone).matches()) {
+                throw new IllegalArgumentException("Số điện thoại nhận hàng không hợp lệ.");
+            }
+        }
+
+        if (hasText(request.getEmail())) {
+            String email = request.getEmail().trim();
+            if (!EMAIL_PATTERN.matcher(email).matches()) {
+                throw new IllegalArgumentException("Email không hợp lệ.");
+            }
+        }
+    }
+
+    private List<CheckoutCartItem> getCheckoutItemsFromSession(HttpSession session) {
+        Object cartObj = session.getAttribute("cart");
+
+        if (!(cartObj instanceof List<?> rawCart)) {
+            return new ArrayList<>();
+        }
+
+        List<CheckoutCartItem> checkoutItems = new ArrayList<>();
+
+        for (Object obj : rawCart) {
+            if (!(obj instanceof CartItem cartItem)) {
+                continue;
+            }
+
+            if (cartItem.getSoLuong() <= 0) {
+                continue;
+            }
+
+            CheckoutCartItem item = new CheckoutCartItem();
+            item.setMaMon(cartItem.getMaMon());
+            item.setTenMon(cartItem.getTenMon());
+            item.setSoLuong(cartItem.getSoLuong());
+            item.setDonGia(cartItem.getDonGia());
+            item.setThanhTien(cartItem.getDonGia() * cartItem.getSoLuong());
+            checkoutItems.add(item);
+        }
+
+        return checkoutItems;
     }
 
     public CheckoutResponse checkout(CheckoutRequest request, HttpSession session) {
@@ -38,8 +97,18 @@ public class CheckoutService {
             return new CheckoutResponse(false, "Phiên làm việc không hợp lệ. Vui lòng đăng nhập lại.", null, null, null, null);
         }
 
-        Long customerId = resolveCustomerId(session);
-        if (customerId == null || customerId <= 0) {
+        Long maKH = null;
+        Object userObj = session.getAttribute("user");
+        if (userObj instanceof User user) {
+            maKH = user.getMaTK();
+        } else {
+            Object maTKObj = session.getAttribute("userId");
+            if (maTKObj instanceof Number maTKNumber) {
+                maKH = maTKNumber.longValue();
+            }
+        }
+
+        if (maKH == null || maKH <= 0) {
             return new CheckoutResponse(false, "Không tìm thấy thông tin tài khoản. Vui lòng đăng nhập lại.", null, null, null, null);
         }
 
@@ -48,12 +117,14 @@ public class CheckoutService {
             maDC = null;
         }
 
-        if (maDC != null && !checkoutDAO.isValidAddress(customerId, maDC)) {
+        if (maDC != null && !checkoutDAO.isValidAddress(maKH, maDC)) {
             return new CheckoutResponse(false, "Địa chỉ giao hàng không hợp lệ hoặc không thuộc tài khoản hiện tại.", null, null, null, null);
         }
 
-        if (maDC == null && !hasText(request.getDeliveryAddress())) {
-            return new CheckoutResponse(false, "Vui lòng nhập địa chỉ giao hàng.", null, null, null, null);
+        try {
+            validateDeliveryInfo(request, maDC);
+        } catch (IllegalArgumentException e) {
+            return new CheckoutResponse(false, e.getMessage(), null, null, null, null);
         }
 
         String maPT = request.getMaPT();
@@ -73,157 +144,41 @@ public class CheckoutService {
 
         double subtotal = 0;
         for (CheckoutCartItem item : items) {
-            subtotal += checkoutDAO.calcSubtotal(item.getDonGia(), item.getSoLuong());
+            subtotal += item.getThanhTien();
         }
 
-        MaGiamGia coupon = couponService.findValidCoupon(request.getDiscountCode()).orElse(null);
-        double discountTotal = couponService.calculateDiscount(coupon, subtotal);
+        MaGiamGia coupon = maGiamGiaService.findValidCoupon(request.getDiscountCode()).orElse(null);
+        double discountTotal = maGiamGiaService.calculateDiscount(coupon, subtotal);
         if (discountTotal > subtotal) {
             discountTotal = subtotal;
         }
 
         double total = subtotal - discountTotal;
         Long maGG = coupon != null ? coupon.getMaGG() : null;
-
-        String orderNote;
-        try {
-            orderNote = buildOrderNote(request);
-        } catch (IllegalArgumentException e) {
-            return new CheckoutResponse(
-                false, 
-                e.getMessage(), 
-                null, 
-                subtotal, 
-                discountTotal, 
-                total
-            );
-        }
+        String orderNote = buildGhiChu(request);
 
         try {
-            long orderId = checkoutDAO.createOrderWithItemsAndPayment(
-                    customerId,
+            long orderId = checkoutDAO.checkout(
+                    maKH,
                     maDC,
                     subtotal,
                     discountTotal,
                     total,
+                    maPT,
                     maGG,
                     orderNote,
-                    items,
-                    maPT
+                    request.getDeliveryName(),
+                    request.getDeliveryPhone(),
+                    request.getEmail(),
+                    request.getDeliveryAddress(),
+                    items
             );
-            if ("COD".equalsIgnoreCase(maPT)) {
-                paymentService.confirmPayment(orderId);
-            }
 
             session.removeAttribute("cart");
-
-            return new CheckoutResponse(
-                    true,
-                    "Đặt hàng thành công.",
-                    orderId,
-                    subtotal,
-                    discountTotal,
-                    total
-            );
+            return new CheckoutResponse(true, "Đặt hàng thành công.", orderId, subtotal, discountTotal, total);
         } catch (SQLException e) {
             e.printStackTrace();
-
-            return new CheckoutResponse(
-                    false,
-                    "Đặt hàng thất bại do lỗi hệ thống.",
-                    null,
-                    subtotal,
-                    discountTotal,
-                    total
-            );
+            return new CheckoutResponse(false, "Đặt hàng thất bại do lỗi hệ thống.", null, subtotal, discountTotal, total);
         }
-    }
-
-    private List<CheckoutCartItem> getCheckoutItemsFromSession(HttpSession session) {
-        Object cartObj = session.getAttribute("cart");
-
-        if (cartObj == null || !(cartObj instanceof List<?>)) {
-            return new ArrayList<>();
-        }
-
-        List<?> rawCart = (List<?>) cartObj;
-        List<CheckoutCartItem> checkoutItems = new ArrayList<>();
-
-        for (Object obj : rawCart) {
-            if (!(obj instanceof CartItem)) {
-                continue;
-            }
-
-            CartItem cartItem = (CartItem) obj;
-            if (cartItem.getSoLuong() <= 0) {
-                continue;
-            }
-
-            CheckoutCartItem item = new CheckoutCartItem();
-            item.setMaMon(cartItem.getMaMon());
-            item.setTenMon(cartItem.getTenMon());
-            item.setSoLuong(cartItem.getSoLuong());
-            item.setDonGia(cartItem.getDonGia());
-            item.setThanhTien(checkoutDAO.calcSubtotal(cartItem.getDonGia(), cartItem.getSoLuong()));
-            checkoutItems.add(item);
-        }
-
-        return checkoutItems;
-    }
-
-    private String buildOrderNote(CheckoutRequest request) {
-        List<String> parts = new ArrayList<>();
-
-        if (hasText(request.getGhiChu())) {
-            parts.add(request.getGhiChu().trim());
-        }
-
-        if (hasText(request.getDeliveryName())) {
-            parts.add("Người nhận: " + request.getDeliveryName().trim());
-        }
-
-        if (hasText(request.getDeliveryPhone())) {
-            String phone = request.getDeliveryPhone().trim();
-            if (!PHONE_PATTERN.matcher(phone).matches()) {
-                throw new IllegalArgumentException("Số điện thoại nhận hàng không hợp lệ.");
-            }
-            parts.add("SĐT: " + phone);
-        }
-
-        if (hasText(request.getEmail())) {
-            String email = request.getEmail().trim();
-            if (!EMAIL_PATTERN.matcher(email).matches()) {
-                throw new IllegalArgumentException("Email không hợp lệ.");
-            }
-            parts.add("Email: " + email);
-        }
-
-        if (hasText(request.getDeliveryAddress())) {
-            parts.add("Địa chỉ nhập: " + request.getDeliveryAddress().trim());
-        }
-
-        if (parts.isEmpty()) {
-            throw new IllegalArgumentException("Vui lòng nhập thông tin giao hàng hợp lệ.");
-        }
-
-        return String.join("; ", parts);
-    }
-
-    private boolean hasText(String value) {
-        return value != null && !value.trim().isEmpty();
-    }
-
-    private Long resolveCustomerId(HttpSession session) {
-        Object userObj = session.getAttribute("user");
-        if (userObj instanceof User user) {
-            return user.getMaTK();
-        }
-
-        Object userIdObj = session.getAttribute("userId");
-        if (userIdObj instanceof Number userIdNumber) {
-            return userIdNumber.longValue();
-        }
-
-        return null;
     }
 }

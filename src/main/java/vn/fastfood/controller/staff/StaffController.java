@@ -126,7 +126,7 @@ public class StaffController {
             return "redirect:/staff/clients";
         }
 
-        List<Order> orders = orderService.getOrdersByCustomerId(clientId);
+        List<Order> orders = orderService.getOrdersByMaKH(clientId);
         DiaChi defaultAddress = getDefaultAddress(client.getDiaChi());
 
         int totalOrders = orders.size();

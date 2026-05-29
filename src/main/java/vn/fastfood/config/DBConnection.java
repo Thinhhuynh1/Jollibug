@@ -14,7 +14,7 @@ public class DBConnection {
             Class.forName("oracle.jdbc.OracleDriver");
             return DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (ClassNotFoundException e) {
-            throw new SQLException("Không tìm thấy Oracle JDBC Driver", e);
+            throw new SQLException("Không tìm thấy Driver", e);
         }
     }
 }

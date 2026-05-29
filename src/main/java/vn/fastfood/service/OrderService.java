@@ -1,5 +1,8 @@
 package vn.fastfood.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import vn.fastfood.dao.OrderDAO;
 import vn.fastfood.dto.OrderStatusHistoryResponse;
 import vn.fastfood.model.Order;
@@ -13,81 +16,94 @@ import java.util.Map;
 public class OrderService {
     private final OrderDAO orderDAO = new OrderDAO();
 
-    public List<Order> getOrdersByCustomerId(long customerId) {
-        return orderDAO.getOrdersByCustomerId(customerId);
-    }
-    
-    public Order getOrderById(long orderId, long customerId) {
-        return orderDAO.getOrderById(orderId, customerId);
+    private String displayStatus(String status) {
+        String normalizedStatus = status == null ? "" : status.trim().toUpperCase();
+
+        switch (normalizedStatus) {
+            case "PENDING":
+                return "Đã đặt hàng";
+            case "CONFIRMED":
+                return "Đã xác nhận";
+            case "SHIPPING":
+                return "Đang giao";
+            case "DELIVERED":
+                return "Đã giao";
+            case "CANCEL_REQUESTED":
+                return "Yêu cầu hủy";
+            case "CANCELLED":
+                return "Đã hủy";
+            default:
+                return status;
+        }
     }
 
-    public List<OrderItem> getOrderItemsByOrderId(long orderId) {
-        return orderDAO.getOrderItemsByOrderId(orderId);
+    private boolean isValidStaffTransition(String current, String next) {
+        if ("PENDING".equals(current) && "CONFIRMED".equals(next)) return true;
+        if ("PENDING".equals(current) && "CANCELLED".equals(next)) return true;
+        if ("CONFIRMED".equals(current) && "SHIPPING".equals(next)) return true;
+        if ("CONFIRMED".equals(current) && "CANCELLED".equals(next)) return true;
+        if ("SHIPPING".equals(current) && "DELIVERED".equals(next)) return true;
+        if ("CANCEL_REQUESTED".equals(current) && "CANCELLED".equals(next)) return true;
+        if ("CANCEL_REQUESTED".equals(current) && "CONFIRMED".equals(next)) return true;
+        return false;
     }
 
-    public boolean requestCancelOrder(long orderId, long customerId) {
-        Order dh = orderDAO.getOrderById(orderId, customerId);
+    public List<Order> getOrdersByMaKH(long maKH) {
+        return orderDAO.getOrdersByMaKH(maKH);
+    }
+
+    public Order getOrderByMaDH(long maDH, long maKH) {
+        return orderDAO.getOrderByMaDH(maDH, maKH);
+    }
+
+    public List<OrderItem> getOrderItemsByMaDH(long maDH) {
+        return orderDAO.getOrderItemsByMaDH(maDH);
+    }
+
+    public boolean requestCancelOrder(long maDH, long maKH) {
+        Order dh = orderDAO.getOrderByMaDH(maDH, maKH);
         if (dh == null) {
             System.out.println("Không tìm thấy đơn hàng hoặc đơn không thuộc khách hàng này.");
             return false;
         }
 
-        String status = normalizeStatus(dh.getTrangThaiDon());
+        String status = dh.getTrangThaiDon() == null ? "" : dh.getTrangThaiDon().trim().toUpperCase();
         if ("PENDING".equals(status)) {
-            return updateCustomerStatus(orderId, customerId, status, "CANCELLED", null);
+            return orderDAO.updateOrderStatus(maDH, "CANCELLED");
         }
 
         if ("CONFIRMED".equals(status)) {
-            return updateCustomerStatus(orderId, customerId, status, "CANCEL_REQUESTED", null);
+            return orderDAO.updateOrderStatus(maDH, "CANCEL_REQUESTED");
         }
-        
+
         System.out.println("Đơn hàng ở trạng thái " + status + " nên không thể hủy.");
         return false;
     }
-    
-    public boolean confirmReceived(long orderId, long customerId) {
-        Order dh = orderDAO.getOrderById(orderId, customerId);
 
+    public boolean confirmReceived(long maDH, long maKH) {
+        Order dh = orderDAO.getOrderByMaDH(maDH, maKH);
         if (dh == null) {
             System.out.println("Không tìm thấy đơn hàng hoặc đơn không thuộc khách hàng này.");
             return false;
         }
 
-        String status = normalizeStatus(dh.getTrangThaiDon());
-
+        String status = dh.getTrangThaiDon() == null ? "" : dh.getTrangThaiDon().trim().toUpperCase();
         if (!"SHIPPING".equals(status)) {
             System.out.println("Chỉ có thể xác nhận hàng khi đơn đang giao.");
             return false;
         }
 
-        return updateCustomerStatus(orderId, customerId, status, "DELIVERED", null);
-    }
-    
-    public boolean canReviewOrder(long orderId, long customerId) {
-        Order dh = orderDAO.getOrderById(orderId, customerId);
-
-        if(dh == null)
-            return false;
-
-        String status = normalizeStatus(dh.getTrangThaiDon());
-        return "DELIVERED".equals(status);
+        return orderDAO.updateOrderStatus(maDH, "DELIVERED");
     }
 
-    public boolean reorder(long orderId, long customerId) {
-        Order order = orderDAO.getOrderById(orderId, customerId);
-
-        if (order == null) {
-            System.out.println("[REORDER] Order not found or not owned by customerId=" + customerId);
+    public boolean canReviewOrder(long maDH, long maKH) {
+        Order dh = orderDAO.getOrderByMaDH(maDH, maKH);
+        if (dh == null) {
             return false;
         }
 
-        return orderDAO.addOrderItemsToCart(orderId, customerId) > 0;
-    }
-
-    private String normalizeStatus(String status) {
-        if (status == null)
-            return "";
-        return status.trim().toUpperCase();
+        String status = dh.getTrangThaiDon() == null ? "" : dh.getTrangThaiDon().trim().toUpperCase();
+        return "DELIVERED".equals(status);
     }
 
     public List<Order> getOrdersForStaff(String status, String keyword, String fromDate, String toDate) {
@@ -102,8 +118,8 @@ public class OrderService {
         return orderDAO.getOrderByIdForStaffWithDemo(orderId, mode, delayMs);
     }
 
-    public List<OrderStatusHistoryResponse> getOrderStatusHistory(long orderId) {
-        List<OrderStatusHistory> history = orderDAO.getOrderStatusHistory(orderId);
+    public List<OrderStatusHistoryResponse> getOrderStatusHistory(long maDH) {
+        List<OrderStatusHistory> history = orderDAO.getOrderStatusHistory(maDH);
         List<OrderStatusHistoryResponse> responses = new ArrayList<>();
 
         for (OrderStatusHistory item : history) {
@@ -120,28 +136,26 @@ public class OrderService {
         return responses;
     }
 
-    public List<OrderStatusHistoryResponse> getOrderStatusHistoryForCustomer(long orderId, long customerId) {
-        Order order = orderDAO.getOrderById(orderId, customerId);
-
+    public List<OrderStatusHistoryResponse> getOrderStatusHistoryForCustomer(long maDH, long maKH) {
+        Order order = orderDAO.getOrderByMaDH(maDH, maKH);
         if (order == null) {
             return null;
         }
 
-        return getOrderStatusHistory(orderId);
+        return getOrderStatusHistory(maDH);
     }
 
-    public boolean updateOrderStatusByStaff(long orderId, long staffId, String nextStatus, String cancelReason) {
-        Order order = orderDAO.getOrderByIdForStaff(orderId);
-
+    public boolean updateOrderStatusByStaff(long maDH, long staffId, String nextStatus, String cancelReason) {
+        Order order = orderDAO.getOrderByMaDHForStaff(maDH);
         if (order == null) {
             System.out.println("[STAFF UPDATE] Không tìm thấy đơn hàng.");
             return false;
         }
 
-        String currentStatus = normalizeStatus(order.getTrangThaiDon());
-        String normalizedNextStatus = normalizeStatus(nextStatus);
+        String currentStatus = order.getTrangThaiDon() == null ? "" : order.getTrangThaiDon().trim().toUpperCase();
+        String normalizedNextStatus = nextStatus == null ? "" : nextStatus.trim().toUpperCase();
 
-        System.out.println("[STAFF UPDATE] orderId=" + orderId);
+        System.out.println("[STAFF UPDATE] maDH=" + maDH);
         System.out.println("[STAFF UPDATE] staffId=" + staffId);
         System.out.println("[STAFF UPDATE] currentStatus=" + currentStatus);
         System.out.println("[STAFF UPDATE] nextStatus=" + normalizedNextStatus);
@@ -153,11 +167,10 @@ public class OrderService {
         }
 
         boolean result;
-
         if ("CANCELLED".equals(normalizedNextStatus)) {
-            result = orderDAO.updateOrderStatusStaffAndCancelReason(orderId, staffId, normalizedNextStatus, cancelReason);
+            result = orderDAO.updateOrderStatusStaffAndCancelReason(maDH, staffId, normalizedNextStatus, cancelReason);
         } else {
-            result = orderDAO.updateOrderStatusAndStaff(orderId, staffId, normalizedNextStatus);
+            result = orderDAO.updateOrderStatusAndStaff(maDH, staffId, normalizedNextStatus);
         }
 
         System.out.println("[STAFF UPDATE] result=" + result);

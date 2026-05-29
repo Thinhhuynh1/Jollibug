@@ -28,11 +28,11 @@
               Yêu cầu #<c:out value="${yeuCau.maYC}"/> –
               <c:out value="${yeuCau.tieuDe}"/> –
               <c:choose>
-                <c:when test="${yeuCau.trangThai == 'Pending'}">
-                  <span style="font-weight:700;color:#d97706">Pending</span>
+                <c:when test="${yeuCau.trangThai == 'PENDING'}">
+                  <span style="font-weight:700;color:#d97706">Chờ tiếp nhận</span>
                 </c:when>
-                <c:when test="${yeuCau.trangThai == 'Processing'}">
-                  <span style="font-weight:700;color:#2563eb">Processing</span>
+                <c:when test="${yeuCau.trangThai == 'PROCESSING'}">
+                  <span style="font-weight:700;color:#2563eb">Đang xử lý</span>
                 </c:when>
                 <c:otherwise>
                   <span style="font-weight:700;color:#16a34a"><c:out value="${yeuCau.trangThai}"/></span>
@@ -75,7 +75,7 @@
                   <div class="support-chat__meta">
                     <strong>Nhân viên Jollibug</strong>
                     <c:choose>
-                      <c:when test="${yeuCau.trangThai == 'Processing' and not empty yeuCau.nhanVien}">
+                      <c:when test="${yeuCau.trangThai == 'PROCESSING' and not empty yeuCau.nhanVien}">
                         <span>Đang hỗ trợ bởi <c:out value="${yeuCau.nhanVien.hoTen}"/></span>
                       </c:when>
                       <c:otherwise>
@@ -116,9 +116,9 @@
 
                 <form class="support-chat__composer" data-chat-form>
                   <label class="sr-only" for="support-chat-input">Tin nhắn</label>
-                  <c:set var="isChatDisabled" value="${yeuCau.trangThai == 'Pending' or yeuCau.trangThai == 'Done'}"/>
+                  <c:set var="isChatDisabled" value="${yeuCau.trangThai == 'PENDING' or yeuCau.trangThai == 'DONE'}"/>
                   <input id="support-chat-input" data-chat-input type="text"
-                         placeholder="${yeuCau.trangThai == 'Pending' ? 'Vui lòng chờ nhân viên tiếp nhận yêu cầu...' : yeuCau.trangThai == 'Done' ? 'Yêu cầu đã hoàn thành.' : 'Nhập tin nhắn của bạn...'}" 
+                         placeholder="${yeuCau.trangThai == 'PENDING' ? 'Vui lòng chờ nhân viên tiếp nhận yêu cầu...' : yeuCau.trangThai == 'DONE' ? 'Yêu cầu đã hoàn thành' : 'Nhập tin nhắn của bạn...'}" 
                          autocomplete="off" 
                          <c:if test="${isChatDisabled}">disabled</c:if> />
                   <button class="btn btn-primary" type="submit" <c:if test="${isChatDisabled}">disabled</c:if>>

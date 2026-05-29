@@ -11,6 +11,9 @@ public class Review {
     private long maDH;
     private int sao;
     private String noiDung;
+    private String anhDG;
+    private String tenMon;
+    private String img;
     private Timestamp ngayDG;
     private User khachHang;
 
@@ -63,6 +66,30 @@ public class Review {
 
     public void setNoiDung(String noiDung) {
         this.noiDung = noiDung;
+    }
+
+    public String getAnhDG() {
+        return anhDG;
+    }
+
+    public void setAnhDG(String anhDG) {
+        this.anhDG = anhDG;
+    }
+
+    public String getTenMon() {
+        return tenMon;
+    }
+
+    public void setTenMon(String tenMon) {
+        this.tenMon = tenMon;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
     }
 
     public Timestamp getNgayDG() {

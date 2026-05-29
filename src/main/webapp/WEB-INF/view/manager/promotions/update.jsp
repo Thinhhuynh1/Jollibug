@@ -1,5 +1,9 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="vn.fastfood.entity.ChuongTrinhKhuyenMai"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%
+ChuongTrinhKhuyenMai promotion = (ChuongTrinhKhuyenMai) request.getAttribute("promotion");
+%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -24,13 +28,16 @@
 <section class="profile-content">
 <section class="profile-section">
 <h1 class="profile-title">Cập nhật khuyến mãi</h1>
+<c:if test="${not empty errorMessage}">
+<div class="alert alert-danger" style="margin-bottom:1rem;">${errorMessage}</div>
+</c:if>
 
 <form action="<c:url value='/manager/promotions/update'/>" method="post" class="profile-form">
-<input type="hidden" name="promotionID" value="${promotion.maCT}" />
+<input type="hidden" name="promotionID" value="${promotion.maKM}" />
 <div class="profile-grid">
 <label class="profile-field">
 <span>Tên chương trình</span>
-<input type="text" name="tenCT" value="${promotion.tenCT}" required />
+<input type="text" name="tenKM" value="${promotion.tenKM}" required />
 </label>
 
 <label class="profile-field">
@@ -40,12 +47,12 @@
 
 <label class="profile-field">
 <span>Ngày bắt đầu</span>
-<input type="date" name="startDate" value="${promotion.ngayBatDauValue}" required />
+<input type="date" name="startDate" value="<%= promotion.getNgayBatDau() == null ? "" : promotion.getNgayBatDau().toLocalDate() %>" required />
 </label>
 
 <label class="profile-field">
 <span>Ngày kết thúc</span>
-<input type="date" name="endDate" value="${promotion.ngayKetThucValue}" required />
+<input type="date" name="endDate" value="<%= promotion.getNgayKetThuc() == null ? "" : promotion.getNgayKetThuc().toLocalDate() %>" required />
 </label>
 </div>
 
@@ -63,14 +70,6 @@
             </div>
         </label>
 
-        <label class="promo-option-card<c:if test='${promotion.phamViApDung == "CATEGORY"}'> active</c:if>">
-            <input type="radio" name="phamViApDung" value="CATEGORY" <c:if test="${promotion.phamViApDung == 'CATEGORY'}">checked</c:if> />
-            <div>
-                <strong>Theo danh mục</strong>
-                <small>Chỉ áp dụng cho một danh mục món ăn cụ thể.</small>
-            </div>
-        </label>
-
         <label class="promo-option-card<c:if test='${promotion.phamViApDung == "ITEM"}'> active</c:if>">
             <input type="radio" name="phamViApDung" value="ITEM" <c:if test="${promotion.phamViApDung == 'ITEM'}">checked</c:if> />
             <div>
@@ -78,18 +77,6 @@
                 <small>Lựa chọn riêng từng món để áp dụng khuyến mãi.</small>
             </div>
         </label>
-    </div>
-
-    <div id="apply-category" class="promo-apply-details<c:if test='${promotion.phamViApDung == "CATEGORY"}'> active</c:if>">
-        <label class="promo-detail-label">Danh mục áp dụng</label>
-        <div class="promo-category-select">
-            <select name="maDM">
-                <option value="">-- Chọn danh mục --</option>
-                <c:forEach items="${danhMucList}" var="category">
-                    <option value="${category.maDM}" <c:if test="${promotion.maDM == category.maDM}">selected</c:if>>${category.tenDM}</option>
-                </c:forEach>
-            </select>
-        </div>
     </div>
 
     <div id="apply-items" class="promo-apply-details<c:if test='${promotion.phamViApDung == "ITEM"}'> active</c:if>">
@@ -106,7 +93,7 @@
 </div>
 
 <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
-<a href="<c:url value='/manager/promotions/detail'/>?promotionID=${promotion.maCT}" class="btn btn-ghost">Hủy</a>
+<a href="<c:url value='/manager/promotions/detail'/>?promotionID=${promotion.maKM}" class="btn btn-ghost">Hủy</a>
 <button type="submit" class="profile-submit" style="max-width:180px;">Lưu thay đổi</button>
 </div>
 </form>
@@ -118,7 +105,6 @@
 <script>
 const applyTypeRadios = document.querySelectorAll('input[name="phamViApDung"]');
 const optionCards = document.querySelectorAll('.promo-option-card');
-const categorySection = document.getElementById('apply-category');
 const itemsSection = document.getElementById('apply-items');
 function updateApplySections() {
   const selected = document.querySelector('input[name="phamViApDung"]:checked');
@@ -126,7 +112,6 @@ function updateApplySections() {
     const radio = card.querySelector('input[type="radio"]');
     card.classList.toggle('active', radio === selected);
   });
-  categorySection.classList.toggle('active', selected.value === 'CATEGORY');
   itemsSection.classList.toggle('active', selected.value === 'ITEM');
 }
 applyTypeRadios.forEach(radio => radio.addEventListener('change', updateApplySections));

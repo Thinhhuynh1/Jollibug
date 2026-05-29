@@ -1,7 +1,16 @@
 package vn.fastfood.controller.staff;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import vn.fastfood.dto.OrderDetailResponse;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
@@ -24,100 +33,35 @@ public class StaffOrderController {
             @RequestParam(value = "fromDate", required = false) String fromDate,
             @RequestParam(value = "toDate", required = false) String toDate
     ) {
-        List<Order> orders = orderService.getOrdersForStaff(status, keyword, fromDate, toDate);
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(orderService.getOrdersForStaff(status, keyword, fromDate, toDate));
     }
 
-    @GetMapping("/concurrency-mode")
-    public ResponseEntity<Map<String, Object>> getConcurrencyMode() {
-        return ResponseEntity.ok(
-                Map.of(
-                        "success", true,
-                        "mode", vn.fastfood.config.OrderConcurrencyDemoSettings.getMode()
-                )
-        );
-    }
+    @GetMapping("/{maDH}")
+    public ResponseEntity<?> getOrderDetailForStaff(@PathVariable("maDH") long maDH) {
+        Order order = orderService.getOrderByMaDHForStaff(maDH);
 
-    @PostMapping("/concurrency-mode")
-    public ResponseEntity<Map<String, Object>> setConcurrencyMode(
-            @RequestParam("mode") String mode
-    ) {
-        String normalizedMode = vn.fastfood.config.OrderConcurrencyDemoSettings.setMode(mode);
-        return ResponseEntity.ok(
-                Map.of(
-                        "success", true,
-                        "mode", normalizedMode
-                )
-        );
-    }
-
-    @GetMapping("/{orderId}")
-    public ResponseEntity<?> getOrderDetailForStaff(
-            @PathVariable("orderId") long orderId
-    ) {
-        String mode = vn.fastfood.config.OrderConcurrencyDemoSettings.getMode();
-
-        try {
-            Map<String, Object> demoResult = orderService.getOrderByIdForStaffWithDemo(orderId, mode, 5000L);
-            Object orderObj = demoResult.get("order");
-            Order order = orderObj instanceof Order ? (Order) orderObj : null;
-
-            if (order == null || "NOT_FOUND".equals(demoResult.get("firstStatus"))) {
-                return ResponseEntity.status(404).body(
-                        Map.of(
-                                "success", false,
-                                "message", "Không tìm thấy đơn hàng hoặc đơn chưa được khởi tạo."
-                        )
-                );
-            }
-
-            List<OrderItem> items = orderService.getOrderItemsByOrderId(orderId);
-
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "order", order,
-                    "orderItems", items,
-                    "demoMode", mode,
-                    "firstStatus", demoResult.get("firstStatus"),
-                    "secondStatus", demoResult.get("secondStatus"),
-                    "changed", demoResult.get("changed"),
-                    "isolation", demoResult.get("isolation")
-            ));
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body(
-                    Map.of(
-                            "success", false,
-                            "message", "Lỗi cơ sở dữ liệu khi demo Non-repeatable Read."
-                    )
-            );
+        if (order == null) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Không tìm thấy đơn hàng."));
         }
+
+        List<OrderItem> items = orderService.getOrderItemsByMaDH(maDH);
+        return ResponseEntity.ok(new OrderDetailResponse(order, items));
     }
 
-    @PutMapping("/{orderId}/status")
+    @PutMapping("/{maDH}/status")
     public ResponseEntity<Map<String, Object>> updateOrderStatus(
-            @PathVariable("orderId") long orderId,
+            @PathVariable("maDH") long maDH,
             @RequestParam("staffId") long staffId,
             @RequestParam("status") String status,
             @RequestParam(value = "cancelReason", required = false) String cancelReason
     ) {
-        boolean result = orderService.updateOrderStatusByStaff(orderId, staffId, status, cancelReason);
+        boolean result = orderService.updateOrderStatusByStaff(maDH, staffId, status, cancelReason);
 
         if (result) {
-            return ResponseEntity.ok(
-                    Map.of(
-                            "success", true,
-                            "message", "Cập nhật trạng thái đơn hàng thành công."
-                    )
-            );
+            return ResponseEntity.ok(Map.of("success", true, "message", "Cập nhật trạng thái đơn hàng thành công."));
         }
 
         return ResponseEntity.badRequest().body(
-                Map.of(
-                        "success", false,
-                        "message", "Không thể cập nhật trạng thái đơn hàng. Vui lòng kiểm tra luồng trạng thái."
-                )
-        );
+                Map.of("success", false, "message", "Không thể cập nhật trạng thái đơn hàng. Vui lòng kiểm tra luồng trạng thái."));
     }
 }

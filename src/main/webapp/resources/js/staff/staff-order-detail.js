@@ -3,22 +3,22 @@ const STAFF_API_BASE = "/api/staff/orders";
 let currentOrder = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-    const orderId = getOrderIdFromUrl();
+    const maDH = getMaDHFromUrl();
 
-    if (!orderId) {
+    if (!maDH) {
         showMessage("Thiếu mã đơn hàng.");
         return;
     }
 
-    loadOrderDetail(orderId);
+    loadOrderDetail(maDH);
 });
 
-function getOrderIdFromUrl() {
+function getMaDHFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("orderId");
+    return params.get("maDH");
 }
 
-async function loadOrderDetail(orderId) {
+async function loadOrderDetail(maDH) {
     const content = document.getElementById("orderDetailContent");
     const itemBody = document.getElementById("staffOrderItemBody");
     const caption = document.getElementById("detailOrderCaption");
@@ -51,7 +51,7 @@ async function loadOrderDetail(orderId) {
     if (caption) caption.textContent = "";
 
     try {
-        const response = await fetch(`${STAFF_API_BASE}/${orderId}`);
+        const response = await fetch(`${STAFF_API_BASE}/${maDH}`);
 
         if (!response.ok) {
             throw new Error("Không thể tải chi tiết đơn hàng.");
@@ -68,8 +68,9 @@ async function loadOrderDetail(orderId) {
         currentOrder = order;
 
         const pageTitle = document.getElementById("detailPageTitle");
-        if (pageTitle)
+        if (pageTitle) {
             pageTitle.textContent = `Chi tiết đơn hàng #${order.maDH}`;
+        }
 
         let payment = null;
         try {
@@ -77,7 +78,7 @@ async function loadOrderDetail(orderId) {
             if (paymentResponse.ok) {
                 payment = await paymentResponse.json();
             }
-        } catch (e) {
+        } catch (error) {
             payment = null;
         }
 
@@ -88,7 +89,6 @@ async function loadOrderDetail(orderId) {
         renderOrderDetail(order, payment, data);
         renderOrderItems(items);
         setupDetailUpdateButton(order);
-
     } catch (error) {
         showMessage(error.message);
         if (content) content.innerHTML = "";
@@ -127,11 +127,12 @@ function renderOrderDetail(order, payment, demoData) {
 
                 <div class="detail-info-list">
                     <p><strong>Ngày đặt:</strong> ${formatDate(order.ngayDat)}</p>
-                    <p><strong>Trạng thái đơn:</strong> 
+                    <p><strong>Trạng thái đơn:</strong>
                         <span class="status ${getStatusClass(order.trangThaiDon)}">${displayStatus(order.trangThaiDon)}</span>
                     </p>
                     <p><strong>Phương thức thanh toán:</strong> ${order.tenPT || displayPaymentMethod(order.maPT)}</p>
-                    <p><strong>Trạng thái thanh toán:</strong> ${displayPaymentStatus(order.trangThaiTT)}</p>                    <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
+                    <p><strong>Trạng thái thanh toán:</strong> ${payment ? displayPaymentStatus(payment.trangThaiTT) : "Chưa có dữ liệu"}</p>
+                    <p><strong>Tổng tiền món:</strong> ${formatMoney(order.tongTienMon)}</p>
                     <p><strong>Giảm giá:</strong> ${formatMoney(order.tienGiamGia)}</p>
                     <p><strong>Thành tiền:</strong> ${formatMoney(order.thanhTien)}</p>
                     <p><strong>Mã giảm giá:</strong> ${order.maGG || "-"}</p>
@@ -165,7 +166,7 @@ function renderOrderItems(items) {
         return;
     }
 
-    items.forEach(item => {
+    items.forEach((item) => {
         const row = document.createElement("tr");
 
         row.innerHTML = `
@@ -209,8 +210,6 @@ function normalizeStatus(status) {
 }
 
 function displayStatus(status) {
-    const s = normalizeStatus(status);
-
     const statusMap = {
         PENDING: "Chờ xác nhận",
         CONFIRMED: "Đã xác nhận",
@@ -220,7 +219,7 @@ function displayStatus(status) {
         CANCELLED: "Đã hủy"
     };
 
-    return statusMap[s] || status;
+    return statusMap[normalizeStatus(status)] || status;
 }
 
 function getStatusClass(status) {
@@ -261,20 +260,16 @@ function parseDeliveryInfo(note) {
 }
 
 function displayPaymentStatus(status) {
-    const s = normalizeStatus(status);
-
     const map = {
         PENDING: "Chờ thanh toán",
         PAID: "Đã thanh toán",
         FAILED: "Thanh toán thất bại"
     };
 
-    return map[s] || status || "-";
+    return map[normalizeStatus(status)] || status || "-";
 }
 
 function displayPaymentMethod(method) {
-    const m = normalizeStatus(method);
-
     const map = {
         COD: "Thanh toán khi nhận hàng",
         BANK: "Chuyển khoản ngân hàng",
@@ -282,5 +277,5 @@ function displayPaymentMethod(method) {
         CREDIT_CARD: "Thẻ tín dụng / Ghi nợ"
     };
 
-    return map[m] || method || "-";
+    return map[normalizeStatus(method)] || method || "-";
 }

@@ -478,18 +478,94 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE PROCEDURE PROC_CREATE_ORDER(
+CREATE OR REPLACE PROCEDURE PROC_RESERVE_VOUCHER(
+    p_magg IN NUMBER
+)
+AS
+    v_soluong MAGIAMGIA.SoLuong%TYPE;
+    v_solansudung MAGIAMGIA.SoLanSuDung%TYPE;
+BEGIN
+    SELECT SoLuong, SoLanSuDung
+    INTO v_soluong, v_solansudung
+    FROM MAGIAMGIA
+    WHERE MaGG = p_magg
+      AND CURRENT_TIMESTAMP BETWEEN NgayBatDau AND NgayKetThuc
+    FOR UPDATE;
+
+    IF v_solansudung >= v_soluong THEN
+        RAISE_APPLICATION_ERROR(-20021, 'Hết lượng sử dụng');
+    END IF;
+
+    UPDATE MAGIAMGIA
+    SET SoLanSuDung = SoLanSuDung + 1
+    WHERE MaGG = p_magg;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20022, 'Voucher không có hiệu lực');
+END;
+/
+
+CREATE OR REPLACE PROCEDURE PROC_CHECKOUT(
     p_matk_kh IN NUMBER,
     p_madc IN NUMBER,
     p_tongtienmon IN NUMBER,
     p_tiengiamgia IN NUMBER,
     p_thanhtien IN NUMBER,
+    p_mapt IN VARCHAR2,
     p_magg IN NUMBER,
     p_ghichu IN CLOB,
+    p_items IN CLOB,
     p_madh OUT NUMBER
 )
 AS
+    v_mapt VARCHAR2(20);
+    v_count NUMBER;
+    v_items VARCHAR2(32767);
+    v_line VARCHAR2(4000);
+    v_mamon NUMBER;
+    v_tenmon VARCHAR2(255);
+    v_soluong NUMBER;
+    v_dongia NUMBER;
+    v_thanhtien NUMBER;
 BEGIN
+    IF p_matk_kh IS NULL OR p_matk_kh <= 0 THEN
+        RAISE_APPLICATION_ERROR(-20030, 'Khach hang khong hop le.');
+    END IF;
+
+    IF p_madc IS NOT NULL THEN
+        SELECT COUNT(*)
+        INTO v_count
+        FROM DIACHI
+        WHERE MaDC = p_madc
+          AND MaTK = p_matk_kh;
+
+        IF v_count = 0 THEN
+            RAISE_APPLICATION_ERROR(-20031, 'Dia chi giao hang khong hop le.');
+        END IF;
+    END IF;
+
+    v_mapt := UPPER(TRIM(p_mapt));
+    IF v_mapt IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20032, 'Phuong thuc thanh toan khong hop le.');
+    END IF;
+
+    SELECT COUNT(*)
+    INTO v_count
+    FROM PHUONGTHUCTT
+    WHERE MaPT = v_mapt;
+
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20032, 'Phuong thuc thanh toan khong hop le.');
+    END IF;
+
+    IF p_items IS NULL OR DBMS_LOB.GETLENGTH(p_items) = 0 THEN
+        RAISE_APPLICATION_ERROR(-20033, 'Gio hang trong.');
+    END IF;
+
+    IF p_magg IS NOT NULL THEN
+        PROC_RESERVE_VOUCHER(p_magg);
+    END IF;
+
     INSERT INTO DONHANG (
         MaTK_KH,
         MaTK_NV,
@@ -517,46 +593,41 @@ BEGIN
         CURRENT_TIMESTAMP
     )
     RETURNING MaDH INTO p_madh;
-END;
-/
 
-CREATE OR REPLACE PROCEDURE PROC_CREATE_ORDER_ITEM(
-    p_madh IN NUMBER,
-    p_mamon IN NUMBER,
-    p_tenmon IN VARCHAR2,
-    p_soluong IN NUMBER,
-    p_dongia IN NUMBER,
-    p_thanhtien IN NUMBER
-)
-AS
-BEGIN
-    INSERT INTO CHITIETDH (
-        MaDH,
-        MaMon,
-        TenMon,
-        SoLuong,
-        DonGia,
-        ThanhTien
-    )
-    VALUES (
-        p_madh,
-        p_mamon,
-        p_tenmon,
-        p_soluong,
-        p_dongia,
-        p_thanhtien
-    );
-END;
-/
+    v_items := DBMS_LOB.SUBSTR(p_items, 32767, 1);
 
-CREATE OR REPLACE PROCEDURE PROC_CREATE_PAYMENT(
-    p_madh IN NUMBER,
-    p_mapt IN VARCHAR2,
-    p_sotien IN NUMBER,
-    p_trangthai IN VARCHAR2
-)
-AS
-BEGIN
+    FOR i IN 1 .. REGEXP_COUNT(v_items, CHR(10)) + 1
+    LOOP
+        v_line := REGEXP_SUBSTR(v_items, '[^' || CHR(10) || ']+', 1, i);
+
+        IF v_line IS NULL THEN
+            CONTINUE;
+        END IF;
+
+        v_mamon := TO_NUMBER(REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 1));
+        v_tenmon := REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 2);
+        v_soluong := TO_NUMBER(REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 3));
+        v_dongia := TO_NUMBER(REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 4));
+        v_thanhtien := TO_NUMBER(REGEXP_SUBSTR(v_line, '[^' || CHR(9) || ']+', 1, 5));
+
+        INSERT INTO CHITIETDH (
+            MaDH,
+            MaMon,
+            TenMon,
+            SoLuong,
+            DonGia,
+            ThanhTien
+        )
+        VALUES (
+            p_madh,
+            v_mamon,
+            v_tenmon,
+            v_soluong,
+            v_dongia,
+            v_thanhtien
+        );
+    END LOOP;
+
     INSERT INTO THANHTOAN (
         MaDH,
         MaPT,
@@ -566,10 +637,10 @@ BEGIN
     )
     VALUES (
         p_madh,
-        p_mapt,
+        v_mapt,
         CURRENT_TIMESTAMP,
-        p_sotien,
-        p_trangthai
+        p_thanhtien,
+        'PENDING'
     );
 END;
 /

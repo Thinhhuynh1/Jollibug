@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function getCustomerId() {
-    const input = document.getElementById("customerId");
+    const input = document.getElementById("maKH");
     return input ? input.value : 1;
 }
 

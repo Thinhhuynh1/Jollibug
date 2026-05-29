@@ -1,153 +1,148 @@
 package vn.fastfood.controller.client;
 
-import vn.fastfood.dto.OrderDetailResponse;
-import vn.fastfood.dto.OrderStatusHistoryResponse;
-import vn.fastfood.model.OrderItem;
-import vn.fastfood.model.Order;
-import vn.fastfood.service.OrderService;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
+
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import vn.fastfood.dto.OrderDetailResponse;
+import vn.fastfood.dto.OrderStatusHistoryResponse;
+import vn.fastfood.entity.MonAn;
+import vn.fastfood.model.Order;
+import vn.fastfood.model.OrderItem;
+import vn.fastfood.repository.MonAnRepository;
+import vn.fastfood.service.CartService;
+import vn.fastfood.service.OrderService;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
+
     private final OrderService orderService = new OrderService();
 
+    @Autowired
+    private CartService cartService;
+
+    @Autowired
+    private MonAnRepository monAnRepository;
+
     @GetMapping
-    public ResponseEntity<List<Order>> getOrdersByCustomerId(
-        @RequestParam("customerId") long customerId
-    ) {
-        List<Order> orders = orderService.getOrdersByCustomerId(customerId);
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<List<Order>> getOrdersByMaKH(@RequestParam("maKH") long maKH) {
+        return ResponseEntity.ok(orderService.getOrdersByMaKH(maKH));
     }
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/{maDH}")
     public ResponseEntity<?> getOrderDetail(
-        @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
-    ) {
-        Order order = orderService.getOrderById(orderId, customerId);
-
-        if(order == null)
-        {
-            return ResponseEntity.status(404).body(
-                Map.of(
-                    "success", false,
-                    "message", "Không tìm thấy đơn hàng hoặc đơn không thuộc khách hàng này."
-                )
-            );
+            @PathVariable("maDH") long maDH,
+            @RequestParam("maKH") long maKH) {
+        Order donHang = orderService.getOrderByMaDH(maDH, maKH);
+        if (donHang == null) {
+            return error(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng hoặc đơn không thuộc khách hàng này.");
         }
-        List<OrderItem> items = orderService.getOrderItemsByOrderId(orderId);
-        OrderDetailResponse response = new OrderDetailResponse(order, items);
-        return ResponseEntity.ok(response);
+
+        List<OrderItem> chiTietDonHang = orderService.getOrderItemsByMaDH(maDH);
+        return ResponseEntity.ok(new OrderDetailResponse(donHang, chiTietDonHang));
     }
 
-    @PostMapping("/{orderId}/cancel")
+    @PostMapping("/{maDH}/cancel")
     public ResponseEntity<Map<String, Object>> cancelOrder(
-        @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
-    ) {
-        boolean result = orderService.requestCancelOrder(orderId, customerId);
-        
-        if (result) {
-            return ResponseEntity.ok(
-                Map.of(
-                    "success", true,
-                    "message", "Cập nhật hủy/ yêu cầu hủy đơn thành công."
-                )
-            );
+            @PathVariable("maDH") long maDH,
+            @RequestParam("maKH") long maKH) {
+        if (!orderService.requestCancelOrder(maDH, maKH)) {
+            return error(HttpStatus.BAD_REQUEST, "Không thể hủy đơn hàng này.");
         }
 
-        return ResponseEntity.badRequest().body(
-            Map.of(
-                "success", false,
-                "message", "Không thể hủy đơn hàng này."
-            )
-        );
+        return ok("Cập nhật hủy/yêu cầu hủy đơn thành công.");
     }
 
-    @PostMapping("/{orderId}/received")
+    @PostMapping("/{maDH}/received")
     public ResponseEntity<Map<String, Object>> confirmReceived(
-        @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
-    ) {
-        boolean result = orderService.confirmReceived(orderId, customerId);
-
-        if (result) {
-            return ResponseEntity.ok(
-                Map.of(
-                    "success", true,
-                    "message", "Xác nhận đã nhận hàng thành công."
-                )
-            );
+            @PathVariable("maDH") long maDH,
+            @RequestParam("maKH") long maKH) {
+        if (!orderService.confirmReceived(maDH, maKH)) {
+            return error(HttpStatus.BAD_REQUEST, "Không thể xác nhận đã nhận hàng cho đơn này.");
         }
-        return ResponseEntity.badRequest().body(
-            Map.of(
-                "success", false,
-                "message", "Không thể xác nhận đã nhận hàng cho đơn này."
-            )
-        );
+
+        return ok("Xác nhận đã nhận hàng thành công.");
     }
 
-    @GetMapping("/{orderId}/status-history")
+    @GetMapping("/{maDH}/status-history")
     public ResponseEntity<?> getOrderStatusHistory(
-        @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
-    ) {
-        List<OrderStatusHistoryResponse> history = orderService.getOrderStatusHistoryForCustomer(orderId, customerId);
-
+            @PathVariable("maDH") long maDH,
+            @RequestParam("maKH") long maKH) {
+        List<OrderStatusHistoryResponse> history = orderService.getOrderStatusHistoryForCustomer(maDH, maKH);
         if (history == null) {
-            return ResponseEntity.status(404).body(
-                Map.of(
-                    "success", false,
-                    "message", "Order not found for this customer."
-                )
-            );
+            return error(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng cho khách hàng này.");
         }
 
         return ResponseEntity.ok(history);
     }
 
-    @PostMapping("/{orderId}/reorder")
+    @PostMapping("/{maDH}/reorder")
     public ResponseEntity<Map<String, Object>> reorder(
-        @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
-    ) {
-        boolean result = orderService.reorder(orderId, customerId);
-
-        if (result) {
-            return ResponseEntity.ok(
-                Map.of(
-                    "success", true,
-                    "message", "\u0110\u00e3 th\u00eam l\u1ea1i c\u00e1c m\u00f3n trong \u0111\u01a1n v\u00e0o gi\u1ecf h\u00e0ng."
-                )
-            );
+            @PathVariable("maDH") long maDH,
+            @RequestParam("maKH") long maKH,
+            HttpSession session) {
+        Order donHang = orderService.getOrderByMaDH(maDH, maKH);
+        if (donHang == null) {
+            return error(HttpStatus.BAD_REQUEST, "Không thể đặt lại đơn hàng này.");
         }
 
-        return ResponseEntity.badRequest().body(
-            Map.of(
-                "success", false,
-                "message", "Kh\u00f4ng th\u1ec3 \u0111\u1eb7t l\u1ea1i \u0111\u01a1n h\u00e0ng n\u00e0y."
-            )
-        );
+        List<OrderItem> chiTietDonHang = orderService.getOrderItemsByMaDH(maDH);
+        int soMonDaThem = addItemsToSessionCart(chiTietDonHang, session);
+        if (soMonDaThem == 0) {
+            return error(HttpStatus.BAD_REQUEST, "Không thể đặt lại đơn hàng này.");
+        }
+
+        return ok("Đã thêm lại các món trong đơn vào giỏ hàng.");
     }
 
-    @GetMapping("/{orderId}/can-review")
+    @GetMapping("/{maDH}/can-review")
     public ResponseEntity<Map<String, Object>> canReviewOrder(
-        @PathVariable("orderId") long orderId,
-        @RequestParam("customerId") long customerId
-    ) {
-        boolean canReview = orderService.canReviewOrder(orderId, customerId);
-
-        return ResponseEntity.ok(
-            Map.of(
+            @PathVariable("maDH") long maDH,
+            @RequestParam("maKH") long maKH) {
+        return ResponseEntity.ok(Map.of(
                 "success", true,
-                "canReview", canReview
-            )
-        );
+                "canReview", orderService.canReviewOrder(maDH, maKH)
+        ));
+    }
+
+    private int addItemsToSessionCart(List<OrderItem> chiTietDonHang, HttpSession session) {
+        int soMonDaThem = 0;
+
+        for (OrderItem chiTiet : chiTietDonHang) {
+            MonAn monAn = monAnRepository.findProduct(chiTiet.getMaMon());
+            if (monAn == null) {
+                continue;
+            }
+
+            cartService.addSessionCart(monAn, chiTiet.getSoLuong(), session);
+            soMonDaThem++;
+        }
+
+        return soMonDaThem;
+    }
+
+    private ResponseEntity<Map<String, Object>> ok(String message) {
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", message
+        ));
+    }
+
+    private ResponseEntity<Map<String, Object>> error(HttpStatus status, String message) {
+        return ResponseEntity.status(status).body(Map.of(
+                "success", false,
+                "message", message
+        ));
     }
 }

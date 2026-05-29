@@ -33,19 +33,9 @@ public class UserService {
     @Autowired
     private DataSource dataSource;
 
-    private void callProcedure(String sql, SqlConsumer consumer) {
-        try (Connection connection = dataSource.getConnection();
-                CallableStatement statement = connection.prepareCall(sql)) {
-            consumer.accept(statement);
-            statement.execute();
-        } catch (SQLException e) {
-            throw new RuntimeException("Không thể chạy procedure", e);
-        }
-    }
-
     private boolean callFunction(String sql, String value) {
         try (Connection connection = dataSource.getConnection();
-                CallableStatement statement = connection.prepareCall(sql)) {
+             CallableStatement statement = connection.prepareCall(sql)) {
             statement.registerOutParameter(1, Types.INTEGER);
             statement.setString(2, value);
             statement.execute();
@@ -55,9 +45,54 @@ public class UserService {
         }
     }
 
-    @FunctionalInterface
-    private interface SqlConsumer {
-        void accept(CallableStatement statement) throws SQLException;
+    private boolean emailExists(String email) {
+        return callFunction("{? = call FUNC_EMAIL_EXISTS(?)}", email);
+    }
+
+    private boolean phoneExists(String phone) {
+        if (phone == null) {
+            return false;
+        }
+        return callFunction("{? = call FUNC_SDT_EXISTS(?)}", phone);
+    }
+
+    private void updatePasswordById(Long userId, String encodedPassword) {
+        try (Connection connection = dataSource.getConnection();
+             CallableStatement statement = connection.prepareCall("{call PROC_UPDATE_USER_PASSWORD(?, ?)}")) {
+            statement.setLong(1, userId);
+            statement.setString(2, encodedPassword);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Không thể chạy procedure", e);
+        }
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmailClean(email);
+    }
+
+    public User getUserByMaTK(Long id) {
+        return this.userRepository.findById(id).orElse(null);
+    }
+
+    public VaiTro getRoleByName(String name) {
+        return this.vaiTroRepository.findByTenVT(name);
+    }
+
+    public List<User> getUserActive() {
+        return this.userRepository.findAll();
+    }
+
+    public List<User> findByTrangThai(String trangThai) {
+        return this.userRepository.findByTrangThai(trangThai);
+    }
+
+    public User saveUser(User user) {
+        return this.userRepository.save(user);
+    }
+
+    public void deleteUser(long maTK) {
+        this.userRepository.deleteById(maTK);
     }
 
     public User registerNewUser(User user) {
@@ -74,19 +109,22 @@ public class UserService {
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
 
-        callProcedure("{call PROC_REGISTER_USER(?, ?, ?, ?)}", statement -> {
+        try (Connection connection = dataSource.getConnection();
+             CallableStatement statement = connection.prepareCall("{call PROC_REGISTER_USER(?, ?, ?, ?)}")) {
             statement.setString(1, encodedPassword);
             statement.setString(2, user.getHoTen());
             statement.setString(3, phone);
             statement.setString(4, email);
-        });
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Không thể chạy procedure", e);
+        }
 
         return userRepository.findByEmailClean(email);
     }
 
     public User login(String email, String password) {
         User user = userRepository.findByEmailClean(email);
-
         if (user == null) {
             throw new RuntimeException("Email không tồn tại");
         }
@@ -95,30 +133,6 @@ public class UserService {
         }
 
         return user;
-    }
-
-    public User saveUser(User user) {
-        return this.userRepository.save(user);
-    }
-
-    public VaiTro getRoleByName(String name) {
-        return this.vaiTroRepository.findByTenVT(name);
-    }
-
-    public List<User> getUserActive() {
-        return this.userRepository.findAll();
-    }
-
-    public List<User> findByTrangThai(String trangThai) {
-        return this.userRepository.findByTrangThai(trangThai);
-    }
-
-    public void deleteUser(long maTK) {
-        this.userRepository.deleteById(maTK);
-    }
-
-    public User getUserByMaTK(Long id) {
-        return this.userRepository.findById(id).orElse(null);
     }
 
     public String resetPassword(HttpSession session, String currentPass, String newPass) {
@@ -143,10 +157,6 @@ public class UserService {
         return "redirect:/login";
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmailClean(email);
-    }
-
     public String changePassword(HttpSession session, String newPass) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
@@ -169,24 +179,5 @@ public class UserService {
 
         String encodedPassword = passwordEncoder.encode(newPass);
         updatePasswordById(user.getMaTK(), encodedPassword);
-    }
-
-    private boolean emailExists(String email) {
-        return callFunction("{? = call FUNC_EMAIL_EXISTS(?)}", email);
-    }
-
-    private boolean phoneExists(String phone) {
-        if (phone == null) {
-            return false;
-        }
-
-        return callFunction("{? = call FUNC_SDT_EXISTS(?)}", phone);
-    }
-
-    private void updatePasswordById(Long userId, String encodedPassword) {
-        callProcedure("{call PROC_UPDATE_USER_PASSWORD(?, ?)}", statement -> {
-            statement.setLong(1, userId);
-            statement.setString(2, encodedPassword);
-        });
     }
 }

@@ -21,7 +21,7 @@ import jakarta.persistence.Transient;
 /**
  * Yêu cầu hỗ trợ (YEUCAUHOTRO)
  * Một yêu cầu = một "phòng chat" giữa Client và Staff.
- * TrangThai: Pending | Processing | Done
+ * TrangThai: PENDING | PROCESSING | DONE
  */
 @Entity
 @Table(name = "YEUCAUHOTRO")
@@ -59,7 +59,7 @@ public class YeuCauHoTro {
     private String noiDung;
 
     @Column(name = "TrangThai", length = 20, nullable = false)
-    private String trangThai = "Pending";
+    private String trangThai = "PENDING";
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -79,7 +79,7 @@ public class YeuCauHoTro {
         this.maTKKH = maTKKH;
         this.tieuDe = tieuDe;
         this.noiDung = noiDung;
-        this.trangThai = "Pending";
+        this.trangThai = "PENDING";
     }
 
     // ---- Getters & Setters ----

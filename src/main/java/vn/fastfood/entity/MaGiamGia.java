@@ -4,6 +4,8 @@ import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -49,11 +51,16 @@ public class MaGiamGia {
     @Column(name = "NgayKetThuc")
     private LocalDateTime ngayKetThuc;
 
+    @CreationTimestamp
+    @Column(name = "createdAt", updatable = false)
+    private LocalDateTime createdAt;
+
     @Transient
     public String getStatus() {
         if (ngayBatDau == null || ngayKetThuc == null) {
             return "Chưa xác định";
         }
+
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(ngayBatDau)) {
             return "Sắp diễn ra";
@@ -61,7 +68,7 @@ public class MaGiamGia {
         if (now.isAfter(ngayKetThuc)) {
             return "Đã kết thúc";
         }
-        if (getRemainingQuantity() <= 0) {
+        if (soLuong != null && soLanSuDung != null && soLanSuDung >= soLuong) {
             return "Hết lượt dùng";
         }
         return "Đang hoạt động";
@@ -76,29 +83,33 @@ public class MaGiamGia {
 
     @Transient
     public String getNgayBatDauValue() {
-        if (ngayBatDau == null)
+        if (ngayBatDau == null) {
             return "";
+        }
         return ngayBatDau.toLocalDate().toString();
     }
 
     @Transient
     public String getNgayKetThucValue() {
-        if (ngayKetThuc == null)
+        if (ngayKetThuc == null) {
             return "";
+        }
         return ngayKetThuc.toLocalDate().toString();
     }
 
     @Transient
     public String getDiscountDisplay() {
-        if (mucGiam == null) return "0";
+        if (mucGiam == null) {
+            return "0";
+        }
         if ("PERCENTAGE".equalsIgnoreCase(loaiGiam) || "PERCENT".equalsIgnoreCase(loaiGiam)) {
             if (mucGiam % 1 == 0) {
                 return String.format("%d%%", mucGiam.longValue());
             }
             return String.format("%s%%", mucGiam);
-        } else {
-            NumberFormat vnFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-            return vnFormat.format(mucGiam);
         }
+
+        NumberFormat vnFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        return vnFormat.format(mucGiam);
     }
 }

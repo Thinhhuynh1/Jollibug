@@ -2372,17 +2372,6 @@
 /* ── Hero ── */
 body[data-page="home"] {
   background:
-    radial-gradient(circle at 38% 34%, rgba(32, 7, 7, 0.12) 0, rgba(32, 7, 7, 0.12) 22px, transparent 23px),
-    radial-gradient(circle at 62% 38%, rgba(32, 7, 7, 0.1) 0, rgba(32, 7, 7, 0.1) 30px, transparent 31px),
-    radial-gradient(circle at 46% 68%, rgba(32, 7, 7, 0.09) 0, rgba(32, 7, 7, 0.09) 18px, transparent 19px),
-    radial-gradient(circle at 58% 74%, rgba(32, 7, 7, 0.11) 0, rgba(32, 7, 7, 0.11) 36px, transparent 37px),
-    radial-gradient(circle at 6% 14%, rgba(32, 7, 7, 0.34) 0, rgba(32, 7, 7, 0.34) 32px, transparent 33px),
-    radial-gradient(circle at 94% 16%, rgba(32, 7, 7, 0.34) 0, rgba(32, 7, 7, 0.34) 42px, transparent 43px),
-    radial-gradient(circle at 4% 48%, rgba(32, 7, 7, 0.32) 0, rgba(32, 7, 7, 0.32) 58px, transparent 59px),
-    radial-gradient(circle at 96% 52%, rgba(32, 7, 7, 0.32) 0, rgba(32, 7, 7, 0.32) 38px, transparent 39px),
-    radial-gradient(circle at 8% 84%, rgba(32, 7, 7, 0.3) 0, rgba(32, 7, 7, 0.3) 28px, transparent 29px),
-    radial-gradient(circle at 92% 86%, rgba(32, 7, 7, 0.3) 0, rgba(32, 7, 7, 0.3) 50px, transparent 51px),
-    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.28) 0, rgba(255, 255, 255, 0.28) 9%, transparent 10%),
     linear-gradient(180deg, #fff3f1 0%, #fbfbfb 38%, #ffe8e5 100%);
 }
 
@@ -2475,11 +2464,11 @@ body[data-page="home"] .page-shell {
   justify-content: center; */
 }
 
-@keyframes hp-hero-floating {
+/* @keyframes hp-hero-floating {
   0% { transform: translateY(-1%) scale(1.03); }
   50% { transform: translateY(-6%) scale(1.03); }
   100% { transform: translateY(-1%) scale(1.03); }
-}
+} */
 
 .hp-hero__img-wrap img {
   width: 150%;

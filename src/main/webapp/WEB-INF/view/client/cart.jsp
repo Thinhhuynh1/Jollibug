@@ -21,7 +21,7 @@
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell section-tight">
-    <input type="hidden" id="customerId" value="1">
+    <input type="hidden" id="maKH" value="1">
     <div class="container">
       <div class="page-intro">
         <h1 class="page-title">Giỏ hàng của tôi</h1>

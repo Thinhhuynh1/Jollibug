@@ -1,5 +1,9 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="vn.fastfood.entity.ChuongTrinhKhuyenMai"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%
+ChuongTrinhKhuyenMai promotion = (ChuongTrinhKhuyenMai) request.getAttribute("promotion");
+%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -29,40 +33,37 @@
 <div class="profile-grid">
 <label class="profile-field">
 <span>Tên chương trình</span>
-<input type="text" value="${promotion.tenCT}" readonly />
+<input type="text" value="${promotion.tenKM}" readonly />
 </label>
 
 <label class="profile-field">
 <span>Mức giảm</span>
-<input type="text" value="${promotion.discountDisplay}" readonly />
+<input type="text" value="${promotion.phanTramGiam}%" readonly />
 </label>
 
 <label class="profile-field">
 <span>Ngày bắt đầu</span>
-<input type="text" value="${promotion.ngayBatDauValue}" readonly />
+<input type="text" value="<%= promotion.getNgayBatDau() == null ? "" : promotion.getNgayBatDau().toLocalDate() %>" readonly />
 </label>
 
 <label class="profile-field">
 <span>Ngày kết thúc</span>
-<input type="text" value="${promotion.ngayKetThucValue}" readonly />
+<input type="text" value="<%= promotion.getNgayKetThuc() == null ? "" : promotion.getNgayKetThuc().toLocalDate() %>" readonly />
 </label>
 
 <label class="profile-field">
 <span>Trạng thái</span>
-<input type="text" value="${promotion.status}" readonly />
+<input type="text" value="<%= promotion.getNgayBatDau() != null && promotion.getNgayBatDau().isAfter(java.time.LocalDateTime.now())
+        ? "Sắp diễn ra"
+        : ((promotion.getNgayKetThuc() != null && promotion.getNgayKetThuc().isBefore(java.time.LocalDateTime.now()))
+                ? "Đã kết thúc"
+                : "Đang hoạt động") %>" readonly />
 </label>
 
 <label class="profile-field">
 <span>Phạm vi áp dụng</span>
-<input type="text" value="${phamViLabel}" readonly />
+<input type="text" value="<%= "ITEM".equals(promotion.getPhamViApDung()) ? "Chọn món" : "Tất cả món" %>" readonly />
 </label>
-
-<c:if test="${not empty apDungDanhMuc}">
-<label class="profile-field" style="grid-column:1/-1;">
-<span>Danh mục áp dụng</span>
-<input type="text" value="${apDungDanhMuc.tenDM}" readonly />
-</label>
-</c:if>
 
 <c:if test="${not empty apDungMonAnList}">
 <label class="profile-field" style="grid-column:1/-1;">
@@ -77,7 +78,7 @@
 
 <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
 <a href="<c:url value='/manager/promotions'/>" class="btn btn-ghost">Quay lại</a>
-<a href="<c:url value='/manager/promotions/update'/>?promotionID=${promotion.maCT}" class="profile-submit" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; max-width:180px;">Chỉnh sửa</a>
+<a href="<c:url value='/manager/promotions/update'/>?promotionID=${promotion.maKM}" class="profile-submit" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; max-width:180px;">Chỉnh sửa</a>
 </div>
 </div>
 </section>
