@@ -10,7 +10,9 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OrderDAO {
 
@@ -136,7 +138,117 @@ public class OrderDAO {
         return orders;
     }
 
+    public Order getOrderByIdForStaffWithConnection(Connection conn, long orderId) throws SQLException {
+        String sql = """
+            SELECT
+                dh.MaDH,
+                dh.MaTK_KH,
+                dh.MaTK_NV,
+                dh.NgayDat,
+                dh.MaDC,
+                dh.TongTienMon,
+                dh.TienGiamGia,
+                dh.ThanhTien,
+                dh.TrangThaiDon,
+                dh.MaGG,
+                dh.GhiChu,
+
+                u.HoTen AS TenKhachHang,
+                u.SDT AS SDTKhachHang,
+                u.Email AS EmailKhachHang,
+
+                dc.TenNguoiNhan AS TenNguoiNhan,
+                dc.SDTNguoiNhan AS SDTNguoiNhan,
+                TRIM(
+                    NVL(dc.DiaChiCuThe, '') ||
+                    CASE WHEN dc.PhuongXa IS NOT NULL THEN ', ' || dc.PhuongXa ELSE '' END ||
+                    CASE WHEN dc.QuanHuyen IS NOT NULL THEN ', ' || dc.QuanHuyen ELSE '' END ||
+                    CASE WHEN dc.TinhThanh IS NOT NULL THEN ', ' || dc.TinhThanh ELSE '' END
+                ) AS DiaChiGiaoHang,
+
+                tt.MaPT AS MaPT,
+                pt.TenPT AS TenPT,
+                tt.TrangThaiTT AS TrangThaiTT
+
+            FROM DONHANG dh
+            LEFT JOIN NGUOIDUNG u ON dh.MaTK_KH = u.MaTK
+            LEFT JOIN DIACHI dc ON dh.MaDC = dc.MaDC
+            LEFT JOIN THANHTOAN tt ON dh.MaDH = tt.MaDH
+            LEFT JOIN PHUONGTHUCTT pt ON tt.MaPT = pt.MaPT
+            WHERE dh.MaDH = ?
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapStaffOrderDetailResultSetToOrder(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Map<String, Object> getOrderByIdForStaffWithDemo(long orderId, String mode, long delayMs) throws SQLException {
+        int isolationLevel = "SAFE".equalsIgnoreCase(mode)
+                ? Connection.TRANSACTION_SERIALIZABLE
+                : Connection.TRANSACTION_READ_COMMITTED;
+        String isolationLabel = isolationLevel == Connection.TRANSACTION_SERIALIZABLE
+                ? "SERIALIZABLE"
+                : "READ_COMMITTED";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            int originalIsolation = conn.getTransactionIsolation();
+
+            try {
+                conn.setTransactionIsolation(isolationLevel);
+                conn.setAutoCommit(false);
+
+                // First read
+                Order firstOrder = getOrderByIdForStaffWithConnection(conn, orderId);
+                String firstStatus = firstOrder != null ? firstOrder.getTrangThaiDon() : "NOT_FOUND";
+
+                // Sleep to allow another transaction to update
+                sleep(delayMs);
+
+                // Second read
+                Order secondOrder = getOrderByIdForStaffWithConnection(conn, orderId);
+                String secondStatus = secondOrder != null ? secondOrder.getTrangThaiDon() : "NOT_FOUND";
+
+                conn.commit();
+
+                return Map.of(
+                        "success", true,
+                        "order", secondOrder != null ? secondOrder : Map.of(),
+                        "firstStatus", firstStatus != null ? firstStatus : "NOT_FOUND",
+                        "secondStatus", secondStatus != null ? secondStatus : "NOT_FOUND",
+                        "changed", !String.valueOf(firstStatus).equals(String.valueOf(secondStatus)),
+                        "isolation", isolationLabel,
+                        "mode", mode
+                );
+
+            } catch (SQLException | RuntimeException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
+                conn.setTransactionIsolation(originalIsolation);
+            }
+        }
+    }
+
     public Order getOrderByIdForStaff(long orderId) {
+        try (Connection conn = DBConnection.getConnection()) {
+            return getOrderByIdForStaffWithConnection(conn, orderId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Order _unused_getOrderByIdForStaff(long orderId) {
         String sql = """
             SELECT
                 dh.MaDH,
@@ -349,6 +461,106 @@ public class OrderDAO {
         }
 
         return false;
+    }
+
+    // ==================== PHANTOM READ DEMO ====================
+
+    public Map<String, Object> countOrderStatsTwiceForPhantomReadDemo(
+            String isolation, long delayMs) throws SQLException {
+        int isolationLevel = "SERIALIZABLE".equalsIgnoreCase(isolation)
+                ? Connection.TRANSACTION_SERIALIZABLE
+                : Connection.TRANSACTION_READ_COMMITTED;
+        String isolationLabel = isolationLevel == Connection.TRANSACTION_SERIALIZABLE
+                ? "SERIALIZABLE" : "READ_COMMITTED";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            int originalIsolation     = conn.getTransactionIsolation();
+
+            try {
+                conn.setTransactionIsolation(isolationLevel);
+                conn.setAutoCommit(false);
+
+                // Lần đọc 1 – đếm đơn hàng hôm nay
+                Map<String, Object> firstRead  = countTodayOrderStatsSnapshot(conn);
+
+                // Ngủ để giao dịch T2 kịp insert/thay đổi trạng thái
+                sleep(delayMs);
+
+                // Lần đọc 2 – cùng câu truy vấn range
+                Map<String, Object> secondRead = countTodayOrderStatsSnapshot(conn);
+
+                conn.commit();
+
+                long firstTotal  = ((Number) firstRead.get("total")).longValue();
+                long secondTotal = ((Number) secondRead.get("total")).longValue();
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("success",   true);
+                result.put("isolation", isolationLabel);
+                result.put("delayMs",   delayMs);
+                result.put("firstRead",  firstRead);
+                result.put("secondRead", secondRead);
+                result.put("changed",   firstTotal != secondTotal);
+                result.put("diff",      secondTotal - firstTotal);
+                return result;
+
+            } catch (SQLException | RuntimeException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
+                conn.setTransactionIsolation(originalIsolation);
+            }
+        }
+    }
+
+    private Map<String, Object> countTodayOrderStatsSnapshot(Connection conn) throws SQLException {
+        String sql = """
+            SELECT
+                COUNT(*) AS totalOrders,
+                SUM(CASE WHEN TrangThaiDon = 'DELIVERED'  THEN 1 ELSE 0 END) AS delivered,
+                SUM(CASE WHEN TrangThaiDon = 'PENDING'    THEN 1 ELSE 0 END) AS pending,
+                SUM(CASE WHEN TrangThaiDon = 'CONFIRMED'  THEN 1 ELSE 0 END) AS confirmed,
+                SUM(CASE WHEN TrangThaiDon = 'SHIPPING'   THEN 1 ELSE 0 END) AS shipping,
+                SUM(CASE WHEN TrangThaiDon = 'CANCELLED'  THEN 1 ELSE 0 END) AS cancelled,
+                COALESCE(SUM(ThanhTien), 0) AS tongDoanhThu
+            FROM DONHANG
+            WHERE NgayDat >= TRUNC(SYSDATE)
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                Map<String, Object> snap = new HashMap<>();
+                snap.put("total",       rs.getLong("totalOrders"));
+                snap.put("delivered",   rs.getLong("delivered"));
+                snap.put("pending",     rs.getLong("pending"));
+                snap.put("confirmed",   rs.getLong("confirmed"));
+                snap.put("shipping",    rs.getLong("shipping"));
+                snap.put("cancelled",   rs.getLong("cancelled"));
+                snap.put("tongDoanhThu",rs.getLong("tongDoanhThu"));
+                return snap;
+            }
+        }
+
+        Map<String, Object> empty = new HashMap<>();
+        empty.put("total", 0L); empty.put("delivered", 0L); empty.put("pending", 0L);
+        empty.put("confirmed", 0L); empty.put("shipping", 0L); empty.put("cancelled", 0L);
+        empty.put("tongDoanhThu", 0L);
+        return empty;
+    }
+
+    private void sleep(long delayMs) {
+        if (delayMs <= 0) {
+            return;
+        }
+
+        try {
+            Thread.sleep(delayMs);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public boolean updateOrderStatusAndStaff(long orderId, long staffId, String newStatus) {
@@ -566,6 +778,94 @@ public class OrderDAO {
             e.printStackTrace();
         }
 
+        return false;
+    }
+
+    // ==================== PHANTOM READ DEMO ====================
+
+    /**
+     * T1: Doc COUNT(*) WHERE PENDING hai lan trong cung mot transaction, voi do tre o giua.
+     * Trong khoang delay, T2 co the thay doi mot don -> PENDING va commit ngay.
+     * READ_COMMITTED  -> T1 thay count thay doi (phantom xay ra).
+     * SERIALIZABLE    -> T1 thay count nhat quan (phantom bi ngan chan).
+     */
+    public Map<String, Object> countPendingOrdersTwiceForPhantomReadDemo(
+            String isolation, long delayMs) throws SQLException {
+
+        int isolationLevel = "SERIALIZABLE".equalsIgnoreCase(isolation)
+                ? Connection.TRANSACTION_SERIALIZABLE
+                : Connection.TRANSACTION_READ_COMMITTED;
+        String isolationLabel = isolationLevel == Connection.TRANSACTION_SERIALIZABLE
+                ? "SERIALIZABLE" : "READ_COMMITTED";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            boolean originalAutoCommit = conn.getAutoCommit();
+            int originalIsolation = conn.getTransactionIsolation();
+
+            try {
+                conn.setTransactionIsolation(isolationLevel);
+                conn.setAutoCommit(false);
+
+                long firstCount = countPendingOrdersForPhantomDemo(conn);
+                sleep(delayMs);
+                long secondCount = countPendingOrdersForPhantomDemo(conn);
+
+                conn.commit();
+
+                return Map.of(
+                        "success",     true,
+                        "isolation",   isolationLabel,
+                        "delayMs",     delayMs,
+                        "firstCount",  firstCount,
+                        "secondCount", secondCount,
+                        "phantom",     firstCount != secondCount
+                );
+
+            } catch (SQLException | RuntimeException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(originalAutoCommit);
+                conn.setTransactionIsolation(originalIsolation);
+            }
+        }
+    }
+
+    /** Cau SQL dung trong moi lan doc cua demo Phantom Read. */
+    private long countPendingOrdersForPhantomDemo(Connection conn) throws SQLException {
+        String sql = """
+            SELECT COUNT(*) AS so_don
+            FROM DONHANG
+            WHERE TrangThaiDon = 'PENDING'
+        """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getLong("so_don") : 0L;
+        }
+    }
+
+    /**
+     * T2: Thay doi trang thai don hang (auto-commit, commit ngay lap tuc).
+     * Goi tu Session 2 de tao ra 'phantom row' trong tap ket qua cua T1.
+     */
+    public boolean resetOrderStatusForPhantomReadDemo(long orderId, String status) {
+        String sql = """
+            UPDATE DONHANG
+            SET TrangThaiDon = ?
+            WHERE MaDH = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+            ps.setLong(2, orderId);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 

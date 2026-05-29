@@ -62,9 +62,7 @@ BEGIN
     FOR UPDATE; --Khoa dong cho update, Tranh bi concurence
 
     IF v_so_luong_ton < :NEW.SoLuong THEN
-        RAISE_APPLICATION_ERROR(
-            -20002, 'So luong ton kho khong du de dat hang'
-        );
+        RAISE_APPLICATION_ERROR(-20002, 'So luong ton kho khong du de dat hang');
     END IF;
 
     UPDATE MONAN
@@ -438,7 +436,7 @@ BEGIN
         p_matk_kh,
         p_tieude,
         p_noidung,
-        'Pending',
+        'PENDING',
         CURRENT_TIMESTAMP
     )
     RETURNING MaYC INTO p_mayc;
@@ -465,7 +463,7 @@ AS
 BEGIN
     UPDATE YEUCAUHOTRO
     SET MaTK_NV = p_matk_nv,
-        TrangThai = 'Processing'
+        TrangThai = 'PROCESSING'
     WHERE MaYC = p_mayc;
 END;
 /
@@ -572,6 +570,58 @@ BEGIN
         CURRENT_TIMESTAMP,
         p_sotien,
         p_trangthai
+    );
+END;
+/
+
+CREATE OR REPLACE PROCEDURE PROC_RESERVE_VOUCHER(
+    p_magg IN NUMBER
+)
+AS
+    v_soluong MAGIAMGIA.SoLuong%TYPE;
+    v_solansudung MAGIAMGIA.SoLanSuDung%TYPE;
+BEGIN
+    SELECT SoLuong, SoLanSuDung
+    INTO v_soluong, v_solansudung
+    FROM MAGIAMGIA
+    WHERE MaGG = p_magg
+      AND CURRENT_TIMESTAMP BETWEEN NgayBatDau AND NgayKetThuc
+    FOR UPDATE;
+
+    IF v_solansudung >= v_soluong THEN
+        RAISE_APPLICATION_ERROR(-20021, 'Hết lượng sử dụng');
+    END IF;
+
+    UPDATE MAGIAMGIA
+    SET SoLanSuDung = SoLanSuDung + 1
+    WHERE MaGG = p_magg;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20022, 'Voucher không có hiệu lực');
+END;
+/
+
+CREATE OR REPLACE PROCEDURE PROC_ORDER(
+    p_matk_kh IN NUMBER,
+    p_madc IN NUMBER,
+    p_tongtienmon IN NUMBER,
+    p_tiengiamgia IN NUMBER,
+    p_thanhtien IN NUMBER,
+    p_magg IN NUMBER,
+    p_ghichu IN CLOB,
+    p_madh OUT NUMBER
+)
+AS
+BEGIN
+    PROC_CREATE_ORDER(
+        p_matk_kh,
+        p_madc,
+        p_tongtienmon,
+        p_tiengiamgia,
+        p_thanhtien,
+        p_magg,
+        p_ghichu,
+        p_madh
     );
 END;
 /

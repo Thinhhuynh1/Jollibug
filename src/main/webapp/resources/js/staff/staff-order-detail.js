@@ -23,7 +23,30 @@ async function loadOrderDetail(orderId) {
     const itemBody = document.getElementById("staffOrderItemBody");
     const caption = document.getElementById("detailOrderCaption");
 
-    if (content) content.innerHTML = "Đang tải...";
+    if (content) {
+        content.innerHTML = `
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                .demo-loading-spin {
+                    width: 48px;
+                    height: 48px;
+                    border: 5px solid rgba(230, 0, 0, 0.1);
+                    border-top-color: var(--color-red-500);
+                    border-radius: 50%;
+                    animation: spin 1s infinite linear;
+                    margin-bottom: 1rem;
+                }
+            </style>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; text-align: center;">
+                <div class="demo-loading-spin"></div>
+                <h3 style="margin-bottom: 0.5rem; color: var(--color-ink-900);">Đang truy xuất thông tin đơn hàng...</h3>
+                <p class="muted">Demo chờ 5 giây theo chế độ SAFE/UNSAFE trên header.</p>
+            </div>
+        `;
+    }
     if (itemBody) itemBody.innerHTML = "";
     if (caption) caption.textContent = "";
 
@@ -62,7 +85,7 @@ async function loadOrderDetail(orderId) {
             caption.textContent = "";
         }
 
-        renderOrderDetail(order, payment);
+        renderOrderDetail(order, payment, data);
         renderOrderItems(items);
         setupDetailUpdateButton(order);
 
@@ -72,16 +95,32 @@ async function loadOrderDetail(orderId) {
     }
 }
 
-function renderOrderDetail(order, payment) {
+function renderOrderDetail(order, payment, demoData) {
     const content = document.getElementById("orderDetailContent");
 
     if (!content) return;
 
     const delivery = parseDeliveryInfo(order.ghiChu);
-    const paymentStatus = payment ? displayPaymentStatus(payment.trangThaiTT) : "Chưa có dữ liệu";
-    const paymentMethod = payment ? displayPaymentMethod(payment.maPT) : "Chưa có dữ liệu";
+    const demoMode = demoData && demoData.demoMode === "UNSAFE" ? "UNSAFE" : "SAFE";
+    const isolation = demoData && demoData.isolation ? demoData.isolation : (demoMode === "UNSAFE" ? "READ_COMMITTED" : "SERIALIZABLE");
+    const firstStatus = demoData && demoData.firstStatus ? demoData.firstStatus : "-";
+    const secondStatus = demoData && demoData.secondStatus ? demoData.secondStatus : "-";
+    const changed = Boolean(demoData && demoData.changed);
 
     content.innerHTML = `
+        <section class="detail-info-card" style="margin-bottom:1rem;">
+            <h3>Demo Non-repeatable Read</h3>
+            <div class="detail-info-list">
+                <p><strong>Mode header:</strong> ${demoMode}</p>
+                <p><strong>Isolation:</strong> ${isolation}</p>
+                <p><strong>Lần đọc 1:</strong> ${displayStatus(firstStatus)}</p>
+                <p><strong>Lần đọc 2:</strong> ${displayStatus(secondStatus)}</p>
+                <p class="full"><strong>Kết quả:</strong> ${changed
+                    ? "Có Non-repeatable Read: READ COMMITTED đọc lại thấy trạng thái mới."
+                    : "Không đổi trong giao tác: SERIALIZABLE giữ snapshot ổn định."}</p>
+            </div>
+        </section>
+
         <div class="detail-two-columns">
             <section class="detail-info-card">
                 <h3>Thông tin đơn hàng</h3>

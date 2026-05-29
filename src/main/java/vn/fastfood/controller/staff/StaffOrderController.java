@@ -7,6 +7,7 @@ import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
 import vn.fastfood.service.OrderService;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -27,44 +28,89 @@ public class StaffOrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @GetMapping("/concurrency-mode")
+    public ResponseEntity<Map<String, Object>> getConcurrencyMode() {
+        return ResponseEntity.ok(
+                Map.of(
+                        "success", true,
+                        "mode", vn.fastfood.config.OrderConcurrencyDemoSettings.getMode()
+                )
+        );
+    }
+
+    @PostMapping("/concurrency-mode")
+    public ResponseEntity<Map<String, Object>> setConcurrencyMode(
+            @RequestParam("mode") String mode
+    ) {
+        String normalizedMode = vn.fastfood.config.OrderConcurrencyDemoSettings.setMode(mode);
+        return ResponseEntity.ok(
+                Map.of(
+                        "success", true,
+                        "mode", normalizedMode
+                )
+        );
+    }
+
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getOrderDetailForStaff(
             @PathVariable("orderId") long orderId
     ) {
-        Order order = orderService.getOrderByIdForStaff(orderId);
+        String mode = vn.fastfood.config.OrderConcurrencyDemoSettings.getMode();
 
-        if (order == null) {
-            return ResponseEntity.status(404).body(
+        try {
+            Map<String, Object> demoResult = orderService.getOrderByIdForStaffWithDemo(orderId, mode, 5000L);
+            Object orderObj = demoResult.get("order");
+            Order order = orderObj instanceof Order ? (Order) orderObj : null;
+
+            if (order == null || "NOT_FOUND".equals(demoResult.get("firstStatus"))) {
+                return ResponseEntity.status(404).body(
+                        Map.of(
+                                "success", false,
+                                "message", "Không tìm thấy đơn hàng hoặc đơn chưa được khởi tạo."
+                        )
+                );
+            }
+
+            List<OrderItem> items = orderService.getOrderItemsByOrderId(orderId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "order", order,
+                    "orderItems", items,
+                    "demoMode", mode,
+                    "firstStatus", demoResult.get("firstStatus"),
+                    "secondStatus", demoResult.get("secondStatus"),
+                    "changed", demoResult.get("changed"),
+                    "isolation", demoResult.get("isolation")
+            ));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(
                     Map.of(
                             "success", false,
-                            "message", "Không tìm thấy đơn hàng."
+                            "message", "Lỗi cơ sở dữ liệu khi demo Non-repeatable Read."
                     )
             );
         }
-
-        List<OrderItem> items = orderService.getOrderItemsByOrderId(orderId);
-
-        OrderDetailResponse response = new OrderDetailResponse(order, items);
-
-        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{orderId}/status")
-        public ResponseEntity<Map<String, Object>> updateOrderStatus(
-                @PathVariable("orderId") long orderId,
-                @RequestParam("staffId") long staffId,
-                @RequestParam("status") String status,
-                @RequestParam(value = "cancelReason", required = false) String cancelReason
-        ) {
+    public ResponseEntity<Map<String, Object>> updateOrderStatus(
+            @PathVariable("orderId") long orderId,
+            @RequestParam("staffId") long staffId,
+            @RequestParam("status") String status,
+            @RequestParam(value = "cancelReason", required = false) String cancelReason
+    ) {
         boolean result = orderService.updateOrderStatusByStaff(orderId, staffId, status, cancelReason);
 
         if (result) {
-                return ResponseEntity.ok(
-                        Map.of(
-                                "success", true,
-                                "message", "Cập nhật trạng thái đơn hàng thành công."
-                        )
-                );
+            return ResponseEntity.ok(
+                    Map.of(
+                            "success", true,
+                            "message", "Cập nhật trạng thái đơn hàng thành công."
+                    )
+            );
         }
 
         return ResponseEntity.badRequest().body(
@@ -73,5 +119,5 @@ public class StaffOrderController {
                         "message", "Không thể cập nhật trạng thái đơn hàng. Vui lòng kiểm tra luồng trạng thái."
                 )
         );
-        }
+    }
 }

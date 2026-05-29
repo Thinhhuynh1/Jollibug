@@ -52,6 +52,16 @@
                     </label>
 
                     <label class="profile-field">
+                      <span>Số lần đã dùng</span>
+                      <input type="text" value="${coupon.soLanSuDung}" readonly />
+                    </label>
+
+                    <label class="profile-field">
+                      <span>Còn lại</span>
+                      <input type="text" value="${coupon.remainingQuantity}" readonly />
+                    </label>
+
+                    <label class="profile-field">
                       <span>Ngày bắt đầu</span>
                       <input type="text" value="${coupon.ngayBatDauValue}" readonly />
                     </label>

@@ -5,8 +5,10 @@ import vn.fastfood.dto.OrderStatusHistoryResponse;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
 import vn.fastfood.model.OrderStatusHistory;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class OrderService {
     private final OrderDAO orderDAO = new OrderDAO();
@@ -96,6 +98,10 @@ public class OrderService {
         return orderDAO.getOrderByIdForStaff(orderId);
     }
 
+    public Map<String, Object> getOrderByIdForStaffWithDemo(long orderId, String mode, long delayMs) throws SQLException {
+        return orderDAO.getOrderByIdForStaffWithDemo(orderId, mode, delayMs);
+    }
+
     public List<OrderStatusHistoryResponse> getOrderStatusHistory(long orderId) {
         List<OrderStatusHistory> history = orderDAO.getOrderStatusHistory(orderId);
         List<OrderStatusHistoryResponse> responses = new ArrayList<>();
@@ -158,6 +164,12 @@ public class OrderService {
         return result;
     }
 
+    public Map<String, Object> countOrderStatsTwiceForPhantomReadDemo(
+            String isolation, long delayMs) throws SQLException {
+        String isolationLabel = "SERIALIZABLE".equalsIgnoreCase(isolation) ? "SERIALIZABLE" : "READ_COMMITTED";
+        return orderDAO.countOrderStatsTwiceForPhantomReadDemo(isolationLabel, delayMs);
+    }
+
     private boolean updateCustomerStatus(
             long orderId,
             long customerId,
@@ -203,4 +215,5 @@ public class OrderService {
 
         return false;
     }
+
 }

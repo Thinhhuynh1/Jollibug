@@ -103,7 +103,9 @@ public class CouponService {
             return false;
         }
 
-        if (coupon.getSoLuong() != null && coupon.getSoLuong() <= 0) {
+        int quantity = coupon.getSoLuong() == null ? 0 : coupon.getSoLuong();
+        int used = coupon.getSoLanSuDung() == null ? 0 : coupon.getSoLanSuDung();
+        if (quantity - used <= 0) {
             return false;
         }
 

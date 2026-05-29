@@ -37,6 +37,9 @@ public class MaGiamGia {
     @Column(name = "SoLuong")
     private Integer soLuong;
 
+    @Column(name = "SoLanSuDung")
+    private Integer soLanSuDung;
+
     @Column(name = "MoTa", length = 255)
     private String moTa;
 
@@ -58,10 +61,17 @@ public class MaGiamGia {
         if (now.isAfter(ngayKetThuc)) {
             return "Đã kết thúc";
         }
-        if (soLuong != null && soLuong <= 0) {
+        if (getRemainingQuantity() <= 0) {
             return "Hết lượt dùng";
         }
         return "Đang hoạt động";
+    }
+
+    @Transient
+    public int getRemainingQuantity() {
+        int quantity = soLuong == null ? 0 : soLuong;
+        int used = soLanSuDung == null ? 0 : soLanSuDung;
+        return Math.max(quantity - used, 0);
     }
 
     @Transient

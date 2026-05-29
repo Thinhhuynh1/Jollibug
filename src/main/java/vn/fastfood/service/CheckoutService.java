@@ -20,6 +20,7 @@ import vn.fastfood.model.CheckoutCartItem;
 public class CheckoutService {
     private final CheckoutDAO checkoutDAO;
     private final CouponService couponService;
+    private final PaymentService paymentService = new PaymentService();
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{9,15}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
 
@@ -99,21 +100,21 @@ public class CheckoutService {
         }
 
         try {
-            long orderId = checkoutDAO.createOrder(
+            long orderId = checkoutDAO.createOrderWithItemsAndPayment(
                     customerId,
                     maDC,
                     subtotal,
                     discountTotal,
                     total,
                     maGG,
-                    orderNote
+                    orderNote,
+                    items,
+                    maPT
             );
-
-            for (CheckoutCartItem item : items) {
-                checkoutDAO.createOrderItem(orderId, item);
+            if ("COD".equalsIgnoreCase(maPT)) {
+                paymentService.confirmPayment(orderId);
             }
 
-            checkoutDAO.createPayment(orderId, maPT, total);
             session.removeAttribute("cart");
 
             return new CheckoutResponse(

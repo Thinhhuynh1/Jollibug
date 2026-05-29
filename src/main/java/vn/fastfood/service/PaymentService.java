@@ -21,7 +21,7 @@ public class PaymentService {
             return true;
         }
 
-        return paymentDAO.updatePaymentStatus(orderId, "Paid");
+        return paymentDAO.confirmPaymentAndIncreaseCouponUsage(orderId);
     }
 
     public boolean failPayment(long orderId) {
@@ -35,6 +35,6 @@ public class PaymentService {
             return false;
         }
 
-        return paymentDAO.updatePaymentStatus(orderId, "Failed");
+        return paymentDAO.updatePaymentStatus(orderId, "FAILED");
     }
 }
