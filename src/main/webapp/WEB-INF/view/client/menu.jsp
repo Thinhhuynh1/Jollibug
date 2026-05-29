@@ -208,6 +208,7 @@
 
   <script src="/js/client/main.js"></script>
   <script src="/js/client/voice-ordering.js"></script>
+  <script src="/js/client/add-to-cart.js"></script>
   <script src="/js/client/jollibug-ai-chat.js"></script>
 </body>
 </html>
