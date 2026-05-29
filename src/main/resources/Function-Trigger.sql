@@ -1,6 +1,6 @@
 
 -- Trigger
---Luu lich su khi thao tac tren don hang
+--Lưu lịch sử khi thao tác trên đơn hàng
 CREATE OR REPLACE TRIGGER trg_donhang_ins_lishsu
 AFTER INSERT ON DONHANG
 FOR EACH ROW
@@ -18,7 +18,7 @@ BEGIN
         NULL,
         :NEW.TrangThaiDon,
         :NEW.MaTK_NV,
-        'Tao don hang moi',
+        'Tạo đơn hàng mới',
         CURRENT_TIMESTAMP
     );
 END;
@@ -42,13 +42,13 @@ BEGIN
         :OLD.TrangThaiDon,
         :NEW.TrangThaiDon,
         :NEW.MaTK_NV,
-        'Cap nhat trang thai don hang',
+        'Cập nhật trạng thái đơn hàng',
         CURRENT_TIMESTAMP
     );
 END;
 /
 
---Mua hang udp SoLuongTon
+--Mua hàng cập nhật SoLuongTon
 CREATE OR REPLACE TRIGGER trg_ctdh_upd_soluongton
 BEFORE INSERT ON CHITIETDH
 FOR EACH ROW
@@ -59,10 +59,10 @@ BEGIN
     INTO v_so_luong_ton
     FROM MONAN
     WHERE MaMon = :NEW.MaMon
-    FOR UPDATE; --Khoa dong cho update, Tranh bi concurence
+    FOR UPDATE; --Khóa dòng để update, tránh bị concurrency
 
     IF v_so_luong_ton < :NEW.SoLuong THEN
-        RAISE_APPLICATION_ERROR(-20002, 'So luong ton kho khong du de dat hang');
+        RAISE_APPLICATION_ERROR(-20002, 'Số lượng tồn kho không đủ để đặt hàng');
     END IF;
 
     UPDATE MONAN
@@ -72,7 +72,7 @@ BEGIN
 END;
 /
 
---Huy don hang hoan lai SoLuongTon
+--Hủy đơn hàng hoàn lại SoLuongTon
 CREATE OR REPLACE TRIGGER trg_donhang_cancel_hoanlaisoluong
 AFTER UPDATE OF TrangThaiDon ON DONHANG
 FOR EACH ROW

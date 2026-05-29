@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import vn.fastfood.entity.ChiTietHoTro;
@@ -102,11 +101,6 @@ public class StaffController {
 
         model.addAttribute("supportTab", tab);
         return "/staff/support";
-    }
-
-    @PostMapping("/staff/support/review/reply")
-    public String replyReview(@RequestParam("reply") String reply) {
-        return "redirect:/staff/support?tab=review";
     }
 
     //-------------------------------------------------------------------
