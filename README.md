@@ -92,6 +92,7 @@ Jollibug là đồ án xây dựng hệ thống bán thức ăn nhanh trực tuy
 - `Java 17`
 - `Spring Boot`
 - `Spring MVC`
+- `REST API` cho giỏ hàng (`/api/cart/items`) kết hợp `AJAX/fetch`
 - `Spring Data JPA`
 - `Hibernate`
 - `Spring Validation`
@@ -145,6 +146,24 @@ Jollibug/
 |-- mvnw
 |-- mvnw.cmd
 `-- sampledb.sql
+```
+
+## Cart API và AJAX
+
+Luồng thêm vào giỏ hàng phía client đã dùng `REST API` thay cho submit form đồng bộ:
+
+- Các form có `data-ajax-add-cart` sẽ được file `src/main/webapp/resources/js/client/add-to-cart.js` bắt sự kiện.
+- Client gửi `POST /api/cart/items` bằng `fetch` với các field như `productID` và `quantity`.
+- Server trả JSON gồm `success`, `message`, `cartCount`.
+- Giao diện cập nhật ngay số lượng trên header mà không cần reload trang.
+
+API hiện có:
+
+```http
+GET    /api/cart
+POST   /api/cart/items
+PUT    /api/cart/items
+DELETE /api/cart/items?maMon={id}
 ```
 
 ## Yêu cầu môi trường

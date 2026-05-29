@@ -98,10 +98,10 @@ COMMIT;
 -- ---------------------------------------------------------
 -- Trong project hien tai:
 -- INSERT vao CHITIETDH se kich hoat trigger trg_ctdh_upd_soluongton
--- Trigger nay SELECT ... FOR UPDATE tren MONAN roi UPDATE MONAN
--- Neu 2 checkout cung dat 2 mon theo thu tu nguoc nhau, deadlock co the xay ra
+-- Trigger này SELECT ... FOR UPDATE trên MONAN rồi UPDATE MONAN
+-- Nếu 2 checkout cùng đặt 2 món theo thứ tự ngược nhau, deadlock có thể xảy ra
 
--- Chuan bi 2 don hang moi
+-- Chuẩn bị 2 đơn hàng mới
 INSERT INTO DONHANG (MATK_KH, NGAYDAT, TONGTIENMON, TIENGIAMGIA, THANHTIEN, TRANGTHAIDON, UPDATED_AT)
 VALUES (1, CURRENT_TIMESTAMP, 0, 0, 0, 'PENDING', CURRENT_TIMESTAMP);
 
@@ -110,37 +110,37 @@ VALUES (1, CURRENT_TIMESTAMP, 0, 0, 0, 'PENDING', CURRENT_TIMESTAMP);
 
 COMMIT;
 
--- Thay :ORDER_A va :ORDER_B bang 2 MaDH vua tao
+-- Thay :ORDER_A và :ORDER_B bằng 2 MaDH vừa tạo
 
--- Session 1: insert mon 1 truoc, trigger se khoa MONAN(1)
+-- Session 1: insert món 1 trước, trigger sẽ khóa MONAN(1)
 INSERT INTO CHITIETDH (MADH, MAMON, TENMON, SOLUONG, DONGIA, THANHTIEN)
 SELECT :ORDER_A, MAMON, TENMON, 1, GIA, GIA
 FROM MONAN
 WHERE MAMON = 1;
 
--- Session 2: insert mon 2 truoc, trigger se khoa MONAN(2)
+-- Session 2: insert món 2 trước, trigger sẽ khóa MONAN(2)
 INSERT INTO CHITIETDH (MADH, MAMON, TENMON, SOLUONG, DONGIA, THANHTIEN)
 SELECT :ORDER_B, MAMON, TENMON, 1, GIA, GIA
 FROM MONAN
 WHERE MAMON = 2;
 
--- Session 1: tiep tuc insert mon 2, nay se doi MONAN(2)
+-- Session 1: tiếp tục insert món 2, nay sẽ đợi MONAN(2)
 INSERT INTO CHITIETDH (MADH, MAMON, TENMON, SOLUONG, DONGIA, THANHTIEN)
 SELECT :ORDER_A, MAMON, TENMON, 1, GIA, GIA
 FROM MONAN
 WHERE MAMON = 2;
 
--- Session 2: tiep tuc insert mon 1, nay se doi MONAN(1)
+-- Session 2: tiếp tục insert món 1, nay sẽ đợi MONAN(1)
 INSERT INTO CHITIETDH (MADH, MAMON, TENMON, SOLUONG, DONGIA, THANHTIEN)
 SELECT :ORDER_B, MAMON, TENMON, 1, GIA, GIA
 FROM MONAN
 WHERE MAMON = 1;
 
--- Oracle co the bao ORA-00060 deadlock detected
+-- Oracle có thể báo ORA-00060 deadlock detected
 
--- CACH GIAI QUYET:
--- Thong nhat thu tu xu ly item trong checkout
--- Vi du luon sap xep danh sach mon theo MAMON tang dan truoc khi insert CHITIETDH
+-- CÁCH GIẢI QUYẾT:
+-- Thống nhất thứ tự xử lý item trong checkout
+-- Ví dụ luôn sắp xếp danh sách món theo MAMON tăng dần trước khi insert CHITIETDH
 
 -- ---------------------------------------------------------
 -- D. Lock ordering that avoids deadlock on MONAN
@@ -162,24 +162,24 @@ FROM MONAN
 WHERE MAMON = 1
 FOR UPDATE;
 
--- Session 2 se phai cho Session 1, nhung khong bi deadlock
--- vi ca hai session deu khoa theo thu tu: MONAN(1) -> MONAN(2)
+-- Session 2 sẽ phải chờ Session 1, nhưng không bị deadlock
+-- vì cả hai session đều khóa theo thứ tự: MONAN(1) -> MONAN(2)
 
 -- ---------------------------------------------------------
--- E. Lost update / locking voi ton kho theo luong checkout cu
+-- E. Lost update / locking với tồn kho theo luồng checkout cũ
 -- ---------------------------------------------------------
--- HIEN TUONG
+-- HIỆN TƯỢNG
 -- Session 1
 SELECT SOLUONGTON
 FROM MONAN
 WHERE MAMON = 1;
--- Gia su Session 1 tinh toan ton moi = 45
+-- Giả sử Session 1 tính toán tồn mới = 45
 
 -- Session 2
 SELECT SOLUONGTON
 FROM MONAN
 WHERE MAMON = 1;
--- Gia su Session 2 tinh toan ton moi = 60
+-- Giả sử Session 2 tính toán tồn mới = 60
 UPDATE MONAN
 SET SOLUONGTON = 60
 WHERE MAMON = 1;
@@ -190,9 +190,9 @@ UPDATE MONAN
 SET SOLUONGTON = 45
 WHERE MAMON = 1;
 COMMIT;
--- Update cua Session 2 bi mat
+-- Update của Session 2 bị mất
 
--- CACH GIAI QUYET
+-- CÁCH GIẢI QUYẾT
 -- Session 1
 SELECT SOLUONGTON
 FROM MONAN
@@ -204,7 +204,7 @@ SELECT SOLUONGTON
 FROM MONAN
 WHERE MAMON = 1
 FOR UPDATE;
--- Session 2 phai cho Session 1
+-- Session 2 phải chờ Session 1
 
 -- Session 1
 UPDATE MONAN
@@ -219,9 +219,9 @@ WHERE MAMON = 1;
 COMMIT;
 
 -- ---------------------------------------------------------
--- F. Voucher race condition va cach xu ly
+-- F. Voucher race condition và cách xử lý
 -- ---------------------------------------------------------
--- HIEN TUONG NEU CHI DOC ROI TINH TOAN NGOAI APP
+-- HIỆN TƯỢNG NẾU CHỈ ĐỌC RỒI TÍNH TOÁN NGOÀI APP
 -- Session 1
 SELECT SOLUONG, SOLANSUDUNG
 FROM MAGIAMGIA
@@ -232,9 +232,9 @@ SELECT SOLUONG, SOLANSUDUNG
 FROM MAGIAMGIA
 WHERE MAGG = 1;
 
--- Ca 2 session cung thay con luot va deu tiep tuc su dung
+-- Cả 2 session cùng thấy còn lượt và đều tiếp tục sử dụng
 
--- CACH GIAI QUYET THEO LUONG CHECKOUT DA SUA
+-- CÁCH GIẢI QUYẾT THEO LUỒNG CHECKOUT ĐÃ SỬA
 -- Session 1
 BEGIN
     PROC_RESERVE_VOUCHER(1);
@@ -246,4 +246,4 @@ BEGIN
     PROC_RESERVE_VOUCHER(1);
 END;
 /
--- Session 2 se cho hoac bao het luot tuy trang thai du lieu sau khi Session 1 commit
+-- Session 2 sẽ chờ hoặc báo hết lượt tùy trạng thái dữ liệu sau khi Session 1 commit

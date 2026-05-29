@@ -100,14 +100,14 @@ INSERT INTO PHUONGTHUCTT (MaPT, TenPT) VALUES ('CREDIT_CARD', 'Thanh toán bằn
 
 -- DON HANG
 -- 1..5: giữ lại các trạng thái để test luồng đơn hàng
-INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, NULL, CURRENT_TIMESTAMP - INTERVAL '6' DAY, 1, 90000, 0, 90000, 'PENDING', NULL, 'Don PENDING de test khach huy truc tiep');
-INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '5' DAY, 2, 76000, 0, 76000, 'CONFIRMED', NULL, 'Don CONFIRMED de test yeu cau huy');
-INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '4' DAY, 3, 121000, 10000, 111000, 'SHIPPING', 1, 'Don SHIPPING de test xac nhan da nhan hang');
-INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '3' DAY, 4, 45000, 0, 45000, 'DELIVERED', NULL, 'Don DELIVERED de test danh gia');
-INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, NULL, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 5, 15000, 0, 15000, 'CANCELLED', NULL, 'Don CANCELLED de test lich su don hang');
+INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, NULL, CURRENT_TIMESTAMP - INTERVAL '6' DAY, 1, 90000, 0, 90000, 'PENDING', NULL, 'Đơn PENDING để test khách hủy trực tiếp');
+INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '5' DAY, 2, 76000, 0, 76000, 'CONFIRMED', NULL, 'Đơn CONFIRMED để test yêu cầu hủy');
+INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '4' DAY, 3, 121000, 10000, 111000, 'SHIPPING', 1, 'Đơn SHIPPING để test xác nhận đã nhận hàng');
+INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, 2, CURRENT_TIMESTAMP - INTERVAL '3' DAY, 4, 45000, 0, 45000, 'DELIVERED', NULL, 'Đơn DELIVERED để test đánh giá');
+INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (1, NULL, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 5, 15000, 0, 15000, 'CANCELLED', NULL, 'Đơn CANCELLED để test lịch sử đơn hàng');
 
 -- 6..32: đơn DELIVERED để seed đánh giá cho từng món
-INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (6, 2, CURRENT_TIMESTAMP - INTERVAL '14' DAY, 1, 38000, 0, 38000, 'DELIVERED', NULL, 'Seed review mon 1');
+INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (6, 2, CURRENT_TIMESTAMP - INTERVAL '14' DAY, 1, 38000, 0, 38000, 'DELIVERED', NULL, 'Seed review món 1');
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (7, 2, CURRENT_TIMESTAMP - INTERVAL '14' DAY, 2, 36000, 0, 36000, 'DELIVERED', NULL, 'Seed review mon 2');
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (8, 2, CURRENT_TIMESTAMP - INTERVAL '13' DAY, 3, 42000, 0, 42000, 'DELIVERED', NULL, 'Seed review mon 3');
 INSERT INTO DONHANG (MaTK_KH, MaTK_NV, NgayDat, MaDC, TongTienMon, TienGiamGia, ThanhTien, TrangThaiDon, MaGG, GhiChu) VALUES (9, 2, CURRENT_TIMESTAMP - INTERVAL '13' DAY, 4, 42000, 0, 42000, 'DELIVERED', NULL, 'Seed review mon 4');
