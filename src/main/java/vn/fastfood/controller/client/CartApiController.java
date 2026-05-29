@@ -35,10 +35,19 @@ public class CartApiController {
 
     @PostMapping("/items")
     public ResponseEntity<Map<String, Object>> addCartItem(
-            @RequestParam("productID") long productID,
-            @RequestParam(value = "quantity", defaultValue = "1") int quantity,
+            @RequestParam(value = "maMon", required = false) Long maMon,
+            @RequestParam(value = "productID", required = false) Long productID,
+            @RequestParam(value = "soLuong", required = false) Integer soLuong,
+            @RequestParam(value = "quantity", required = false) Integer quantity,
             HttpSession session) {
-        CartAddResult result = cartService.addSessionCart(productID, quantity, session);
+        Long maMonResolved = maMon != null ? maMon : productID;
+        int soLuongResolved = soLuong != null ? soLuong : (quantity != null ? quantity : 1);
+
+        if (maMonResolved == null) {
+            return error(HttpStatus.BAD_REQUEST, "Sản phẩm không tồn tại");
+        }
+
+        CartAddResult result = cartService.addSessionCart(maMonResolved, soLuongResolved, session);
         if (!result.success()) {
             return error(HttpStatus.BAD_REQUEST, result.message());
         }

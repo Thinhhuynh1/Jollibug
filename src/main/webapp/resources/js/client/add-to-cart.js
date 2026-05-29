@@ -11,12 +11,22 @@
   async function submitAddToCart(form) {
     const submitBtn = form.querySelector('button[type="submit"]');
     const formData = new FormData(form);
+    const maMon = formData.get("maMon") || formData.get("productID");
+    const soLuong = formData.get("soLuong") || formData.get("quantity");
 
     if (submitBtn) {
       submitBtn.disabled = true;
     }
 
     try {
+      if (maMon) {
+        formData.set("maMon", maMon);
+      }
+
+      if (soLuong) {
+        formData.set("soLuong", soLuong);
+      }
+
       const response = await fetch(API_URL, {
         method: "POST",
         body: formData

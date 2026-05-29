@@ -14,9 +14,11 @@ import vn.fastfood.repository.MonAnRepository;
 @Service
 public class CartService {
     private final MonAnRepository monAnRepository;
+    private final KhuyenMaiService khuyenMaiService;
 
-    public CartService(MonAnRepository monAnRepository) {
+    public CartService(MonAnRepository monAnRepository, KhuyenMaiService khuyenMaiService) {
         this.monAnRepository = monAnRepository;
+        this.khuyenMaiService = khuyenMaiService;
     }
 
     public record CartAddResult(boolean success, String message, int cartCount) {
@@ -53,48 +55,42 @@ public class CartService {
         return cart;
     }
 
-    public CartAddResult addSessionCart(Long productID, HttpSession session) {
-        return addSessionCart(productID, 1, session);
+    public CartAddResult addSessionCart(Long maMon, HttpSession session) {
+        return addSessionCart(maMon, 1, session);
     }
 
-    public CartAddResult addSessionCart(Long productID, int quantity, HttpSession session) {
-        MonAn monAn = this.monAnRepository.findProduct(productID);
+    public CartAddResult addSessionCart(Long maMon, int soLuong, HttpSession session) {
+        MonAn monAn = this.monAnRepository.findProduct(maMon);
         if (monAn == null) {
             return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
         }
 
-        return addSessionCart(monAn, quantity, session);
-    }
+        khuyenMaiService.applyKhuyenMai(List.of(monAn));
 
-    public CartAddResult addSessionCart(MonAn monAn, int quantity, HttpSession session) {
-        if (monAn == null) {
-            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
-        }
-
-        if (quantity < 1) {
-            quantity = 1;
+        if (soLuong < 1) {
+            soLuong = 1;
         }
 
         List<CartItem> cart = getSessionCart(session);
         CartItem cartItem = findCartItem(cart, monAn.getMaMon());
-        double gia = monAn.getGiaGiam();
-        double giaGoc = monAn.getGia();
+        double donGia = monAn.getGiaGiam();
+        double donGiaGoc = monAn.getGia();
 
         if (cartItem != null) {
-            int soLuong = cartItem.getSoLuong() + quantity;
-            cartItem.setSoLuong(soLuong);
-            cartItem.setDonGia(gia);
-            cartItem.setThanhTien(gia * soLuong);
-            cartItem.setDonGiaGoc(giaGoc);
+            int tongSoLuong = cartItem.getSoLuong() + soLuong;
+            cartItem.setSoLuong(tongSoLuong);
+            cartItem.setDonGia(donGia);
+            cartItem.setDonGiaGoc(donGiaGoc);
+            cartItem.setThanhTien(donGia * tongSoLuong);
         } else {
             CartItem item = new CartItem();
             item.setMaMon(monAn.getMaMon());
             item.setTenMon(monAn.getTenMon());
-            item.setSoLuong(quantity);
-            item.setDonGia(gia);
-            item.setThanhTien(gia * quantity);
+            item.setSoLuong(soLuong);
+            item.setDonGia(donGia);
+            item.setDonGiaGoc(donGiaGoc);
+            item.setThanhTien(donGia * soLuong);
             item.setImageUrl(monAn.getImg());
-            item.setDonGiaGoc(giaGoc);
             cart.add(item);
         }
 

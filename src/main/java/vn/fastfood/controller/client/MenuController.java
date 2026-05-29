@@ -67,12 +67,17 @@ public class MenuController {
 
     @GetMapping("/product")
     public String getProductDetail(Model model,
-            @RequestParam("productID") Long productID) {
-        MonAn monAn = this.monAnRepository.findProduct(productID);
+            @RequestParam(value = "maMon", required = false) Long maMon,
+            @RequestParam(value = "productID", required = false) Long productID) {
+        if (maMon == null) {
+            maMon = productID;
+        }
+
+        MonAn monAn = this.monAnRepository.findProduct(maMon);
         model.addAttribute("monAn", monAn);
-        model.addAttribute("productReviews", this.reviewDAO.findReviewsByProduct(productID));
-        model.addAttribute("averageRating", this.reviewDAO.getAverageRatingByProduct(productID));
-        model.addAttribute("reviewCount", this.reviewDAO.countReviewsByProduct(productID));
+        model.addAttribute("productReviews", this.reviewDAO.findReviewsByProduct(maMon));
+        model.addAttribute("averageRating", this.reviewDAO.getAverageRatingByProduct(maMon));
+        model.addAttribute("reviewCount", this.reviewDAO.countReviewsByProduct(maMon));
         if (monAn != null) {
             this.khuyenmaiService.applyKhuyenMai(java.util.List.of(monAn));
         }
@@ -81,18 +86,19 @@ public class MenuController {
     }
 
     @PostMapping("/addCart")
-    public String addToCart(@RequestParam("productID") Long productID,
+    public String addToCart(@RequestParam(value = "maMon", required = false) Long maMon,
+            @RequestParam(value = "productID", required = false) Long productID,
             HttpServletRequest request,
             HttpSession session) {
-
-        MonAn monAn = this.monAnRepository.findProduct(productID);
-        if (monAn == null) {
-            session.setAttribute("cartError", "Sản phẩm không tồn tại");
-            return "redirect:/menu";
+        if (maMon == null) {
+            maMon = productID;
         }
 
-        this.khuyenmaiService.applyKhuyenMai(java.util.List.of(monAn));
-        cartService.addSessionCart(monAn, 1, session);
+        CartService.CartAddResult result = cartService.addSessionCart(maMon, 1, session);
+        if (!result.success()) {
+            session.setAttribute("cartError", result.message());
+            return "redirect:/menu";
+        }
 
         String referer = request.getHeader("Referer");
         if (referer != null && !referer.isBlank()) {

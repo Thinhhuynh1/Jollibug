@@ -14,7 +14,6 @@ import vn.fastfood.service.MaGiamGiaService;
 
 @Controller
 public class CartController {
-    // cart, checkout, orders
     @Autowired
     private UserRepository userRepository;
 

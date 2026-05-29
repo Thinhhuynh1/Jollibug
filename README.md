@@ -5,71 +5,70 @@
 <h1 align="center">Jollibug</h1>
 
 <p align="center">
-  Hệ thống đặt đồ ăn nhanh trực tuyến xây dựng bằng Spring Boot, JSP/Servlet và Oracle Database.
+  Hệ thống đặt đồ ăn nhanh trực tuyến xây dựng bằng Spring Boot, JSP/Servlet và Oracle Database
 </p>
 
 ## Tổng quan
 
 Jollibug là dự án web đặt đồ ăn nhanh trực tuyến hỗ trợ nhiều vai trò như khách hàng, nhân viên, quản lý và admin. Hệ thống bao gồm các luồng xem menu, đặt món, thanh toán, theo dõi đơn hàng, quản lý sản phẩm, voucher, khuyến mãi và hỗ trợ khách hàng.
 
-- Kiến trúc web app sử dụng Spring Boot, Spring MVC, JSP/Servlet và JPA/Hibernate.
-- Dữ liệu chính được lưu trên Oracle Database.
-- Giỏ hàng hiện tại được quản lý theo session trong ứng dụng.
-- Hỗ trợ chat realtime qua WebSocket.
-- Có luồng gửi email cho xác thực tài khoản và quên mật khẩu.
-- Có chatbot thông qua Spring AI.
+- Kiến trúc web app sử dụng Spring Boot, Spring MVC, JSP/Servlet và JPA/Hibernate
+- Dữ liệu chính được lưu trên Oracle Database
+- Giỏ hàng hiện tại được quản lý theo session trong ứng dụng
+- Hỗ trợ chat realtime qua WebSocket
+- Có luồng gửi email cho xác thực tài khoản và quên mật khẩu
+- Có chatbot thông qua Spring AI
 
 ## Thành viên nhóm
 
-| STT | Họ và tên | MSSV | 
-|---|---|---|---|---|
-| 1 | Nguyễn Mạnh Trí | 24521834 | 
-| 2 | Huỳnh Nguyễn Hoàng Thịnh | 2452xxxx | 
-| 3 | Nguyễn Bá Thiên | 2452xxxx | 
-| 4 | Nguyễn Khánh Vi | 2452xxxx | 
-
+| STT | Họ và tên | MSSV |
+| --- | --- | --- |
+| 1 | Nguyễn Mạnh Trí | 24521834 |
+| 2 | Huỳnh Nguyễn Hoàng Thịnh | 2452xxxx |
+| 3 | Nguyễn Bá Thiên | 2452xxxx |
+| 4 | Nguyễn Khánh Vi | 2452xxxx |
 
 ## Chức năng chính
 
 ### Khách hàng
 
-- Đăng ký, đăng nhập, đăng xuất.
-- Xác thực email và khôi phục mật khẩu.
-- Xem trang chủ, menu và chi tiết món ăn.
-- Thêm món vào giỏ hàng và cập nhật số lượng.
-- Quản lý địa chỉ giao hàng.
-- Áp dụng mã giảm giá.
-- Thanh toán và tạo đơn hàng.
-- Xem lịch sử đơn hàng, chi tiết đơn hàng và trạng thái xử lý.
-- Hủy đơn, xác nhận đã nhận hàng, đặt lại đơn cũ.
-- Đánh giá sản phẩm sau khi đơn đã giao.
-- Chat hỗ trợ với cửa hàng.
+- Đăng ký, đăng nhập, đăng xuất
+- Xác thực email và khôi phục mật khẩu
+- Xem trang chủ, menu và chi tiết món ăn
+- Thêm món vào giỏ hàng và cập nhật số lượng
+- Quản lý địa chỉ giao hàng
+- Áp dụng mã giảm giá
+- Thanh toán và tạo đơn hàng
+- Xem lịch sử đơn hàng, chi tiết đơn hàng và trạng thái xử lý
+- Hủy đơn, xác nhận đã nhận hàng, đặt lại đơn cũ
+- Đánh giá sản phẩm sau khi đơn đã giao
+- Chat hỗ trợ với cửa hàng
 
 ### Nhân viên
 
-- Xem danh sách đơn hàng.
-- Xác nhận đơn và cập nhật trạng thái.
-- Theo dõi và xử lý yêu cầu hỗ trợ.
-- Trả lời đánh giá và chat với khách hàng.
+- Xem danh sách đơn hàng
+- Xác nhận đơn và cập nhật trạng thái
+- Theo dõi và xử lý yêu cầu hỗ trợ
+- Trả lời đánh giá và chat với khách hàng
 
 ### Quản lý
 
-- Xem dashboard tổng quan.
-- Quản lý sản phẩm và danh mục.
-- Quản lý mã giảm giá và chương trình khuyến mãi.
-- Theo dõi thống kê doanh thu và đơn hàng.
+- Xem dashboard tổng quan
+- Quản lý sản phẩm và danh mục
+- Quản lý mã giảm giá và chương trình khuyến mãi
+- Theo dõi thống kê doanh thu và đơn hàng
 
 ### Admin
 
-- Quản lý tài khoản người dùng.
-- Tạo, cập nhật, khóa/mở khóa tài khoản.
+- Quản lý tài khoản người dùng
+- Tạo, cập nhật, khóa hoặc mở khóa tài khoản
 
 ## Công nghệ sử dụng
 
 ### Backend
 
 - Java 17
-- Spring Boot 4
+- Spring Boot
 - Spring MVC
 - Spring Data JPA
 - Hibernate
@@ -90,7 +89,7 @@ Jollibug là dự án web đặt đồ ăn nhanh trực tuyến hỗ trợ nhi�
 ### Database
 
 - Oracle Database
-- H2 có trong dependency để phục vụ một số trường hợp runtime/dev
+- H2 có trong dependency để phục vụ một số trường hợp runtime hoặc dev
 
 ### Build tool
 
@@ -162,8 +161,8 @@ spring.datasource.password=...
 
 Bạn cần:
 
-- Tạo schema Oracle phù hợp.
-- Hoặc sửa lại `spring.datasource.url`, `spring.datasource.username`, `spring.datasource.password` theo máy của bạn.
+- Tạo schema Oracle phù hợp
+- Hoặc sửa lại `spring.datasource.url`, `spring.datasource.username`, `spring.datasource.password` theo máy của bạn
 
 ### 3. Khởi tạo schema và dữ liệu
 
@@ -209,10 +208,10 @@ mvn spring-boot:run
 
 ## Lưu ý về dữ liệu và schema
 
-- Dự án dùng `schema.sql` và `data.sql` để khởi tạo database.
-- `ddl-auto` hiện đang để `none`, vì vậy Hibernate không tự tạo schema.
-- Nếu bật `ddl-auto=validate`, schema thực tế trong Oracle phải khớp hoàn toàn với entity JPA.
-- Giỏ hàng đang được lưu trong session, không còn dùng bảng chi tiết giỏ hàng trong JPA nữa.
+- Dự án dùng `schema.sql` và `data.sql` để khởi tạo database
+- `ddl-auto` hiện đang để `none`, vì vậy Hibernate không tự tạo schema
+- Nếu bật `ddl-auto=validate`, schema thực tế trong Oracle phải khớp hoàn toàn với entity JPA
+- Giỏ hàng đang được lưu trong session, không còn dùng bảng chi tiết giỏ hàng trong JPA nữa
 
 ## Hình minh họa
 
@@ -238,5 +237,3 @@ mvn spring-boot:run
 - [data.sql](/d:/Storage/Documents/Jollibug/src/main/resources/data.sql): dữ liệu mẫu
 - [Function-Trigger.sql](/d:/Storage/Documents/Jollibug/src/main/resources/Function-Trigger.sql): trigger Oracle chạy riêng sau khi tạo bảng
 - [sampledb.sql](/d:/Storage/Documents/Jollibug/sampledb.sql): script tham khảo bổ sung
-
-

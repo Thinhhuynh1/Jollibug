@@ -112,8 +112,7 @@ public class CheckoutService {
         Object userObj = session.getAttribute("user");
         if (userObj instanceof User user) {
             maKH = user.getMaTK();
-        }
-        else {
+        } else {
             Object maTKObj = session.getAttribute("userId");
             if (maTKObj instanceof Number maTKNumber) {
                 maKH = maTKNumber.longValue();
