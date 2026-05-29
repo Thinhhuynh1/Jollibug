@@ -56,15 +56,24 @@ public class CartService {
     public CartAddResult addSessionCart(Long productID, HttpSession session) {
         MonAn monAn = this.monAnRepository.findProduct(productID);
         if (monAn == null) {
-            return new CartAddResult(false, "Sáº£n pháº©m khÃ´ng tá»“n táº¡i.", 0);
+            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
         }
 
         return addSessionCart(monAn, 1, session);
     }
 
+    public CartAddResult addSessionCart(Long productID, int quantity, HttpSession session) {
+        MonAn monAn = this.monAnRepository.findProduct(productID);
+        if (monAn == null) {
+            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
+        }
+
+        return addSessionCart(monAn, quantity, session);
+    }
+
     public CartAddResult addSessionCart(MonAn monAn, int quantity, HttpSession session) {
         if (monAn == null) {
-            return new CartAddResult(false, "Sáº£n pháº©m khÃ´ng tá»“n táº¡i.", 0);
+            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
         }
 
         if (quantity < 1) {
@@ -95,7 +104,7 @@ public class CartService {
         }
 
         session.setAttribute("cart", cart);
-        return new CartAddResult(true, "ThÃªm vÃ o giá» hÃ ng thÃ nh cÃ´ng.", countCartItems(cart));
+        return new CartAddResult(true, "Thêm vào giỏ hàng thành công", countCartItems(cart));
     }
 
     public boolean updateSessionQuantity(HttpSession session, long maMon, int soLuong) {

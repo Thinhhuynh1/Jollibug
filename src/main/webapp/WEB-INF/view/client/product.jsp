@@ -206,7 +206,7 @@
               <div class="cluster">
                 <a class="btn btn-outline" href="${pageContext.request.contextPath}/menu">Quay lại</a>
                 <c:if test="${not empty sessionScope.user}">
-                  <form method="post" action="${pageContext.request.contextPath}/addCart">
+                  <form method="post" action="${pageContext.request.contextPath}/addCart" data-ajax-add-cart>
                     <input type="hidden" name="productID" value="${monAn.maMon}">
                     <button class="btn btn-primary" type="submit">Thêm vào giỏ</button>
                   </form>
@@ -268,5 +268,6 @@
   </main>
 
   <jsp:include page="layout/footer.jsp"/>
+  <script src="/js/client/add-to-cart.js"></script>
 </body>
 </html>
