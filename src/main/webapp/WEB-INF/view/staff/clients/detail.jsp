@@ -17,6 +17,69 @@
   <link rel="stylesheet" href="<c:url value='/css/components.css'/>" />
   <link rel="stylesheet" href="<c:url value='/css/admin.css'/>" />
   <link rel="stylesheet" href="<c:url value='/css/manager.css'/>" />
+  <style>
+    .client-orders-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .client-order-card {
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      padding: 1.1rem 1.25rem;
+    }
+
+    .client-order-card__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .client-order-card__row + .client-order-card__row {
+      margin-top: 0.95rem;
+      padding-top: 0.95rem;
+      border-top: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .client-order-card__code {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .client-order-card__date,
+    .client-order-card__note {
+      margin: 0;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .client-order-card__total {
+      min-width: 160px;
+      text-align: right;
+    }
+
+    .client-order-card__total span {
+      display: block;
+      margin-bottom: 0.2rem;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .client-order-card__total strong {
+      font-size: 1.15rem;
+      color: #b91c1c;
+    }
+
+    .client-order-card__info {
+      flex: 1 1 420px;
+    }
+  </style>
 </head>
 
 <body data-admin-role="admin" data-admin-page="manage-users">
@@ -92,38 +155,45 @@
 
         <section class="order-detail__section">
           <h2 class="order-detail__title">Lịch sử đơn hàng gần đây</h2>
-          <div class="orders-table-wrap">
-            <table class="orders-table" style="text-align: center;">
-              <thead>
-                <tr>
-                  <th style="text-align: center;">Mã đơn</th>
-                  <th style="text-align: center;">Ngày đặt</th>
-                  <th style="text-align: center;">Ghi chú</th>
-                  <th style="text-align: center;">Tổng tiền</th>
-                  <th style="text-align: center;">Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody>
-                <c:choose>
-                  <c:when test="${not empty recentOrders}">
-                    <c:forEach var="order" items="${recentOrders}">
-                      <tr>
-                        <td><strong>#${order.maDH}</strong></td>
-                        <td class="muted"><fmt:formatDate value="${order.ngayDat}" pattern="dd/MM/yyyy HH:mm" /></td>
-                        <td>${empty order.ghiChu ? '-' : order.ghiChu}</td>
-                        <td style="font-weight:700;"><fmt:formatNumber value="${order.thanhTien}" pattern="#,##0" />đ</td>
-                        <td><span class="status-badge">${order.trangThaiDon}</span></td>
-                      </tr>
-                    </c:forEach>
-                  </c:when>
-                  <c:otherwise>
-                    <tr>
-                      <td colspan="5" style="text-align:center;">Khách hàng này chưa có đơn hàng nào.</td>
-                    </tr>
-                  </c:otherwise>
-                </c:choose>
-              </tbody>
-            </table>
+          <div class="client-orders-list">
+            <c:choose>
+              <c:when test="${not empty recentOrders}">
+                <c:forEach var="order" items="${recentOrders}">
+                  <article class="client-order-card">
+                    <div class="client-order-card__row">
+                      <div>
+                        <p class="client-order-card__code">#${order.maDH}</p>
+                        <p class="client-order-card__date">
+                          <fmt:formatDate value="${order.ngayDat}" pattern="dd/MM/yyyy HH:mm" />
+                        </p>
+                      </div>
+                      <div class="client-order-card__total">
+                        <span>Tổng tiền</span>
+                        <strong><fmt:formatNumber value="${order.thanhTien}" pattern="#,##0" />đ</strong>
+                      </div>
+                    </div>
+
+                    <div class="client-order-card__row">
+                      <div>
+                        <span class="order-detail__label">Trạng thái</span>
+                        <div style="margin-top: 0.35rem;">
+                          <span class="status-badge">${order.trangThaiDon}</span>
+                        </div>
+                      </div>
+                      <div class="client-order-card__info">
+                        <span class="order-detail__label">Ghi chú</span>
+                        <p class="client-order-card__note">${empty order.ghiChu ? '-' : order.ghiChu}</p>
+                      </div>
+                    </div>
+                  </article>
+                </c:forEach>
+              </c:when>
+              <c:otherwise>
+                <div class="orders-table-wrap" style="text-align:center;">
+                  Khách hàng này chưa có đơn hàng nào.
+                </div>
+              </c:otherwise>
+            </c:choose>
           </div>
         </section>
 

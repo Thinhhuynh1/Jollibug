@@ -92,7 +92,7 @@
                 <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: #475569;">Quét mã QR dưới đây bằng ứng dụng ngân hàng của bạn:</p>
                 <div style="background: #fff; display: inline-block; padding: 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 1rem;">
                   <!-- Dùng ảnh QR giả lập -->
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=JollibugPaymentSystem" alt="QR Code" width="180" height="180" />
+                  <img src="${pageContext.request.contextPath}/resources/images/QRJollibug.png" alt="QR Code" width="180" height="180" />
                 </div>
                 <p style="margin: 0; font-size: 0.85rem; color: var(--color-red-600); font-weight: 700;">Hệ thống sẽ tự động xác nhận sau khi thanh toán thành công.</p>
               </div>
