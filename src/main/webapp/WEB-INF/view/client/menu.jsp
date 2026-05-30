@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,9 +67,49 @@
           </div>
         </section>
 
+        <section class="voice-ordering reveal-up"
+                 data-voice-ordering
+                 data-add-cart-url="${pageContext.request.contextPath}/addCart"
+                 data-cart-api-url="${pageContext.request.contextPath}/api/cart"
+                 data-cart-url="${pageContext.request.contextPath}/cart"
+                 data-checkout-url="${pageContext.request.contextPath}/checkout"
+                 aria-label="Voice ordering">
+          <div class="voice-ordering__main">
+            <button class="voice-ordering__mic" type="button" data-voice-start aria-label="Bắt đầu đặt món bằng giọng nói">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <path d="M12 19v3"></path>
+                <path d="M8 22h8"></path>
+              </svg>
+            </button>
+            <div class="voice-ordering__content">
+              <div class="voice-ordering__title">Đặt món bằng giọng nói</div>
+              <div class="voice-ordering__heard">
+                <span>Câu vừa nói:</span>
+                <strong data-voice-transcript>Chưa có lệnh</strong>
+              </div>
+              <div class="voice-ordering__status" data-voice-status>Sẵn sàng nghe lệnh tiếng Việt.</div>
+              <div class="voice-ordering__suggestions" data-voice-suggestions hidden></div>
+            </div>
+          </div>
+          <form class="voice-ordering__fallback" data-voice-manual-form>
+            <input type="text"
+                   data-voice-manual-input
+                   placeholder="thêm 2 pepsi"
+                   autocomplete="off" />
+            <button type="submit">Nhập</button>
+          </form>
+        </section>
+
         <section class="card-grid" data-menu-grid id="menu-grid" aria-label="Menu items">
           <c:forEach var="monAn" items="${listMonAn}">
-            <article class="hp-prod-card reveal-up">
+            <article class="hp-prod-card reveal-up"
+                     data-food-card
+                     data-food-id="${monAn.maMon}"
+                     data-food-name="${fn:escapeXml(monAn.tenMon)}"
+                     data-food-price="${monAn.giaGiam}"
+                     data-food-category="${fn:escapeXml(monAn.danhMuc.tenDM)}">
             <div class="hp-prod-card__img">
               <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
               <c:if test="${monAn.hasGiamGia}">
@@ -167,6 +208,7 @@
 
   <script src="/js/client/main.js"></script>
   <script src="/js/client/add-to-cart.js"></script>
+  <script src="/js/client/voice-ordering.js"></script>
   <script src="/js/client/jollibug-ai-chat.js"></script>
 </body>
 </html>
