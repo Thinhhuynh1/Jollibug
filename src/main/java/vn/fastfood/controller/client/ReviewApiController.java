@@ -47,7 +47,7 @@ public class ReviewApiController {
             return unauthorized();
         }
         return reviewService.findReview(reviewId, user.getMaTK())
-                .map(d -> ResponseEntity.ok(Map.of("success", true, "data", ReviewResponse.from(d))))
+                .map(d -> ResponseEntity.ok(Map.of("success", true, "data", reviewService.toResponse(d))))
                 .orElseGet(() -> ResponseEntity.status(404).body(Map.of(
                         "success", false,
                         "message", "Khong tim thay danh gia.")));
@@ -66,8 +66,8 @@ public class ReviewApiController {
                     request.getSao(), request.getNoiDung());
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Danh gia thanh cong.",
-                    "data", ReviewResponse.from(danhGia)));
+                    "message", "Đánh giá thành công.",
+                    "data", reviewService.toResponse(danhGia)));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", ex.getMessage()));
         }
@@ -86,8 +86,29 @@ public class ReviewApiController {
                     request.getSao(), request.getNoiDung());
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Cap nhat danh gia thanh cong.",
-                    "data", ReviewResponse.from(danhGia)));
+                    "message", "Cập nhật đánh giá thành công.",
+                    "data", reviewService.toResponse(danhGia)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", ex.getMessage()));
+        }
+    }
+
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<Map<String, Object>> listReviewsByOrder(@PathVariable long orderId,
+            @RequestParam("customerId") long customerId,
+            HttpSession session) {
+        User user = requireUser(session);
+        if (user == null) {
+            return unauthorized();
+        }
+        if (user.getMaTK() != customerId) {
+            return ResponseEntity.status(403).body(Map.of(
+                    "success", false,
+                    "message", "Không có quyền xem đánh giá."));
+        }
+        try {
+            var data = reviewService.listByOrderAndCustomer(orderId, customerId);
+            return ResponseEntity.ok(Map.of("success", true, "total", data.size(), "data", data));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", ex.getMessage()));
         }

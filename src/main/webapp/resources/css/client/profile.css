@@ -664,6 +664,29 @@ body[data-page="orders"] .orders-table tbody tr:last-child td {
     border-bottom: 0;
 }
 
+body[data-page="orders"] .review-table-actions {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+body[data-page="orders"] .review-table-actions .btn-sm {
+    min-height: 1.85rem;
+    padding: 0.28rem 0.62rem;
+    font-size: 0.74rem;
+    font-weight: 800;
+    line-height: 1.2;
+    border-radius: 999px;
+}
+
+body[data-page="orders"] .orders-table th:last-child,
+body[data-page="orders"] .orders-table td:last-child {
+    min-width: 9.5rem;
+}
+
 body[data-page="orders"] .orders-product {
     display: flex;
     align-items: center;
@@ -860,4 +883,84 @@ body[data-page="orders"] .order-detail__total strong {
     color: #555;
     font-size: 0.9rem;
     margin-top: 4px;
+}
+
+body[data-page="orders"] .review-order-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+body[data-page="orders"] .review-order-header__title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+body[data-page="orders"] .review-batch-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+body[data-page="orders"] .review-item-panel {
+    border: 1px solid rgba(26, 26, 26, 0.1);
+    border-radius: 1rem;
+    padding: 1.15rem 1.25rem;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+body[data-page="orders"] .review-item-panel__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+}
+
+body[data-page="orders"] .review-item-panel__title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+body[data-page="orders"] .review-item-panel__meta {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+body[data-page="orders"] .review-batch-form__actions {
+    margin-top: 0.25rem;
+}
+
+body[data-page="orders"] .review-section-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0 0 0.75rem;
+}
+
+body[data-page="orders"] .review-pending-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+body[data-page="orders"] .review-pending-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(26, 26, 26, 0.1);
+    border-radius: 0.85rem;
+    background: #fff;
 }

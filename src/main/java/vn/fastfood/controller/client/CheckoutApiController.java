@@ -1,5 +1,7 @@
 package vn.fastfood.controller.client;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +33,21 @@ public class CheckoutApiController {
             @RequestParam("customerId") long customerId,
             HttpSession session) {
         List<CheckoutCartItem> items = checkoutService.getCheckoutItems(customerId, session);
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "total", items.size(),
-                "data", items));
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (CheckoutCartItem item : items) {
+            if (item.getThanhTien() != null) {
+                subtotal = subtotal.add(item.getThanhTien());
+            } else if (item.getDonGia() != null) {
+                subtotal = subtotal.add(item.getDonGia().multiply(BigDecimal.valueOf(item.getSoLuong())));
+            }
+        }
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("success", true);
+        payload.put("total", items.size());
+        payload.put("subtotal", subtotal);
+        payload.put("data", items);
+        return ResponseEntity.ok(payload);
     }
 
     @PostMapping

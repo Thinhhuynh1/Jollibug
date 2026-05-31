@@ -119,15 +119,23 @@ async function submitUpdateStatus() {
 
         const data = await response.json();
 
-        alert(data.message || "Đã cập nhật trạng thái.");
-
         if (response.ok) {
             closeStatusModal();
             loadStaffOrders();
+            return;
         }
 
+        showStaffMessage(data.message || "Không thể cập nhật trạng thái.");
+
     } catch (error) {
-        alert("Lỗi khi cập nhật trạng thái.");
+        showStaffMessage("Lỗi khi cập nhật trạng thái.");
+    }
+}
+
+function showStaffMessage(message) {
+    const el = document.getElementById("message");
+    if (el) {
+        el.textContent = message || "";
     }
 }
 

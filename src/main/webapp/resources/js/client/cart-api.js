@@ -55,7 +55,7 @@ async function loadCart() {
             totalQuantity += soLuong;
             totalAmount += thanhTien;
 
-            const imageUrl = item.imageUrl || "https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg";
+            const imageUrl = buildProductImageUrl(item.imageUrl);
 
             const donGia = Number(item.donGia || 0);
             const donGiaGoc = Number(item.donGiaGoc || donGia);
@@ -74,6 +74,7 @@ async function loadCart() {
                     <img 
                         src="${imageUrl}"
                         alt="${item.tenMon || "Món ăn"}"
+                        onerror="this.onerror=null;this.src='/images/house-regular.png';"
                         style="width:100%;height:100%;object-fit:cover;border-radius:10px;"
                     />
                 </div>
@@ -344,4 +345,33 @@ function recalculateSummaryFromDOM() {
 
 function formatMoney(value) {
     return Number(value || 0).toLocaleString("vi-VN") + " VND";
+}
+
+function buildProductImageUrl(rawImageUrl) {
+    if (!rawImageUrl) {
+        return "/images/house-regular.png";
+    }
+
+    const value = String(rawImageUrl).trim();
+    if (!value) {
+        return "/images/house-regular.png";
+    }
+
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+        return value;
+    }
+
+    if (value.startsWith("/images/")) {
+        return value;
+    }
+
+    if (value.startsWith("/resources/images/")) {
+        return value.replace("/resources/images/", "/images/");
+    }
+
+    if (value.startsWith("images/")) {
+        return `/${value}`;
+    }
+
+    return `/images/${value}`;
 }

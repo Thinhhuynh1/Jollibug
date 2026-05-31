@@ -25,6 +25,11 @@
         <section class="profile-content">
           <h1 class="section-title">Sửa đánh giá — ${review.monAn.tenMon}</h1>
 
+          <div class="client-flash" style="background:#f8fafc;border:1px solid #e2e8f0;color:#334155;margin-bottom:1rem;">
+            Ngày đánh giá lần đầu: <strong>${review.ngayDGDisplay}</strong>.
+            Hạn sửa cuối: <strong>${editDeadlineDisplay}</strong>.
+          </div>
+
           <div class="review-container">
             <form action="/orders/reviews/update" method="post">
               <input type="hidden" name="reviewId" value="${review.maDG}" />
@@ -51,7 +56,7 @@
               </div>
 
               <div class="form-actions">
-                <a href="/orders/reviews" class="btn btn-secondary">Hủy</a>
+                <a href="/orders/reviews/view?reviewId=${review.maDG}" class="btn btn-secondary">Hủy</a>
                 <button type="submit" class="btn btn-primary">Cập nhật</button>
               </div>
             </form>

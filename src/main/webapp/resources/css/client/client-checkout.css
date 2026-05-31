@@ -4,12 +4,18 @@
 
 .checkout-main {
   padding-block: clamp(2.2rem, 5vw, 3.2rem);
+  overflow-x: clip;
 }
 
 .checkout-layout {
   display: grid;
   gap: 1.25rem;
   align-items: start;
+  min-width: 0;
+}
+
+.checkout-layout > * {
+  min-width: 0;
 }
 
 .checkout-card {
@@ -21,6 +27,9 @@
   padding: var(--checkout-card-pad);
   display: grid;
   gap: 1rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .checkout-card__title {
@@ -71,6 +80,44 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.55rem;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.voucher-box__row input {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.voucher-box__row .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.invoice-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-ink-700);
+  min-width: 0;
+}
+
+.invoice-line > *:first-child {
+  min-width: 0;
+  flex: 1;
+}
+
+.invoice-line > strong:last-child {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+#checkoutItemList {
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .voucher-message {
@@ -138,15 +185,6 @@
   padding: 0.9rem;
   display: grid;
   gap: 0.5rem;
-}
-
-.invoice-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  font-size: 0.9rem;
-  color: var(--color-ink-700);
 }
 
 .invoice-line--total {
@@ -326,32 +364,53 @@
 
 /* Voucher Carousel */
 .voucher-inline {
-  min-width: 0; /* Fix Grid blowout bug */
+  min-width: 0;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.voucher-inline__apply {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .voucher-carousel-wrapper {
   position: relative;
   margin-top: 1.25rem;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .voucher-carousel-list {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 4px 0 8px 0;
   scrollbar-width: none;
   scroll-snap-type: x mandatory;
   -ms-overflow-style: none;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 .voucher-carousel-list::-webkit-scrollbar {
   display: none;
 }
 
+.voucher-empty {
+  margin: 0;
+  padding: 0.75rem 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
 .voucher-card {
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  width: min(210px, calc(100% - 0.5rem));
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 10px;

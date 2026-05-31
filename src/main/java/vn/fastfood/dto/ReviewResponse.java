@@ -16,6 +16,8 @@ public class ReviewResponse {
     private String noiDung;
     private LocalDateTime ngayDG;
     private String ngayDGDisplay;
+    private boolean canEdit;
+    private String editDeadlineDisplay;
 
     public static ReviewResponse from(DanhGia danhGia) {
         ReviewResponse response = new ReviewResponse();
@@ -61,5 +63,21 @@ public class ReviewResponse {
 
     public String getNgayDGDisplay() {
         return ngayDGDisplay;
+    }
+
+    public boolean isCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(boolean canEdit) {
+        this.canEdit = canEdit;
+    }
+
+    public String getEditDeadlineDisplay() {
+        return editDeadlineDisplay;
+    }
+
+    public void setEditDeadlineDisplay(String editDeadlineDisplay) {
+        this.editDeadlineDisplay = editDeadlineDisplay;
     }
 }

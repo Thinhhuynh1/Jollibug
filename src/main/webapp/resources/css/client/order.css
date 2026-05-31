@@ -33,15 +33,25 @@ body[data-page="orders"] {
 }
 
 .message {
-    min-height: 1.25rem;
-    color: var(--color-danger);
+    min-height: 0;
     font-weight: 800;
+    line-height: 1.45;
 }
 
 .message:not(:empty) {
     padding: 0.9rem 1rem;
-    border: 1px solid rgba(201, 58, 55, 0.18);
     border-radius: 12px;
+}
+
+.message.is-success:not(:empty) {
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    background: #ecfdf3;
+}
+
+.message.is-error:not(:empty) {
+    color: #9f1d24;
+    border: 1px solid rgba(201, 58, 55, 0.18);
     background: rgba(201, 58, 55, 0.08);
 }
 
@@ -76,6 +86,26 @@ body[data-page="orders"] {
     font-size: 0.84rem;
     font-weight: 700;
     text-align: right;
+}
+
+.order-item-review-actions {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.order-item-review-actions .btn {
+    min-height: 1.85rem;
+    padding: 0.28rem 0.62rem;
+    font-size: 0.74rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.order-item-review-actions .order-note {
+    font-size: 0.74rem;
 }
 
 .empty-cell,
@@ -791,8 +821,14 @@ body[data-page="orders"] {
 }
 
 .timeline-step.is-complete .timeline-step__dot {
+    display: grid;
+    place-items: center;
     border-color: #2f9e66;
     background: #2f9e66;
+    color: #ffffff;
+    font-size: 0.62rem;
+    font-weight: 900;
+    line-height: 1;
 }
 
 .timeline-step.is-active .timeline-step__dot {

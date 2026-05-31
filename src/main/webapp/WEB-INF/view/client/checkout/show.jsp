@@ -139,66 +139,18 @@
           <div class="voucher-inline">
             <p class="section-subtitle">Bạn có Mã giảm giá?</p>
             <div class="voucher-box__row">
-              <input id="voucher-code" type="text" placeholder="Nhập mã giảm giá" style="min-width: 0; box-sizing: border-box;" />
+              <input id="voucher-code" type="text" placeholder="Nhập mã giảm giá" />
               <button class="btn btn-outline voucher-inline__apply" id="voucher-apply" type="button">Áp dụng</button>
             </div>
             <div id="voucher-message" style="min-height: 1.4rem; margin-top: 0.75rem; font-size: 0.95rem;"></div>
 
             
-            <!-- Danh sách Voucher có sẵn -->
+            <!-- Danh sách mã khuyến mãi đủ điều kiện (load bằng checkout-api.js) -->
             <div class="voucher-carousel-wrapper">
               <button class="voucher-carousel-arrow voucher-carousel-arrow--prev" data-voucher-arrow="prev">❮</button>
               
               <div class="voucher-carousel-list" data-voucher-list>
-                
-                <!-- Fake Voucher 1 -->
-                <div class="voucher-card">
-                  <div class="voucher-card__header">
-                    <span class="voucher-card__title">GIAM20K</span>
-                    <span class="voucher-card__tag voucher-card__tag--blue">Freeship</span>
-                  </div>
-                  <p class="voucher-card__desc">Giảm 20k phí vận chuyển cho đơn từ 100k</p>
-                  <div class="voucher-card__actions">
-                    <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='GIAM20K'">Chọn</button>
-                  </div>
-                </div>
-
-                <!-- Fake Voucher 2 -->
-                <div class="voucher-card">
-                  <div class="voucher-card__header">
-                    <span class="voucher-card__title">NEWUSER50</span>
-                    <span class="voucher-card__tag voucher-card__tag--yellow">Bạn mới</span>
-                  </div>
-                  <p class="voucher-card__desc">Giảm 50% tối đa 30k cho khách mới</p>
-                  <div class="voucher-card__actions">
-                    <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='NEWUSER50'">Chọn</button>
-                  </div>
-                </div>
-
-                <!-- Fake Voucher 3 -->
-                <div class="voucher-card">
-                  <div class="voucher-card__header">
-                    <span class="voucher-card__title">HOAN10K</span>
-                    <span class="voucher-card__tag voucher-card__tag--green">Hoàn tiền</span>
-                  </div>
-                  <p class="voucher-card__desc">Hoàn ngay 10k vào ví Jollibug</p>
-                  <div class="voucher-card__actions">
-                    <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='HOAN10K'">Chọn</button>
-                  </div>
-                </div>
-
-                <!-- Fake Voucher 4 -->
-                <div class="voucher-card">
-                  <div class="voucher-card__header">
-                    <span class="voucher-card__title">LUNCH15</span>
-                    <span class="voucher-card__tag voucher-card__tag--purple">Ăn trưa</span>
-                  </div>
-                  <p class="voucher-card__desc">Giảm 15% cho khung giờ 11h-13h</p>
-                  <div class="voucher-card__actions">
-                    <button type="button" class="btn btn-primary voucher-card__btn" onclick="document.getElementById('voucher-code').value='LUNCH15'">Chọn</button>
-                  </div>
-                </div>
-
+                <p class="voucher-empty">Đang tải mã khuyến mãi...</p>
               </div>
               <button class="voucher-carousel-arrow voucher-carousel-arrow--next" data-voucher-arrow="next">❯</button>
             </div>

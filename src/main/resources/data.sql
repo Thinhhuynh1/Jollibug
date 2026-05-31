@@ -111,9 +111,9 @@ COMMIT;
 INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('WELCOME10', 'PERCENTAGE', 10, 100, N'Giảm 10% cho khách hàng mới',
     TIMESTAMP '2026-01-01 00:00:00', TIMESTAMP '2026-12-31 23:59:59');
-INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
+INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc, DieuKien)
   VALUES ('SAVE20K', 'AMOUNT', 20000, 50, N'Giảm thẳng 20.000đ cho đơn từ 100.000đ',
-    TIMESTAMP '2026-05-01 00:00:00', TIMESTAMP '2026-05-31 23:59:59');
+    TIMESTAMP '2026-05-01 00:00:00', TIMESTAMP '2026-05-31 23:59:59', 100000);
 INSERT INTO MAGIAMGIA (MACODE, LoaiGiam, MucGiam, SoLuong, MoTa, NgayBatDau, NgayKetThuc)
   VALUES ('SUMMER15', 'PERCENTAGE', 15, 200, N'Khuyến mãi hè - giảm 15%',
     TIMESTAMP '2026-05-15 00:00:00', TIMESTAMP '2026-08-31 23:59:59');
@@ -214,15 +214,49 @@ INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 7, 1, 45000);
 INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 11, 2, 35000);
 INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 15, 1, 15000);
 INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 24, 3, 12000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (19, 1, 2, 38000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (19, 13, 1, 19000);
+-- Món cho các đơn DELIVERED còn thiếu chi tiết
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (4, 6, 1, 92000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (6, 6, 1, 88000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (7, 1, 2, 38000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (7, 13, 2, 40000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (8, 22, 2, 37000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (9, 8, 2, 40000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (9, 7, 2, 57500);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (10, 11, 2, 35000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (10, 15, 2, 25000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (11, 2, 1, 36000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (11, 3, 1, 42000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (11, 19, 1, 20000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (12, 8, 3, 40000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (12, 24, 3, 21667);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (14, 6, 2, 45000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (14, 16, 2, 42500);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (15, 7, 2, 45000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (15, 11, 4, 35000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (15, 15, 2, 15000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (16, 22, 2, 44000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (17, 1, 3, 38000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (17, 13, 3, 42000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (18, 2, 2, 36000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (18, 3, 2, 42000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (18, 19, 1, 20000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (20, 8, 3, 40000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (20, 7, 2, 45000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (20, 11, 2, 35000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (22, 22, 2, 38500);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (23, 1, 4, 38000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (23, 13, 4, 42000);
+INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (23, 24, 5, 12000);
 COMMIT;
 
 -- ===================================================================
 -- ĐÁNH GIÁ MẪU (SAMPLE REVIEWS)
+-- NgayDG = ngày đánh giá lần đầu; NgayCapNhat = lần sửa gần nhất
 -- ===================================================================
-INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG)
-  VALUES (1, 1, 1, 5, N'Gà giòn rụm, giao hàng nhanh.', TIMESTAMP '2026-01-06 09:00:00');
-INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG)
-  VALUES (6, 6, 2, 4, N'Combo ngon, đóng gói cẩn thận.', TIMESTAMP '2026-01-09 14:30:00');
+INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG, NgayCapNhat)
+  VALUES (6, 6, 2, 4, N'Combo ngon, đóng gói cẩn thận.', TIMESTAMP '2026-05-28 14:30:00', TIMESTAMP '2026-05-28 14:30:00');
 COMMIT;
 
 -- ===================================================================

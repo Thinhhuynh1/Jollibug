@@ -208,18 +208,28 @@ async function submitRuntimeUpdateStatus() {
 
         const data = await response.json();
 
-        alert(data.message || "Đã cập nhật trạng thái.");
-        window.selectedCancelReason = "";
-
         if (response.ok) {
             closeRuntimeStatusModal();
+            window.selectedCancelReason = "";
 
-            if (typeof window.afterOrderStatusUpdated === "function")
+            if (typeof window.afterOrderStatusUpdated === "function") {
                 window.afterOrderStatusUpdated(orderId);
+            }
+            return;
         }
 
+        showStaffMessage(data.message || "Không thể cập nhật trạng thái.");
+        window.selectedCancelReason = "";
+
     } catch (error) {
-        alert("Lỗi khi cập nhật trạng thái.");
+        showStaffMessage("Lỗi khi cập nhật trạng thái.");
+    }
+}
+
+function showStaffMessage(message) {
+    const el = document.getElementById("message");
+    if (el) {
+        el.textContent = message || "";
     }
 }
 

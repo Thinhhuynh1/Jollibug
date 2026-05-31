@@ -1,6 +1,8 @@
 package vn.fastfood.controller.client;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,6 +24,22 @@ public class ClientCouponController {
         this.couponService = couponService;
     }
 
+    @GetMapping("/api/voucher/available")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> listAvailableVouchers(
+            @RequestParam(name = "subtotal", defaultValue = "0") double subtotal) {
+
+        List<Map<String, Object>> vouchers = new ArrayList<>();
+        for (MaGiamGia coupon : couponService.listApplicableCoupons(subtotal)) {
+            vouchers.add(toVoucherPayload(coupon, subtotal));
+        }
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("vouchers", vouchers);
+        payload.put("count", vouchers.size());
+        return ResponseEntity.ok(payload);
+    }
+
     @GetMapping("/api/voucher/validate")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> validateVoucher(
@@ -40,6 +58,14 @@ public class ClientCouponController {
         }
 
         MaGiamGia coupon = couponOpt.get();
+        if (!couponService.meetsMinimumOrder(coupon, subtotal)) {
+            payload.put("valid", false);
+            payload.put("message", couponService.getMinimumOrderMessage(coupon));
+            payload.put("discountAmount", 0);
+            payload.put("total", subtotal);
+            return ResponseEntity.ok(payload);
+        }
+
         double discountAmount = couponService.calculateDiscount(coupon, subtotal);
         double total = Math.max(0, subtotal - discountAmount);
 
@@ -50,7 +76,22 @@ public class ClientCouponController {
         payload.put("total", total);
         payload.put("couponType", coupon.getLoaiGiam());
         payload.put("couponValue", coupon.getMucGiam());
+        payload.put("description", coupon.getMoTa());
+        payload.put("discountDisplay", coupon.getDiscountDisplay());
 
         return ResponseEntity.ok(payload);
+    }
+
+    private Map<String, Object> toVoucherPayload(MaGiamGia coupon, double subtotal) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("code", coupon.getTenMa());
+        item.put("description", coupon.getMoTa());
+        item.put("discountDisplay", coupon.getDiscountDisplay());
+        item.put("couponType", coupon.getLoaiGiam());
+        item.put("couponValue", coupon.getMucGiam());
+        item.put("minimumOrder", coupon.getDieuKien());
+        item.put("minimumOrderDisplay", coupon.getMinimumOrderDisplay());
+        item.put("estimatedDiscount", couponService.calculateDiscount(coupon, subtotal));
+        return item;
     }
 }

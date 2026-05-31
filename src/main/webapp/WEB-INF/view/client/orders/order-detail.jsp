@@ -22,7 +22,7 @@
 <main class="profile-page order-page">
     <div class="container container--account-wide">
         <section class="profile-content orders-content">
-            <input type="hidden" id="currentCustomerId" value="${sessionScope.userId}">
+            <input type="hidden" id="currentCustomerId" value="${sessionScope.userId != null ? sessionScope.userId : sessionScope.user.maTK}">
 
             <div class="client-order-top-actions">
                 <a class="btn btn-outline order-back-btn" href="<c:url value='/orders'/>">
@@ -52,7 +52,7 @@
             <section class="orders-card">
                 <div class="orders-card__header">
                     <h2>Danh sách món ăn</h2>
-                    <span class="orders-card__hint">Có thể đánh giá từng món khi đơn đã giao</span>
+                    <span class="orders-card__hint">Có thể đánh giá trong 6 tháng kể từ ngày giao hàng; sửa đánh giá trong 2 tháng kể từ ngày đánh giá</span>
                 </div>
 
                 <div class="orders-table-wrap">
@@ -105,6 +105,7 @@
 </div>
 
 <jsp:include page="../layout/footer.jsp" />
+<script src="<c:url value='/js/client/order-status.js'/>"></script>
 <script src="<c:url value='/js/client/order-detail.js'/>"></script>
 </body>
 </html>

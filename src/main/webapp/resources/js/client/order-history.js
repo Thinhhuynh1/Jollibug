@@ -91,7 +91,7 @@ function renderOrdersByTab() {
         }
 
         if (currentTab === "review") {
-            return status === "DELIVERED";
+            return Boolean(order.canReview);
         }
 
         return true;
@@ -286,20 +286,23 @@ function renderOrderAction(order) {
         return `<span class="order-note">Đang chờ xử lý hủy</span>`;
     }
 
-    if (currentTab === "review" && status === "DELIVERED") {
-        return `
-            <a class="btn btn-outline" href="/orders/detail?orderId=${order.maDH}" onclick="event.stopPropagation();">
+    if (Boolean(order.canReview)) {
+        const reviewButton = `
+            <a class="btn btn-primary" href="${buildReviewOrderUrl(order.maDH)}" onclick="event.stopPropagation();">
                 Đánh giá món
             </a>
         `;
-    }
 
-    if (currentTab === "history" && status === "DELIVERED") {
-        return `
-            <button type="button" class="btn btn-outline reorder-btn" onclick="event.stopPropagation(); reorderOrder(${order.maDH});">
-                Đặt lại
-            </button>
-        `;
+        if (currentTab === "history") {
+            return `
+                ${reviewButton}
+                <button type="button" class="btn btn-outline reorder-btn" onclick="event.stopPropagation(); reorderOrder(${order.maDH});">
+                    Đặt lại
+                </button>
+            `;
+        }
+
+        return reviewButton;
     }
 
     return "";
@@ -339,15 +342,16 @@ async function requestCancelOrder(orderId) {
 
         const data = await response.json();
 
-        alert(data.message || "Đã xử lý yêu cầu hủy đơn.");
-
         if (response.ok) {
             orderDetailCache.delete(orderId);
             await loadOrders();
+            return;
         }
 
+        showMessage(data.message || "Không thể hủy đơn hàng.");
+
     } catch (error) {
-        alert("Lỗi khi gửi yêu cầu hủy đơn.");
+        showMessage("Lỗi khi gửi yêu cầu hủy đơn.");
     }
 }
 
@@ -382,25 +386,11 @@ function getCurrentCustomerId() {
     return input ? input.value : "";
 }
 
-function normalizeStatus(status) {
-    return (status || "").trim().toUpperCase();
-}
-
-function displayStatus(status) {
-    const statusMap = {
-        PENDING: "Đã đặt hàng",
-        CONFIRMED: "Đã xác nhận",
-        SHIPPING: "Đang giao",
-        DELIVERED: "Đã giao",
-        CANCEL_REQUESTED: "Yêu cầu hủy",
-        CANCELLED: "Đã hủy"
-    };
-
-    return statusMap[normalizeStatus(status)] || status || "-";
-}
-
-function getStatusClass(status) {
-    return normalizeStatus(status).toLowerCase().replace("_", "-");
+function showMessage(message) {
+    const el = document.getElementById("message");
+    if (el) {
+        el.textContent = message || "";
+    }
 }
 
 function formatMoney(value) {

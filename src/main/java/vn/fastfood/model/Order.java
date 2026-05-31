@@ -28,6 +28,9 @@ public class Order {
     private String tenPT;
     private String trangThaiTT;
 
+    private Boolean canReview;
+    private String reviewDeadlineDisplay;
+
     public Order() {}
 
     public long getMaDH() {
@@ -188,6 +191,22 @@ public class Order {
 
     public void setTrangThaiTT(String trangThaiTT) {
         this.trangThaiTT = trangThaiTT;
+    }
+
+    public Boolean getCanReview() {
+        return canReview;
+    }
+
+    public void setCanReview(Boolean canReview) {
+        this.canReview = canReview;
+    }
+
+    public String getReviewDeadlineDisplay() {
+        return reviewDeadlineDisplay;
+    }
+
+    public void setReviewDeadlineDisplay(String reviewDeadlineDisplay) {
+        this.reviewDeadlineDisplay = reviewDeadlineDisplay;
     }
 
     @Override

@@ -32,7 +32,7 @@
                 </a>
             </div>
 
-            <input type="hidden" id="currentCustomerId" value="${sessionScope.userId}">
+            <input type="hidden" id="currentCustomerId" value="${sessionScope.userId != null ? sessionScope.userId : sessionScope.user.maTK}">
 
             <div class="order-tabs" role="tablist" aria-label="Order tabs">
                 <button class="order-tab is-active" type="button" data-tab="active" onclick="switchOrderTab('active')">
@@ -60,6 +60,7 @@
 </main>
 
 <jsp:include page="../layout/footer.jsp" />
+<script src="<c:url value='/js/client/order-status.js'/>"></script>
 <script src="<c:url value='/js/client/order-history.js'/>"></script>
 </body>
 </html>

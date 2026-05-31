@@ -13,6 +13,8 @@ public interface DanhGiaRepository extends JpaRepository<DanhGia, Long> {
 
     List<DanhGia> findByMaTKKHOrderByNgayDGDesc(Long maTKKH);
 
+    List<DanhGia> findByDonHang_MaDHAndMaTKKH(Long maDH, Long maTKKH);
+
     Optional<DanhGia> findByMaDGAndMaTKKH(Long maDG, Long maTKKH);
 
     boolean existsByDonHang_MaDHAndMonAn_MaMonAndMaTKKH(Long maDH, Long maMon, Long maTKKH);

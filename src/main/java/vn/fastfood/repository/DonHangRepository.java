@@ -99,4 +99,6 @@ List<Object[]> revenueByMonth(@Param("year") int year);
     List<DonHang> findRecentOrders(Pageable pageable);
 
     List<DonHang> findByUser_MaTKAndTrangThaiOrderByNgayDatDesc(Long maTK, String trangThai);
+
+    List<DonHang> findByUser_MaTKOrderByNgayDatDesc(Long maTK);
 }

@@ -43,6 +43,17 @@ public class MaGiamGia {
     @Column(name = "NgayKetThuc")
     private LocalDateTime ngayKetThuc;
 
+    @Column(name = "DieuKien")
+    private Double dieuKien;
+
+    @Transient
+    public String getMinimumOrderDisplay() {
+        if (dieuKien == null || dieuKien <= 0) {
+            return null;
+        }
+        return NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(dieuKien) + "đ";
+    }
+
     @Transient
     public String getStatus() {
         if (ngayBatDau == null || ngayKetThuc == null) {

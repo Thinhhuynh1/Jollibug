@@ -8,6 +8,7 @@ import java.util.List;
 public class OrderDetailResponse {
     private Order order;
     private List<OrderItem> orderItems;
+    private List<ReviewResponse> reviews;
 
     public OrderDetailResponse() {
     }
@@ -15,6 +16,12 @@ public class OrderDetailResponse {
     public OrderDetailResponse(Order order, List<OrderItem> orderItems) {
         this.order = order;
         this.orderItems = orderItems;
+    }
+
+    public OrderDetailResponse(Order order, List<OrderItem> orderItems, List<ReviewResponse> reviews) {
+        this.order = order;
+        this.orderItems = orderItems;
+        this.reviews = reviews;
     }
 
     public Order getOrder() {
@@ -31,5 +38,13 @@ public class OrderDetailResponse {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public List<ReviewResponse> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<ReviewResponse> reviews) {
+        this.reviews = reviews;
     }
 }

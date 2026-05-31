@@ -1,7 +1,12 @@
 package vn.fastfood.service;
 
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -36,8 +41,48 @@ public class CouponService {
         return Optional.of(maGiamGia);
     }
 
-    public double calculateDiscount(MaGiamGia coupon, double subtotal) {
+    public List<MaGiamGia> listApplicableCoupons(double subtotal) {
+        if (subtotal <= 0) {
+            return List.of();
+        }
+
+        return couponRepository.findAll().stream()
+                .filter(coupon -> isApplicable(coupon, subtotal))
+                .sorted(Comparator.comparing(MaGiamGia::getTenMa))
+                .collect(Collectors.toList());
+    }
+
+    public boolean isApplicable(MaGiamGia coupon, double subtotal) {
+        return isCouponActive(coupon)
+                && meetsMinimumOrder(coupon, subtotal)
+                && calculateDiscount(coupon, subtotal) > 0;
+    }
+
+    public boolean meetsMinimumOrder(MaGiamGia coupon, double subtotal) {
         if (coupon == null || subtotal <= 0) {
+            return false;
+        }
+
+        Double minimumOrder = coupon.getDieuKien();
+        if (minimumOrder == null || minimumOrder <= 0) {
+            return true;
+        }
+
+        return subtotal >= minimumOrder;
+    }
+
+    public String getMinimumOrderMessage(MaGiamGia coupon) {
+        Double minimumOrder = coupon.getDieuKien();
+        if (minimumOrder == null || minimumOrder <= 0) {
+            return "Đơn hàng chưa đủ điều kiện để áp dụng mã này.";
+        }
+
+        NumberFormat format = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+        return "Mã này chỉ áp dụng cho đơn từ " + format.format(minimumOrder) + " VND.";
+    }
+
+    public double calculateDiscount(MaGiamGia coupon, double subtotal) {
+        if (coupon == null || subtotal <= 0 || !meetsMinimumOrder(coupon, subtotal)) {
             return 0;
         }
 
