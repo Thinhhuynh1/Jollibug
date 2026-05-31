@@ -25,8 +25,23 @@ public class CartService {
         this.promotionService = promotionService;
     }
 
+    public List<CartItem> getCartItems(long customerId, HttpSession session) {
+        List<CartItem> items = cartDAO.getCartItemsByCustomerId(customerId);
+        if (!items.isEmpty()) {
+            return items;
+        }
+
+        if (session == null) {
+            return items;
+        }
+
+        @SuppressWarnings("unchecked")
+        List<CartItem> sessionCart = (List<CartItem>) session.getAttribute("cart");
+        return sessionCart != null ? sessionCart : items;
+    }
+
     public List<CartItem> getCartItems(long customerId) {
-        return cartDAO.getCartItemsByCustomerId(customerId);
+        return getCartItems(customerId, null);
     }
 
     public CartAddResult addSessionCart(Long productID, HttpSession session) {
@@ -70,16 +85,59 @@ public class CartService {
         return new CartAddResult(true, "Them vao gio hang thanh cong.", countCartItems(cart));
     }
 
+    public boolean updateQuantity(long customerId, long maMon, int soLuong, HttpSession session) {
+        if (cartDAO.getCartIdByCustomerId(customerId) != null) {
+            if (soLuong <= 0) {
+                return cartDAO.removeCartItem(customerId, maMon);
+            }
+            return cartDAO.updateCartItemQuantity(customerId, maMon, soLuong);
+        }
+
+        return updateSessionCartQuantity(session, maMon, soLuong);
+    }
+
     public boolean updateQuantity(long customerId, long maMon, int soLuong) {
-        if (soLuong <= 0) {
+        return updateQuantity(customerId, maMon, soLuong, null);
+    }
+
+    public boolean removeItem(long customerId, long maMon, HttpSession session) {
+        if (cartDAO.getCartIdByCustomerId(customerId) != null) {
             return cartDAO.removeCartItem(customerId, maMon);
         }
 
-        return cartDAO.updateCartItemQuantity(customerId, maMon, soLuong);
+        return updateSessionCartQuantity(session, maMon, 0);
     }
 
     public boolean removeItem(long customerId, long maMon) {
-        return cartDAO.removeCartItem(customerId, maMon);
+        return removeItem(customerId, maMon, null);
+    }
+
+    private boolean updateSessionCartQuantity(HttpSession session, long maMon, int soLuong) {
+        if (session == null) {
+            return false;
+        }
+
+        @SuppressWarnings("unchecked")
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart == null) {
+            return false;
+        }
+
+        CartItem item = findCartItem(cart, maMon);
+        if (item == null) {
+            return false;
+        }
+
+        if (soLuong <= 0) {
+            cart.removeIf(cartItem -> cartItem.getMaMon() == maMon);
+            session.setAttribute("cart", cart);
+            return true;
+        }
+
+        item.setSoLuong(soLuong);
+        item.setThanhTien(item.getDonGia().multiply(BigDecimal.valueOf(soLuong)));
+        session.setAttribute("cart", cart);
+        return true;
     }
 
     private CartItem findCartItem(List<CartItem> cart, long maMon) {

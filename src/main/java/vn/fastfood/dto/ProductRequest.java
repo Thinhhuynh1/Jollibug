@@ -6,6 +6,7 @@ public class ProductRequest {
     private Long gia;
     private Long soLuongTon;
     private String moTa;
+    private String donVi;
     private Boolean available;
 
     public ProductRequest() {
@@ -49,6 +50,14 @@ public class ProductRequest {
 
     public void setMoTa(String moTa) {
         this.moTa = moTa;
+    }
+
+    public String getDonVi() {
+        return donVi;
+    }
+
+    public void setDonVi(String donVi) {
+        this.donVi = donVi;
     }
 
     public Boolean getAvailable() {

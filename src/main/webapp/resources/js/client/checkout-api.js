@@ -39,13 +39,20 @@ async function loadCheckoutSummary() {
     if (messageEl) messageEl.textContent = "";
 
     try {
-        const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
+        let items = null;
 
-        if (!response.ok) {
-            throw new Error("Không thể tải tóm tắt giỏ hàng.");
+        const summaryRes = await fetch(`${CHECKOUT_API_BASE}/summary?customerId=${customerId}`);
+        if (summaryRes.ok) {
+            const summaryJson = await summaryRes.json();
+            items = summaryJson.data;
         }
 
-        const items = await response.json();
+        if (!items || items.length === 0) {
+            const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
+            if (response.ok) {
+                items = await response.json();
+            }
+        }
 
         if (!items || items.length === 0) {
             if (itemList) {
@@ -131,7 +138,7 @@ function updateInvoice(subtotal, discount) {
 
 async function submitCheckout() {
     const customerId = getCustomerId();
-    const maDC = Number(getValue("addressSelect") || 1);
+    const maDC = Number(getValue("addressSelect") || 0);
     const discountCode = getValue("voucher-code").trim();
     const ghiChu = buildCheckoutNote();
 
@@ -144,7 +151,7 @@ async function submitCheckout() {
     }
 
     if (!maDC) {
-        showCheckoutMessage("Vui lòng chọn địa chỉ giao hàng.");
+        showCheckoutMessage("Vui lòng chọn địa chỉ giao hàng. Bấm 'Đổi địa chỉ' hoặc thêm địa chỉ tại /address/create.");
         return;
     }
 

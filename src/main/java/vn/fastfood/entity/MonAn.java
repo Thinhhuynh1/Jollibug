@@ -35,6 +35,10 @@ public class MonAn {
     @Nationalized
     private String moTa;
 
+    @Column(name = "DonVi")
+    @Nationalized
+    private String donVi = "phần";
+
     @Column(name = "Gia")
     private long gia;
 

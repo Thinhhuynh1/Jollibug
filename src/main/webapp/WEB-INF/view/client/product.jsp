@@ -149,6 +149,10 @@
                   <strong id="product-category">${monAn.danhMuc.tenDM}</strong>
                 </article>
                 <article class="product-spec">
+                  <span class="muted">Đơn vị</span>
+                  <strong>${empty monAn.donVi ? 'phần' : monAn.donVi}</strong>
+                </article>
+                <article class="product-spec">
                   <span class="muted">Tình trạng</span>
                   <strong style="color:${monAn.available ? '#43a047' : '#e53935'}">
                     ${monAn.available ? 'Còn hàng' : 'Hết hàng'}
@@ -174,7 +178,7 @@
                 <c:choose>
                   <c:when test="${monAn.hasGiamGia}">
                     <span class="price-block__current">
-                      <fmt:formatNumber value="${monAn.giaGiam}" type="number" />đ
+                      <fmt:formatNumber value="${monAn.giaGiam}" type="number" />đ/${empty monAn.donVi ? 'phần' : monAn.donVi}
                     </span>
                     <span class="price-block__original">
                       <fmt:formatNumber value="${monAn.gia}" type="number" />đ
@@ -185,7 +189,7 @@
                   </c:when>
                   <c:otherwise>
                     <span class="price-block__current">
-                      <fmt:formatNumber value="${monAn.gia}" type="number" />đ
+                      <fmt:formatNumber value="${monAn.gia}" type="number" />đ/${empty monAn.donVi ? 'phần' : monAn.donVi}
                     </span>
                   </c:otherwise>
                 </c:choose>

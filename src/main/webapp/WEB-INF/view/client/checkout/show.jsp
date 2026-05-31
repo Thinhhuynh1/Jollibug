@@ -21,8 +21,15 @@
   <jsp:include page="../layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="1">
-    <input type="hidden" id="addressSelect" value="1">
+    <input type="hidden" id="customerId" value="${sessionScope.user.maTK}">
+    <input type="hidden" id="addressSelect" value="${defaultMaDC}">
+
+    <c:if test="${empty defaultAddress}">
+      <div class="manager-flash manager-flash--error" style="margin-bottom:1rem;">
+        Bạn chưa có địa chỉ giao hàng.
+        <a href="/address/create">Thêm địa chỉ ngay</a>
+      </div>
+    </c:if>
 
     <div class="container">
       <div class="page-intro">
@@ -35,22 +42,23 @@
           <form class="delivery-form" id="delivery-form">
             <label class="field-label">
               <span>Họ tên</span>
-              <input type="text" id="delivery-name" required />
+              <input type="text" id="delivery-name" value="${defaultAddress.tenNguoiNhan}" required />
             </label>
 
             <label class="field-label">
               <span>Số điện thoại</span>
-              <input type="tel" id="delivery-phone" required />
+              <input type="tel" id="delivery-phone" value="${defaultAddress.sdtNguoiNhan}" required />
             </label>
 
             <label class="field-label">
               <span>Địa chỉ email</span>
-              <input type="text" id="delivery-email" required />
+              <input type="text" id="delivery-email" value="${sessionScope.user.email}" required />
             </label>
 
             <label class="field-label" style="position: relative;">
               <span>Địa chỉ đặt hàng</span>
-              <input type="text" id="delivery-address" autocomplete="off" required />
+              <input type="text" id="delivery-address" autocomplete="off" required
+                     value="${defaultAddress.diaChiCuThe}, ${defaultAddress.phuongXa}, ${defaultAddress.quanHuyen}, ${defaultAddress.tinhThanh}" />
               <!-- Dropdown gợi ý địa chỉ -->
               <div id="address-suggestions" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto; margin-top: 4px;"></div>
             </label>

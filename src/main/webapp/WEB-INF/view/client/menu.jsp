@@ -85,11 +85,11 @@
                 <div class="hp-prod-card__price-container">
                   <c:choose>
                     <c:when test="${monAn.hasGiamGia}">
-                      <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.giaGiam}" type="number" />đ</span>
+                      <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.giaGiam}" type="number" />đ/${empty monAn.donVi ? 'phần' : monAn.donVi}</span>
                       <span class="hp-prod-card__old-price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
                     </c:when>
                     <c:otherwise>
-                      <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ</span>
+                      <span class="hp-prod-card__price"><fmt:formatNumber value="${monAn.gia}" type="number" />đ/${empty monAn.donVi ? 'phần' : monAn.donVi}</span>
                     </c:otherwise>
                   </c:choose>
                 </div>
@@ -167,7 +167,7 @@
   
 
   </body>
-  <script src="js/client/main.js"></script>  <!-- mui ten qua lai danh muc-->
+  <script src="/js/client/main.js"></script>
   <script src="/js/client/jollibug-ai-chat.js"></script>
 </html>
 

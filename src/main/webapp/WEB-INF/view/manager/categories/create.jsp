@@ -46,8 +46,8 @@
                 <label class="profile-field">
                   <span>Trạng thái</span>
                   <select name="available">
-                    <option value="1" selected>Đang hoạt động</option>
-                    <option value="0">Ẩn</option>
+                    <option value="true" selected>Đang hoạt động</option>
+                    <option value="false">Ẩn</option>
                   </select>
                 </label>
 

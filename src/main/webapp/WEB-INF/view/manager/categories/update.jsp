@@ -46,7 +46,7 @@
                   <span>Trạng thái</span>
                   <select name="available">
                     <option value="true" <c:if test="${danhMuc.available == true}">selected</c:if>>Đang hoạt động</option>
-                    <option value="false" <c:if test="${danhMuc.available == false}">selected</c:if  >>Ẩn</option>
+                    <option value="false" <c:if test="${danhMuc.available == false}">selected</c:if>>Ẩn</option>
                   </select>
                 </label>
 

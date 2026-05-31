@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +55,48 @@ public class ProductService {
 
     public Optional<MonAn> findProduct(long productId) {
         return Optional.ofNullable(monAnRepository.findProduct(productId));
+    }
+
+    /**
+     * Tìm kiếm + sắp xếp + lọc trạng thái món ăn (dùng chung MVC và API).
+     */
+    public List<MonAn> searchProducts(Long categoryID, String keyword, String filter, String status) {
+        if (keyword != null) {
+            keyword = keyword.trim();
+            if (keyword.isEmpty()) {
+                keyword = null;
+            }
+        }
+
+        List<MonAn> listMonAn;
+        if ("price-low".equals(filter)) {
+            listMonAn = monAnRepository.findMonAnPriceLow(categoryID, keyword);
+        } else if ("price-high".equals(filter)) {
+            listMonAn = monAnRepository.findMonAnPriceHigh(categoryID, keyword);
+        } else if ("rating".equals(filter)) {
+            listMonAn = monAnRepository.findMonAnBestSeller(categoryID, keyword);
+        } else if ("name-asc".equals(filter)) {
+            listMonAn = monAnRepository.findMonAnNameAsc(categoryID, keyword);
+        } else {
+            listMonAn = monAnRepository.findMonAn(categoryID, keyword);
+        }
+
+        if ("active".equals(status)) {
+            return listMonAn.stream()
+                    .filter(monAn -> monAn.isAvailable() && monAn.getSoLuongTon() > 0)
+                    .collect(Collectors.toList());
+        }
+        if ("inactive".equals(status)) {
+            return listMonAn.stream()
+                    .filter(monAn -> !monAn.isAvailable())
+                    .collect(Collectors.toList());
+        }
+        if ("out_of_stock".equals(status)) {
+            return listMonAn.stream()
+                    .filter(monAn -> monAn.getSoLuongTon() == 0)
+                    .collect(Collectors.toList());
+        }
+        return listMonAn;
     }
 
     public String storeProductImage(MultipartFile file, String currentImageName) {
@@ -110,6 +154,9 @@ public class ProductService {
         monAn.setGia(request.getGia());
         monAn.setSoLuongTon(request.getSoLuongTon());
         monAn.setMoTa(request.getMoTa());
+        monAn.setDonVi(request.getDonVi() == null || request.getDonVi().isBlank()
+                ? "phần"
+                : request.getDonVi().trim());
         monAn.setAvailable(request.getAvailable() == null || request.getAvailable());
     }
 }

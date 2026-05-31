@@ -122,29 +122,4 @@ public String resetPassword(
     public String getOrderDetail() {
         return "client/orders/order-detail";
     }
-
-    @GetMapping("/orders/reviews")
-    public String getOrderReviews() {
-        return "client/orders/reviews";
-    }
-
-    @GetMapping("/orders/reviews/create")
-    public String getReviewsCreate() {
-        return "client/orders/reviewsCreate";
-    }
-
-    @GetMapping("/orders/reviews/view")
-    public String getReviewsView() {
-        return "client/orders/reviewsView";
-    }
-
-    @GetMapping("/orders/reviews/update")
-    public String getReviewsUpdate() {
-        return "client/orders/reviewsUpdate";
-    }
-
-    @GetMapping("/orders/reviews/delete")
-    public String getReviewsDelete() {
-        return "client/orders/reviewsDelete";
-    }
 }

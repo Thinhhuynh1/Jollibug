@@ -48,6 +48,10 @@
                                     <input type="number" name="soLuongTon" min="0" value="0" required />
                                 </label>
                                 <label class="profile-field">
+                                    <span>Đơn vị</span>
+                                    <input type="text" name="donVi" placeholder="phần, cây, ly..." value="phần" />
+                                </label>
+                                <label class="profile-field">
                                     <span>Trạng thái</span>
                                     <select name="available">
                                         <option value="true" selected>Đang bán</option>

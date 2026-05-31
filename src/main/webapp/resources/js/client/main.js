@@ -97,6 +97,16 @@ document.addEventListener("DOMContentLoaded", function () {
             const button = form.querySelector("button[type='submit']");
             const originalText = button ? button.textContent : "";
             const apiUrl = form.dataset.addCartApi || "/api/cart/add";
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
+
+            function restoreScroll() {
+                window.scrollTo(scrollX, scrollY);
+            }
+
+            if (button) {
+                button.disabled = true;
+            }
 
             try {
                 const response = await fetch(apiUrl, {
@@ -119,17 +129,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (button) {
                     button.textContent = "Đã thêm";
+                    button.blur();
                 }
+
+                restoreScroll();
             } catch (error) {
                 if (button) {
                     button.textContent = "Thử lại";
+                    button.blur();
                 }
+                restoreScroll();
             } finally {
                 window.setTimeout(function () {
                     if (button) {
                         button.disabled = false;
                         button.textContent = originalText;
                     }
+                    restoreScroll();
                 }, 1200);
             }
         });

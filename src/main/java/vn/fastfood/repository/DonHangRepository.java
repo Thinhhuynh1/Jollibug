@@ -97,4 +97,6 @@ List<Object[]> revenueByMonth(@Param("year") int year);
     // Đơn hàng gần đây
     @Query("SELECT d FROM DonHang d ORDER BY d.ngayDat DESC")
     List<DonHang> findRecentOrders(Pageable pageable);
+
+    List<DonHang> findByUser_MaTKAndTrangThaiOrderByNgayDatDesc(Long maTK, String trangThai);
 }

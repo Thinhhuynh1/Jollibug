@@ -49,6 +49,10 @@
                                     <input type="number" name="soLuongTon" min="0" value="${monAn.soLuongTon}" required />
                                 </label>
                                 <label class="profile-field">
+                                    <span>Đơn vị</span>
+                                    <input type="text" name="donVi" value="${empty monAn.donVi ? 'phần' : monAn.donVi}" />
+                                </label>
+                                <label class="profile-field">
                                     <span>Trạng thái</span>
                                     <select name="available">
                                         <option value="true" <c:if test="${monAn.available}">selected</c:if>>Đang bán</option>

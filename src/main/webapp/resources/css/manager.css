@@ -232,3 +232,75 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* Danh sách món ăn — tìm kiếm / sắp xếp */
+.manager-flash {
+  margin: 0 var(--space-6, 1.5rem) var(--space-4, 1rem);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md, 0.5rem);
+  font-size: 0.92rem;
+}
+
+.manager-flash--success {
+  background: #ecfdf3;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.manager-flash--error {
+  background: #fff4f5;
+  color: #9f1d24;
+  border: 1px solid #f1c0c4;
+}
+
+.manager-feature-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.manager-feature-tag {
+  font-size: 0.82rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 248, 238, 0.9);
+  border: 1px solid rgba(111, 82, 55, 0.12);
+  color: var(--color-ink-700, #4a4038);
+}
+
+.manager-products-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.manager-products-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.manager-search-field {
+  flex: 1 1 16rem;
+  min-width: 14rem;
+}
+
+.manager-result-summary {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+  color: var(--color-ink-600, #6b5f54);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

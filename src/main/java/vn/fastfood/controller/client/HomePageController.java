@@ -107,4 +107,9 @@ public class HomePageController {
         return "redirect:/chat";
     }
 
+    @GetMapping("/complaints")
+    public String getComplaintsPage() {
+        return "client/complaints";
+    }
+
 }

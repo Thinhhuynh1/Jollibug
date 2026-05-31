@@ -57,10 +57,17 @@ async function loadCart() {
 
             const imageUrl = item.imageUrl || "https://static.kfcvietnam.com.vn/images/items/lg/6-COB-April.jpg?v=3ydVxg";
 
+            const donGia = Number(item.donGia || 0);
+            const donGiaGoc = Number(item.donGiaGoc || donGia);
+            const hasDiscount = donGiaGoc > donGia;
+
             const line = document.createElement("article");
             line.className = "cart-line";
             line.id = `cart-line-${item.maMon}`;
-            line.dataset.price = item.donGia || 0;
+            line.dataset.price = donGia;
+            if (hasDiscount) {
+                line.dataset.origPrice = donGiaGoc;
+            }
 
             line.innerHTML = `
                 <div class="cart-line__thumb">
@@ -73,7 +80,6 @@ async function loadCart() {
 
                 <div class="cart-line__meta">
                     <h3 class="cart-line__name">${item.tenMon || `Món #${item.maMon}`}</h3>
-                    <p class="cart-line__unit">Mã món: ${item.maMon}</p>
 
                     <div class="cart-line__controls">
                         <a class="cart-link-btn" href="#" data-action="remove" onclick="removeCartItem(event, ${item.maMon})">
@@ -82,13 +88,16 @@ async function loadCart() {
 
                         <div class="cart-line__purchase">
                             <div class="qty-stepper" aria-label="Chỉnh số lượng">
-                                <button class="qty-stepper__btn" type="button" onclick="changeQuantity(${item.maMon}, -1)">-</button>
+                                <button class="qty-stepper__btn" type="button" aria-label="Giảm số lượng" onclick="changeQuantity(${item.maMon}, -1)">-</button>
                                 <span class="qty-stepper__value" id="qty-${item.maMon}">${soLuong}</span>
-                                <button class="qty-stepper__btn" type="button" onclick="changeQuantity(${item.maMon}, 1)">+</button>
+                                <button class="qty-stepper__btn" type="button" aria-label="Tăng số lượng" onclick="changeQuantity(${item.maMon}, 1)">+</button>
                             </div>
-                            <strong class="cart-line__sum" id="sum-${item.maMon}">
-                                ${formatMoney(thanhTien)}
-                            </strong>
+                            <div style="display:flex;flex-direction:column;align-items:flex-end;">
+                                ${hasDiscount ? `<span style="text-decoration:line-through;color:#999;font-size:0.85em;font-weight:500;" id="orig-${item.maMon}">${formatMoney(donGiaGoc * soLuong)}</span>` : ""}
+                                <strong class="cart-line__sum" id="sum-${item.maMon}">
+                                    ${formatMoney(thanhTien)}
+                                </strong>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -147,6 +156,14 @@ async function changeQuantity(maMon, delta) {
     const sumEl = document.getElementById(`sum-${maMon}`);
     if (sumEl) {
         sumEl.textContent = formatMoney(newLineTotal);
+    }
+
+    const origEl = document.getElementById(`orig-${maMon}`);
+    if (origEl) {
+        const origUnit = Number(line.dataset.origPrice || 0);
+        if (origUnit > 0) {
+            origEl.textContent = formatMoney(origUnit * newQty);
+        }
     }
 
     recalculateSummaryFromDOM();

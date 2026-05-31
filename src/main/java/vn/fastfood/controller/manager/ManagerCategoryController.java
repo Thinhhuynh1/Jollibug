@@ -1,37 +1,29 @@
 package vn.fastfood.controller.manager;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import vn.fastfood.entity.DanhMuc;
+import vn.fastfood.dto.CategoryRequest;
 import vn.fastfood.repository.DanhMucRepository;
+import vn.fastfood.service.CategoryService;
 
 @Controller
 public class ManagerCategoryController {
+    private final CategoryService categoryService;
     private final DanhMucRepository danhMucRepository;
 
-    ManagerCategoryController(DanhMucRepository danhMucRepository) {
+    ManagerCategoryController(CategoryService categoryService, DanhMucRepository danhMucRepository) {
+        this.categoryService = categoryService;
         this.danhMucRepository = danhMucRepository;
     }
 
     @GetMapping("/manager/categories")
     public String getCategoriesPage(Model model) {
-        List<DanhMuc> listDanhMuc = this.danhMucRepository.findListDanhMuc();
-        Map<Long, Long> soLuongMonMap = new HashMap<>();
-
-        for (DanhMuc danhMuc : listDanhMuc) {
-            soLuongMonMap.put(danhMuc.getMaDM(), this.danhMucRepository.countMonAn(danhMuc.getMaDM()));
-        }
-
-        model.addAttribute("listDanhMuc", listDanhMuc);
-        model.addAttribute("soLuongMonMap", soLuongMonMap);
+        model.addAttribute("listDanhMuc", categoryService.listCategories());
         return "manager/categories/show";
     }
 
@@ -42,66 +34,86 @@ public class ManagerCategoryController {
 
     @PostMapping("/manager/categories/create")
     public String postCreate(@RequestParam("tenDM") String tenDM,
-            @RequestParam("moTa") String moTa,
-            @RequestParam("available") boolean available) {
-        DanhMuc danhMuc = new DanhMuc();
-        danhMuc.setTenDM(tenDM);
-        danhMuc.setAvailable(available);
-        danhMuc.setMoTa(moTa);
-        this.danhMucRepository.save(danhMuc);
+            @RequestParam(value = "moTa", required = false) String moTa,
+            @RequestParam(value = "available", defaultValue = "true") boolean available,
+            RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.createCategory(buildRequest(tenDM, moTa, available));
+            redirectAttributes.addFlashAttribute("message", "Đã thêm danh mục thành công.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/manager/categories";
     }
 
     @GetMapping("/manager/categories/detail")
     public String getCategoriesDetailPage(@RequestParam(value = "categoryID", required = false) Long categoryID,
             Model model) {
-        model.addAttribute("danhMuc", this.danhMucRepository.findDanhMuc(categoryID));
-        model.addAttribute("soLuongMon", this.danhMucRepository.countMonAn(categoryID));
-        return "manager/categories/detail";
+        return categoryService.findCategory(categoryID)
+                .map(danhMuc -> {
+                    model.addAttribute("danhMuc", danhMuc);
+                    model.addAttribute("soLuongMon", danhMucRepository.countMonAn(danhMuc.getMaDM()));
+                    return "manager/categories/detail";
+                })
+                .orElse("redirect:/manager/categories");
     }
 
     @GetMapping("/manager/categories/update")
     public String getCategoriesUpdatePage(@RequestParam(value = "categoryID", required = false) Long categoryID,
             Model model) {
-        if (categoryID == null) {
-            return "redirect:/manager/categories";
-        }
-        DanhMuc danhMuc = this.danhMucRepository.findById(categoryID).orElse(null);
-        if (danhMuc == null) {
-            return "redirect:/manager/categories";
-        }
-        model.addAttribute("danhMuc", danhMuc);
-        return "manager/categories/update";
+        return categoryService.findCategory(categoryID)
+                .map(danhMuc -> {
+                    model.addAttribute("danhMuc", danhMuc);
+                    return "manager/categories/update";
+                })
+                .orElse("redirect:/manager/categories");
     }
 
     @PostMapping("/manager/categories/update")
     public String postCategoriesUpdate(
             @RequestParam("categoryID") Long categoryID,
             @RequestParam("tenDM") String tenDM,
-            @RequestParam("moTa") String moTa,
-            @RequestParam("available") boolean available) {
-        DanhMuc danhMuc = this.danhMucRepository.findDanhMuc(categoryID);
-
-        danhMuc.setTenDM(tenDM);
-        danhMuc.setMoTa(moTa);
-        danhMuc.setAvailable(available);
-        this.danhMucRepository.save(danhMuc);
+            @RequestParam(value = "moTa", required = false) String moTa,
+            @RequestParam(value = "available", defaultValue = "true") boolean available,
+            RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.updateCategory(categoryID, buildRequest(tenDM, moTa, available));
+            redirectAttributes.addFlashAttribute("message", "Đã cập nhật danh mục thành công.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/manager/categories";
     }
 
     @GetMapping("/manager/categories/delete")
     public String getCategoriesDeletePage(@RequestParam(value = "categoryID", required = false) Long categoryID,
             Model model) {
-        model.addAttribute("danhMuc", this.danhMucRepository.findDanhMuc(categoryID));
-
-        return "manager/categories/delete";
+        return categoryService.findCategory(categoryID)
+                .map(danhMuc -> {
+                    model.addAttribute("danhMuc", danhMuc);
+                    model.addAttribute("soLuongMon", danhMucRepository.countMonAn(danhMuc.getMaDM()));
+                    return "manager/categories/delete";
+                })
+                .orElse("redirect:/manager/categories");
     }
 
     @PostMapping("/manager/categories/delete")
-    public String postDelete(@RequestParam("categoryID") Long categoryID) {
-        DanhMuc danhMuc = this.danhMucRepository.findDanhMuc(categoryID);
-        this.danhMucRepository.delete(danhMuc);
+    public String postDelete(@RequestParam("categoryID") Long categoryID,
+            RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.deleteCategory(categoryID);
+            redirectAttributes.addFlashAttribute("message", "Đã xóa danh mục thành công.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/manager/categories";
     }
 
+    private CategoryRequest buildRequest(String tenDM, String moTa, boolean available) {
+        CategoryRequest request = new CategoryRequest();
+        request.setTenDM(tenDM);
+        request.setMoTa(moTa);
+        request.setAvailable(available);
+        return request;
+    }
 }

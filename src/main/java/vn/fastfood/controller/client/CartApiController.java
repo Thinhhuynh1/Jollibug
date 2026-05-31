@@ -30,8 +30,9 @@ public class CartApiController {
 
         @GetMapping
         public ResponseEntity<List<CartItem>> getCart(
-                        @RequestParam("customerId") long customerId) {
-                return ResponseEntity.ok(cartService.getCartItems(customerId));
+                        @RequestParam("customerId") long customerId,
+                        HttpSession session) {
+                return ResponseEntity.ok(cartService.getCartItems(customerId, session));
         }
 
         @PostMapping("/add")
@@ -56,11 +57,13 @@ public class CartApiController {
 
         @PutMapping("/items")
         public ResponseEntity<Map<String, Object>> updateCartItem(
-                        @RequestBody CartUpdateRequest request) {
+                        @RequestBody CartUpdateRequest request,
+                        HttpSession session) {
                 boolean result = cartService.updateQuantity(
                                 request.getCustomerId(),
                                 request.getMaMon(),
-                                request.getSoLuong());
+                                request.getSoLuong(),
+                                session);
 
                 if (result) {
                         return ResponseEntity.ok(
@@ -78,8 +81,9 @@ public class CartApiController {
         @DeleteMapping("/items")
         public ResponseEntity<Map<String, Object>> removeCartItem(
                         @RequestParam("customerId") long customerId,
-                        @RequestParam("maMon") long maMon) {
-                boolean result = cartService.removeItem(customerId, maMon);
+                        @RequestParam("maMon") long maMon,
+                        HttpSession session) {
+                boolean result = cartService.removeItem(customerId, maMon, session);
 
                 if (result) {
                         return ResponseEntity.ok(

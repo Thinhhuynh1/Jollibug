@@ -72,8 +72,8 @@ INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan
 INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Tropical Sundae', N'Kem sữa tươi mềm mịn phủ xốt trái cây nhiệt đới thơm lừng và topping giòn tan.', 20000, 'Tropical_Sundae.png', 6, 1, 85, 30, SYSDATE, SYSDATE);
 INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sundae Dâu', N'Kem sữa tươi mát lạnh kết hợp cùng xốt dâu tây chua ngọt đậm vị.', 15000, 'Sundae_Dau.png', 6, 1, 190, 40, SYSDATE, SYSDATE);
 INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sundae Socola', N'Kem sữa tươi mát lạnh hòa quyện cùng xốt socola thơm béo, đậm đà.', 15000, 'Sundae_Socola.png', 6, 1, 220, 45, SYSDATE, SYSDATE);
-INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sôcôla (Cúp)', N'Kem ốc quế vị sôcôla mát lạnh, sảng khoái cực đã.', 7000, 'Kem_Socola.png', 6, 1, 315, 70, SYSDATE, SYSDATE);
-INSERT INTO monan (TenMon, MoTa, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sữa Tươi (Cúp)', N'Kem ốc quế sữa tươi truyền thống, chất kem mềm mịn ngọt ngào.', 5000, 'Kem.png', 6, 1, 480, 110, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, DonVi, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sôcôla', N'Kem ốc quế vị sôcôla mát lạnh, sảng khoái cực đã.', N'cây', 7000, 'Kem_Socola.png', 6, 1, 315, 70, SYSDATE, SYSDATE);
+INSERT INTO monan (TenMon, MoTa, DonVi, Gia, image_url, MaDM, IsAvailable, SoLuongDaBan, SoLuongTon, created_at, updated_at) VALUES (N'Kem Sữa Tươi', N'Kem ốc quế sữa tươi truyền thống, chất kem mềm mịn ngọt ngào.', N'cây', 5000, 'Kem.png', 6, 1, 480, 110, SYSDATE, SYSDATE);
 COMMIT;
 
 -- ===================================================================
@@ -214,4 +214,24 @@ INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 7, 1, 45000);
 INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 11, 2, 35000);
 INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 15, 1, 15000);
 INSERT INTO CHITIETDH (MaDH, MaMon, SoLuong, DonGia) VALUES (5, 24, 3, 12000);
+COMMIT;
+
+-- ===================================================================
+-- ĐÁNH GIÁ MẪU (SAMPLE REVIEWS)
+-- ===================================================================
+INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG)
+  VALUES (1, 1, 1, 5, N'Gà giòn rụm, giao hàng nhanh.', TIMESTAMP '2026-01-06 09:00:00');
+INSERT INTO DANHGIA (MaTK_KH, MaMon, MaDH, Sao, NoiDung, NgayDG)
+  VALUES (6, 6, 2, 4, N'Combo ngon, đóng gói cẩn thận.', TIMESTAMP '2026-01-09 14:30:00');
+COMMIT;
+
+-- ===================================================================
+-- ĐỊA CHỈ MẪU (SAMPLE ADDRESSES)
+-- ===================================================================
+INSERT INTO DIACHI (MaTK, TenDiaChi, TenNguoiNhan, SDTNguoiNhan, DiaChiCuThe, TinhThanh, QuanHuyen, PhuongXa, isDefault, created_at, updated_at)
+  VALUES (1, N'Nhà riêng', N'User A', '0900000001', N'123 Nguyễn Huệ', N'TP.HCM', N'Quận 1', N'Bến Nghé', 1, SYSDATE, SYSDATE);
+INSERT INTO DIACHI (MaTK, TenDiaChi, TenNguoiNhan, SDTNguoiNhan, DiaChiCuThe, TinhThanh, QuanHuyen, PhuongXa, isDefault, created_at, updated_at)
+  VALUES (1, N'Công ty', N'User A', '0900000001', N'45 Lê Lợi', N'TP.HCM', N'Quận 1', N'Bến Nghé', 0, SYSDATE, SYSDATE);
+INSERT INTO DIACHI (MaTK, TenDiaChi, TenNguoiNhan, SDTNguoiNhan, DiaChiCuThe, TinhThanh, QuanHuyen, PhuongXa, isDefault, created_at, updated_at)
+  VALUES (6, N'Nhà riêng', N'User F', '0900000006', N'45 Lê Lợi', N'TP.HCM', N'Quận 1', N'Bến Nghé', 1, SYSDATE, SYSDATE);
 COMMIT;

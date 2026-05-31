@@ -10,73 +10,58 @@
     <link rel="stylesheet" href="<c:url value='/css/global.css'/>" />
     <link rel="stylesheet" href="<c:url value='/css/components.css'/>" />
     <link rel="stylesheet" href="<c:url value='/css/admin.css'/>" />
-    <link rel="stylesheet" href="<c:url value='/css/client/profile.css'/>" />
+    <link rel="stylesheet" href="<c:url value='/css/manager.css'/>" />
 </head>
 <body data-admin-role="manager" data-admin-page="products">
     <div class="admin-shell admin-body">
         <jsp:include page="../layout/sidebar.jsp" />
         <main class="admin-main">
             <jsp:include page="../layout/topbar.jsp" />
-            <div style="max-width:52rem; margin:0 auto; width:100%;">
-                <section class="profile-content">
-                    <section class="profile-section">
-                        <h1 class="profile-title">Chi tiết món ăn</h1>
-                        <div class="profile-form">
-                            <div class="profile-grid">
-                                <fmt:formatNumber var="giaFormatted" value="${monAn.gia}" type="number" groupingUsed="true" />
-                                <label class="profile-field">
-                                    <span>Mã món</span>
-                                    <input type="text" value="${monAn.maMon}" readonly />
-                                </label>
-                                <label class="profile-field">
-                                    <span>Tên món</span>
-                                    <input type="text" value="${monAn.tenMon}" readonly />
-                                </label>
-                                <label class="profile-field">
-                                    <span>Danh mục</span>
-                                    <input type="text" value="${monAn.danhMuc.tenDM}" readonly />
-                                </label>
-                                <label class="profile-field">
-                                    <span>Giá bán</span>
-                                    <input type="text" value="${giaFormatted}đ" readonly />
-                                </label>
-                                <label class="profile-field">
-                                    <span>Tồn kho</span>
-                                    <input type="text" value="${monAn.soLuongTon}" readonly />
-                                </label>
-                                <label class="profile-field">
-                                    <span>Đã bán</span>
-                                    <input type="text" value="${monAn.soLuongDaBan}" readonly />
-                                </label>
-                                <label class="profile-field">
-                                    <span>Trạng thái</span>
-                                    <input type="text" value="${monAn.available ? 'Đang bán' : 'Tạm ẩn'}" readonly />
-                                </label>
-                                <label class="profile-field" style="grid-column:1/-1;">
-                                    <span>Mô tả</span>
-                                    <textarea rows="3" readonly style="width:100%;">${monAn.moTa}</textarea>
-                                </label>
-                                <div class="profile-field" style="grid-column:1/-1;">
-                                    <span>Hình ảnh</span>
-                                    <c:if test="${not empty monAn.img}">
-                                        <img src="<c:url value='/images/${monAn.img}'/>" alt="${monAn.tenMon}"
-                                             style="max-width:220px; border-radius:8px; margin-top:0.5rem;" />
-                                    </c:if>
-                                    <c:if test="${empty monAn.img}">
-                                        <p class="muted">Chưa có ảnh</p>
-                                    </c:if>
-                                </div>
-                            </div>
-                            <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:2rem;">
-                                <a href="<c:url value='/manager/products'/>" class="btn btn-ghost">Quay lại</a>
-                                <a href="<c:url value='/manager/products/update'><c:param name='productID' value='${monAn.maMon}'/></c:url>"
-                                   class="profile-submit" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none; max-width:180px;">Sửa món</a>
-                                <a href="<c:url value='/manager/products/delete'><c:param name='productID' value='${monAn.maMon}'/></c:url>"
-                                   class="btn btn-ghost" style="color:#d32f2f;">Xóa món</a>
+
+            <div class="manager-delete-wrap" style="max-width:48rem;">
+                <div class="manager-delete-card">
+                    <div class="manager-delete-card__header" style="background:linear-gradient(135deg,#fff9f5,#fff4e8); border-bottom-color:rgba(111,82,55,0.12);">
+                        <div class="manager-delete-card__icon" style="background:var(--color-red-500,#d94436);">🍔</div>
+                        <div>
+                            <h1>Chi tiết món ăn</h1>
+                            <p>Mã #${monAn.maMon}</p>
+                        </div>
+                    </div>
+
+                    <div class="manager-delete-preview">
+                        <c:choose>
+                            <c:when test="${not empty monAn.img}">
+                                <img class="manager-delete-preview__img" src="<c:url value='/images/${monAn.img}'/>" alt="${monAn.tenMon}" />
+                            </c:when>
+                            <c:otherwise>
+                                <div class="manager-delete-preview__img manager-delete-preview__img--empty">Chưa có ảnh</div>
+                            </c:otherwise>
+                        </c:choose>
+                        <div class="manager-delete-preview__body">
+                            <strong>${monAn.tenMon}</strong>
+                            <div class="manager-delete-preview__meta">
+                                <span>Danh mục: ${monAn.danhMuc.tenDM}</span>
+                                <span>Giá: <fmt:formatNumber value="${monAn.gia}" type="number" groupingUsed="true"/>đ</span>
+                                <span>Tồn: ${monAn.soLuongTon}</span>
+                                <span>Đã bán: ${monAn.soLuongDaBan}</span>
+                                <span>Trạng thái: ${monAn.available ? 'Đang bán' : 'Tạm ẩn'}</span>
                             </div>
                         </div>
-                    </section>
-                </section>
+                    </div>
+
+                    <c:if test="${not empty monAn.moTa}">
+                        <div style="padding:0 1.5rem 1rem;">
+                            <strong style="font-size:0.88rem;color:var(--color-ink-600);">Mô tả</strong>
+                            <p style="margin:0.35rem 0 0;line-height:1.55;">${monAn.moTa}</p>
+                        </div>
+                    </c:if>
+
+                    <div class="manager-delete-actions">
+                        <a href="<c:url value='/manager/products'/>" class="btn btn-ghost">← Quay lại danh sách</a>
+                        <a href="<c:url value='/manager/products/update'><c:param name='productID' value='${monAn.maMon}'/></c:url>" class="btn btn-primary">Sửa món</a>
+                        <a href="<c:url value='/manager/products/delete'><c:param name='productID' value='${monAn.maMon}'/></c:url>" class="btn btn-ghost" style="color:#d32f2f;">Xóa món</a>
+                    </div>
+                </div>
             </div>
         </main>
     </div>

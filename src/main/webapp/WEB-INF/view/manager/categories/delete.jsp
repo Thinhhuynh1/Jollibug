@@ -46,21 +46,33 @@
               </div>
             </div>
 
-            <div class="manager-delete-warning">
-              Danh mục sẽ bị xóa vĩnh viễn. Các món ăn thuộc danh mục này có thể bị ảnh hưởng.
-            </div>
+            <c:choose>
+              <c:when test="${soLuongMon > 0}">
+                <div class="manager-delete-warning">
+                  Không thể xóa danh mục này vì còn <strong>${soLuongMon}</strong> món ăn. Hãy chuyển hoặc xóa các món trước.
+                </div>
+                <div class="manager-delete-actions">
+                  <a href="<c:url value='/manager/categories'/>" class="btn btn-ghost">Quay lại danh sách</a>
+                </div>
+              </c:when>
+              <c:otherwise>
+                <div class="manager-delete-warning">
+                  Danh mục sẽ bị xóa vĩnh viễn. Thao tác không thể hoàn tác.
+                </div>
 
-            <label class="manager-delete-confirm">
-              <input type="checkbox" data-delete-confirm-check />
-              <span>Tôi hiểu và muốn xóa danh mục <strong>${danhMuc.tenDM}</strong> khỏi hệ thống.</span>
-            </label>
+                <label class="manager-delete-confirm">
+                  <input type="checkbox" data-delete-confirm-check />
+                  <span>Tôi hiểu và muốn xóa danh mục <strong>${danhMuc.tenDM}</strong> khỏi hệ thống.</span>
+                </label>
 
-            <div class="manager-delete-actions">
-              <a href="<c:url value='/manager/categories'/>" class="btn btn-ghost">Hủy, quay lại danh sách</a>
-              <button type="submit" class="btn-delete-submit" data-delete-submit disabled>
-                Xác nhận xóa
-              </button>
-            </div>
+                <div class="manager-delete-actions">
+                  <a href="<c:url value='/manager/categories'/>" class="btn btn-ghost">Hủy, quay lại danh sách</a>
+                  <button type="submit" class="btn-delete-submit" data-delete-submit disabled>
+                    Xác nhận xóa
+                  </button>
+                </div>
+              </c:otherwise>
+            </c:choose>
           </div>
         </form>
       </div>

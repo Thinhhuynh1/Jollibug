@@ -21,37 +21,38 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.fastfood.dto.ProductRequest;
 import vn.fastfood.dto.ProductResponse;
 import vn.fastfood.entity.MonAn;
-import vn.fastfood.repository.MonAnRepository;
 import vn.fastfood.service.ProductService;
 
 @RestController
 @RequestMapping("/api/manager/products")
 public class ManagerProductApiController {
     private final ProductService productService;
-    private final MonAnRepository monAnRepository;
 
-    public ManagerProductApiController(ProductService productService, MonAnRepository monAnRepository) {
+    public ManagerProductApiController(ProductService productService) {
         this.productService = productService;
-        this.monAnRepository = monAnRepository;
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> listProducts(
+    public ResponseEntity<Map<String, Object>> listProducts(
             @RequestParam(value = "categoryID", required = false) Long categoryID,
-            @RequestParam(value = "keyword", required = false) String keyword) {
-        if (keyword != null) {
-            keyword = keyword.trim();
-        }
-        List<ProductResponse> products = monAnRepository.findMonAn(categoryID, keyword).stream()
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "filter", required = false, defaultValue = "popular") String filter,
+            @RequestParam(value = "status", required = false) String status) {
+        List<ProductResponse> products = productService.searchProducts(categoryID, keyword, filter, status).stream()
                 .map(ProductResponse::from)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "total", products.size(),
+                "data", products));
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<?> getProduct(@PathVariable long productId) {
+    public ResponseEntity<Map<String, Object>> getProduct(@PathVariable long productId) {
         return productService.findProduct(productId)
-                .<ResponseEntity<?>>map(monAn -> ResponseEntity.ok(ProductResponse.from(monAn)))
+                .map(monAn -> ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "data", ProductResponse.from(monAn))))
                 .orElseGet(() -> ResponseEntity.status(404).body(Map.of(
                         "success", false,
                         "message", "Khong tim thay mon an.")));
