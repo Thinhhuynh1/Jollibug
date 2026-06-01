@@ -415,7 +415,7 @@ public class OrderDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, maDH);
+            ps.setLong(1, orderId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

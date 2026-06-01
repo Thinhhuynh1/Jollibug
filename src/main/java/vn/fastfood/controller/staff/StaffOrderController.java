@@ -38,7 +38,7 @@ public class StaffOrderController {
 
     @GetMapping("/{maDH}")
     public ResponseEntity<?> getOrderDetailForStaff(@PathVariable("maDH") long maDH) {
-        Order order = orderService.getOrderByMaDHForStaff(maDH);
+        Order order = orderService.getOrderByIdForStaff(maDH);
 
         if (order == null) {
             return ResponseEntity.status(404).body(Map.of("success", false, "message", "Không tìm thấy đơn hàng."));

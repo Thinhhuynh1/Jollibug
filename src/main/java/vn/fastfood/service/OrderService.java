@@ -146,7 +146,7 @@ public class OrderService {
     }
 
     public boolean updateOrderStatusByStaff(long maDH, long staffId, String nextStatus, String cancelReason) {
-        Order order = orderDAO.getOrderByMaDHForStaff(maDH);
+        Order order = orderDAO.getOrderByIdForStaff(maDH);
         if (order == null) {
             System.out.println("[STAFF UPDATE] Không tìm thấy đơn hàng.");
             return false;

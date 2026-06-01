@@ -183,23 +183,25 @@ public class KhuyenMaiService {
     private void updateChiTietKhuyenMai(ChuongTrinhKhuyenMai khuyenMai,
             String phamViApDung,
             List<Long> selectedMonAnIds) {
-        if (!APPLY_ITEM.equals(phamViApDung) || selectedMonAnIds == null || selectedMonAnIds.isEmpty()) {
+        if (khuyenMai.getChiTietKhuyenMais() == null) {
             khuyenMai.setChiTietKhuyenMais(new ArrayList<>());
+        } else {
+            khuyenMai.getChiTietKhuyenMais().clear();
+        }
+
+        if (!APPLY_ITEM.equals(phamViApDung) || selectedMonAnIds == null || selectedMonAnIds.isEmpty()) {
             return;
         }
 
         List<MonAn> monAnDuocChon = monAnRepository.findAllById(selectedMonAnIds);
-        List<ChiTietKhuyenMai> chiTietKhuyenMaiList = new ArrayList<>();
 
         for (MonAn monAn : monAnDuocChon) {
             ChiTietKhuyenMai chiTiet = new ChiTietKhuyenMai();
             chiTiet.setKhuyenMai(khuyenMai);
             chiTiet.setMonAn(monAn);
             chiTiet.setPhanTramGiam(khuyenMai.getPhanTramGiam());
-            chiTietKhuyenMaiList.add(chiTiet);
+            khuyenMai.getChiTietKhuyenMais().add(chiTiet);
         }
-
-        khuyenMai.setChiTietKhuyenMais(chiTietKhuyenMaiList);
     }
 
     private void resetKhuyenMai(List<MonAn> monAnList) {
