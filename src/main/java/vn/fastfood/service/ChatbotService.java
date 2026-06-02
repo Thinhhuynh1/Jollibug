@@ -16,15 +16,19 @@ public class ChatbotService {
 
         private final ChatClient chatClient;
         private final MonAnRepository monAnRepository;
+        private final KhuyenMaiService khuyenMaiService;
 
         public ChatbotService(OpenAiChatModel chatModel,
-                        MonAnRepository monAnRepository) {
+                        MonAnRepository monAnRepository,
+                        KhuyenMaiService khuyenMaiService) {
                 this.chatClient = ChatClient.create(chatModel);
                 this.monAnRepository = monAnRepository;
+                this.khuyenMaiService = khuyenMaiService;
         }
 
         public String ask(String message) {
                 List<MonAn> menuItems = monAnRepository.findListMonAn();
+                khuyenMaiService.applyKhuyenMai(menuItems);
 
                 String menuContext = menuItems.stream()
                                 .map(this::toMenuLine)
@@ -61,11 +65,11 @@ public class ChatbotService {
 
         private String toMenuLine(MonAn item) {
                 String category = item.getDanhMuc() != null ? item.getDanhMuc().getTenDM() : "Khác";
-                String description = item.getMoTa() != null ? item.getMoTa() : "";
+                long price = item.isHasGiamGia() ? item.getGiaGiam() : item.getGia();
                 return String.format("- %s | %s | %dd",
                                 item.getTenMon(),
                                 category,
-                                item.getGia());
+                                price);
         }
 
         /**
