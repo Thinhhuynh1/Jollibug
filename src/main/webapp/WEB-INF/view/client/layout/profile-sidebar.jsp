@@ -12,7 +12,7 @@
   <div class="profile-sidebar__name">User Demo!</div>
   <a class="profile-sidebar__logout" href="/logout">Đăng xuất</a>
 
-  <nav class="profile-nav" aria-label="Profile navigation">
+  <nav class="profile-nav" aria-label="Điều hướng hồ sơ">
     <a href="/orders">Đơn hàng</a>
     <a href="/address">Địa chỉ của bạn</a>
     <a href="/profile">Chi tiết tài khoản</a>

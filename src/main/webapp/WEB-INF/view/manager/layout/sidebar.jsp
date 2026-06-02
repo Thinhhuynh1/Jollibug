@@ -16,14 +16,14 @@
         <span class="brand__mark">JB</span>
         <span class="brand__copy">
           <span class="brand__title">Quản lý Jollibug</span>
-          <span class="brand__tag">Control Center</span>
+          <span class="brand__tag">Trung tâm điều hành</span>
         </span>
       </div>
     </div>
 
     <nav class="admin-nav">
-      <span class="admin-nav__section">Workspace</span>
-      <a class="<c:if test='${currentPath == "/manager"}'>is-active</c:if>" href="<c:url value='/manager'/>">Dashboard</a>
+      <span class="admin-nav__section">Điều hướng</span>
+      <a class="<c:if test='${currentPath == "/manager"}'>is-active</c:if>" href="<c:url value='/manager'/>">Tổng quan</a>
       <a class="<c:if test='${fn:startsWith(currentPath, "/manager/categories")}'>is-active</c:if>" href="<c:url value='/manager/categories'/>">Quản lý danh mục</a>
       <a class="<c:if test='${fn:startsWith(currentPath, "/manager/products")}'>is-active</c:if>" href="<c:url value='/manager/products'/>">Quản lý món ăn</a>
       <a class="<c:if test='${fn:startsWith(currentPath, "/manager/coupons")}'>is-active</c:if>" href="<c:url value='/manager/coupons'/>">Quản lý mã giảm giá</a>

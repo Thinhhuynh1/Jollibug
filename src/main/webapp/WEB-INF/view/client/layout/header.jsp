@@ -19,7 +19,7 @@
 
         <header class="site-header" id="site-header">
           <div class="container site-header__inner">
-            <a class="brand" href="${homeUrl}" aria-label="Jollibug home">
+            <a class="brand" href="${homeUrl}" aria-label="Trang chủ Jollibug">
               <span class="brand__mark"><img src="/images/jollibug.png" alt="JB Logo"></span>
               <span class="brand__copy">
                 <span class="brand__title">Jollibug</span>
@@ -27,7 +27,7 @@
               </span>
             </a>
 
-            <nav class="main-nav" aria-label="Primary">
+            <nav class="main-nav" aria-label="Điều hướng chính">
               <a href="${homeUrl}" <c:if test="${currentPath == '/'}"> class="is-active"</c:if>>Trang chủ</a>
               <a href="${menuUrl}" <c:if test="${fn:contains(currentPath, '/menu')}"> class="is-active"</c:if>>Thực
                 đơn</a>

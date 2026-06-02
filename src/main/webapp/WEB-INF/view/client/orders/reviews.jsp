@@ -55,7 +55,7 @@
             </c:choose>
           </div>
 
-          <div class="client-tabs" role="tablist" aria-label="Order views">
+          <div class="client-tabs" role="tablist" aria-label="Chế độ xem đơn hàng">
             <a class="client-tab" href="/orders">Tất cả</a>
             <a class="client-tab" href="/orders/pending">Đang xử lý</a>
             <a class="client-tab" href="/orders/confirmed">Đã xác nhận</a>

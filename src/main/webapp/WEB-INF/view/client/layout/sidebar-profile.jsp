@@ -24,7 +24,7 @@
     <div class="profile-sidebar__name">${sessionScope.user.hoTen}</div>
     <a class="profile-sidebar__logout" href="/logout">Đăng xuất</a>
 
-    <nav class="profile-nav" aria-label="Profile navigation">
+    <nav class="profile-nav" aria-label="Điều hướng hồ sơ">
     <a href="${ordersUrl}"<c:if test="${ordersActive}"> class="is-active"</c:if>>Đơn hàng</a>
     <a href="${addressUrl}"<c:if test="${addressActive}"> class="is-active"</c:if>>Địa chỉ của bạn</a>
     <a href="${profileUrl}"<c:if test="${profileActive}"> class="is-active"</c:if>>Chi tiết tài khoản</a>

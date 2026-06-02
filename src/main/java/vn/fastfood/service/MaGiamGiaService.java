@@ -119,4 +119,25 @@ public class MaGiamGiaService {
         }
         return discount;
     }
+
+    public boolean canDeleteCoupon(Long couponId) {
+        if (couponId == null) {
+            return false;
+        }
+
+        return couponRepository.countOrdersUsingCoupon(couponId) == 0;
+    }
+
+    public boolean deleteCoupon(Long couponId) {
+        if (couponId == null || !couponRepository.existsById(couponId)) {
+            return false;
+        }
+
+        if (!canDeleteCoupon(couponId)) {
+            return false;
+        }
+
+        couponRepository.deleteById(couponId);
+        return true;
+    }
 }

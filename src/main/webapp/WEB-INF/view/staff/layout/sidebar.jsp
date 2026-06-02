@@ -9,7 +9,6 @@
 <c:set var="resolvedPath" value="${not empty pathWithinHandler ? pathWithinHandler : fn:substringAfter(requestUri, pageContext.request.contextPath)}" />
 <c:set var="currentPath" value="${empty resolvedPath ? '/' : resolvedPath}" />
 
-<!-- SECTION -->
 <aside class="admin-sidebar">
   <div class="admin-sidebar__inner">
     <div class="admin-brand">
@@ -17,12 +16,12 @@
         <span class="brand__mark">JB</span>
         <span class="brand__copy">
           <span class="brand__title">Nhân viên Jollibug</span>
-          <span class="brand__tag">Operations Portal</span>
+          <span class="brand__tag">Cổng vận hành</span>
         </span>
       </div>
     </div>
     <nav class="admin-nav">
-      <span class="admin-nav__section">Workspace</span>
+      <span class="admin-nav__section">Điều hướng</span>
       <a class="<c:if test='${fn:startsWith(currentPath, "/staff/orders")}'>is-active</c:if>" 
         href="<c:url value='/staff/orders'/>">
         Quản lý đơn hàng

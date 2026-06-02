@@ -1,5 +1,6 @@
 ﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -27,7 +28,7 @@
       <div class="cart-shell">
         <section class="cart-column">
           <article class="cart-panel">
-            <div class="cart-item-list">
+            <div class="cart-item-list" id="cartItems">
               <c:set var="tongSoLuong" value="0" />
               <c:set var="tongTien" value="0" />
               <c:forEach var="cartItem" items="${sessionScope.cart}">
@@ -80,7 +81,7 @@
                               <fmt:formatNumber type="number" value="${cartItem.donGiaGoc * cartItem.soLuong}" /> đ
                             </span>
                           </c:if>
-                          <strong class="cart-line__sum">
+                          <strong class="cart-line__sum" id="sum-${cartItem.maMon}">
                             <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> đ
                           </strong>
                         </div>
@@ -99,13 +100,13 @@
           <article class="summary-panel">
             <div style="display:flex; align-items:center; width:100%;">
               <h2 class="summary-panel__title">Tổng sản phẩm</h2>
-              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">0 MÓN</h2>
+              <h2 class="summary-count" id="summary-item-count" style="margin-left:auto;">${tongSoLuong} MÓN</h2>
             </div>
 
             <div class="summary-lines">
               <div class="summary-line summary-line--strong">
                 <span>Tổng tiền</span>
-                <strong id="summary-total">0 VND</strong>
+                <strong id="summary-total"><fmt:formatNumber type="number" value="${tongTien}" /> đ</strong>
               </div>
             </div>
 

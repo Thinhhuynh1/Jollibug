@@ -7,7 +7,7 @@
 <c:set var="userInitials" value="${not empty userName ? fn:toUpperCase(fn:substring(userName, 0, 1)) : 'A'}" />
 <div class="admin-topbar">
     <div class="admin-topbar__copy">
-        <h2>Jollibug Control Center</h2>
+        <h2>Trung tâm điều hành Jollibug</h2>
     </div>
     <div class="admin-topbar__user">
         <div class="admin-avatar" id="topbar-user-initials" aria-hidden="true">${userInitials}</div>

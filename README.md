@@ -27,13 +27,12 @@ Jollibug là đồ án xây dựng hệ thống bán thức ăn nhanh trực tuy
 > Jollibug là hệ thống hỗ trợ kinh doanh thức ăn nhanh, cho phép khách hàng xem thực đơn, đặt món, theo dõi đơn hàng và đánh giá sản phẩm. Đồng thời, hệ thống cũng cung cấp các trang quản trị dành cho nhân viên, quản lý và quản trị viên để xử lý đơn, theo dõi doanh thu, quản lý tài khoản, sản phẩm, danh mục, mã giảm giá và chương trình khuyến mãi.
 
 ## Thành viên nhóm
-| STT | Họ và tên | MSSV | Vai trò | Phân công |
+| STT | Họ và tên | MSSV | Vai trò | Link GitHUB |
 |---|---|---|---|---|
-| 1 | Nguyễn Mạnh Trí | 24521834 | Nhóm trưởng | Phân tích yêu cầu , Module User , CSDL
-| 2 | Huỳnh Nguyễn Hoàng Thịnh | 2452xxxx | Thành viên | Giao diện, JSP , Module Admin , CSKH 
-| 3 | Nguyễn Bá Thiên | 2452 | Thành viên |  kiểm thử  , Thống kê , Giảm giá  , Đánh giá
-| 4 | Nguyễn Khánh Vi | 2452xxxx | Thành viên | CSDL ,  đặt hàng , thanh toán , giỏ hàng
-| 4 | Trần Thư | 2452xxxx | Thành viên , module Quản lý , module Staff (nhân viên)
+| 1 | Nguyễn Mạnh Trí | 24521834 | Nhóm trưởng | https://github.com/TimoTino
+| 2 | Huỳnh Nguyễn Hoàng Thịnh | 24521681 | Thành viên | https://github.com/Thinhhuynh1
+| 3 | Nguyễn Bá Thiên | 24521662 | Thành viên | https://github.com/LawTx06
+| 4 | Trần Thư | 24521732 | Thành viên | https://github.com/tranthu296
 
 ## Điểm nổi bật
 
@@ -104,8 +103,8 @@ Jollibug là đồ án xây dựng hệ thống bán thức ăn nhanh trực tuy
 
 - `JSP`
 - `JSTL`
-- `HTML5`
-- `CSS3`
+- `HTML`
+- `CSS`
 - `JavaScript`
 - `Chart.js`
 
@@ -146,24 +145,6 @@ Jollibug/
 |-- mvnw
 |-- mvnw.cmd
 `-- sampledb.sql
-```
-
-## Cart API và AJAX
-
-Luồng thêm vào giỏ hàng phía client đã dùng `REST API` thay cho submit form đồng bộ:
-
-- Các form có `data-ajax-add-cart` sẽ được file `src/main/webapp/resources/js/client/add-to-cart.js` bắt sự kiện.
-- Client gửi `POST /api/cart/items` bằng `fetch` với các field như `productID` và `quantity`.
-- Server trả JSON gồm `success`, `message`, `cartCount`.
-- Giao diện cập nhật ngay số lượng trên header mà không cần reload trang.
-
-API hiện có:
-
-```http
-GET    /api/cart
-POST   /api/cart/items
-PUT    /api/cart/items
-DELETE /api/cart/items?maMon={id}
 ```
 
 ## Yêu cầu môi trường
@@ -250,12 +231,6 @@ Một số điểm đáng chú ý trong cấu hình hiện tại:
 - Dự án có cấu hình gửi email để xác thực tài khoản/quên mật khẩu.
 - Dự án có hỗ trợ WebSocket cho tính năng chat.
 
-### Lưu ý bảo mật
-
-- Không nên giữ trực tiếp tài khoản database hoặc API key email trong file `application.properties` khi đưa lên GitHub công khai.
-- Nên chuyển các thông tin nhạy cảm sang biến môi trường hoặc file cấu hình riêng cho từng máy.
-- Trong mã nguồn hiện tại, lớp `FastFoodApplication` đang loại trừ một số cấu hình auto security để thuận tiện cho quá trình phát triển. Khi triển khai thực tế, nên rà soát và bật lại cơ chế bảo mật phù hợp.
-
 ## Dữ liệu mẫu
 
 Dự án hiện có các nguồn dữ liệu hỗ trợ khởi tạo:
@@ -320,9 +295,3 @@ Nếu gặp lỗi khi khởi tạo dữ liệu:
 - Dự án đang phù hợp để trình bày như một đồ án môn học hoặc đồ án nhóm phát triển web Java.
 - README này đã chừa sẵn các phần để nhóm tùy chỉnh lại theo đúng thông tin chính thức trước khi nộp.
 
-<!-- có thể bổ sung thêm:
-  - sơ đồ use case
-  - sơ đồ cơ sở dữ liệu
-  - sơ đồ kiến trúc hệ thống
-  - video demo
-  - bảng phân công công việc và tiến độ -->

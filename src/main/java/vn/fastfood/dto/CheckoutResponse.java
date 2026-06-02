@@ -12,7 +12,7 @@ public class CheckoutResponse {
     }
 
     public CheckoutResponse(boolean success, String message, Long maDH,
-            Double tongTienMon, Double tienGiamGia, Double thanhTien) {
+    Double tongTienMon, Double tienGiamGia, Double thanhTien) {
         this.success = success;
         this.message = message;
         this.maDH = maDH;

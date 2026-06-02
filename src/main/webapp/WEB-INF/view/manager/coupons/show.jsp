@@ -23,6 +23,11 @@
         <main class="admin-main">
           <jsp:include page="../layout/topbar.jsp" />
           <section class="admin-panel">
+            <c:if test="${not empty couponMessage}">
+              <div class="message ${couponMessageType == 'success' ? 'is-success' : 'is-error'}" style="margin-bottom:1rem;">
+                ${couponMessage}
+              </div>
+            </c:if>
             <div class="panel-header">
               <div class="stack" style="gap:0.3rem;">
                 <h1 class="section-title" style="margin:0;">Quản lý mã giảm giá</h1>

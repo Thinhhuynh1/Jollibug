@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Staff - Quản lý đơn hàng</title>
+  <title>Jollibug | Nhân viên - Quản lý đơn hàng</title>
   <meta name="description" content="Jollibug Staff portal - quản lý đơn hàng đã xác nhận và chưa xác nhận." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />

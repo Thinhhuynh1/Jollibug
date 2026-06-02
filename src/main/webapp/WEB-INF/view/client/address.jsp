@@ -31,7 +31,7 @@
           <div class="profile-sidebar__name">User Demo!</div>
           <a class="profile-sidebar__logout" href="/logout">Đăng xuất</a>
 
-          <nav class="profile-nav" aria-label="Profile navigation">
+          <nav class="profile-nav" aria-label="Điều hướng hồ sơ">
             <a href="/orders">Đơn hàng</a>
             <a href="/address">Địa chỉ của bạn</a>
             <a class="is-active" href="/profile">Chi tiết tài khoản</a>
@@ -46,7 +46,7 @@
                   <h2 class="section-title">Địa chỉ đặt hàng của bạn</h2>
                 </div>
                 <button class="btn btn-primary" type="button" data-open-address-modal id="btn-open-address-modal">
-                    Add New Address
+                    Thêm địa chỉ mới
                 </button>
               </div>
 

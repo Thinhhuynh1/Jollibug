@@ -1,4 +1,4 @@
-package vn.fastfood.service;
+﻿package vn.fastfood.service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,6 +13,9 @@ import vn.fastfood.repository.MonAnRepository;
 
 @Service
 public class CartService {
+    private static final String PRODUCT_NOT_FOUND_MESSAGE = "Sản phẩm không tồn tại";
+    private static final String ADD_TO_CART_SUCCESS_MESSAGE = "Thêm vào giỏ hàng thành công";
+
     private final MonAnRepository monAnRepository;
     private final KhuyenMaiService khuyenMaiService;
 
@@ -58,7 +61,7 @@ public class CartService {
     public CartAddResult addSessionCart(Long productID, HttpSession session) {
         MonAn monAn = monAnRepository.findProduct(productID);
         if (monAn == null) {
-            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
+            return new CartAddResult(false, PRODUCT_NOT_FOUND_MESSAGE, 0);
         }
 
         khuyenMaiService.applyKhuyenMai(List.of(monAn));
@@ -68,7 +71,7 @@ public class CartService {
     public CartAddResult addSessionCart(Long productID, int quantity, HttpSession session) {
         MonAn monAn = monAnRepository.findProduct(productID);
         if (monAn == null) {
-            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
+            return new CartAddResult(false, PRODUCT_NOT_FOUND_MESSAGE, 0);
         }
 
         khuyenMaiService.applyKhuyenMai(List.of(monAn));
@@ -77,7 +80,7 @@ public class CartService {
 
     public CartAddResult addSessionCart(MonAn monAn, int quantity, HttpSession session) {
         if (monAn == null) {
-            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
+            return new CartAddResult(false, PRODUCT_NOT_FOUND_MESSAGE, 0);
         }
 
         if (quantity < 1) {
@@ -86,7 +89,7 @@ public class CartService {
 
         List<CartItem> cart = getSessionCart(session);
         CartItem cartItem = findCartItem(cart, monAn.getMaMon());
-        double gia = monAn.isHasGiamGia() ? monAn.getGiaGiam() : monAn.getGia();
+        double gia = resolveCartPrice(monAn);
         double giaGoc = monAn.getGia();
 
         if (cartItem != null) {
@@ -108,7 +111,18 @@ public class CartService {
         }
 
         session.setAttribute("cart", cart);
-        return new CartAddResult(true, "Thêm vào giỏ hàng thành công", countCartItems(cart));
+        return new CartAddResult(true, ADD_TO_CART_SUCCESS_MESSAGE, countCartItems(cart));
+    }
+
+    private double resolveCartPrice(MonAn monAn) {
+        double giaGoc = monAn.getGia();
+        double giaGiam = monAn.getGiaGiam();
+
+        if (giaGiam > 0 && giaGiam < giaGoc) {
+            return giaGiam;
+        }
+
+        return giaGoc;
     }
 
     public boolean updateSessionQuantity(HttpSession session, long maMon, int soLuong) {

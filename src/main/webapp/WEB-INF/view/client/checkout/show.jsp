@@ -6,8 +6,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Checkout</title>
-  <meta name="description" content="Jollibug checkout page: review order details, choose delivery address, apply voucher, and place your order." />
+  <title>Jollibug | Thanh toán</title>
+  <meta name="description" content="Trang thanh toán Jollibug: xem chi tiết đơn hàng, chọn địa chỉ giao, áp dụng mã giảm giá và hoàn tất đặt món." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -73,7 +73,7 @@
           <section class="payment-method-section">
             <h3 class="section-subtitle">Phương thức thanh toán</h3>
 
-            <div class="payment-options" role="radiogroup" aria-label="Payment method">
+            <div class="payment-options" role="radiogroup" aria-label="Phương thức thanh toán">
               <label class="payment-option">
                 <input type="radio" name="payment-method" value="COD" checked>
                 <div>

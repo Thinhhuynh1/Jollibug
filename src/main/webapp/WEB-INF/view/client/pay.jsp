@@ -1,13 +1,13 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Checkout</title>
-  <meta name="description" content="Jollibug checkout page: review order details, choose delivery address, apply voucher, and place your order." />
+  <title>Jollibug | Thanh toán</title>
+  <meta name="description" content="Trang thanh toán Jollibug: xác nhận phương thức thanh toán và hoàn tất giao dịch đơn hàng." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,19 +30,17 @@
       </div>
 
       <div class="checkout-layout">
-
         <section class="checkout-card checkout-sticky">
-
           <section>
             <h3 class="section-subtitle">Phương thức đã chọn</h3>
-            <div class="payment-options" role="radiogroup" aria-label="Payment method">
+            <div class="payment-options" role="radiogroup" aria-label="Phương thức thanh toán">
               <label class="payment-option">
                 <input type="radio" name="payment-method" value="COD" checked disabled />
                 <div>
                   <strong>Thanh toán khi nhận hàng (COD)</strong>
                 </div>
               </label>
-                <label class="payment-option">
+              <label class="payment-option">
                 <input type="radio" name="payment-method" value="CREDIT_CARD" disabled />
                 <div>
                   <strong>Thẻ tín dụng / Ghi nợ</strong>
@@ -64,10 +62,7 @@
               </label>
             </div>
 
-            <!-- Dynamic Payment Content -->
             <div id="payment-dynamic-content" style="margin-top: 1.5rem;">
-              
-              <!-- Form Thẻ Tín Dụng -->
               <div id="view-credit-card" class="payment-view" style="display: none;">
                 <div class="credit-card-form" style="display: grid; gap: 1rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
                   <label class="field-label" style="display: grid; gap: 6px;">
@@ -87,36 +82,31 @@
                 </div>
               </div>
 
-              <!-- Internet Banking -->
               <div id="view-banking" class="payment-view" style="display: none; text-align: center; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: #475569;">Quét mã QR dưới đây bằng ứng dụng ngân hàng của bạn:</p>
                 <div style="background: #fff; display: inline-block; padding: 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 1rem;">
-                  <!-- Dùng ảnh QR giả lập -->
-                  <img src="${pageContext.request.contextPath}/resources/images/QRJollibug.png" alt="QR Code" width="180" height="180" />
+                  <img src="${pageContext.request.contextPath}/resources/images/QRJollibug.png" alt="Mã QR thanh toán" width="180" height="180" />
                 </div>
                 <p style="margin: 0; font-size: 0.85rem; color: var(--color-red-600); font-weight: 700;">Hệ thống sẽ tự động xác nhận sau khi thanh toán thành công.</p>
               </div>
 
-              <!-- Ví điện tử -->
               <div id="view-ewallet" class="payment-view" style="display: none; text-align: center; background: #f8fafc; padding: 2rem; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <p style="margin: 0; font-size: 0.95rem; color: #475569;">Sau khi bấm <strong>Thanh toán</strong>, bạn sẽ được chuyển hướng an toàn đến cổng thanh toán của Ví điện tử.</p>
+                <p style="margin: 0; font-size: 0.95rem; color: #475569;">Sau khi bấm <strong>Thanh toán</strong>, bạn sẽ được chuyển hướng an toàn đến cổng thanh toán của ví điện tử.</p>
               </div>
 
-              <!-- COD -->
               <div id="view-cod" class="payment-view" style="display: block; text-align: center; background: #f8fafc; padding: 2rem; border-radius: 8px; border: 1px solid #e2e8f0;">
                 <p style="margin: 0; font-size: 0.95rem; color: #475569;">Bạn sẽ thanh toán bằng tiền mặt trực tiếp cho nhân viên giao hàng khi nhận được món ăn.</p>
               </div>
-
             </div>
           </section>
 
-          <!-- <button class="btn btn-primary btn-block" type="button" id="btn-place-order">Thanh toán</button> -->
           <div id="paymentMessage" class="payment-message"></div>
 
           <button class="btn btn-primary btn-block" type="button" id="confirmPaymentBtn" disabled>
             Đang xử lý thanh toán...
           </button>
         </section>
+
         <section class="checkout-card">
           <h2 class="checkout-card__title">Thông tin người đặt</h2>
           <div style="font-size: 0.95rem; color: #334155; display: grid; gap: 0.6rem; line-height: 1.4;">
@@ -139,7 +129,6 @@
 
           <hr class="checkout-divider" />
 
-          
           <div>
             <div class="invoice-line "><span>Tổng cộng</span><strong id="invoice-total">0 VND</strong></div>
           </div>
@@ -148,14 +137,9 @@
     </div>
   </main>
 
-
-
-
-    <!-- SHARED FOOTER -->
   <jsp:include page="layout/footer.jsp" />
 
   <script src="/js/client/main.js"></script>
   <script src="${pageContext.request.contextPath}/resources/js/client/payment-api.js"></script>
 </body>
 </html>
-

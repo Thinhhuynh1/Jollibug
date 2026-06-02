@@ -7,7 +7,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jollibug | Staff - Chăm sóc khách hàng</title>
+  <title>Jollibug | Nhân viên - Chăm sóc khách hàng</title>
   <meta name="description" content="Jollibug Staff portal - chat hỗ trợ, xử lý khiếu nại và phản hồi đánh giá." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />

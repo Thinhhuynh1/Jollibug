@@ -20,4 +20,7 @@ public interface MaGiamGiaRepository extends JpaRepository<MaGiamGia, Long> {
     List<MaGiamGia> searchByCode(@Param("keyword") String keyword);
 
     Optional<MaGiamGia> findByTenMa(String tenMa);
+
+    @Query("select count(d) from DonHang d where d.maGiamGia.maGG = :couponId")
+    long countOrdersUsingCoupon(@Param("couponId") Long couponId);
 }

@@ -1,4 +1,4 @@
-package vn.fastfood.dao;
+﻿package vn.fastfood.dao;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -346,9 +346,9 @@ public class OrderDAO {
             WHERE MaDH = ?
         """;
 
-        String reasonText = "[Há»§y Ä‘Æ¡n] LÃ½ do: "
+        String reasonText = "[Hủy đơn] Lý do: "
                 + (cancelReason == null || cancelReason.trim().isEmpty()
-                ? "KhÃ´ng cÃ³ lÃ½ do cá»¥ thá»ƒ"
+                ? "Không có lý do cụ thể"
                 : cancelReason.trim());
 
         try (Connection conn = DBConnection.getConnection();
@@ -473,7 +473,7 @@ public class OrderDAO {
 
             return value.toString();
         } catch (IOException e) {
-            throw new SQLException("Could not read order status history CLOB.", e);
+                    throw new SQLException("Không tìm thấy đơn hàng");
         }
     }
 }

@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-    private static final String URL = "jdbc:oracle:thin:@localhost:1521/orclpdb";
-    private static final String USERNAME = "fastfooddb";
-    private static final String PASSWORD = "123456";
+    private static final String URL = "jdbc:oracle:thin:@localhost:1521/mynewprojectdb";
+    private static final String USERNAME = "timo";
+    private static final String PASSWORD = "0710";
 
     public static Connection getConnection() throws SQLException {
         try {

@@ -30,7 +30,7 @@
         </div>
 
         <!-- SECTION -->
-        <section class="menu-toolbar reveal-up" aria-label="Menu filters">
+        <section class="menu-toolbar reveal-up" aria-label="Bộ lọc thực đơn">
           
           <form class="toolbar-row" method="get" action="/menu">
             <input type="hidden" name="categoryID" value="${selectCategoryID}" />
@@ -55,15 +55,15 @@
             </select>
           </form>
 
-          <div class="category-nav" aria-label="Menu categories">
-            <button class="category-nav__arrow" type="button" data-cat-arrow="prev" aria-label="Previous categories">&#10094;</button>
+          <div class="category-nav" aria-label="Danh mục thực đơn">
+            <button class="category-nav__arrow" type="button" data-cat-arrow="prev" aria-label="Danh mục trước">&#10094;</button>
             <div class="category-strip" data-menu-cats id="menu-categories">
               <a class="filter-pill ${selectCategoryID == null ? 'is-active' :''}" href="/menu?filter=${selectedFilter}&keyword=${keyword}">All</a>
               <c:forEach var="dm" items="${danhMuc}">
                 <a class="filter-pill ${selectCategoryID != null && selectCategoryID == dm.maDM ? 'is-active' : ''}" href="/menu?categoryID=${dm.maDM}&filter=${selectedFilter}&keyword=${keyword}" >${dm.tenDM}</a>
               </c:forEach>
             </div>
-            <button class="category-nav__arrow" type="button" data-cat-arrow="next" aria-label="Next categories">&#10095;</button>
+            <button class="category-nav__arrow" type="button" data-cat-arrow="next" aria-label="Danh mục tiếp theo">&#10095;</button>
           </div>
         </section>
 
@@ -73,7 +73,7 @@
                  data-cart-api-url="${pageContext.request.contextPath}/api/cart"
                  data-cart-url="${pageContext.request.contextPath}/cart"
                  data-checkout-url="${pageContext.request.contextPath}/checkout"
-                 aria-label="Voice ordering">
+                 aria-label="Đặt món bằng giọng nói">
           <div class="voice-ordering__main">
             <button class="voice-ordering__mic" type="button" data-voice-start aria-label="Bắt đầu đặt món bằng giọng nói">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -158,7 +158,7 @@
   <jsp:include page="layout/footer.jsp" />
   
     <div class="jb-ai-chat" data-jb-ai-chat>
-    <section class="jb-ai-chat__panel" data-chat-panel aria-label="Jollibug AI chat" aria-hidden="true">
+    <section class="jb-ai-chat__panel" data-chat-panel aria-label="Khung chat AI Jollibug" aria-hidden="true">
       <header class="jb-ai-chat__header">
         <div class="jb-ai-chat__avatar" aria-hidden="true">JB</div>
         <div class="jb-ai-chat__identity">

@@ -9,7 +9,6 @@
 <c:set var="resolvedPath" value="${not empty pathWithinHandler ? pathWithinHandler : fn:substringAfter(requestUri, pageContext.request.contextPath)}" />
 <c:set var="currentPath" value="${empty resolvedPath ? '/' : resolvedPath}" />
 
-<!-- SIDEBAR -->
 <aside class="admin-sidebar">
   <div class="admin-sidebar__inner">
     <div class="admin-brand">
@@ -17,14 +16,14 @@
         <span class="brand__mark"><img src="/images/jollibug.png" alt="JB Logo"></span>
         <span class="brand__copy">
           <span class="brand__title">Quản trị viên Jollibug</span>
-          <span class="brand__tag">Control Center</span>
+          <span class="brand__tag">Trung tâm điều hành</span>
         </span>
       </div>
     </div>
 
     <nav class="admin-nav">
-      <span class="admin-nav__section">Workspace</span>
-      <a class="<c:if test='${currentPath == "/admin"}'>is-active</c:if>" href="<c:url value='/admin'/>">Dashboard</a>
+      <span class="admin-nav__section">Điều hướng</span>
+      <a class="<c:if test='${currentPath == "/admin"}'>is-active</c:if>" href="<c:url value='/admin'/>">Tổng quan</a>
       <a class="<c:if test='${fn:startsWith(currentPath, "/admin/users")}'>is-active</c:if>" href="<c:url value='/admin/users'/>">Quản lý người dùng</a>
     </nav>
   </div>

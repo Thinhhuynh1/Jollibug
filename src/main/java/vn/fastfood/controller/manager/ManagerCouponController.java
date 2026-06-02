@@ -10,16 +10,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import vn.fastfood.entity.MaGiamGia;
 import vn.fastfood.repository.MaGiamGiaRepository;
+import vn.fastfood.service.MaGiamGiaService;
 
 @Controller
 public class ManagerCouponController {
     private final MaGiamGiaRepository couponRepository;
+    private final MaGiamGiaService maGiamGiaService;
 
-    public ManagerCouponController(MaGiamGiaRepository couponRepository) {
+    public ManagerCouponController(MaGiamGiaRepository couponRepository, MaGiamGiaService maGiamGiaService) {
         this.couponRepository = couponRepository;
+        this.maGiamGiaService = maGiamGiaService;
     }
 
     @GetMapping("/manager/coupons")
@@ -137,8 +141,29 @@ public class ManagerCouponController {
     }
 
     @PostMapping("/manager/coupons/delete")
-    public String postCouponsDelete(@RequestParam("couponID") Long couponID) {
-        this.couponRepository.deleteById(couponID);
+    public String postCouponsDelete(@RequestParam("couponID") Long couponID, RedirectAttributes redirectAttributes) {
+        if (couponID == null) {
+            redirectAttributes.addFlashAttribute("couponMessage", "Mã giảm giá không hợp lệ.");
+            redirectAttributes.addFlashAttribute("couponMessageType", "error");
+            return "redirect:/manager/coupons";
+        }
+
+        if (!maGiamGiaService.canDeleteCoupon(couponID)) {
+            redirectAttributes.addFlashAttribute("couponMessage",
+                    "Không thể xóa mã giảm giá này vì đã được áp dụng trong đơn hàng.");
+            redirectAttributes.addFlashAttribute("couponMessageType", "error");
+            return "redirect:/manager/coupons";
+        }
+
+        boolean deleted = maGiamGiaService.deleteCoupon(couponID);
+        if (!deleted) {
+            redirectAttributes.addFlashAttribute("couponMessage", "Không thể xóa mã giảm giá.");
+            redirectAttributes.addFlashAttribute("couponMessageType", "error");
+            return "redirect:/manager/coupons";
+        }
+
+        redirectAttributes.addFlashAttribute("couponMessage", "Xóa mã giảm giá thành công.");
+        redirectAttributes.addFlashAttribute("couponMessageType", "success");
         return "redirect:/manager/coupons";
     }
 
