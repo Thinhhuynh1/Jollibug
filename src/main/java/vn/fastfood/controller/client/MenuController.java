@@ -1,7 +1,8 @@
 package vn.fastfood.controller.client;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -12,27 +13,29 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import vn.fastfood.dao.ReviewDAO;
 import vn.fastfood.entity.MonAn;
-import vn.fastfood.model.CartItem;
 import vn.fastfood.repository.DanhMucRepository;
 import vn.fastfood.repository.MonAnRepository;
-import vn.fastfood.service.PromotionService;
-
-import java.net.URL;
-import java.net.MalformedURLException;
+import vn.fastfood.service.CartService;
+import vn.fastfood.service.KhuyenMaiService;
 
 @Controller
 public class MenuController {
     private final MonAnRepository monAnRepository;
     private final DanhMucRepository danhMucRepository;
-    private final PromotionService promotionService;
+    private final KhuyenMaiService khuyenmaiService;
+    private final CartService cartService;
+    private final ReviewDAO reviewDAO = new ReviewDAO();
 
     public MenuController(MonAnRepository monAnRepository,
             DanhMucRepository danhMucRepository,
-            PromotionService promotionService) {
+            KhuyenMaiService khuyenmaiService,
+            CartService cartService) {
         this.monAnRepository = monAnRepository;
         this.danhMucRepository = danhMucRepository;
-        this.promotionService = promotionService;
+        this.khuyenmaiService = khuyenmaiService;
+        this.cartService = cartService;
     }
 
     @GetMapping("/menu")
@@ -52,7 +55,8 @@ public class MenuController {
             list = this.monAnRepository.findMonAn(categoryID, keyword);
         }
 
-        this.promotionService.applyPromotions(list);
+        this.khuyenmaiService.applyKhuyenMai(list);
+        sortByDiscountedPrice(list, filter);
 
         model.addAttribute("listMonAn", list);
         model.addAttribute("selectCategoryID", categoryID);
@@ -65,8 +69,12 @@ public class MenuController {
     public String getProductDetail(Model model,
             @RequestParam("productID") Long productID) {
         MonAn monAn = this.monAnRepository.findProduct(productID);
+        model.addAttribute("monAn", monAn);
+        model.addAttribute("productReviews", this.reviewDAO.findReviewsByProduct(productID));
+        model.addAttribute("averageRating", this.reviewDAO.getAverageRatingByProduct(productID));
+        model.addAttribute("reviewCount", this.reviewDAO.countReviewsByProduct(productID));
         if (monAn != null) {
-            this.promotionService.applyPromotions(java.util.List.of(monAn));
+            this.khuyenmaiService.applyKhuyenMai(java.util.List.of(monAn));
         }
         model.addAttribute("monAn", monAn);
         return "client/product";
@@ -77,52 +85,15 @@ public class MenuController {
             HttpServletRequest request,
             HttpSession session) {
 
-        int quantity = 1;
         MonAn monAn = this.monAnRepository.findProduct(productID);
         if (monAn == null) {
             session.setAttribute("cartError", "Sản phẩm không tồn tại");
             return "redirect:/menu";
         }
 
-        // Áp dụng khuyến mãi để lấy giá sau giảm
-        this.promotionService.applyPromotions(java.util.List.of(monAn));
+        this.khuyenmaiService.applyKhuyenMai(java.util.List.of(monAn));
+        cartService.addSessionCart(monAn, 1, session);
 
-        @SuppressWarnings("unchecked")
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new ArrayList<>();
-        }
-
-        CartItem cartItem = null;
-        for (CartItem item : cart) {
-            if (item.getMaMon() == monAn.getMaMon()) {
-                cartItem = item;
-                break;
-            }
-        }
-
-        // Dùng giá giảm nếu có khuyến mãi, ngược lại dùng giá gốc
-        BigDecimal gia = BigDecimal.valueOf(monAn.getGiaGiam());
-        BigDecimal giaGoc = BigDecimal.valueOf(monAn.getGia());
-        if (cartItem != null) {
-            int soLuong = cartItem.getSoLuong() + quantity;
-            cartItem.setSoLuong(soLuong);
-            cartItem.setDonGia(gia);
-            cartItem.setThanhTien(gia.multiply(BigDecimal.valueOf(soLuong)));
-            cartItem.setDonGiaGoc(giaGoc);
-        } else {
-            CartItem item = new CartItem();
-            item.setMaMon(monAn.getMaMon());
-            item.setTenMon(monAn.getTenMon());
-            item.setSoLuong(quantity);
-            item.setDonGia(gia);
-            item.setThanhTien(gia.multiply(BigDecimal.valueOf(quantity)));
-            item.setImageUrl(monAn.getImg());
-            item.setDonGiaGoc(giaGoc);
-            cart.add(item);
-        }
-
-        session.setAttribute("cart", cart);
         String referer = request.getHeader("Referer");
         if (referer != null && !referer.isBlank()) {
             try {
@@ -132,10 +103,29 @@ public class MenuController {
                 String redirectUrl = path + (query != null ? "?" + query : "");
                 return "redirect:" + redirectUrl;
             } catch (MalformedURLException e) {
-                // fallback nếu referer không hợp lệ
+                // fallback neu referer khong hop le
             }
         }
         return "redirect:/menu";
     }
 
+    private void sortByDiscountedPrice(List<MonAn> products, String filter) {
+        if (products == null || products.isEmpty()) {
+            return;
+        }
+
+        if ("price-low".equals(filter)) {
+            products.sort(Comparator.comparingLong(MonAn::getGiaGiam)
+                    .thenComparingLong(MonAn::getGia)
+                    .thenComparingLong(MonAn::getMaMon));
+            return;
+        }
+
+        if ("price-high".equals(filter)) {
+            products.sort(Comparator.comparingLong(MonAn::getGiaGiam)
+                    .reversed()
+                    .thenComparing(Comparator.comparingLong(MonAn::getGia).reversed())
+                    .thenComparingLong(MonAn::getMaMon));
+        }
+    }
 }

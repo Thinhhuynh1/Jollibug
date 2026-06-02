@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 public class OrderStatusHistoryResponse {
     private String oldStatus;
     private String newStatus;
-    private String actorType;
     private Long actorId;
     private String reason;
     private Timestamp createdAt;
@@ -17,7 +16,6 @@ public class OrderStatusHistoryResponse {
     public OrderStatusHistoryResponse(
             String oldStatus,
             String newStatus,
-            String actorType,
             Long actorId,
             String reason,
             Timestamp createdAt,
@@ -25,7 +23,6 @@ public class OrderStatusHistoryResponse {
     ) {
         this.oldStatus = oldStatus;
         this.newStatus = newStatus;
-        this.actorType = actorType;
         this.actorId = actorId;
         this.reason = reason;
         this.createdAt = createdAt;
@@ -46,14 +43,6 @@ public class OrderStatusHistoryResponse {
 
     public void setNewStatus(String newStatus) {
         this.newStatus = newStatus;
-    }
-
-    public String getActorType() {
-        return actorType;
-    }
-
-    public void setActorType(String actorType) {
-        this.actorType = actorType;
     }
 
     public Long getActorId() {

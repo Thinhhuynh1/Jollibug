@@ -14,7 +14,7 @@
   <div class="admin-sidebar__inner">
     <div class="admin-brand">
       <div class="brand">
-        <span class="brand__mark">JB</span>
+        <span class="brand__mark"><img src="/images/jollibug.png" alt="JB Logo"></span>
         <span class="brand__copy">
           <span class="brand__title">Quản trị viên Jollibug</span>
           <span class="brand__tag">Control Center</span>

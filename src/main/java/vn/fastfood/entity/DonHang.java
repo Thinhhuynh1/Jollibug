@@ -8,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -37,21 +39,33 @@ public class DonHang {
     private Long maDH;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "MaTK")
+    @JoinColumn(name = "MaTK_KH")
     private User user;
 
-    @Column(name = "TongTien")
-    private Long tongTien;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MaTK_NV")
+    private User nhanVien;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MaDC")
+    private DiaChi diaChi;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "MaGG")
+    private MaGiamGia maGiamGia;
+
+    @Column(name = "TongTienMon")
+    private Double tongTienMon;
+
+    @Column(name = "TienGiamGia")
+    private Double tienGiamGia;
+
+    @Column(name = "ThanhTien")
+    private Double tongTien;
 
     // PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED
-    @Column(name = "TrangThai")
+    @Column(name = "TrangThaiDon")
     private String trangThai;
-
-    @Column(name = "DiaChiGiaoHang")
-    private String diaChiGiaoHang;
-
-    @Column(name = "SDTNhanHang", length = 15)
-    private String sdtNhanHang;
 
     @Column(name = "GhiChu")
     private String ghiChu;

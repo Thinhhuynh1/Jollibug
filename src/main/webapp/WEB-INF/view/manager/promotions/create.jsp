@@ -24,12 +24,15 @@
 <section class="profile-content">
 <section class="profile-section">
 <h1 class="profile-title">Thêm khuyến mãi</h1>
+<c:if test="${not empty errorMessage}">
+<div class="alert alert-danger" style="margin-bottom:1rem;">${errorMessage}</div>
+</c:if>
 
 <form action="<c:url value='/manager/promotions/create'/>" method="post" class="profile-form">
 <div class="profile-grid">
 <label class="profile-field">
 <span>Tên chương trình</span>
-<input type="text" name="tenCT" placeholder="Combo trưa" required />
+<input type="text" name="tenKM" placeholder="Combo trưa" required />
 </label>
 
 <label class="profile-field">
@@ -63,32 +66,12 @@
         </label>
 
         <label class="promo-option-card">
-            <input type="radio" name="phamViApDung" value="CATEGORY" />
-            <div>
-                <strong>Theo danh mục</strong>
-                <small>Chỉ áp dụng cho một danh mục món ăn cụ thể.</small>
-            </div>
-        </label>
-
-        <label class="promo-option-card">
             <input type="radio" name="phamViApDung" value="ITEM" />
             <div>
                 <strong>Chọn món</strong>
                 <small>Lựa chọn riêng từng món để áp dụng khuyến mãi.</small>
             </div>
         </label>
-    </div>
-
-    <div id="apply-category" class="promo-apply-details">
-        <label class="promo-detail-label">Danh mục áp dụng</label>
-        <div class="promo-category-select">
-            <select name="maDM">
-                <option value="">-- Chọn danh mục --</option>
-                <c:forEach items="${danhMucList}" var="category">
-                    <option value="${category.maDM}">${category.tenDM}</option>
-                </c:forEach>
-            </select>
-        </div>
     </div>
 
     <div id="apply-items" class="promo-apply-details">
@@ -117,7 +100,6 @@
 <script>
 const applyTypeRadios = document.querySelectorAll('input[name="phamViApDung"]');
 const optionCards = document.querySelectorAll('.promo-option-card');
-const categorySection = document.getElementById('apply-category');
 const itemsSection = document.getElementById('apply-items');
 function updateApplySections() {
   const selected = document.querySelector('input[name="phamViApDung"]:checked');
@@ -125,7 +107,6 @@ function updateApplySections() {
     const radio = card.querySelector('input[type="radio"]');
     card.classList.toggle('active', radio === selected);
   });
-  categorySection.classList.toggle('active', selected.value === 'CATEGORY');
   itemsSection.classList.toggle('active', selected.value === 'ITEM');
 }
 applyTypeRadios.forEach(radio => radio.addEventListener('change', updateApplySections));

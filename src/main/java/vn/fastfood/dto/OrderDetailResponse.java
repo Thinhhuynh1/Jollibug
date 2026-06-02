@@ -39,12 +39,4 @@ public class OrderDetailResponse {
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
     }
-
-    public List<ReviewResponse> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<ReviewResponse> reviews) {
-        this.reviews = reviews;
-    }
 }

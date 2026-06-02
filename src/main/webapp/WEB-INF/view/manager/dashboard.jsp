@@ -137,7 +137,7 @@
                   <c:forEach var="order" items="${orderStats.recentOrders}" end="4">
                     <tr>
                       <td>#${order.maDH}</td>
-                      <td>${order.user.hoTen}</td>
+                      <td>${order.hoTen}</td>
                       <td style="text-align:right;"><fmt:formatNumber value="${order.tongTien}" pattern="#,###"/>đ</td>
                       <td style="text-align:center;">
                         <span class="badge badge--${order.trangThai == 'DELIVERED' ? 'success' : order.trangThai == 'CANCELLED' ? 'danger' : order.trangThai == 'PENDING' ? 'warning' : 'info'}">${order.trangThai}</span>

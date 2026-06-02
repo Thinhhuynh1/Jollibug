@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import vn.fastfood.entity.MaGiamGia;
-import vn.fastfood.service.CouponService;
+import vn.fastfood.service.MaGiamGiaService;
 
 @Controller
 public class ClientCouponController {
 
-    private final CouponService couponService;
+    private final MaGiamGiaService maGiamGiaService;
 
-    public ClientCouponController(CouponService couponService) {
-        this.couponService = couponService;
+    public ClientCouponController(MaGiamGiaService maGiamGiaService) {
+        this.maGiamGiaService = maGiamGiaService;
     }
 
     @GetMapping("/api/voucher/available")
@@ -30,7 +30,7 @@ public class ClientCouponController {
             @RequestParam(name = "subtotal", defaultValue = "0") double subtotal) {
 
         List<Map<String, Object>> vouchers = new ArrayList<>();
-        for (MaGiamGia coupon : couponService.listApplicableCoupons(subtotal)) {
+        for (MaGiamGia coupon : maGiamGiaService.listApplicableCoupons(subtotal)) {
             vouchers.add(toVoucherPayload(coupon, subtotal));
         }
 
@@ -47,7 +47,7 @@ public class ClientCouponController {
             @RequestParam(name = "subtotal", defaultValue = "0") double subtotal) {
 
         Map<String, Object> payload = new HashMap<>();
-        Optional<MaGiamGia> couponOpt = couponService.findValidCoupon(code);
+        Optional<MaGiamGia> couponOpt = maGiamGiaService.findValidCoupon(code);
 
         if (couponOpt.isEmpty()) {
             payload.put("valid", false);
@@ -58,17 +58,18 @@ public class ClientCouponController {
         }
 
         MaGiamGia coupon = couponOpt.get();
-        if (!couponService.meetsMinimumOrder(coupon, subtotal)) {
+        double discountAmount = maGiamGiaService.calculateDiscount(coupon, subtotal);
+        Double minimumOrderAmount = coupon.getDieuKien();
+        if (minimumOrderAmount != null && minimumOrderAmount > 0 && subtotal < minimumOrderAmount) {
             payload.put("valid", false);
-            payload.put("message", couponService.getMinimumOrderMessage(coupon));
+            payload.put("message", "Đơn hàng chưa đủ điều kiện để áp dụng mã giảm giá.");
             payload.put("discountAmount", 0);
             payload.put("total", subtotal);
+            payload.put("minimumOrderAmount", minimumOrderAmount);
             return ResponseEntity.ok(payload);
         }
 
-        double discountAmount = couponService.calculateDiscount(coupon, subtotal);
         double total = Math.max(0, subtotal - discountAmount);
-
         payload.put("valid", true);
         payload.put("message", "Áp dụng mã giảm giá thành công.");
         payload.put("code", coupon.getTenMa());
@@ -76,8 +77,7 @@ public class ClientCouponController {
         payload.put("total", total);
         payload.put("couponType", coupon.getLoaiGiam());
         payload.put("couponValue", coupon.getMucGiam());
-        payload.put("description", coupon.getMoTa());
-        payload.put("discountDisplay", coupon.getDiscountDisplay());
+        payload.put("minimumOrderAmount", coupon.getDieuKien());
 
         return ResponseEntity.ok(payload);
     }
@@ -91,7 +91,7 @@ public class ClientCouponController {
         item.put("couponValue", coupon.getMucGiam());
         item.put("minimumOrder", coupon.getDieuKien());
         item.put("minimumOrderDisplay", coupon.getMinimumOrderDisplay());
-        item.put("estimatedDiscount", couponService.calculateDiscount(coupon, subtotal));
+        item.put("estimatedDiscount", maGiamGiaService.calculateDiscount(coupon, subtotal));
         return item;
     }
 }

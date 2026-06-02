@@ -1,4 +1,4 @@
-function openStatusModal(orderId, currentStatus, afterSuccessCallback) {
+function openStatusModal(maDH, currentStatus, afterSuccessCallback) {
     const current = normalizeStatus(currentStatus);
 
     const oldModal = document.getElementById("runtimeStatusModal");
@@ -6,7 +6,7 @@ function openStatusModal(orderId, currentStatus, afterSuccessCallback) {
 
     window.afterOrderStatusUpdated = afterSuccessCallback || null;
 
-    const choicesHtml = getAllStatusActions().map(action => {
+    const choicesHtml = getAllStatusActions().map((action) => {
         const enabled = isActionAllowed(current, action.status);
         const disabled = enabled ? "" : "disabled";
         const checked = enabled && action.status === getDefaultNextStatus(current) ? "checked" : "";
@@ -33,11 +33,11 @@ function openStatusModal(orderId, currentStatus, afterSuccessCallback) {
     modal.innerHTML = `
         <div class="runtime-modal-box">
             <div class="runtime-modal-header">
-                <h2>Cập nhật trạng thái đơn #${orderId}</h2>
+                <h2>Cập nhật trạng thái đơn #${maDH}</h2>
                 <button type="button" class="runtime-close-btn" onclick="closeRuntimeStatusModal()">×</button>
             </div>
 
-            <input type="hidden" id="runtimeSelectedOrderId" value="${orderId}">
+            <input type="hidden" id="runtimeMaDH" value="${maDH}">
             <input type="hidden" id="runtimeCurrentStatus" value="${current}">
 
             <div class="status-choice-list">
@@ -121,7 +121,7 @@ function openCancelConfirmModal() {
 
     document.body.appendChild(confirmModal);
 
-    document.querySelectorAll('input[name="cancelReason"]').forEach(input => {
+    document.querySelectorAll('input[name="cancelReason"]').forEach((input) => {
         input.addEventListener("change", toggleOtherCancelReason);
     });
 }
@@ -172,8 +172,9 @@ function confirmCancelOrder() {
 
     let reason = selectedReason.value;
 
-    if (selectedReason.dataset.other === "true")
+    if (selectedReason.dataset.other === "true") {
         reason = otherReason.value.trim();
+    }
 
     window.selectedCancelReason = reason;
 
@@ -182,7 +183,7 @@ function confirmCancelOrder() {
 }
 
 async function submitRuntimeUpdateStatus() {
-    const orderId = document.getElementById("runtimeSelectedOrderId").value;
+    const maDH = document.getElementById("runtimeMaDH").value;
     const selectedStatus = document.querySelector('input[name="runtimeNextStatus"]:checked');
     const status = selectedStatus ? selectedStatus.value : "";
 
@@ -199,10 +200,11 @@ async function submitRuntimeUpdateStatus() {
         params.append("staffId", staffId);
         params.append("status", status);
 
-        if (normalizeStatus(status) === "CANCELLED" && window.selectedCancelReason)
+        if (normalizeStatus(status) === "CANCELLED" && window.selectedCancelReason) {
             params.append("cancelReason", window.selectedCancelReason);
+        }
 
-        const response = await fetch(`/api/staff/orders/${orderId}/status?${params.toString()}`, {
+        const response = await fetch(`/api/staff/orders/${maDH}/status?${params.toString()}`, {
             method: "PUT"
         });
 
@@ -213,14 +215,9 @@ async function submitRuntimeUpdateStatus() {
             window.selectedCancelReason = "";
 
             if (typeof window.afterOrderStatusUpdated === "function") {
-                window.afterOrderStatusUpdated(orderId);
+                window.afterOrderStatusUpdated(maDH);
             }
-            return;
         }
-
-        showStaffMessage(data.message || "Không thể cập nhật trạng thái.");
-        window.selectedCancelReason = "";
-
     } catch (error) {
         showStaffMessage("Lỗi khi cập nhật trạng thái.");
     }
@@ -243,12 +240,12 @@ function getAllStatusActions() {
 }
 
 function getNextStatuses(status) {
-    const s = normalizeStatus(status);
+    const normalized = normalizeStatus(status);
 
-    if (s === "PENDING") return ["CONFIRMED", "CANCELLED"];
-    if (s === "CONFIRMED") return ["SHIPPING", "CANCELLED"];
-    if (s === "SHIPPING") return ["DELIVERED"];
-    if (s === "CANCEL_REQUESTED") return ["CANCELLED", "CONFIRMED"];
+    if (normalized === "PENDING") return ["CONFIRMED", "CANCELLED"];
+    if (normalized === "CONFIRMED") return ["SHIPPING", "CANCELLED"];
+    if (normalized === "SHIPPING") return ["DELIVERED"];
+    if (normalized === "CANCEL_REQUESTED") return ["CANCELLED", "CONFIRMED"];
 
     return [];
 }

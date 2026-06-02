@@ -1,12 +1,12 @@
 package vn.fastfood.dao;
 
-import vn.fastfood.config.DBConnection;
-import vn.fastfood.model.Payment;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import vn.fastfood.config.DBConnection;
+import vn.fastfood.model.Payment;
 
 public class PaymentDAO {
 
@@ -65,5 +65,56 @@ public class PaymentDAO {
         }
 
         return false;
+    }
+
+    public boolean createPayment(long orderId, String maPT, double soTien, String trangThaiTT) {
+        String sql = """
+            INSERT INTO THANHTOAN (MaDH, MaPT, NgayTT, SoTien, TrangThaiTT)
+            VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?)
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, orderId);
+            ps.setString(2, maPT);
+            ps.setDouble(3, soTien);
+            ps.setString(4, trangThaiTT);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public void lockPayment(Connection conn, long orderId) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("""
+            SELECT MaTT
+            FROM THANHTOAN
+            WHERE MaDH = ?
+            FOR UPDATE
+        """)) {
+            ps.setLong(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("Không tìm thấy thanh toán");
+                }
+            }
+        }
+    }
+
+    public void updatePaymentStatus(Connection conn, long orderId, String status) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("""
+            UPDATE THANHTOAN
+            SET TrangThaiTT = ?,
+                NgayTT = CURRENT_TIMESTAMP
+            WHERE MaDH = ?
+        """)) {
+            ps.setString(1, status);
+            ps.setLong(2, orderId);
+            ps.executeUpdate();
+        }
     }
 }

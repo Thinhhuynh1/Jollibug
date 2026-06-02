@@ -54,10 +54,12 @@ public class JpaOrderService {
 
         DonHang donHang = new DonHang();
         donHang.setUser(user);
-        donHang.setTongTien(totalAmount.longValue());
+        double total = totalAmount.doubleValue();
+        donHang.setTongTienMon(total);
+        donHang.setTienGiamGia(0D);
+        donHang.setTongTien(total);
         donHang.setTrangThai("PENDING");
-        donHang.setDiaChiGiaoHang(formatAddress(diaChi));
-        donHang.setSdtNhanHang(diaChi.getSdtNguoiNhan());
+        donHang.setDiaChi(diaChi);
         donHang.setGhiChu(ghiChu);
         donHang = donHangRepository.save(donHang);
 
@@ -66,8 +68,10 @@ public class JpaOrderService {
             ChiTietDH chiTiet = new ChiTietDH();
             chiTiet.setMaDH(orderId);
             chiTiet.setMaMon(item.getMaMon());
+            chiTiet.setTenMon(item.getTenMon());
             chiTiet.setSoLuong(item.getSoLuong());
-            chiTiet.setDonGia(item.getDonGia().longValue());
+            chiTiet.setDonGia((long) item.getDonGia());
+            chiTiet.setThanhTien((long) item.getThanhTien());
             chiTietDHRepository.save(chiTiet);
         }
 
@@ -182,14 +186,19 @@ public class JpaOrderService {
             order.setNgayDat(Timestamp.valueOf(donHang.getNgayDat()));
         }
         order.setTrangThaiDon(donHang.getTrangThai());
-        order.setDiaChiGiaoHang(donHang.getDiaChiGiaoHang());
-        order.setSdtNguoiNhan(donHang.getSdtNhanHang());
+        DiaChi diaChi = donHang.getDiaChi();
+        if (diaChi != null) {
+            order.setMaDC(diaChi.getMaDC());
+            order.setTenNguoiNhan(diaChi.getTenNguoiNhan());
+            order.setSdtNguoiNhan(diaChi.getSdtNguoiNhan());
+            order.setDiaChiGiaoHang(formatAddress(diaChi));
+        }
         order.setGhiChu(donHang.getGhiChu());
 
-        BigDecimal total = BigDecimal.valueOf(donHang.getTongTien() != null ? donHang.getTongTien() : 0L);
+        BigDecimal total = BigDecimal.valueOf(donHang.getTongTien() != null ? donHang.getTongTien() : 0D);
         order.setThanhTien(total);
-        order.setTongTienMon(total);
-        order.setTienGiamGia(BigDecimal.ZERO);
+        order.setTongTienMon(BigDecimal.valueOf(donHang.getTongTienMon() != null ? donHang.getTongTienMon() : 0D));
+        order.setTienGiamGia(BigDecimal.valueOf(donHang.getTienGiamGia() != null ? donHang.getTienGiamGia() : 0D));
         order.setMaPT("COD");
         order.setTenPT("Thanh toán khi nhận hàng");
         order.setTrangThaiTT("PENDING");

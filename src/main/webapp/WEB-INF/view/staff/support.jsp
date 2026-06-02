@@ -74,7 +74,7 @@
                           </div>
                           <p class="ticket-item__preview"><c:out value="${ticket.tieuDe}"/></p>
                           <span class="status-badge" style="font-size:.7rem;margin-top:.25rem;display:inline-block"
-                                data-status="${ticket.trangThai == 'Pending' ? 'pending' : ticket.trangThai == 'Processing' ? 'active' : 'done'}">
+                                data-status="${ticket.trangThai == 'PENDING' ? 'pending' : ticket.trangThai == 'PROCESSING' ? 'active' : 'done'}">
                             <c:out value="${ticket.trangThai}"/>
                           </span>
                         </article>
@@ -111,7 +111,7 @@
                       <c:otherwise><span>Đang hoạt động</span></c:otherwise>
                     </c:choose>
                   </div>
-                  <c:if test="${not empty activeYC and activeYC.trangThai != 'Done'}">
+                  <c:if test="${not empty activeYC and activeYC.trangThai != 'DONE'}">
                     <a href="/api/chat/close?maYC=${activeYC.maYC}"
                        class="btn btn-ghost" style="margin-left:auto;font-size:.8rem"
                        onclick="return confirm('Đánh dấu hoàn thành yêu cầu này?')">✓ Hoàn thành</a>
@@ -151,9 +151,9 @@
                 <form class="chat-input-bar" data-chat-form>
                   <input id="chat-input" data-chat-input name="message" type="text"
                          placeholder="Nhập phản hồi cho khách hàng..."
-                         <c:if test="${empty activeConvId or activeYC.trangThai == 'Done'}">disabled</c:if>/>
+                         <c:if test="${empty activeConvId or activeYC.trangThai == 'DONE'}">disabled</c:if>/>
                   <button class="chat-send-btn" type="submit" aria-label="Gửi tin nhắn"
-                          <c:if test="${empty activeConvId or activeYC.trangThai == 'Done'}">disabled</c:if>>
+                          <c:if test="${empty activeConvId or activeYC.trangThai == 'DONE'}">disabled</c:if>>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="m22 2-7 20-4-9-9-4z" />
                       <path d="M22 2 11 13" />
@@ -196,15 +196,6 @@
               <div class="review-text-box">
                 <p>Giao hàng muộn hơn dự kiến 30 phút. Cơm bị lạnh, sườn cũng không còn mềm như vừa nướng xong. Rất không hài lòng với chất lượng lần này.</p>
               </div>
-
-              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
-                <input type="hidden" name="maDG" value="1">
-                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
-                <div class="form-footer">
-                  <span class="char-count"><span class="current">0</span>/500</span>
-                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
-                </div>
-              </form>
             </article>
 
             <!-- Review 2: Medium Score (3 stars) -->
@@ -236,15 +227,6 @@
               <div class="review-text-box">
                 <p>Gà rán tươi, giòn ngon. Nhưng phần mì ốc quên trong combo bị mềm và ẩm, không còn độ giòn. Tuy nhiên vẫn có thể ăn được.</p>
               </div>
-
-              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
-                <input type="hidden" name="maDG" value="2">
-                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
-                <div class="form-footer">
-                  <span class="char-count"><span class="current">0</span>/500</span>
-                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
-                </div>
-              </form>
             </article>
 
             <!-- Review 3: Low Score (1 star) -->
@@ -276,15 +258,6 @@
               <div class="review-text-box">
                 <p>Nhận được bánh mì sai người. Hỗ trợ khách hàng rất chậm. Đã chờ đợi 2 ngày không ai xử lý. Sẽ không quay lại Jollibug nữa.</p>
               </div>
-
-              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
-                <input type="hidden" name="maDG" value="3">
-                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
-                <div class="form-footer">
-                  <span class="char-count"><span class="current">0</span>/500</span>
-                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
-                </div>
-              </form>
             </article>
 
             <!-- Review 4: High Score (4 stars) -->
@@ -316,15 +289,6 @@
               <div class="review-text-box">
                 <p>Khoai tây rất ngon, giòn vàng ươm. Giao hàng nhanh chóng. Chỉ tiếc hơi ít muối một chút, nhưng vẫn rất hài lòng.</p>
               </div>
-
-              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
-                <input type="hidden" name="maDG" value="4">
-                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
-                <div class="form-footer">
-                  <span class="char-count"><span class="current">0</span>/500</span>
-                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
-                </div>
-              </form>
             </article>
 
             <!-- Review 5: Perfect Score (5 stars) -->
@@ -356,15 +320,6 @@
               <div class="review-text-box">
                 <p>Tuyệt vời! Burger rất ngon, thịt gà mềm, phô mai tan chảy. Giao hàng lại vô cùng nhanh. Sẽ tiếp tục đặt hàng từ Jollibug!</p>
               </div>
-
-              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
-                <input type="hidden" name="maDG" value="5">
-                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
-                <div class="form-footer">
-                  <span class="char-count"><span class="current">0</span>/500</span>
-                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
-                </div>
-              </form>
             </article>
 
             <!-- Review 6: Low Score (2 stars) -->
@@ -396,15 +351,6 @@
               <div class="review-text-box">
                 <p>Trà sữa bị lạnh quá, không còn vị trà. Trân châu cũng cứng chứ không mềm. Mong Jollibug cải thiện chất lượng nước uống.</p>
               </div>
-
-              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
-                <input type="hidden" name="maDG" value="6">
-                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
-                <div class="form-footer">
-                  <span class="char-count"><span class="current">0</span>/500</span>
-                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
-                </div>
-              </form>
             </article>
 
             <!-- Review 7: Good Score (4 stars) -->
@@ -436,15 +382,6 @@
               <div class="review-text-box">
                 <p>Đồ ăn tươi ngon, giao hàng nhanh chóng. Chất lượng ổn định. Giá hơi cao một chút so với quán khác nhưng chấp nhận được.</p>
               </div>
-
-              <form class="review-reply-form" method="post" action="<c:url value='/staff/support/review/reply'/>">
-                <input type="hidden" name="maDG" value="7">
-                <textarea name="reply" placeholder="Nhập phản hồi cho khách hàng..." maxlength="500"></textarea>
-                <div class="form-footer">
-                  <span class="char-count"><span class="current">0</span>/500</span>
-                  <button class="btn-send-reply" type="submit">Gửi phản hồi</button>
-                </div>
-              </form>
             </article>
           </div>
         </div>
@@ -459,4 +396,5 @@
   <script src="<c:url value='/js/staff/support.js'/>"></script>
 </body>
 </html>
+
 

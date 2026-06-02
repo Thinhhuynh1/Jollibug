@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/global.css" />
-  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/client/menu.css" />
 </head>
 <body data-page="menu">
@@ -66,9 +67,49 @@
           </div>
         </section>
 
+        <section class="voice-ordering reveal-up"
+                 data-voice-ordering
+                 data-add-cart-url="${pageContext.request.contextPath}/addCart"
+                 data-cart-api-url="${pageContext.request.contextPath}/api/cart"
+                 data-cart-url="${pageContext.request.contextPath}/cart"
+                 data-checkout-url="${pageContext.request.contextPath}/checkout"
+                 aria-label="Voice ordering">
+          <div class="voice-ordering__main">
+            <button class="voice-ordering__mic" type="button" data-voice-start aria-label="Bắt đầu đặt món bằng giọng nói">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <path d="M12 19v3"></path>
+                <path d="M8 22h8"></path>
+              </svg>
+            </button>
+            <div class="voice-ordering__content">
+              <div class="voice-ordering__title">Đặt món bằng giọng nói</div>
+              <div class="voice-ordering__heard">
+                <span>Câu vừa nói:</span>
+                <strong data-voice-transcript>Chưa có lệnh</strong>
+              </div>
+              <div class="voice-ordering__status" data-voice-status>Sẵn sàng nghe lệnh tiếng Việt.</div>
+              <div class="voice-ordering__suggestions" data-voice-suggestions hidden></div>
+            </div>
+          </div>
+          <form class="voice-ordering__fallback" data-voice-manual-form>
+            <input type="text"
+                   data-voice-manual-input
+                   placeholder="thêm 2 pepsi"
+                   autocomplete="off" />
+            <button type="submit">Nhập</button>
+          </form>
+        </section>
+
         <section class="card-grid" data-menu-grid id="menu-grid" aria-label="Menu items">
           <c:forEach var="monAn" items="${listMonAn}">
-            <article class="hp-prod-card reveal-up">
+            <article class="hp-prod-card reveal-up"
+                     data-food-card
+                     data-food-id="${monAn.maMon}"
+                     data-food-name="${fn:escapeXml(monAn.tenMon)}"
+                     data-food-price="${monAn.giaGiam}"
+                     data-food-category="${fn:escapeXml(monAn.danhMuc.tenDM)}">
             <div class="hp-prod-card__img">
               <img src="/images/${monAn.img}" alt="${monAn.tenMon}" />
               <c:if test="${monAn.hasGiamGia}">
@@ -99,7 +140,7 @@
                 
                 <a class="hp-prod-card__btn" href="/product?productID=${monAn.maMon}">Xem chi tiết</a>
                 <c:if test="${not empty sessionScope.user}">
-                  <form method="post" data-add-cart-form data-add-cart-api="/api/cart/add">
+                  <form method="post" action="/addCart" data-ajax-add-cart>
                     <input type="hidden" name="productID" value="${monAn.maMon}">
                     <button class="hp-prod-card__btn" type="submit">+ Thêm</button>
                   </form>
@@ -113,10 +154,10 @@
     </section>
   </main>
 
-    <!-- SHARED FOOTER -->
+    <!--  FOOTER -->
   <jsp:include page="layout/footer.jsp" />
-
-  <div class="jb-ai-chat" data-jb-ai-chat>
+  
+    <div class="jb-ai-chat" data-jb-ai-chat>
     <section class="jb-ai-chat__panel" data-chat-panel aria-label="Jollibug AI chat" aria-hidden="true">
       <header class="jb-ai-chat__header">
         <div class="jb-ai-chat__avatar" aria-hidden="true">JB</div>
@@ -149,26 +190,27 @@
       </form>
     </section>
 
-    <button class="jb-ai-chat__toggle" type="button" data-chat-toggle aria-label="Chat với AI Jollibug">
-      <span class="jb-ai-chat__tooltip">Chat với AI Jollibug</span>
-      <span class="jb-ai-chat__badge" aria-hidden="true"></span>
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 5V3"></path>
-        <path d="M8 3H16"></path>
-        <rect x="5" y="7" width="14" height="11" rx="4"></rect>
-        <path d="M9 12H9.01"></path>
-        <path d="M15 12H15.01"></path>
-        <path d="M10 16H14"></path>
-        <path d="M4 11H3"></path>
-        <path d="M21 11H20"></path>
-      </svg>
-    </button>
-  </div>
-  
+      <button class="jb-ai-chat__toggle" type="button" data-chat-toggle aria-label="Chat với AI Jollibug">
+        <span class="jb-ai-chat__tooltip">Chat với AI Jollibug</span>
+        <span class="jb-ai-chat__badge" aria-hidden="true"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5V3"></path>
+          <path d="M8 3H16"></path>
+          <rect x="5" y="7" width="14" height="11" rx="4"></rect>
+          <path d="M9 12H9.01"></path>
+          <path d="M15 12H15.01"></path>
+          <path d="M10 16H14"></path>
+          <path d="M4 11H3"></path>
+          <path d="M21 11H20"></path>
+        </svg>
+      </button>
+    </div>
 
-  </body>
   <script src="/js/client/main.js"></script>
+  <script src="/js/client/add-to-cart.js"></script>
+  <script src="/js/client/voice-ordering.js"></script>
   <script src="/js/client/jollibug-ai-chat.js"></script>
+</body>
 </html>
 
 

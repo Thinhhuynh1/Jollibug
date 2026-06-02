@@ -60,6 +60,11 @@
                     </label>
 
                     <label class="profile-field">
+                      <span>Điều kiện đơn tối thiểu (VNĐ)</span>
+                      <input type="number" min="0" step="1000" name="dieuKien" placeholder="0 hoặc 100000" />
+                    </label>
+
+                    <label class="profile-field">
                       <span>Ngày bắt đầu</span>
                       <input type="date" name="startDate" required />
                     </label>

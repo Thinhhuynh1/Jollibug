@@ -195,8 +195,8 @@
 
           // Cập nhật trạng thái hiển thị trên màn hình từ Pending -> Processing
           var statusEl = document.querySelector(".page-intro p span");
-          if (statusEl && statusEl.textContent === "Pending") {
-            statusEl.textContent = "Processing";
+          if (statusEl && statusEl.textContent === "Chờ tiếp nhận") {
+            statusEl.textContent = "Đang xử lý";
             statusEl.style.color = "#2563eb"; // Đổi màu xanh
           }
         }

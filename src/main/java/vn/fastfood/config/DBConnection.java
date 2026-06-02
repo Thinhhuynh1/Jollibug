@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-    private static final String URL = "jdbc:oracle:thin:@localhost:1522/ORCLPDB";
+    private static final String URL = "jdbc:oracle:thin:@localhost:1521/orclpdb";
     private static final String USERNAME = "fastfooddb";
     private static final String PASSWORD = "123456";
 
@@ -14,7 +14,7 @@ public class DBConnection {
             Class.forName("oracle.jdbc.OracleDriver");
             return DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (ClassNotFoundException e) {
-            throw new SQLException("Không tìm thấy Oracle JDBC Driver", e);
+            throw new SQLException("Không tìm thấy Driver", e);
         }
     }
 }

@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -18,8 +18,7 @@
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell section-tight">
-    <input type="hidden" id="customerId" value="${sessionScope.user.maTK}">
-
+    <input type="hidden" id="maKH" value="1">
     <div class="container">
       <div class="page-intro">
         <h1 class="page-title">Giỏ hàng của tôi</h1>
@@ -28,8 +27,71 @@
       <div class="cart-shell">
         <section class="cart-column">
           <article class="cart-panel">
-            <div class="cart-item-list" id="cartItems"></div>
-            <div id="cartMessage" class="cart-message"></div>
+            <div class="cart-item-list">
+              <c:set var="tongSoLuong" value="0" />
+              <c:set var="tongTien" value="0" />
+              <c:forEach var="cartItem" items="${sessionScope.cart}">
+                <c:set var="tongSoLuong" value="${tongSoLuong + cartItem.soLuong}"/>
+                <c:set var="tongTien" value="${tongTien + cartItem.thanhTien}" />
+                <article class="cart-line"
+                        id="cart-line-${cartItem.maMon}"
+                        data-price="${cartItem.donGia}">
+                  <div class="cart-line__thumb">
+                    <img src="/images/${cartItem.imageUrl}"
+                        alt="${cartItem.tenMon}"
+                        style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+                  </div>
+
+                  <div class="cart-line__meta">
+                    <h3 class="cart-line__name">${cartItem.tenMon}</h3>
+                    <p class="cart-line__unit">Mã món: ${cartItem.maMon}</p>
+
+                    <div class="cart-line__controls">
+                      <a class="cart-link-btn"
+                        href="#"
+                        data-action="remove"
+                        onclick="removeCartItem(event, ${cartItem.maMon})">
+                        Xóa
+                      </a>
+
+                      <div class="cart-line__purchase">
+                        <div class="qty-stepper" aria-label="Chỉnh số lượng">
+                          <button class="qty-stepper__btn"
+                                  type="button"
+                                  aria-label="Giảm số lượng"
+                                  onclick="changeQuantity(${cartItem.maMon}, -1)">
+                            -
+                          </button>
+
+                          <span class="qty-stepper__value" id="qty-${cartItem.maMon}">
+                            ${cartItem.soLuong}
+                          </span>
+
+                          <button class="qty-stepper__btn"
+                                  type="button"
+                                  aria-label="Tăng số lượng"
+                                  onclick="changeQuantity(${cartItem.maMon}, 1)">
+                            +
+                          </button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                          <c:if test="${cartItem.donGia < cartItem.donGiaGoc}">
+                            <span style="text-decoration: line-through; color: #999; font-size: 0.85em; font-weight: 500;">
+                              <fmt:formatNumber type="number" value="${cartItem.donGiaGoc * cartItem.soLuong}" /> đ
+                            </span>
+                          </c:if>
+                          <strong class="cart-line__sum">
+                            <fmt:formatNumber type="number" value="${cartItem.thanhTien}" /> đ
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </c:forEach>
+            </div>
+
+            <div id="cartMessage" class="cart-message"><c:out value="${cartMessage}" /></div>
           </article>
         </section>
 
@@ -47,7 +109,22 @@
               </div>
             </div>
 
-            <a class="btn btn-primary btn-block" id="checkout-button" href="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
+            <c:choose>
+              <c:when test="${tongSoLuong > 0}">
+                <a class="btn btn-primary btn-block"
+                   id="checkout-button"
+                   href="${pageContext.request.contextPath}/checkout"
+                   data-checkout-url="${pageContext.request.contextPath}/checkout">Đặt hàng</a>
+              </c:when>
+              <c:otherwise>
+                <a class="btn btn-primary btn-block is-disabled"
+                   id="checkout-button"
+                   href="#"
+                   data-checkout-url="${pageContext.request.contextPath}/checkout"
+                   aria-disabled="true"
+                   tabindex="-1">Đặt hàng</a>
+              </c:otherwise>
+            </c:choose>
           </article>
         </aside>
       </div>

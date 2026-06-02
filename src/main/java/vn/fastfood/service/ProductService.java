@@ -113,7 +113,7 @@ public class ProductService {
             Files.copy(file.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
             return fileName;
         } catch (IOException e) {
-            throw new RuntimeException("Khong the luu hinh anh", e);
+            throw new RuntimeException("Không thể lưu hình ảnh", e);
         }
     }
 

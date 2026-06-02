@@ -1,19 +1,6 @@
 {
+  "version": "0.2.0",
   "configurations": [
-    {
-      "type": "java",
-      "name": "FastFoodApplication",
-      "request": "launch",
-      "mainClass": "FastFoodApplication",
-      "projectName": "fast-food"
-    },
-    {
-      "type": "java",
-      "name": "FastFoodApplication",
-      "request": "launch",
-      "mainClass": "vn.fastfood.FastFoodApplication",
-      "projectName": "fast-food"
-    },
     {
       "type": "java",
       "name": "Spring Boot-FastFoodApplication<fast-food>",
@@ -21,8 +8,8 @@
       "cwd": "${workspaceFolder}",
       "mainClass": "vn.fastfood.FastFoodApplication",
       "projectName": "fast-food",
-      "args": "",
-      "envFile": "${workspaceFolder}/.env"
+      "console": "integratedTerminal",
+      "args": ""
     }
   ]
 }

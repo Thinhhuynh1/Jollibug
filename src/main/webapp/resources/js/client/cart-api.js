@@ -3,12 +3,31 @@ let pendingDeleteMaMon = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     setupDeleteModal();
+    setupCheckoutGuard();
     loadCart();
 });
 
 function getCustomerId() {
-    const input = document.getElementById("customerId");
+    const input = document.getElementById("maKH");
     return input ? input.value : 1;
+}
+
+function setupCheckoutGuard() {
+    const checkoutButton = document.getElementById("checkout-button");
+    const message = document.getElementById("cartMessage");
+
+    if (!checkoutButton) return;
+
+    checkoutButton.addEventListener("click", (event) => {
+        if (checkoutButton.getAttribute("aria-disabled") !== "true") {
+            return;
+        }
+
+        event.preventDefault();
+        if (message) {
+            message.textContent = "Giỏ hàng đang trống. Vui lòng chọn món trước khi đặt hàng.";
+        }
+    });
 }
 
 async function loadCart() {
@@ -24,7 +43,8 @@ async function loadCart() {
     if (message) message.textContent = "";
 
     try {
-        const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
+        // const response = await fetch(`${CART_API_BASE}?customerId=${customerId}`);
+        const response = await fetch(CART_API_BASE);
 
         if (!response.ok) {
             throw new Error("Không thể tải giỏ hàng.");
@@ -120,6 +140,7 @@ function updateSummary(totalQuantity, totalAmount) {
     const totalQuantityEl = document.getElementById("summary-item-count");
     const totalEl = document.getElementById("summary-total");
     const headerCartCountEl = document.getElementById("header-cart-count");
+    const checkoutButton = document.getElementById("checkout-button");
 
     if (totalQuantityEl) {
         totalQuantityEl.textContent = `${totalQuantity} MÓN`;
@@ -131,6 +152,16 @@ function updateSummary(totalQuantity, totalAmount) {
 
     if (headerCartCountEl) {
         headerCartCountEl.textContent = totalQuantity;
+    }
+
+    if (checkoutButton) {
+        const hasItems = totalQuantity > 0;
+        const checkoutUrl = checkoutButton.dataset.checkoutUrl || "/checkout";
+
+        checkoutButton.classList.toggle("is-disabled", !hasItems);
+        checkoutButton.setAttribute("aria-disabled", String(!hasItems));
+        checkoutButton.tabIndex = hasItems ? 0 : -1;
+        checkoutButton.href = hasItems ? checkoutUrl : "#";
     }
 }
 
@@ -289,10 +320,10 @@ function closeDeleteModal() {
 }
 
 async function deleteCartItem(maMon) {
-    const customerId = getCustomerId();
+    // const customerId = getCustomerId();
 
     try {
-        const response = await fetch(`${CART_API_BASE}/items?customerId=${customerId}&maMon=${maMon}`, {
+        const response = await fetch(`${CART_API_BASE}/items?maMon=${maMon}`, {
             method: "DELETE"
         });
 

@@ -76,7 +76,7 @@ public class MonAn {
     @JoinColumn(name = "MaDM")
     private DanhMuc danhMuc;
 
-    @Transient
+    @Column(name = "GiaGiam")
     private long giaGiam;
 
     @Transient
@@ -89,6 +89,6 @@ public class MonAn {
         if (hasGiamGia) {
             return giaGiam;
         }
-        return gia;
+        return giaGiam > 0 ? giaGiam : gia;
     }
 }

@@ -33,6 +33,7 @@ public class SessionInterceptor implements HandlerInterceptor {
                 || requestURI.startsWith("/verify")
                 || requestURI.startsWith("/new-password")
                 || requestURI.startsWith("/logout")
+                || requestURI.startsWith("/api/ai")
                 || requestURI.startsWith("/menu")
                 || requestURI.startsWith("/product")
                 || requestURI.startsWith("/about")
@@ -41,7 +42,7 @@ public class SessionInterceptor implements HandlerInterceptor {
                 || requestURI.startsWith("/images")
                 || requestURI.startsWith("/css")
                 || requestURI.startsWith("/js")
-                || requestURI.startsWith("/api")) {
+                || requestURI.startsWith("/api/ai")) {
             return true;
         }
 

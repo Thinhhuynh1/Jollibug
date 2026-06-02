@@ -24,9 +24,9 @@ public interface DonHangRepository extends JpaRepository<DonHang, Long> {
                     @Param("toDate") LocalDateTime toDate);
 
     // Doanh thu theo từng ngày (cho biểu đồ) - Oracle native query
-    @Query(value = "SELECT TRUNC(d.NGAYDAT) AS ngay, COALESCE(SUM(d.TONGTIEN), 0) AS doanhThu " +
+    @Query(value = "SELECT TRUNC(d.NGAYDAT) AS ngay, COALESCE(SUM(d.THANHTIEN), 0) AS doanhThu " +
                "FROM DONHANG d " +
-               "WHERE d.TRANGTHAI = 'DELIVERED' " +
+               "WHERE d.TRANGTHAIDON = 'DELIVERED' " +
                "AND d.NGAYDAT BETWEEN :fromDate AND :toDate " +
                "GROUP BY TRUNC(d.NGAYDAT) " +
                "ORDER BY TRUNC(d.NGAYDAT)",
@@ -36,9 +36,9 @@ List<Object[]> revenueByDay(@Param("fromDate") LocalDateTime fromDate,
 
     // Doanh thu theo tháng trong năm - Oracle native query
     @Query(value = "SELECT EXTRACT(MONTH FROM d.NGAYDAT) AS thang, " +
-               "COALESCE(SUM(d.TONGTIEN), 0) AS doanhThu " +
+               "COALESCE(SUM(d.THANHTIEN), 0) AS doanhThu " +
                "FROM DONHANG d " +
-               "WHERE d.TRANGTHAI = 'DELIVERED' " +
+               "WHERE d.TRANGTHAIDON = 'DELIVERED' " +
                "AND EXTRACT(YEAR FROM d.NGAYDAT) = :year " +
                "GROUP BY EXTRACT(MONTH FROM d.NGAYDAT) " +
                "ORDER BY EXTRACT(MONTH FROM d.NGAYDAT)",

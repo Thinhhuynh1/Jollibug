@@ -14,17 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.fastfood.dto.OrderDetailResponse;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
-import vn.fastfood.service.JpaOrderService;
+import vn.fastfood.service.OrderService;
 
 @RestController
 @RequestMapping("/api/staff/orders")
 public class StaffOrderController {
 
-    private final JpaOrderService jpaOrderService;
-
-    public StaffOrderController(JpaOrderService jpaOrderService) {
-        this.jpaOrderService = jpaOrderService;
-    }
+    private final OrderService orderService = new OrderService();
 
     @GetMapping
     public ResponseEntity<List<Order>> getOrdersForStaff(
@@ -32,81 +28,35 @@ public class StaffOrderController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "fromDate", required = false) String fromDate,
             @RequestParam(value = "toDate", required = false) String toDate) {
-        return ResponseEntity.ok(jpaOrderService.getOrdersForStaff(status, keyword, fromDate, toDate));
+        return ResponseEntity.ok(orderService.getOrdersForStaff(status, keyword, fromDate, toDate));
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<?> getOrderDetailForStaff(@PathVariable("orderId") long orderId) {
-        Order order = jpaOrderService.getOrderByIdForStaff(orderId);
+    @GetMapping("/{maDH}")
+    public ResponseEntity<?> getOrderDetailForStaff(@PathVariable("maDH") long maDH) {
+        Order order = orderService.getOrderByMaDHForStaff(maDH);
 
         if (order == null) {
-            return ResponseEntity.status(404).body(
-                    Map.of(
-                            "success", false,
-                            "message", "Không tìm thấy đơn hàng."));
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Không tìm thấy đơn hàng."));
         }
 
-        List<OrderItem> items = jpaOrderService.getOrderItemsByOrderId(orderId);
-        OrderDetailResponse response = new OrderDetailResponse(order, items);
-        return ResponseEntity.ok(response);
+        List<OrderItem> items = orderService.getOrderItemsByMaDH(maDH);
+        return ResponseEntity.ok(new OrderDetailResponse(order, items));
     }
 
-    @PutMapping("/{orderId}/status")
+    @PutMapping("/{maDH}/status")
     public ResponseEntity<Map<String, Object>> updateOrderStatus(
-            @PathVariable("orderId") long orderId,
+            @PathVariable("maDH") long maDH,
             @RequestParam("staffId") long staffId,
             @RequestParam("status") String status,
             @RequestParam(value = "cancelReason", required = false) String cancelReason) {
-        String currentStatus = normalizeStatus(jpaOrderService.getCurrentStatus(orderId));
-        String nextStatus = normalizeStatus(status);
+        boolean result = orderService.updateOrderStatusByStaff(maDH, staffId, status, cancelReason);
 
-        if (!isValidStaffTransition(currentStatus, nextStatus)) {
-            return ResponseEntity.badRequest().body(
-                    Map.of(
-                            "success", false,
-                            "message", "Không thể cập nhật trạng thái đơn hàng. Vui lòng kiểm tra luồng trạng thái."));
-        }
-
-        boolean updated = jpaOrderService.updateStatus(orderId, nextStatus);
-        if (updated) {
-            return ResponseEntity.ok(
-                    Map.of(
-                            "success", true,
-                            "message", "Cập nhật trạng thái đơn hàng thành công."));
+        if (result) {
+            return ResponseEntity.ok(Map.of("success", true, "message", "Cập nhật trạng thái đơn hàng thành công."));
         }
 
         return ResponseEntity.badRequest().body(
-                Map.of(
-                        "success", false,
-                        "message", "Không thể cập nhật trạng thái đơn hàng."));
-    }
-
-    private String normalizeStatus(String status) {
-        return status == null ? "" : status.trim().toUpperCase();
-    }
-
-    private boolean isValidStaffTransition(String current, String next) {
-        if ("PENDING".equals(current) && "CONFIRMED".equals(next)) {
-            return true;
-        }
-        if ("PENDING".equals(current) && "CANCELLED".equals(next)) {
-            return true;
-        }
-        if ("CONFIRMED".equals(current) && "SHIPPING".equals(next)) {
-            return true;
-        }
-        if ("CONFIRMED".equals(current) && "CANCELLED".equals(next)) {
-            return true;
-        }
-        if ("SHIPPING".equals(current) && "DELIVERED".equals(next)) {
-            return true;
-        }
-        if ("CANCEL_REQUESTED".equals(current) && "CANCELLED".equals(next)) {
-            return true;
-        }
-        if ("CANCEL_REQUESTED".equals(current) && "CONFIRMED".equals(next)) {
-            return true;
-        }
-        return false;
+                Map.of("success", false, "message",
+                        "Không thể cập nhật trạng thái đơn hàng. Vui lòng kiểm tra luồng trạng thái."));
     }
 }

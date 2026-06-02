@@ -1,143 +1,27 @@
 package vn.fastfood.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import vn.fastfood.dao.CartDAO;
-import vn.fastfood.entity.MonAn;
-import vn.fastfood.model.CartItem;
-import vn.fastfood.repository.MonAnRepository;
-
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
+import vn.fastfood.entity.MonAn;
+import vn.fastfood.model.CartItem;
+import vn.fastfood.repository.MonAnRepository;
 
 @Service
 public class CartService {
-    private final CartDAO cartDAO = new CartDAO();
     private final MonAnRepository monAnRepository;
-    private final PromotionService promotionService;
+    private final KhuyenMaiService khuyenMaiService;
 
-    public CartService(MonAnRepository monAnRepository, PromotionService promotionService) {
+    public CartService(MonAnRepository monAnRepository, KhuyenMaiService khuyenMaiService) {
         this.monAnRepository = monAnRepository;
-        this.promotionService = promotionService;
+        this.khuyenMaiService = khuyenMaiService;
     }
 
-    public List<CartItem> getCartItems(long customerId, HttpSession session) {
-        List<CartItem> items = cartDAO.getCartItemsByCustomerId(customerId);
-        if (!items.isEmpty()) {
-            return items;
-        }
-
-        if (session == null) {
-            return items;
-        }
-
-        @SuppressWarnings("unchecked")
-        List<CartItem> sessionCart = (List<CartItem>) session.getAttribute("cart");
-        return sessionCart != null ? sessionCart : items;
-    }
-
-    public List<CartItem> getCartItems(long customerId) {
-        return getCartItems(customerId, null);
-    }
-
-    public CartAddResult addSessionCart(Long productID, HttpSession session) {
-        MonAn monAn = this.monAnRepository.findProduct(productID);
-        if (monAn == null) {
-            return new CartAddResult(false, "San pham khong ton tai.", 0);
-        }
-
-        // Áp dụng chương trình khuyến mãi để tính giá giảm
-        promotionService.applyPromotions(Collections.singletonList(monAn));
-
-        @SuppressWarnings("unchecked")
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new ArrayList<>();
-        }
-
-        CartItem cartItem = findCartItem(cart, monAn.getMaMon());
-        BigDecimal giaGoc = BigDecimal.valueOf(monAn.getGia());
-        BigDecimal giaGiam = BigDecimal.valueOf(monAn.getGiaGiam());
-
-        if (cartItem != null) {
-            int soLuong = cartItem.getSoLuong() + 1;
-            cartItem.setSoLuong(soLuong);
-            cartItem.setDonGia(giaGiam);
-            cartItem.setDonGiaGoc(giaGoc);
-            cartItem.setThanhTien(giaGiam.multiply(BigDecimal.valueOf(soLuong)));
-        } else {
-            CartItem item = new CartItem();
-            item.setMaMon(monAn.getMaMon());
-            item.setTenMon(monAn.getTenMon());
-            item.setSoLuong(1);
-            item.setDonGia(giaGiam);
-            item.setDonGiaGoc(giaGoc);
-            item.setThanhTien(giaGiam);
-            item.setImageUrl(monAn.getImg());
-            cart.add(item);
-        }
-
-        session.setAttribute("cart", cart);
-        return new CartAddResult(true, "Them vao gio hang thanh cong.", countCartItems(cart));
-    }
-
-    public boolean updateQuantity(long customerId, long maMon, int soLuong, HttpSession session) {
-        if (cartDAO.getCartIdByCustomerId(customerId) != null) {
-            if (soLuong <= 0) {
-                return cartDAO.removeCartItem(customerId, maMon);
-            }
-            return cartDAO.updateCartItemQuantity(customerId, maMon, soLuong);
-        }
-
-        return updateSessionCartQuantity(session, maMon, soLuong);
-    }
-
-    public boolean updateQuantity(long customerId, long maMon, int soLuong) {
-        return updateQuantity(customerId, maMon, soLuong, null);
-    }
-
-    public boolean removeItem(long customerId, long maMon, HttpSession session) {
-        if (cartDAO.getCartIdByCustomerId(customerId) != null) {
-            return cartDAO.removeCartItem(customerId, maMon);
-        }
-
-        return updateSessionCartQuantity(session, maMon, 0);
-    }
-
-    public boolean removeItem(long customerId, long maMon) {
-        return removeItem(customerId, maMon, null);
-    }
-
-    private boolean updateSessionCartQuantity(HttpSession session, long maMon, int soLuong) {
-        if (session == null) {
-            return false;
-        }
-
-        @SuppressWarnings("unchecked")
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-        if (cart == null) {
-            return false;
-        }
-
-        CartItem item = findCartItem(cart, maMon);
-        if (item == null) {
-            return false;
-        }
-
-        if (soLuong <= 0) {
-            cart.removeIf(cartItem -> cartItem.getMaMon() == maMon);
-            session.setAttribute("cart", cart);
-            return true;
-        }
-
-        item.setSoLuong(soLuong);
-        item.setThanhTien(item.getDonGia().multiply(BigDecimal.valueOf(soLuong)));
-        session.setAttribute("cart", cart);
-        return true;
+    public record CartAddResult(boolean success, String message, int cartCount) {
     }
 
     private CartItem findCartItem(List<CartItem> cart, long maMon) {
@@ -157,6 +41,107 @@ public class CartService {
         return total;
     }
 
-    public record CartAddResult(boolean success, String message, int cartCount) {
+    public List<CartItem> getSessionCart(HttpSession session) {
+        Object cartObj = session.getAttribute("cart");
+
+        if (cartObj instanceof List<?>) {
+            @SuppressWarnings("unchecked")
+            List<CartItem> cart = (List<CartItem>) cartObj;
+            return cart;
+        }
+
+        List<CartItem> cart = new ArrayList<>();
+        session.setAttribute("cart", cart);
+        return cart;
+    }
+
+    public CartAddResult addSessionCart(Long productID, HttpSession session) {
+        MonAn monAn = monAnRepository.findProduct(productID);
+        if (monAn == null) {
+            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
+        }
+
+        khuyenMaiService.applyKhuyenMai(List.of(monAn));
+        return addSessionCart(monAn, 1, session);
+    }
+
+    public CartAddResult addSessionCart(Long productID, int quantity, HttpSession session) {
+        MonAn monAn = monAnRepository.findProduct(productID);
+        if (monAn == null) {
+            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
+        }
+
+        khuyenMaiService.applyKhuyenMai(List.of(monAn));
+        return addSessionCart(monAn, quantity, session);
+    }
+
+    public CartAddResult addSessionCart(MonAn monAn, int quantity, HttpSession session) {
+        if (monAn == null) {
+            return new CartAddResult(false, "Sản phẩm không tồn tại", 0);
+        }
+
+        if (quantity < 1) {
+            quantity = 1;
+        }
+
+        List<CartItem> cart = getSessionCart(session);
+        CartItem cartItem = findCartItem(cart, monAn.getMaMon());
+        double gia = monAn.isHasGiamGia() ? monAn.getGiaGiam() : monAn.getGia();
+        double giaGoc = monAn.getGia();
+
+        if (cartItem != null) {
+            int soLuong = cartItem.getSoLuong() + quantity;
+            cartItem.setSoLuong(soLuong);
+            cartItem.setDonGia(gia);
+            cartItem.setThanhTien(gia * soLuong);
+            cartItem.setDonGiaGoc(giaGoc);
+        } else {
+            CartItem item = new CartItem();
+            item.setMaMon(monAn.getMaMon());
+            item.setTenMon(monAn.getTenMon());
+            item.setSoLuong(quantity);
+            item.setDonGia(gia);
+            item.setThanhTien(gia * quantity);
+            item.setImageUrl(monAn.getImg());
+            item.setDonGiaGoc(giaGoc);
+            cart.add(item);
+        }
+
+        session.setAttribute("cart", cart);
+        return new CartAddResult(true, "Thêm vào giỏ hàng thành công", countCartItems(cart));
+    }
+
+    public boolean updateSessionQuantity(HttpSession session, long maMon, int soLuong) {
+        if (soLuong < 1) {
+            return false;
+        }
+
+        List<CartItem> cart = getSessionCart(session);
+        CartItem item = findCartItem(cart, maMon);
+        if (item == null) {
+            return false;
+        }
+
+        item.setSoLuong(soLuong);
+        item.setThanhTien(item.getDonGia() * soLuong);
+        session.setAttribute("cart", cart);
+        return true;
+    }
+
+    public boolean removeSessionItem(HttpSession session, long maMon) {
+        List<CartItem> cart = getSessionCart(session);
+        Iterator<CartItem> iterator = cart.iterator();
+
+        while (iterator.hasNext()) {
+            CartItem item = iterator.next();
+            if (item.getMaMon() == maMon) {
+                iterator.remove();
+                session.setAttribute("cart", cart);
+                return true;
+            }
+        }
+
+        session.setAttribute("cart", cart);
+        return false;
     }
 }

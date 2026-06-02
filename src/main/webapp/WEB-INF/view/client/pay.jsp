@@ -21,8 +21,9 @@
   <jsp:include page="layout/header.jsp"/>
 
   <main class="page-shell checkout-main">
-    <input type="hidden" id="customerId" value="1">
-    <input type="hidden" id="orderId">
+    <input type="hidden" id="maKH" value="${param.maKH}">
+    <input type="hidden" id="maDH" value="${param.maDH}">
+    <input type="hidden" id="maPT" value="${param.maPT}">
     <div class="container">
       <div class="page-intro">
         <h1 class="section-title">Thanh toán đơn hàng</h1>
@@ -36,27 +37,27 @@
             <h3 class="section-subtitle">Phương thức đã chọn</h3>
             <div class="payment-options" role="radiogroup" aria-label="Payment method">
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="cod" checked />
+                <input type="radio" name="payment-method" value="COD" checked disabled />
                 <div>
                   <strong>Thanh toán khi nhận hàng (COD)</strong>
                 </div>
               </label>
                 <label class="payment-option">
-                <input type="radio" name="payment-method" value="credit-card" />
+                <input type="radio" name="payment-method" value="CREDIT_CARD" disabled />
                 <div>
                   <strong>Thẻ tín dụng / Ghi nợ</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="banking" />
+                <input type="radio" name="payment-method" value="BANK" disabled />
                 <div>
                   <strong>Chuyển khoản (Internet Banking)</strong>
                 </div>
               </label>
 
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="ewallet" />
+                <input type="radio" name="payment-method" value="EWALLET" disabled />
                 <div>
                   <strong>Ví điện tử (Momo, ZaloPay, VNPAY)</strong>
                 </div>
@@ -91,7 +92,7 @@
                 <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: #475569;">Quét mã QR dưới đây bằng ứng dụng ngân hàng của bạn:</p>
                 <div style="background: #fff; display: inline-block; padding: 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 1rem;">
                   <!-- Dùng ảnh QR giả lập -->
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=JollibugPaymentSystem" alt="QR Code" width="180" height="180" />
+                  <img src="${pageContext.request.contextPath}/resources/images/QRJollibug.png" alt="QR Code" width="180" height="180" />
                 </div>
                 <p style="margin: 0; font-size: 0.85rem; color: var(--color-red-600); font-weight: 700;">Hệ thống sẽ tự động xác nhận sau khi thanh toán thành công.</p>
               </div>
@@ -112,8 +113,8 @@
           <!-- <button class="btn btn-primary btn-block" type="button" id="btn-place-order">Thanh toán</button> -->
           <div id="paymentMessage" class="payment-message"></div>
 
-          <button class="btn btn-primary btn-block" type="button" id="confirmPaymentBtn">
-            Xác nhận thanh toán
+          <button class="btn btn-primary btn-block" type="button" id="confirmPaymentBtn" disabled>
+            Đang xử lý thanh toán...
           </button>
         </section>
         <section class="checkout-card">

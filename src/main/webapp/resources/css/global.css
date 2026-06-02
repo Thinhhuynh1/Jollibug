@@ -87,7 +87,7 @@ body.is-lock-scroll {
 }
 
 ::selection {
-  background: rgba(230, 0, 0, 0.18);
+  background: rgba(154, 7, 7, 0.538);
   color: var(--color-ink-900);
 }
 
@@ -161,6 +161,7 @@ h6 {
   line-height: 1.05;
   letter-spacing: -0.02em;
 }
+
 
 p {
   margin: 0;

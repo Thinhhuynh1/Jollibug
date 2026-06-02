@@ -4,6 +4,12 @@
     font-weight: 700;
 }
 
+.cart-page #checkout-button.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: auto;
+}
+
 .cart-empty {
     padding: 2rem;
     text-align: center;

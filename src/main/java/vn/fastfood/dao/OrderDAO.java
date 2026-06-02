@@ -1,20 +1,23 @@
 package vn.fastfood.dao;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import vn.fastfood.config.DBConnection;
 import vn.fastfood.model.Order;
 import vn.fastfood.model.OrderItem;
 import vn.fastfood.model.OrderStatusHistory;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
 public class OrderDAO {
 
-    public List<Order> getOrdersByCustomerId(long customerId) {
+    public List<Order> getOrdersByMaKH(long maKH) {
         List<Order> orders = new ArrayList<>();
 
         String sql = """
@@ -29,14 +32,13 @@ public class OrderDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, customerId);
+            ps.setLong(1, maKH);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     orders.add(mapResultSetToOrder(rs));
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -44,28 +46,54 @@ public class OrderDAO {
         return orders;
     }
 
-    public Order getOrderById(long orderId, long customerId) {
+    public Order getOrderByMaDH(long maDH, long maKH) {
         String sql = """
-            SELECT MaDH, MaTK_KH, MaTK_NV, NgayDat, MaDC,
-                   TongTienMon, TienGiamGia, ThanhTien,
-                   TrangThaiDon, MaGG, GhiChu
-            FROM DONHANG
-            WHERE MaDH = ?
-              AND MaTK_KH = ?
+            SELECT
+                dh.MaDH,
+                dh.MaTK_KH,
+                dh.MaTK_NV,
+                dh.NgayDat,
+                dh.MaDC,
+                dh.TongTienMon,
+                dh.TienGiamGia,
+                dh.ThanhTien,
+                dh.TrangThaiDon,
+                dh.MaGG,
+                dh.GhiChu,
+                u.HoTen AS TenKhachHang,
+                u.SDT AS SDTKhachHang,
+                u.Email AS EmailKhachHang,
+                dc.TenNguoiNhan AS TenNguoiNhan,
+                dc.SDTNguoiNhan AS SDTNguoiNhan,
+                TRIM(
+                    NVL(dc.DiaChiCuThe, '') ||
+                    CASE WHEN dc.PhuongXa IS NOT NULL AND dc.PhuongXa <> '-' THEN ', ' || dc.PhuongXa ELSE '' END ||
+                    CASE WHEN dc.QuanHuyen IS NOT NULL AND dc.QuanHuyen <> '-' THEN ', ' || dc.QuanHuyen ELSE '' END ||
+                    CASE WHEN dc.TinhThanh IS NOT NULL AND dc.TinhThanh <> '-' THEN ', ' || dc.TinhThanh ELSE '' END
+                ) AS DiaChiGiaoHang,
+                tt.MaPT AS MaPT,
+                pt.TenPT AS TenPT,
+                tt.TrangThaiTT AS TrangThaiTT
+            FROM DONHANG dh
+            LEFT JOIN NGUOIDUNG u ON dh.MaTK_KH = u.MaTK
+            LEFT JOIN DIACHI dc ON dh.MaDC = dc.MaDC
+            LEFT JOIN THANHTOAN tt ON dh.MaDH = tt.MaDH
+            LEFT JOIN PHUONGTHUCTT pt ON tt.MaPT = pt.MaPT
+            WHERE dh.MaDH = ?
+              AND dh.MaTK_KH = ?
         """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, orderId);
-            ps.setLong(2, customerId);
+            ps.setLong(1, maDH);
+            ps.setLong(2, maKH);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapResultSetToOrder(rs);
+                    return mapOrderDetailResultSetToOrder(rs);
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -128,7 +156,6 @@ public class OrderDAO {
                     orders.add(mapResultSetToOrder(rs));
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -136,7 +163,7 @@ public class OrderDAO {
         return orders;
     }
 
-    public Order getOrderByIdForStaff(long orderId) {
+    public Order getOrderByMaDHForStaff(long maDH) {
         String sql = """
             SELECT
                 dh.MaDH,
@@ -150,11 +177,9 @@ public class OrderDAO {
                 dh.TrangThaiDon,
                 dh.MaGG,
                 dh.GhiChu,
-
                 u.HoTen AS TenKhachHang,
                 u.SDT AS SDTKhachHang,
                 u.Email AS EmailKhachHang,
-
                 dc.TenNguoiNhan AS TenNguoiNhan,
                 dc.SDTNguoiNhan AS SDTNguoiNhan,
                 TRIM(
@@ -163,13 +188,11 @@ public class OrderDAO {
                     CASE WHEN dc.QuanHuyen IS NOT NULL THEN ', ' || dc.QuanHuyen ELSE '' END ||
                     CASE WHEN dc.TinhThanh IS NOT NULL THEN ', ' || dc.TinhThanh ELSE '' END
                 ) AS DiaChiGiaoHang,
-
                 tt.MaPT AS MaPT,
                 pt.TenPT AS TenPT,
                 tt.TrangThaiTT AS TrangThaiTT
-
             FROM DONHANG dh
-            LEFT JOIN USERS u ON dh.MaTK_KH = u.MaTK
+            LEFT JOIN NGUOIDUNG u ON dh.MaTK_KH = u.MaTK
             LEFT JOIN DIACHI dc ON dh.MaDC = dc.MaDC
             LEFT JOIN THANHTOAN tt ON dh.MaDH = tt.MaDH
             LEFT JOIN PHUONGTHUCTT pt ON tt.MaPT = pt.MaPT
@@ -177,16 +200,15 @@ public class OrderDAO {
         """;
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, orderId);
+            ps.setLong(1, maDH);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapStaffOrderDetailResultSetToOrder(rs);
+                    return mapOrderDetailResultSetToOrder(rs);
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -194,36 +216,42 @@ public class OrderDAO {
         return null;
     }
 
-    public List<OrderItem> getOrderItemsByOrderId(long orderId) {
+    public List<OrderItem> getOrderItemsByMaDH(long maDH) {
         List<OrderItem> items = new ArrayList<>();
 
         String sql = """
-            SELECT MaDH, MaMon, TenMon, SoLuong, DonGia, ThanhTien
-            FROM CHITIETDH
-            WHERE MaDH = ?
-            ORDER BY MaMon
+            SELECT
+                ctdh.MaDH,
+                ctdh.MaMon,
+                ctdh.TenMon,
+                ctdh.SoLuong,
+                ctdh.DonGia,
+                ctdh.ThanhTien,
+                ma.image_url AS ImageUrl
+            FROM CHITIETDH ctdh
+            LEFT JOIN MONAN ma ON ctdh.MaMon = ma.MaMon
+            WHERE ctdh.MaDH = ?
+            ORDER BY ctdh.MaMon
         """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, orderId);
+            ps.setLong(1, maDH);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     OrderItem item = new OrderItem();
-
                     item.setMaDH(rs.getLong("MaDH"));
                     item.setMaMon(rs.getLong("MaMon"));
                     item.setTenMon(rs.getString("TenMon"));
                     item.setSoLuong(rs.getInt("SoLuong"));
                     item.setDonGia(rs.getBigDecimal("DonGia"));
                     item.setThanhTien(rs.getBigDecimal("ThanhTien"));
-
+                    item.setImg(rs.getString("ImageUrl"));
                     items.add(item);
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -231,65 +259,11 @@ public class OrderDAO {
         return items;
     }
 
-    public boolean insertOrderStatusHistory(
-            long orderId,
-            String oldStatus,
-            String newStatus,
-            String actorType,
-            Long actorId,
-            String reason
-    ) {
-        String sql = """
-            INSERT INTO LICHSUTRANGTHAIDH (
-                MaDH,
-                TrangThaiCu,
-                TrangThaiMoi,
-                NguoiThucHienLoai,
-                MaNguoiThucHien,
-                LyDo,
-                ThoiGian
-            )
-            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        """;
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setLong(1, orderId);
-            setNullableVarchar(ps, 2, oldStatus);
-            ps.setString(3, newStatus);
-            ps.setString(4, actorType);
-
-            if (actorId == null) {
-                ps.setNull(5, Types.NUMERIC);
-            } else {
-                ps.setLong(5, actorId);
-            }
-
-            setNullableClob(ps, 6, reason);
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    public List<OrderStatusHistory> getOrderStatusHistory(long orderId) {
+    public List<OrderStatusHistory> getOrderStatusHistory(long maDH) {
         List<OrderStatusHistory> history = new ArrayList<>();
 
         String sql = """
-            SELECT
-                MaLS,
-                MaDH,
-                TrangThaiCu,
-                TrangThaiMoi,
-                NguoiThucHienLoai,
-                MaNguoiThucHien,
-                LyDo,
-                ThoiGian
+            SELECT MaLS, MaDH, TrangThaiCu, TrangThaiMoi, MaNguoiThucHien, LyDo, ThoiGian
             FROM LICHSUTRANGTHAIDH
             WHERE MaDH = ?
             ORDER BY ThoiGian ASC, MaLS ASC
@@ -298,14 +272,13 @@ public class OrderDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setLong(1, orderId);
+            ps.setLong(1, maDH);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     history.add(mapResultSetToOrderStatusHistory(rs));
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -313,70 +286,7 @@ public class OrderDAO {
         return history;
     }
 
-    public int addOrderItemsToCart(long orderId, long customerId) {
-        String orderItemsSql = """
-            SELECT MaMon, SoLuong
-            FROM CHITIETDH
-            WHERE MaDH = ?
-            ORDER BY MaMon
-        """;
-
-        String mergeCartItemSql = """
-            MERGE INTO CHITIETGH ct
-            USING (
-                SELECT ? AS MaGH, ? AS MaMon, ? AS SLuong
-                FROM dual
-            ) src
-            ON (ct.MaGH = src.MaGH AND ct.MaMon = src.MaMon)
-            WHEN MATCHED THEN
-                UPDATE SET ct.SLuong = ct.SLuong + src.SLuong
-            WHEN NOT MATCHED THEN
-                INSERT (MaGH, MaMon, SLuong, added_at)
-                VALUES (src.MaGH, src.MaMon, src.SLuong, CURRENT_TIMESTAMP)
-        """;
-
-        try (Connection conn = DBConnection.getConnection()) {
-            boolean originalAutoCommit = conn.getAutoCommit();
-            conn.setAutoCommit(false);
-
-            try {
-                Long cartId = getOrCreateCartId(conn, customerId);
-                int itemCount = 0;
-
-                try (PreparedStatement itemPs = conn.prepareStatement(orderItemsSql);
-                     PreparedStatement mergePs = conn.prepareStatement(mergeCartItemSql)) {
-
-                    itemPs.setLong(1, orderId);
-
-                    try (ResultSet rs = itemPs.executeQuery()) {
-                        while (rs.next()) {
-                            mergePs.setLong(1, cartId);
-                            mergePs.setLong(2, rs.getLong("MaMon"));
-                            mergePs.setInt(3, rs.getInt("SoLuong"));
-                            mergePs.executeUpdate();
-                            itemCount++;
-                        }
-                    }
-                }
-
-                conn.commit();
-                conn.setAutoCommit(originalAutoCommit);
-                return itemCount;
-
-            } catch (SQLException e) {
-                conn.rollback();
-                conn.setAutoCommit(originalAutoCommit);
-                throw e;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
-    public boolean updateOrderStatus(long orderId, String newStatus) {
+    public boolean updateOrderStatus(long maDH, String newStatus) {
         String sql = """
             UPDATE DONHANG
             SET TrangThaiDon = ?
@@ -387,10 +297,8 @@ public class OrderDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, newStatus);
-            ps.setLong(2, orderId);
-
+            ps.setLong(2, maDH);
             return ps.executeUpdate() > 0;
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -398,11 +306,14 @@ public class OrderDAO {
         return false;
     }
 
-    public boolean updateOrderStatusAndStaff(long orderId, long staffId, String newStatus) {
+    public boolean updateOrderStatusAndStaff(long maDH, long staffId, String newStatus) {
         String sql = """
             UPDATE DONHANG
             SET TrangThaiDon = ?,
-                MaTK_NV = ?
+                MaTK_NV = CASE
+                    WHEN MaTK_NV IS NULL THEN ?
+                    ELSE MaTK_NV
+                END
             WHERE MaDH = ?
         """;
 
@@ -411,15 +322,81 @@ public class OrderDAO {
 
             ps.setString(1, newStatus);
             ps.setLong(2, staffId);
-            ps.setLong(3, orderId);
-
+            ps.setLong(3, maDH);
             return ps.executeUpdate() > 0;
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return false;
+    }
+
+    public boolean updateOrderStatusStaffAndCancelReason(long maDH, long staffId, String newStatus, String cancelReason) {
+        String sql = """
+            UPDATE DONHANG
+            SET TrangThaiDon = ?,
+                MaTK_NV = CASE
+                    WHEN MaTK_NV IS NULL THEN ?
+                    ELSE MaTK_NV
+                END,
+                GhiChu = CASE
+                    WHEN GhiChu IS NULL THEN TO_CLOB(?)
+                    ELSE GhiChu || TO_CLOB(CHR(10) || ?)
+                END
+            WHERE MaDH = ?
+        """;
+
+        String reasonText = "[Há»§y Ä‘Æ¡n] LÃ½ do: "
+                + (cancelReason == null || cancelReason.trim().isEmpty()
+                ? "KhÃ´ng cÃ³ lÃ½ do cá»¥ thá»ƒ"
+                : cancelReason.trim());
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newStatus);
+            ps.setLong(2, staffId);
+            ps.setString(3, reasonText);
+            ps.setString(4, reasonText);
+            ps.setLong(5, maDH);
+
+            int rows = ps.executeUpdate();
+            System.out.println("[DAO CANCEL] rows=" + rows);
+            return rows > 0;
+        } catch (SQLException e) {
+            System.out.println("[DAO CANCEL] SQL ERROR:");
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public void lockOrder(Connection conn, long maDH) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("""
+            SELECT MaDH
+            FROM DONHANG
+            WHERE MaDH = ?
+            FOR UPDATE
+        """)) {
+            ps.setLong(1, maDH);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("Không tìm thấy đơn hàng");
+                }
+            }
+        }
+    }
+
+    public void updateOrderStatus(Connection conn, long maDH, String newStatus) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("""
+            UPDATE DONHANG
+            SET TrangThaiDon = ?
+            WHERE MaDH = ?
+        """)) {
+            ps.setString(1, newStatus);
+            ps.setLong(2, maDH);
+            ps.executeUpdate();
+        }
     }
 
     private void setParameters(PreparedStatement ps, List<Object> params) throws SQLException {
@@ -428,80 +405,13 @@ public class OrderDAO {
         }
     }
 
-    private void setNullableVarchar(PreparedStatement ps, int index, String value) throws SQLException {
-        if (value == null || value.trim().isEmpty()) {
-            ps.setNull(index, Types.VARCHAR);
-            return;
-        }
-
-        ps.setString(index, value.trim());
-    }
-
-    private void setNullableClob(PreparedStatement ps, int index, String value) throws SQLException {
-        if (value == null || value.trim().isEmpty()) {
-            ps.setNull(index, Types.CLOB);
-            return;
-        }
-
-        String trimmedValue = value.trim();
-        ps.setCharacterStream(index, new StringReader(trimmedValue), trimmedValue.length());
-    }
-
-    private Long getOrCreateCartId(Connection conn, long customerId) throws SQLException {
-        String findSql = """
-            SELECT MaGH
-            FROM GIOHANG
-            WHERE MaTK = ?
-        """;
-
-        try (PreparedStatement ps = conn.prepareStatement(findSql)) {
-            ps.setLong(1, customerId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getLong("MaGH");
-                }
-            }
-        }
-
-        String insertSql = """
-            INSERT INTO GIOHANG (MaTK, created_at)
-            VALUES (?, CURRENT_TIMESTAMP)
-        """;
-
-        try (PreparedStatement ps = conn.prepareStatement(insertSql, new String[]{"MaGH"})) {
-            ps.setLong(1, customerId);
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getLong(1);
-                }
-            }
-        }
-
-        try (PreparedStatement ps = conn.prepareStatement(findSql)) {
-            ps.setLong(1, customerId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getLong("MaGH");
-                }
-            }
-        }
-
-        throw new SQLException("Could not create cart for customerId=" + customerId);
-    }
-
     private Order mapResultSetToOrder(ResultSet rs) throws SQLException {
         Order order = new Order();
-
         order.setMaDH(rs.getLong("MaDH"));
         order.setMaTKKH(rs.getLong("MaTK_KH"));
 
         long maTKNV = rs.getLong("MaTK_NV");
         order.setMaTKNV(rs.wasNull() ? null : maTKNV);
-
         order.setNgayDat(rs.getTimestamp("NgayDat"));
 
         long maDC = rs.getLong("MaDC");
@@ -514,45 +424,35 @@ public class OrderDAO {
 
         long maGG = rs.getLong("MaGG");
         order.setMaGG(rs.wasNull() ? null : maGG);
-
         order.setGhiChu(rs.getString("GhiChu"));
-
         return order;
     }
 
-    private Order mapStaffOrderDetailResultSetToOrder(ResultSet rs) throws SQLException {
+    private Order mapOrderDetailResultSetToOrder(ResultSet rs) throws SQLException {
         Order order = mapResultSetToOrder(rs);
-
         order.setTenKhachHang(rs.getString("TenKhachHang"));
         order.setSdtKhachHang(rs.getString("SDTKhachHang"));
         order.setEmailKhachHang(rs.getString("EmailKhachHang"));
-
         order.setTenNguoiNhan(rs.getString("TenNguoiNhan"));
         order.setSdtNguoiNhan(rs.getString("SDTNguoiNhan"));
         order.setDiaChiGiaoHang(rs.getString("DiaChiGiaoHang"));
-
         order.setMaPT(rs.getString("MaPT"));
         order.setTenPT(rs.getString("TenPT"));
         order.setTrangThaiTT(rs.getString("TrangThaiTT"));
-
         return order;
     }
 
     private OrderStatusHistory mapResultSetToOrderStatusHistory(ResultSet rs) throws SQLException {
         OrderStatusHistory history = new OrderStatusHistory();
-
         history.setMaLS(rs.getLong("MaLS"));
         history.setMaDH(rs.getLong("MaDH"));
         history.setTrangThaiCu(rs.getString("TrangThaiCu"));
         history.setTrangThaiMoi(rs.getString("TrangThaiMoi"));
-        history.setNguoiThucHienLoai(rs.getString("NguoiThucHienLoai"));
 
         long actorId = rs.getLong("MaNguoiThucHien");
         history.setMaNguoiThucHien(rs.wasNull() ? null : actorId);
-
         history.setLyDo(readClob(rs.getClob("LyDo")));
         history.setThoiGian(rs.getTimestamp("ThoiGian"));
-
         return history;
     }
 
@@ -572,50 +472,8 @@ public class OrderDAO {
             }
 
             return value.toString();
-
         } catch (IOException e) {
             throw new SQLException("Could not read order status history CLOB.", e);
         }
     }
-
-    public boolean updateOrderStatusStaffAndCancelReason(long orderId, long staffId, String newStatus, String cancelReason) {
-        String sql = """
-            UPDATE DONHANG
-            SET TrangThaiDon = ?,
-                MaTK_NV = ?,
-                GhiChu = CASE
-                    WHEN GhiChu IS NULL OR DBMS_LOB.GETLENGTH(GhiChu) = 0 THEN TO_CLOB(?)
-                    ELSE GhiChu || TO_CLOB(CHR(10) || ?)
-                END
-            WHERE MaDH = ?
-        """;
-
-        String reasonText = "[Hủy đơn] Lý do: "
-                + (cancelReason == null || cancelReason.trim().isEmpty()
-                ? "Không có lý do cụ thể"
-                : cancelReason.trim());
-
-        try (Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, newStatus);
-            ps.setLong(2, staffId);
-            ps.setString(3, reasonText);
-            ps.setString(4, reasonText);
-            ps.setLong(5, orderId);
-
-            int rows = ps.executeUpdate();
-
-            System.out.println("[DAO CANCEL] rows=" + rows);
-
-            return rows > 0;
-
-        } catch (SQLException e) {
-            System.out.println("[DAO CANCEL] SQL ERROR:");
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
 }

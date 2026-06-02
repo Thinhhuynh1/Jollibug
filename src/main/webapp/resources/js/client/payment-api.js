@@ -1,151 +1,173 @@
 const PAYMENT_API_BASE = "/api/payments";
 
 document.addEventListener("DOMContentLoaded", () => {
-    const orderId = getOrderIdFromUrl();
+    const params = getPaymentParams();
 
-    if (!orderId) {
-        showPaymentMessage("Thiếu mã đơn hàng. Vui lòng quay lại đơn hàng để thanh toán.");
-        disableConfirmButton();
+    if (!params.maDH || !params.maKH || !params.maPT) {
+        showPaymentMessage("Thiếu thông tin thanh toán, vui lòng quay lại lịch sử đơn hàng");
+        disableConfirmButton("Không thể xử lý thanh toán");
         return;
     }
 
-    loadPaymentInfo(orderId);
-
-    const confirmBtn = document.getElementById("confirmPaymentBtn");
-    if (confirmBtn) {
-        confirmBtn.addEventListener("click", () => confirmPayment(orderId));
-    }
+    setHiddenValue("maDH", params.maDH);
+    setHiddenValue("maKH", params.maKH);
+    setHiddenValue("maPT", params.maPT);
+    lockPaymentMethods(params.maPT);
+    showPaymentView(params.maPT);
+    renderPaymentParams(params);
+    bindConfirmButton(params);
+    loadPaymentInfo(params).finally(() => enableConfirmButton(getConfirmButtonLabel(params.maPT)));
 });
 
-function getOrderIdFromUrl() {
+function getPaymentParams() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("orderId");
+
+    return {
+        maDH: params.get("maDH"),
+        maKH: params.get("maKH"),
+        maPT: (params.get("maPT") || "").trim().toUpperCase()
+    };
 }
 
-async function loadPaymentInfo(orderId) {
+async function loadPaymentInfo(params) {
     try {
-        const response = await fetch(`${PAYMENT_API_BASE}/order/${orderId}`);
+        const response = await fetch(
+            `${PAYMENT_API_BASE}/order/${encodeURIComponent(params.maDH)}?maPT=${encodeURIComponent(params.maPT)}`
+        );
         const data = await response.json();
 
         if (!response.ok) {
-            showPaymentMessage(data.message || "Không tìm thấy thông tin thanh toán.");
-            disableConfirmButton();
+            showPaymentMessage(data.message || "Không tìm thấy thông tin thanh toán");
             return;
         }
 
         renderPaymentInfo(data);
-
     } catch (error) {
-        showPaymentMessage("Lỗi khi tải thông tin thanh toán.");
-        disableConfirmButton();
+        showPaymentMessage("Lỗi khi tải thông tin thanh toán");
     }
 }
 
-function renderPaymentInfo(payment) {
-    const orderIdEl = document.getElementById("paymentOrderId");
-    const methodEl = document.getElementById("paymentMethod");
-    const amountEl = document.getElementById("paymentAmount");
-    const statusEl = document.getElementById("paymentStatus");
-    const totalEl = document.getElementById("invoice-total");
+function bindConfirmButton(params) {
     const confirmBtn = document.getElementById("confirmPaymentBtn");
+    if (!confirmBtn) {
+        return;
+    }
 
-    if (orderIdEl) orderIdEl.textContent = "#" + payment.maDH;
-    if (methodEl) methodEl.textContent = displayPaymentMethod(payment.maPT);
-    if (amountEl) amountEl.textContent = formatMoney(payment.soTien);
-    if (totalEl) totalEl.textContent = formatMoney(payment.soTien);
-    if (statusEl) statusEl.textContent = displayPaymentStatus(payment.trangThaiTT);
+    confirmBtn.addEventListener("click", async () => {
+        if (confirmBtn.disabled) {
+            return;
+        }
 
+        await completePayment(params);
+    });
+}
+
+async function completePayment(params) {
+    showPaymentMessage("Đang xử lý thanh toán...");
+    disableConfirmButton("Đang xử lý thanh toán...");
+    setText("paymentStatus", "Đang xử lý thanh toán");
+
+    try {
+        const response = await fetch(`${PAYMENT_API_BASE}/order/${encodeURIComponent(params.maDH)}/confirm`, {
+            method: "PUT"
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {};
+        }
+
+        if (!response.ok || data.success === false) {
+            showPaymentMessage(data.message || "Không thể cập nhật trạng thái thanh toán");
+            enableConfirmButton(getConfirmButtonLabel(params.maPT));
+            setText("paymentStatus", "Chờ thanh toán");
+            return;
+        }
+
+        showPaymentMessage("Thanh toán thành công");
+        disableConfirmButton("Thanh toán thành công");
+        setText("paymentStatus", "Đã thanh toán");
+        localStorage.removeItem("selectedCheckoutAddress");
+
+        window.setTimeout(() => {
+            window.location.href = "/orders/detail?maDH=" + encodeURIComponent(params.maDH);
+        }, 1000);
+    } catch (error) {
+        showPaymentMessage("Không thể xử lý thanh toán, vui lòng thử lại");
+        enableConfirmButton(getConfirmButtonLabel(params.maPT));
+        setText("paymentStatus", "Chờ thanh toán");
+    }
+}
+
+function getConfirmButtonLabel(maPT) {
+    const normalized = normalizePaymentMethod(maPT);
+    if (normalized === "COD") {
+        return "Xác nhận đặt hàng";
+    }
+    return "Xác nhận thanh toán";
+}
+
+function renderPaymentParams(params) {
+    setText("paymentOrderId", "#" + params.maDH);
+    setText("paymentMethod", displayPaymentMethod(params.maPT));
+    setText("paymentStatus", "Chờ thanh toán");
+}
+
+function renderPaymentInfo(payment) {
+    setText("paymentOrderId", "#" + payment.maDH);
+    setText("paymentMethod", displayPaymentMethod(payment.maPT));
+    setText("paymentAmount", formatMoney(payment.soTien));
+    setText("invoice-total", formatMoney(payment.soTien));
+    setText("paymentStatus", displayPaymentStatus(payment.trangThaiTT));
     showPaymentView(payment.maPT);
     lockPaymentMethods(payment.maPT);
 
-    if (confirmBtn && normalizeStatus(payment.trangThaiTT) === "PAID") {
-        confirmBtn.disabled = true;
-        confirmBtn.textContent = "Đã thanh toán";
-        showPaymentMessage("Đơn hàng này đã được thanh toán.");
+    if (normalizeStatus(payment.trangThaiTT) === "PAID") {
+        disableConfirmButton("Thanh toán thành công");
+        showPaymentMessage("Đơn hàng đã được thanh toán");
     }
 }
 
 function lockPaymentMethods(maPT) {
     const selectedValue = normalizePaymentMethod(maPT);
 
-    document.querySelectorAll('input[name="payment-method"]').forEach(input => {
-        input.checked = input.value === selectedValue;
+    document.querySelectorAll('input[name="payment-method"]').forEach((input) => {
+        input.checked = normalizePaymentMethod(input.value) === selectedValue;
         input.disabled = true;
-    });
-}
-
-async function confirmPayment(orderId) {
-    const confirmBtn = document.getElementById("confirmPaymentBtn");
-
-    if (confirmBtn) {
-        confirmBtn.disabled = true;
-        confirmBtn.textContent = "Đang xử lý...";
-    }
-
-    try {
-        const response = await fetch(`${PAYMENT_API_BASE}/order/${orderId}/confirm`, {
-            method: "PUT"
-        });
-
-        const data = await response.json();
-
-        showPaymentMessage(data.message || "Đã xử lý thanh toán.");
-
-        if (response.ok) {
-            loadPaymentInfo(orderId);
-            return;
-        }
-
-        if (confirmBtn) {
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = "Xác nhận thanh toán";
-        }
-
-    } catch (error) {
-        showPaymentMessage("Lỗi khi xác nhận thanh toán.");
-
-        if (confirmBtn) {
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = "Xác nhận thanh toán";
-        }
-    }
-}
-
-function selectPaymentMethod(maPT) {
-    const normalized = normalizePaymentMethod(maPT);
-
-    document.querySelectorAll('input[name="payment-method"]').forEach(input => {
-        input.checked = input.value === normalized;
     });
 }
 
 function showPaymentView(maPT) {
     const normalized = normalizePaymentMethod(maPT);
+    const viewMap = {
+        COD: "view-cod",
+        BANK: "view-banking",
+        EWALLET: "view-ewallet",
+        CREDIT_CARD: "view-credit-card"
+    };
 
-    document.querySelectorAll(".payment-view").forEach(view => {
+    document.querySelectorAll(".payment-view").forEach((view) => {
         view.style.display = "none";
     });
 
-    const view = document.getElementById(`view-${normalized}`);
+    const view = document.getElementById(viewMap[normalized] || "view-banking");
     if (view) {
         view.style.display = "block";
     }
 }
 
 function normalizePaymentMethod(method) {
-    const m = (method || "").trim().toUpperCase();
+    const value = (method || "").trim().toUpperCase();
 
-    if (m === "COD") return "cod";
-    if (m === "BANK") return "banking";
-    if (m === "EWALLET") return "ewallet";
-    if (m === "CREDIT_CARD") return "credit-card";
+    if (value === "BANKING") return "BANK";
+    if (value === "CREDIT-CARD") return "CREDIT_CARD";
 
-    return "cod";
+    return value;
 }
 
 function displayPaymentMethod(method) {
-    const m = (method || "").trim().toUpperCase();
-
     const map = {
         COD: "Thanh toán khi nhận hàng (COD)",
         BANK: "Chuyển khoản ngân hàng",
@@ -153,19 +175,18 @@ function displayPaymentMethod(method) {
         CREDIT_CARD: "Thẻ tín dụng / Ghi nợ"
     };
 
-    return map[m] || method;
+    return map[normalizePaymentMethod(method)] || method || "-";
 }
 
 function displayPaymentStatus(status) {
-    const s = normalizeStatus(status);
-
     const map = {
         PENDING: "Chờ thanh toán",
         PAID: "Đã thanh toán",
-        FAILED: "Thanh toán thất bại"
+        FAILED: "Thanh toán thất bại",
+        CANCELLED: "Đã hủy"
     };
 
-    return map[s] || status;
+    return map[normalizeStatus(status)] || status || "-";
 }
 
 function normalizeStatus(status) {
@@ -177,22 +198,41 @@ function formatMoney(value) {
 }
 
 function showPaymentMessage(message) {
-    const messageEl = document.getElementById("paymentMessage");
-
-    if (messageEl) {
-        messageEl.textContent = message || "";
-    }
-    const amountEl = document.getElementById("paymentAmount");
-    const totalEl = document.getElementById("invoice-total");
-
-    if (amountEl) amountEl.textContent = formatMoney(payment.soTien);
-    if (totalEl) totalEl.textContent = formatMoney(payment.soTien);
+    setText("paymentMessage", message || "");
 }
 
-function disableConfirmButton() {
+function disableConfirmButton(text) {
     const confirmBtn = document.getElementById("confirmPaymentBtn");
 
     if (confirmBtn) {
         confirmBtn.disabled = true;
+        if (text) {
+            confirmBtn.textContent = text;
+        }
+    }
+}
+
+function enableConfirmButton(text) {
+    const confirmBtn = document.getElementById("confirmPaymentBtn");
+
+    if (confirmBtn) {
+        confirmBtn.disabled = false;
+        if (text) {
+            confirmBtn.textContent = text;
+        }
+    }
+}
+
+function setHiddenValue(id, value) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.value = value || "";
+    }
+}
+
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.textContent = value;
     }
 }

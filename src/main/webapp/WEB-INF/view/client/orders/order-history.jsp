@@ -32,9 +32,9 @@
                 </a>
             </div>
 
-            <input type="hidden" id="currentCustomerId" value="${sessionScope.userId != null ? sessionScope.userId : sessionScope.user.maTK}">
+            <input type="hidden" id="currentMaKH" value="${not empty sessionScope.user ? sessionScope.user.maTK : sessionScope.userId}">
 
-            <div class="order-tabs" role="tablist" aria-label="Order tabs">
+            <div class="order-tabs" role="tablist" aria-label="Bộ lọc đơn hàng">
                 <button class="order-tab is-active" type="button" data-tab="active" onclick="switchOrderTab('active')">
                     Đơn đang đến
                 </button>

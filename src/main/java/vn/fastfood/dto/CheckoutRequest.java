@@ -1,21 +1,25 @@
 package vn.fastfood.dto;
 
 public class CheckoutRequest {
-    private long customerId;
+    private long maKH;
     private Long maDC;
     private String discountCode;
     private String maPT;
     private String ghiChu;
+    private String deliveryName;
+    private String deliveryPhone;
+    private String email;
+    private String deliveryAddress;
 
     public CheckoutRequest() {
     }
 
-    public long getCustomerId() {
-        return customerId;
+    public long getMaKH() {
+        return maKH;
     }
 
-    public void setCustomerId(long customerId) {
-        this.customerId = customerId;
+    public void setMaKH(long maKH) {
+        this.maKH = maKH;
     }
 
     public Long getMaDC() {
@@ -48,5 +52,37 @@ public class CheckoutRequest {
 
     public void setGhiChu(String ghiChu) {
         this.ghiChu = ghiChu;
+    }
+
+    public String getDeliveryName() {
+        return deliveryName;
+    }
+
+    public void setDeliveryName(String deliveryName) {
+        this.deliveryName = deliveryName;
+    }
+
+    public String getDeliveryPhone() {
+        return deliveryPhone;
+    }
+
+    public void setDeliveryPhone(String deliveryPhone) {
+        this.deliveryPhone = deliveryPhone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 }

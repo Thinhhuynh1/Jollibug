@@ -25,7 +25,6 @@ public class ThongKeService {
         this.userRepository = userRepository;
     }
 
-    // ==================== THỐNG KÊ DOANH THU ====================
     public Map<String, Object> getRevenueStats(String period) {
         LocalDateTime from = calculateFrom(period);
         LocalDateTime to = LocalDateTime.now();
@@ -35,13 +34,11 @@ public class ThongKeService {
         stats.put("totalRevenue", currentRevenue != null ? currentRevenue : 0L);
         stats.put("avgOrderValue", donHangRepository.avgOrderValue(from, to));
 
-        // So sánh với kỳ trước
         LocalDateTime[] prevRange = calculatePreviousRange(period);
         Long prevRevenue = donHangRepository.sumRevenue(prevRange[0], prevRange[1]);
         stats.put("prevTotalRevenue", prevRevenue != null ? prevRevenue : 0L);
         stats.put("revenueGrowth", calculateGrowth(currentRevenue, prevRevenue));
 
-        // Doanh thu theo ngày (cho biểu đồ bar/line chart)
         List<Object[]> rawByDay = donHangRepository.revenueByDay(from, to);
         List<Map<String, Object>> revenueByDay = new ArrayList<>();
         for (Object[] row : rawByDay) {
@@ -52,7 +49,6 @@ public class ThongKeService {
         }
         stats.put("revenueByDay", revenueByDay);
 
-        // Doanh thu theo tháng (cho năm hiện tại)
         int currentYear = LocalDate.now().getYear();
         List<Object[]> rawByMonth = donHangRepository.revenueByMonth(currentYear);
         List<Map<String, Object>> revenueByMonth = new ArrayList<>();
@@ -64,16 +60,15 @@ public class ThongKeService {
         }
         stats.put("revenueByMonth", revenueByMonth);
 
-        // Doanh thu nhanh
         LocalDateTime todayStart = LocalDate.now().atStartOfDay();
         LocalDateTime todayEnd = LocalDateTime.now();
         stats.put("revenueToday", donHangRepository.sumRevenue(todayStart, todayEnd));
+        stats.put("revenueWeek", donHangRepository.sumRevenue(LocalDate.now().minusWeeks(1).atStartOfDay(), todayEnd));
         stats.put("revenueMonth", donHangRepository.sumRevenue(LocalDate.now().withDayOfMonth(1).atStartOfDay(), todayEnd));
 
         return stats;
     }
 
-    // ==================== THỐNG KÊ ĐƠN HÀNG ====================
     public Map<String, Object> getOrderStats(String period) {
         LocalDateTime from = calculateFrom(period);
         LocalDateTime to = LocalDateTime.now();
@@ -82,13 +77,11 @@ public class ThongKeService {
         Long currentOrders = donHangRepository.countByDateRange(from, to);
         stats.put("totalOrders", currentOrders != null ? currentOrders : 0L);
 
-        // So sánh với kỳ trước
         LocalDateTime[] prevRange = calculatePreviousRange(period);
         Long prevOrders = donHangRepository.countByDateRange(prevRange[0], prevRange[1]);
         stats.put("prevTotalOrders", prevOrders != null ? prevOrders : 0L);
         stats.put("ordersGrowth", calculateGrowth(currentOrders, prevOrders));
 
-        // Đơn theo trạng thái
         List<Object[]> rawByStatus = donHangRepository.countGroupByStatus(from, to);
         Map<String, Long> ordersByStatus = new LinkedHashMap<>();
         for (Object[] row : rawByStatus) {
@@ -96,7 +89,6 @@ public class ThongKeService {
         }
         stats.put("ordersByStatus", ordersByStatus);
 
-        // Đơn theo ngày
         List<Object[]> rawByDay = donHangRepository.countByDay(from, to);
         List<Map<String, Object>> ordersByDay = new ArrayList<>();
         for (Object[] row : rawByDay) {
@@ -108,10 +100,12 @@ public class ThongKeService {
         stats.put("ordersByDay", ordersByDay);
 
         stats.put("pending", donHangRepository.countByTrangThai("PENDING"));
+        stats.put("confirmed", donHangRepository.countByTrangThai("CONFIRMED"));
+        stats.put("shipping", donHangRepository.countByTrangThai("SHIPPING"));
         stats.put("delivered", donHangRepository.countByTrangThai("DELIVERED"));
+        stats.put("cancelled", donHangRepository.countByTrangThai("CANCELLED"));
         stats.put("avgOrderValue", donHangRepository.avgOrderValue(from, to));
 
-        // Recent orders
         List<vn.fastfood.entity.DonHang> recentOrderEntities = donHangRepository.findRecentOrders(PageRequest.of(0, 10));
         List<Map<String, Object>> recentOrders = new ArrayList<>();
         for (vn.fastfood.entity.DonHang order : recentOrderEntities) {
@@ -120,7 +114,8 @@ public class ThongKeService {
             item.put("tongTien", order.getTongTien());
             item.put("trangThai", order.getTrangThai());
             item.put("ngayDat", order.getNgayDat() != null ? order.getNgayDat().toString() : null);
-            item.put("hoTen", order.getUser() != null ? order.getUser().getHoTen() : "Khách vãng lai");
+            item.put("ngayDatDisplay", order.getNgayDatDisplay());
+            item.put("hoTen", order.getUser() != null ? order.getUser().getHoTen() : "Khach vang lai");
             recentOrders.add(item);
         }
         stats.put("recentOrders", recentOrders);
@@ -128,7 +123,6 @@ public class ThongKeService {
         return stats;
     }
 
-    // ==================== THỐNG KÊ KHÁCH HÀNG ====================
     public Map<String, Object> getCustomerStats(String period) {
         LocalDateTime from = calculateFrom(period);
         LocalDateTime to = LocalDateTime.now();
@@ -137,7 +131,6 @@ public class ThongKeService {
         Long currentNewCustomers = userRepository.countNewCustomers(from, to);
         stats.put("newCustomers", currentNewCustomers != null ? currentNewCustomers : 0L);
 
-        // So sánh với kỳ trước
         LocalDateTime[] prevRange = calculatePreviousRange(period);
         Long prevNewCustomers = userRepository.countNewCustomers(prevRange[0], prevRange[1]);
         stats.put("prevNewCustomers", prevNewCustomers != null ? prevNewCustomers : 0L);
@@ -145,14 +138,16 @@ public class ThongKeService {
 
         stats.put("totalCustomers", userRepository.count("CLIENT", null));
         stats.put("totalActiveCustomers", userRepository.countActiveCustomers());
+        stats.put("orderingCustomers", donHangRepository.countDistinctCustomers(from, to));
 
-        // Top customers
         List<Object[]> rawTopCustomers = donHangRepository.findTopCustomers(PageRequest.of(0, 10));
         List<Map<String, Object>> topCustomers = new ArrayList<>();
         for (Object[] row : rawTopCustomers) {
             Map<String, Object> entry = new HashMap<>();
             vn.fastfood.entity.User user = (vn.fastfood.entity.User) row[0];
             entry.put("hoTen", user.getHoTen());
+            entry.put("email", user.getEmail());
+            entry.put("sdt", user.getSdt());
             entry.put("totalSpent", ((Number) row[1]).longValue());
             entry.put("orderCount", ((Number) row[2]).longValue());
             topCustomers.add(entry);
@@ -162,7 +157,6 @@ public class ThongKeService {
         return stats;
     }
 
-    // ==================== HELPER ====================
     private LocalDateTime calculateFrom(String period) {
         return switch (period) {
             case "today" -> LocalDate.now().atStartOfDay();
@@ -183,14 +177,16 @@ public class ThongKeService {
             case "year" -> from.minusYears(1);
             default -> from.minusMonths(1);
         };
-        return new LocalDateTime[]{prevFrom, to};
+        return new LocalDateTime[] { prevFrom, to };
     }
 
     private double calculateGrowth(Long current, Long previous) {
         if (previous == null || previous == 0) {
             return current != null && current > 0 ? 100.0 : 0.0;
         }
-        if (current == null) current = 0L;
+        if (current == null) {
+            current = 0L;
+        }
         return ((double) (current - previous) / previous) * 100;
     }
 }
